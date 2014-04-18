@@ -1,0 +1,41 @@
+<idea-plugin version="2">
+  <id>the.r.plugin</id>
+  <name>IntelliJ plugin for the R language</name>
+  <version>0.1</version>
+  <vendor email="kt@jetbrains.com">JetBrains</vendor>
+
+  <description><![CDATA[
+      It's first approach to the scientific IDE.
+      We decided to start with the R language.
+      ]]></description>
+
+  <change-notes><![CDATA[
+          1. Syntax highlighting
+      ]]>
+  </change-notes>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="133.331"/>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+</idea-plugin>
