@@ -137,6 +137,33 @@ public class TheRLexerTest extends PlatformLiteFixture {
     doTest("'\\0'", "TheR:STRING_LITERAL");
   }
 
+  public void testIdentifier() {
+    doTest("a1", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierDot() {
+    doTest("a.1", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierUnderscore() {
+    doTest("a_1", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierDotDot() {
+    doTest("..", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierDotUnderscore() {
+    doTest("._", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierDotLetter() {
+    doTest(".x", "TheR:IDENTIFIER");
+  }
+
+  public void testIdentifierDotDigit() {
+    doTest(".1", "TheR:NUMERIC_LITERAL");
+  }
 
 
   private static void doTest(String text, String... expectedTokens) {

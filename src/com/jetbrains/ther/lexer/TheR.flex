@@ -15,8 +15,14 @@ import com.intellij.psi.tree.IElementType;
 %eof}
 
 WHITE_SPACE_CHAR=[\ \n\r\t\f]
-IDENT_START = [a-zA-Z_]|"."[a-zA-Z_]|[:unicode_uppercase_letter:]|[:unicode_lowercase_letter:]|[:unicode_titlecase_letter:]|[:unicode_modifier_letter:]|[:unicode_other_letter:]|[:unicode_letter_number:]
-IDENT_CONTINUE = [a-zA-Z0-9_"."]|[:unicode_uppercase_letter:]|[:unicode_lowercase_letter:]|[:unicode_titlecase_letter:]|[:unicode_modifier_letter:]|[:unicode_other_letter:]|[:unicode_letter_number:]|[:unicode_non_spacing_mark:]|[:unicode_combining_spacing_mark:]|[:unicode_decimal_digit_number:]|[:unicode_connector_punctuation:]
+
+// identifiers
+// Identifiers consist of a sequence of letters, digits, the period (‘.’) and the underscore.
+// They must not start with a digit or an underscore, or with a period followed by a digit.
+// TODO: Notice also that objects can have names that are not identifiers! ("x" <- 1, assign("x$a",1))
+LETTER = [a-zA-Z]|[:unicode_uppercase_letter:]|[:unicode_lowercase_letter:]|[:unicode_titlecase_letter:]|[:unicode_modifier_letter:]|[:unicode_other_letter:]|[:unicode_letter_number:]
+IDENT_START = {LETTER}|"."{LETTER}|"._"|".."
+IDENT_CONTINUE = {LETTER}|[0-9_"."]
 IDENTIFIER = {IDENT_START}{IDENT_CONTINUE}**
 
 END_OF_LINE_COMMENT="#"[^\r\n]*
