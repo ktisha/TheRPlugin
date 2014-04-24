@@ -25,8 +25,10 @@ END_OF_LINE_COMMENT="#"[^\r\n]*
 // numeric constants
 DIGIT = [0-9]
 NONZERO_DIGIT = [1-9]
-HEXDIGIT = [0-9A-Fa-f]
-HEX_INTEGER = 0[Xx]({HEXDIGIT})+
+HEX_DIGIT = [0-9A-Fa-f]
+OCT_DIGIT = [0-7]
+NONZERO_OCT_DIGIT = [1-7]
+HEX_INTEGER = 0[Xx]({HEX_DIGIT})+
 DECIMAL_INTEGER = (({NONZERO_DIGIT}({DIGIT})*)|0)
 INTEGER = {DECIMAL_INTEGER}|{HEX_INTEGER}                                  // essential
 
@@ -45,6 +47,12 @@ LONG_INTEGER = ({INTEGER} | {FLOAT_NUMBER})[Ll]                                 
 // complex constants
 COMPLEX_NUMBER=(({FLOAT_NUMBER})|({INT_PART}))[i]             // essential
 
+// string constants
+QUOTED_LITERAL="'"([^\\\']|{ANY_ESCAPE_SEQUENCE})*?("'")?
+DOUBLE_QUOTED_LITERAL=\"([^\\\"]|{ANY_ESCAPE_SEQUENCE})*?(\")?
+ANY_ESCAPE_SEQUENCE = \\[^]
+STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
+//ESCAPE_SEQUENCE=\\([rntbafv\'\"\\]|{NONZERO_OCT_DIGIT}|{OCT_DIGIT}{2,3}|"x"{HEX_DIGIT}{1,2}|"u"{HEX_DIGIT}{1,4}|"u{"{HEX_DIGIT}{1,4}"}"|"U"{HEX_DIGIT}{1,8}|"U{"{HEX_DIGIT}{1,8}"}")
 
 
 %%
@@ -67,10 +75,10 @@ COMPLEX_NUMBER=(({FLOAT_NUMBER})|({INT_PART}))[i]             // essential
 {COMPLEX_NUMBER}            { return TheRTokenTypes.COMPLEX_LITERAL; }
 
 // integer constants
-{LONG_INTEGER}               { return TheRTokenTypes.INTEGER_LITERAL; }
+{LONG_INTEGER}              { return TheRTokenTypes.INTEGER_LITERAL; }
 
 // string constants
-
+{STRING}                    { return TheRTokenTypes.STRING_LITERAL; }
 // special constants
 "NULL"                      { return TheRTokenTypes.NULL_KEYWORD; }
 "NA"                        { return TheRTokenTypes.NA_KEYWORD; }

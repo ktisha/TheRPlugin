@@ -97,6 +97,46 @@ public class TheRLexerTest extends PlatformLiteFixture {
     doTest("0xFL", "TheR:INTEGER_LITERAL");
   }
 
+  public void testSingleQuotedString() {
+    doTest("'qwerty'", "TheR:STRING_LITERAL");
+  }
+
+  public void testDoubleQuotedString() {
+    doTest("\"qwerty\"", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeStringDouble() {
+    doTest("\"\\\"\"", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeStringSingle() {
+    doTest("'\\\''", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeString() {
+    doTest("'\\r\\n\\t\\b\\a\\f\\v'", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeOctString() {
+    doTest("'\\123'", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeHexString() {
+    doTest("'\\x1'", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeUnicodeString() {
+    doTest("'\\u1234'", "TheR:STRING_LITERAL");
+  }
+
+  public void testEscapeBigUnicodeString() {
+    doTest("'\\u12345678'", "TheR:STRING_LITERAL");
+  }
+
+  public void testErrorInString() {             //TODO: inspection. string errors
+    doTest("'\\0'", "TheR:STRING_LITERAL");
+  }
+
 
 
   private static void doTest(String text, String... expectedTokens) {
