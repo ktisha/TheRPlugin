@@ -1,5 +1,6 @@
 package com.jetbrains.ther;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,6 @@ public class TheRFileType extends LanguageFileType {
 
   @NotNull
   public Icon getIcon() {
-    return null;    // TODO: create an icon
+    return AllIcons.FileTypes.Text;    // TODO: create an icon
   }
 }

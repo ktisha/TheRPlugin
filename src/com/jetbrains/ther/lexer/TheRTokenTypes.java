@@ -2,6 +2,7 @@ package com.jetbrains.ther.lexer;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.jetbrains.ther.psi.TheRElementType;
 
 public class TheRTokenTypes {
@@ -150,5 +151,11 @@ public class TheRTokenTypes {
 
   public static final IElementType END_OF_LINE_COMMENT = new TheRElementType("END_OF_LINE_COMMENT");
 
+  public static final TokenSet RESERVED_WORDS = TokenSet
+    .create(IF_KEYWORD, ELSE_KEYWORD, REPEAT_KEYWORD, WHILE_KEYWORD, FUNCTION_KEYWORD, FOR_KEYWORD, IN_KEYWORD, NEXT_KEYWORD,
+            BREAK_KEYWORD);
 
+  public static final TokenSet OPERATORS = TokenSet
+    .create(MINUS, PLUS, NOT, TILDE, HELP, COLON, MULT, DIV, EXP, MODULUS, INT_DIV, MATRIX_PROD, OUTER_PROD, MATCHING, KRONECKER_PROD,
+            INFIX_OP, LT, GT, EQEQ, GTEQ, LTEQ, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT);
 }

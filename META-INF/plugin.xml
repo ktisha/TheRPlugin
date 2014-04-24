@@ -36,6 +36,7 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <fileTypeFactory implementation="com.jetbrains.ther.TheRFileTypeFactory"/>
+    <lang.syntaxHighlighterFactory key="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRSyntaxHighlighterFactory"/>
   </extensions>
 </idea-plugin>
