@@ -85,6 +85,14 @@ public class TheRLexerTest extends PlatformLiteFixture {
     doTest("1i", "TheR:COMPLEX_LITERAL");
   }
 
+  public void testFloatComplex() {
+    doTest("4.1i", "TheR:COMPLEX_LITERAL");
+  }
+
+  public void testExponentComplex() {
+    doTest("1e-2i", "TheR:COMPLEX_LITERAL");
+  }
+
   public void testHexLong() {
     doTest("0xFL", "TheR:INTEGER_LITERAL");
   }
