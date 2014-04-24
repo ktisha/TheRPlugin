@@ -50,7 +50,6 @@ public class TheRTokenTypes {
   public static final IElementType NA_CHARACTER_KEYWORD = new TheRElementType("NA_CHARACTER_KEYWORD");
 
   public static final IElementType TRIPLE_DOTS = new TheRElementType("TRIPLE_DOTS");
-  public static final IElementType DOUBLE_DOTS = new TheRElementType("DOUBLE_DOTS");
 
   public static final IElementType IF_KEYWORD = new TheRElementType("IF_KEYWORD");
   public static final IElementType ELSE_KEYWORD = new TheRElementType("ELSE_KEYWORD");
@@ -108,6 +107,8 @@ public class TheRTokenTypes {
   public static final IElementType MATRIX_PROD = new TheRElementType("MATRIX_PROD");  // %*%
   public static final IElementType OUTER_PROD = new TheRElementType("OUTER_PROD");    // %o%
   public static final IElementType MATCHING = new TheRElementType("MATCHING");        // %in%
+  public static final IElementType KRONECKER_PROD = new TheRElementType("MATCHING");        // %x%
+  public static final IElementType INFIX_OP = new TheRElementType("INFIX_OP");        // %{character}+%
   public static final IElementType LT = new TheRElementType("LT");        // <
   public static final IElementType GT = new TheRElementType("GT");        // >
   public static final IElementType EQEQ = new TheRElementType("EQEQ");    // ==
@@ -130,7 +131,9 @@ public class TheRTokenTypes {
   public static final IElementType LPAR = new TheRElementType("LPAR");    // (
   public static final IElementType RPAR = new TheRElementType("RPAR");    // )
   public static final IElementType LBRACKET = new TheRElementType("LBRACKET");    // [
+  public static final IElementType LDBRACKET = new TheRElementType("LBRACKET");    // [[
   public static final IElementType RBRACKET = new TheRElementType("RBRACKET");    // ]
+  public static final IElementType RDBRACKET = new TheRElementType("RBRACKET");    // ]]
   public static final IElementType LBRACE = new TheRElementType("LBRACE");    // {
   public static final IElementType RBRACE = new TheRElementType("RBRACE");    // }
   public static final IElementType COMMA = new TheRElementType("COMMA");    // ,

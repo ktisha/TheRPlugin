@@ -91,71 +91,94 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "Inf"                       { return TheRTokenTypes.INF_KEYWORD; }
 "NaN"                       { return TheRTokenTypes.NAN_KEYWORD; }
 
+"NA_integer_"               { return TheRTokenTypes.NA_INTEGER_KEYWORD; }
+"NA_real_"                  { return TheRTokenTypes.NA_REAL_KEYWORD; }
+"NA_complex_"               { return TheRTokenTypes.NA_COMPLEX_KEYWORD; }
+"NA_character_"             { return TheRTokenTypes.NA_CHARACTER_KEYWORD; }
 
-//"NA_integer_"         { return TheRTokenTypes.NA_INTEGER_KEYWORD; }
-//"NA_real_"            { return TheRTokenTypes.NA_REAL_KEYWORD; }
-//"NA_complex_"         { return TheRTokenTypes.NA_COMPLEX_KEYWORD; }
-//"NA_character_"       { return TheRTokenTypes.NA_CHARACTER_KEYWORD; }
-
-"if"                  { return TheRTokenTypes.IF_KEYWORD; }
-"else"                  { return TheRTokenTypes.ELSE_KEYWORD; }
-"repeat"                  { return TheRTokenTypes.REPEAT_KEYWORD; }
-"while"                  { return TheRTokenTypes.WHILE_KEYWORD; }
+"if"                        { return TheRTokenTypes.IF_KEYWORD; }
+"else"                      { return TheRTokenTypes.ELSE_KEYWORD; }
+"repeat"                    { return TheRTokenTypes.REPEAT_KEYWORD; }
+"while"                     { return TheRTokenTypes.WHILE_KEYWORD; }
 "function"                  { return TheRTokenTypes.FUNCTION_KEYWORD; }
-"for"                  { return TheRTokenTypes.FOR_KEYWORD; }
-"in"                  { return TheRTokenTypes.IN_KEYWORD; }
-"next"                  { return TheRTokenTypes.NEXT_KEYWORD; }
-"break"                  { return TheRTokenTypes.BREAK_KEYWORD; }
+"for"                       { return TheRTokenTypes.FOR_KEYWORD; }
+"in"                        { return TheRTokenTypes.IN_KEYWORD; }
+"next"                      { return TheRTokenTypes.NEXT_KEYWORD; }
+"break"                     { return TheRTokenTypes.BREAK_KEYWORD; }
+"..."                       { return TheRTokenTypes.TRIPLE_DOTS; }
 
-{IDENTIFIER}          { return TheRTokenTypes.IDENTIFIER; }  // TODO
+{IDENTIFIER}                { return TheRTokenTypes.IDENTIFIER; }
 
-"..."                 { return TheRTokenTypes.TRIPLE_DOTS; }
-".."                  { return TheRTokenTypes.DOUBLE_DOTS; }
+//special operators
+"%/%"                       { return TheRTokenTypes.INT_DIV; }
+"%*%"                       { return TheRTokenTypes.MATRIX_PROD; }
+"%o%"                       { return TheRTokenTypes.OUTER_PROD; }
+"%in%"                      { return TheRTokenTypes.MATCHING; }
+"%x%"                       { return TheRTokenTypes.KRONECKER_PROD; }
+// user-defined
+"%"{LETTER}+"%"             { return TheRTokenTypes.INFIX_OP; }
 
-"-"                   { return TheRTokenTypes.MINUS; }
-"+"                   { return TheRTokenTypes.PLUS; }
-"!"                   { return TheRTokenTypes.NOT; }
-"~"                   { return TheRTokenTypes.TILDE; }
-"?"                   { return TheRTokenTypes.HELP; }
-"::"                 { return TheRTokenTypes.COLONCOLON; }
-":"                   { return TheRTokenTypes.COLON; }
-"*"                   { return TheRTokenTypes.MULT; }
-"/"                   { return TheRTokenTypes.DIV; }
-"^"                   { return TheRTokenTypes.EXP; }
-"%%"                   { return TheRTokenTypes.MODULUS; }
-"%/%"                   { return TheRTokenTypes.INT_DIV; }
-"%*%"                   { return TheRTokenTypes.MATRIX_PROD; }
-"%o%"                   { return TheRTokenTypes.OUTER_PROD; }
-"%in%"                   { return TheRTokenTypes.MATCHING; }
-"<"                   { return TheRTokenTypes.LT; }
-">"                   { return TheRTokenTypes.GT; }
-"=="                  { return TheRTokenTypes.EQEQ; }
-">="                 { return TheRTokenTypes.GTEQ; }
-"<="                 { return TheRTokenTypes.LTEQ; }
-"&&"                 { return TheRTokenTypes.ANDAND; }
-"&"                 { return TheRTokenTypes.AND; }
-"||"                 { return TheRTokenTypes.OROR; }
-"|"                 { return TheRTokenTypes.OR; }
-"<<-"                 { return TheRTokenTypes.LEFT_COMPLEX_ASSING; }
-"<-"                 { return TheRTokenTypes.LEFT_ASSIGN; }
-"->>"                 { return TheRTokenTypes.RIGHT_COMPLEX_ASSING; }
-"->"                 { return TheRTokenTypes.RIGHT_ASSIGN; }
-"$"                 { return TheRTokenTypes.LIST_SUBSET; }
-"@"                 { return TheRTokenTypes.AT; }
-"!="                  { return TheRTokenTypes.NOTEQ; }
+// Infix and prefix operators
+"::"                        { return TheRTokenTypes.COLONCOLON; }
+"@"                         { return TheRTokenTypes.AT; }
+"&&"                        { return TheRTokenTypes.ANDAND; }
+"||"                        { return TheRTokenTypes.OROR; }
+"<<-"                       { return TheRTokenTypes.LEFT_COMPLEX_ASSING; }
+"->>"                       { return TheRTokenTypes.RIGHT_COMPLEX_ASSING; }
 
-"("                   { return TheRTokenTypes.LPAR; }
-")"                   { return TheRTokenTypes.RPAR; }
-"["                   { return TheRTokenTypes.LBRACKET; }
-"]"                   { return TheRTokenTypes.RBRACKET; }
-"{"                   { return TheRTokenTypes.LBRACE; }
-"}"                   { return TheRTokenTypes.RBRACE; }
-","                   { return TheRTokenTypes.COMMA; }
-"."                   { return TheRTokenTypes.DOT; }
-"="                   { return TheRTokenTypes.EQ; }
-";"                   { return TheRTokenTypes.SEMICOLON; }
+//arithmetic
+"-"                         { return TheRTokenTypes.MINUS; }
+"+"                         { return TheRTokenTypes.PLUS; }
+"*"                         { return TheRTokenTypes.MULT; }
+"/"                         { return TheRTokenTypes.DIV; }
+"^"                         { return TheRTokenTypes.EXP; }
+"%%"                        { return TheRTokenTypes.MODULUS; }
 
+// relational
+"<"                         { return TheRTokenTypes.LT; }
+">"                         { return TheRTokenTypes.GT; }
+"=="                        { return TheRTokenTypes.EQEQ; }
+">="                        { return TheRTokenTypes.GTEQ; }
+"<="                        { return TheRTokenTypes.LTEQ; }
+"!="                        { return TheRTokenTypes.NOTEQ; }
 
-.                     { return TheRTokenTypes.BAD_CHARACTER; }
+// logical
+"!"                         { return TheRTokenTypes.NOT; }
+"|"                         { return TheRTokenTypes.OR; }
+"&"                         { return TheRTokenTypes.AND; }
+
+// model formulae
+"~"                         { return TheRTokenTypes.TILDE; }
+
+// assign
+"<-"                        { return TheRTokenTypes.LEFT_ASSIGN; }
+"->"                        { return TheRTokenTypes.RIGHT_ASSIGN; }
+
+// list indexing
+"$"                         { return TheRTokenTypes.LIST_SUBSET; }
+
+// sequence
+":"                         { return TheRTokenTypes.COLON; }
+
+// grouping
+"("                         { return TheRTokenTypes.LPAR; }
+")"                         { return TheRTokenTypes.RPAR; }
+"{"                         { return TheRTokenTypes.LBRACE; }
+"}"                         { return TheRTokenTypes.RBRACE; }
+
+// indexing
+"[["                        { return TheRTokenTypes.LDBRACKET; }
+"]]"                        { return TheRTokenTypes.RDBRACKET; }
+"["                         { return TheRTokenTypes.LBRACKET; }
+"]"                         { return TheRTokenTypes.RBRACKET; }
+
+// separators
+","                         { return TheRTokenTypes.COMMA; }
+"."                         { return TheRTokenTypes.DOT; }
+";"                         { return TheRTokenTypes.SEMICOLON; }
+
+"="                         { return TheRTokenTypes.EQ; }
+"?"                         { return TheRTokenTypes.HELP; }
+.                           { return TheRTokenTypes.BAD_CHARACTER; }
 
 }

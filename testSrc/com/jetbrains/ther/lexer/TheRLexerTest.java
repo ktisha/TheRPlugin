@@ -165,6 +165,29 @@ public class TheRLexerTest extends PlatformLiteFixture {
     doTest(".1", "TheR:NUMERIC_LITERAL");
   }
 
+  public void testAssignment() {
+    doTest("a <- 42\n", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:LEFT_ASSIGN", "TheR:SPACE", "TheR:NUMERIC_LITERAL", "TheR:LINE_BREAK");
+  }
+
+  public void testAssignmentComment() {
+    doTest("A <- a * 2  # R is case sensitive\n", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:LEFT_ASSIGN", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:MULT", "TheR:SPACE", "TheR:NUMERIC_LITERAL", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK");
+  }
+
+  public void testPrintFunction() {
+    doTest("print(a)\n", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:LINE_BREAK");
+  }
+
+  public void testCat() {
+    doTest("cat(A, \"\\n\") # \"84\" is concatenated with \"\\n\"\n", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:RPAR", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK");
+  }
+
+  public void testIf() {
+    doTest("if(A>a) # true, 84 > 42\n" +
+           "{\n" +
+           "  cat(A, \">\", a, \"\\n\")\n" +
+           "} ", "TheR:IF_KEYWORD", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:GT", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK", "TheR:LBRACE", "TheR:LINE_BREAK", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:COMMA", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:RPAR", "TheR:LINE_BREAK", "TheR:RBRACE", "TheR:SPACE");
+  }
+
 
   private static void doTest(String text, String... expectedTokens) {
     doLexerTest(text, new TheRLexer(), expectedTokens);
