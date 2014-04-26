@@ -41,4 +41,12 @@ public class Parsing {
     marker.done(type);
   }
 
+  protected boolean matchToken(@NotNull final IElementType tokenType) {
+    if (myBuilder.getTokenType() == tokenType) {
+      myBuilder.advanceLexer();
+      return true;
+    }
+    return false;
+  }
+
 }

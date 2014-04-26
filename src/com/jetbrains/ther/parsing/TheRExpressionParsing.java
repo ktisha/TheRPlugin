@@ -1,9 +1,9 @@
 package com.jetbrains.ther.parsing;
 
+import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.tree.IElementType;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
-import com.jetbrains.ther.parsing.TheRElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRExpressionParsing extends Parsing {
@@ -16,7 +16,17 @@ public class TheRExpressionParsing extends Parsing {
   public boolean parsePrimaryExpression() {
     final IElementType firstToken = myBuilder.getTokenType();
     if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {
+      final PsiBuilder.Marker slice = myBuilder.mark();
       buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
+      if (matchToken(TheRTokenTypes.COLON)) {
+        if (myBuilder.getTokenType() == TheRTokenTypes.NUMERIC_LITERAL) {
+          buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
+          slice.done(TheRElementTypes.SLICE_EXPRESSION);
+        }
+      }
+      else {
+        slice.drop();
+      }
       return true;
     }
     else if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {

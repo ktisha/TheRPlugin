@@ -1,0 +1,9 @@
+TheRFile:Assignment.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')

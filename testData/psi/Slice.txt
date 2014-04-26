@@ -1,0 +1,8 @@
+TheRFile:Slice.r
+  TheR:EXPRESSION_STATEMENT
+    TheR:SLICE_EXPRESSION
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiElement(TheR:COLON)(':')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('10')
