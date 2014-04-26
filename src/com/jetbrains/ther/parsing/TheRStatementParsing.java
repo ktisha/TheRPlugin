@@ -4,15 +4,12 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.tree.IElementType;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
-import com.jetbrains.ther.parsing.TheRElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 
 public class TheRStatementParsing extends Parsing {
   private static final Logger LOG = Logger.getInstance(TheRStatementParsing.class.getName());
 
-  private static final String EXPRESSION_EXPECTED = "Expression expected";
-  public static final String IDENTIFIER_EXPECTED = "Identifier expected";
 
   public TheRStatementParsing(@NotNull final TheRParsingContext context) {
     super(context);
@@ -35,11 +32,11 @@ public class TheRStatementParsing extends Parsing {
 
     final PsiBuilder.Marker exprStatement = myBuilder.mark();
     final TheRExpressionParsing expressionParser = getExpressionParser();
-    final boolean successfull = expressionParser.parsePrimaryExpression();
+    final boolean successfull = expressionParser.parseExpression();
     if (successfull) {
       if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
         myBuilder.advanceLexer();
-        if (!expressionParser.parsePrimaryExpression()) {
+        if (!expressionParser.parseExpression()) {
           myBuilder.error(EXPRESSION_EXPECTED);
         }
         exprStatement.done(TheRElementTypes.ASSIGNMENT_STATEMENT);

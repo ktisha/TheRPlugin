@@ -138,8 +138,8 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "<"                         { return TheRTokenTypes.LT; }
 ">"                         { return TheRTokenTypes.GT; }
 "=="                        { return TheRTokenTypes.EQEQ; }
-">="                        { return TheRTokenTypes.GTEQ; }
-"<="                        { return TheRTokenTypes.LTEQ; }
+">="                        { return TheRTokenTypes.GE; }
+"<="                        { return TheRTokenTypes.LE; }
 "!="                        { return TheRTokenTypes.NOTEQ; }
 
 // logical

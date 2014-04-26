@@ -113,8 +113,8 @@ public class TheRTokenTypes {
   public static final IElementType LT = new TheRElementType("LT");        // <
   public static final IElementType GT = new TheRElementType("GT");        // >
   public static final IElementType EQEQ = new TheRElementType("EQEQ");    // ==
-  public static final IElementType GTEQ = new TheRElementType("GTEQ");    // >=
-  public static final IElementType LTEQ = new TheRElementType("LTEQ");    // <=
+  public static final IElementType GE = new TheRElementType("GE");    // >=
+  public static final IElementType LE = new TheRElementType("LE");    // <=
   public static final IElementType AND = new TheRElementType("AND");      // &
   public static final IElementType ANDAND = new TheRElementType("ANDAND");  // &&
   public static final IElementType OR = new TheRElementType("OR");        // |
@@ -159,5 +159,15 @@ public class TheRTokenTypes {
 
   public static final TokenSet OPERATORS = TokenSet
     .create(MINUS, PLUS, NOT, TILDE, HELP, COLON, MULT, DIV, EXP, MODULUS, INT_DIV, MATRIX_PROD, OUTER_PROD, MATCHING, KRONECKER_PROD,
-            INFIX_OP, LT, GT, EQEQ, GTEQ, LTEQ, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT);
+            INFIX_OP, LT, GT, EQEQ, GE, LE, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT);
+
+  public static final TokenSet COMPARISON_OPERATIONS = TokenSet.create(
+    LT, GT, EQEQ, GE, LE, NOTEQ);
+
+  public static final TokenSet ADDITIVE_OPERATIONS = TokenSet.create(PLUS, MINUS);
+  public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV);
+  public static final TokenSet UNARY_OPERATIONS = TokenSet.create(PLUS, MINUS, TILDE);
+  public static final TokenSet EQUALITY_OPERATIONS = TokenSet.create(EQEQ, NOTEQ);
+  public static final TokenSet RELATIONAL_OPERATIONS = TokenSet.create(LT, GT, LE, GE);
+
 }

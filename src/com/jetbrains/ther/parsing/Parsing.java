@@ -4,8 +4,12 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Parsing {
+  protected static final String EXPRESSION_EXPECTED = "Expression expected";
+  protected static final String IDENTIFIER_EXPECTED = "Identifier expected";
+
   private final TheRParsingContext myContext;
   protected final PsiBuilder myBuilder;
   private static final Logger LOG = Logger.getInstance(Parsing.class.getName());
@@ -47,6 +51,10 @@ public class Parsing {
       return true;
     }
     return false;
+  }
+
+  protected boolean atToken(@Nullable final IElementType tokenType) {
+    return myBuilder.getTokenType() == tokenType;
   }
 
 }
