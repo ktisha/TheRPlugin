@@ -27,8 +27,13 @@ public class TheRStatementParsing extends Parsing {
       parseWhileStatement();
       return;
     }
-    else if (firstToken == TheRTokenTypes.FOR_KEYWORD) {
+    if (firstToken == TheRTokenTypes.FOR_KEYWORD) {
       parseForStatement();
+      return;
+    }
+    if (firstToken == TheRTokenTypes.REPEAT_KEYWORD) {
+      parseRepeatStatement();
+      return;
     }
     if (firstToken == TheRTokenTypes.LBRACE) {
       parseBlock();
@@ -86,6 +91,15 @@ public class TheRStatementParsing extends Parsing {
     ifStatement.done(TheRElementTypes.IF_STATEMENT);
   }
   
+  private void parseRepeatStatement() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.REPEAT_KEYWORD);
+    final PsiBuilder.Marker statement = myBuilder.mark();
+    myBuilder.advanceLexer();
+
+    parseStatement();
+    statement.done(TheRElementTypes.REPEAT_STATEMENT);
+  }
+
   private void parseWhileStatement() {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.WHILE_KEYWORD);
     final PsiBuilder.Marker statement = myBuilder.mark();

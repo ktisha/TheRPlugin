@@ -1,0 +1,30 @@
+TheRFile:RepeatBlockStatement.r
+  TheR:REPEAT_STATEMENT
+    PsiElement(TheR:REPEAT_KEYWORD)('repeat')
+    PsiWhiteSpace(' ')
+    TheR:BLOCK
+      PsiElement(TheR:LBRACE)('{')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('print')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:STRING_LITERAL_EXPRESSION
+              PsiElement(TheR:STRING_LITERAL)('"Swag"')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('Sys.sleep')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('15')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiElement(TheR:RBRACE)('}')
