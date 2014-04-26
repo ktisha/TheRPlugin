@@ -11,6 +11,7 @@ public interface TheRElementTypes {
   TheRElementType ASSIGNMENT_STATEMENT = new TheRElementType("ASSIGNMENT_STATEMENT", TheRAssignmentStatementImpl.class);
   TheRElementType IF_STATEMENT = new TheRElementType("IF_STATEMENT", TheRIfStatementImpl.class);
   TheRElementType WHILE_STATEMENT = new TheRElementType("WHILE_STATEMENT", TheRWhileStatementImpl.class);
+  TheRElementType FOR_STATEMENT = new TheRElementType("FOR_STATEMENT", TheRForStatementImpl.class);
 
   // expressions
   TheRElementType INTEGER_LITERAL_EXPRESSION = new TheRElementType("INTEGER_LITERAL_EXPRESSION", TheRNumericLiteralExpressionImpl.class);

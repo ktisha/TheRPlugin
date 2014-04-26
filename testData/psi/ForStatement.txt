@@ -1,0 +1,22 @@
+TheRFile:ForStatement.r
+  TheR:FOR_STATEMENT
+    PsiElement(TheR:FOR_KEYWORD)('for')
+    PsiElement(TheR:LPAR)('(')
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('variable')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:IN_KEYWORD)('in')
+    PsiWhiteSpace(' ')
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('sequence')
+    PsiElement(TheR:RPAR)(')')
+    PsiWhiteSpace(' ')
+    TheR:BLOCK
+      PsiElement(TheR:LBRACE)('{')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('    ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('statements')
+      PsiWhiteSpace('\n')
+      PsiElement(TheR:RBRACE)('}')

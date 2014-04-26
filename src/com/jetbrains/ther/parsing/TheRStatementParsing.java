@@ -27,6 +27,9 @@ public class TheRStatementParsing extends Parsing {
       parseWhileStatement();
       return;
     }
+    else if (firstToken == TheRTokenTypes.FOR_KEYWORD) {
+      parseForStatement();
+    }
     if (firstToken == TheRTokenTypes.LBRACE) {
       parseBlock();
       return;
@@ -96,7 +99,27 @@ public class TheRStatementParsing extends Parsing {
     statement.done(TheRElementTypes.WHILE_STATEMENT);
   }
 
+  private void parseForStatement() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.FOR_KEYWORD);
+    final PsiBuilder.Marker statement = myBuilder.mark();
+    myBuilder.advanceLexer();
+    checkMatches(TheRTokenTypes.LPAR, "( expected");
+    getExpressionParser().parseExpression();
 
+    if (myBuilder.getTokenType() == TheRTokenTypes.IN_KEYWORD) {
+      myBuilder.advanceLexer();
+      getExpressionParser().parseExpression();
+    }
+    else {
+      myBuilder.error("in expected");
+    }
+
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+
+    parseStatement();
+    statement.done(TheRElementTypes.FOR_STATEMENT);
+  }
+  
   public void parseBlock() {
     if (myBuilder.getTokenType() != TheRTokenTypes.LBRACE) {
       myBuilder.error("statements block expected");
