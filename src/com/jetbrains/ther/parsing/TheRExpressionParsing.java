@@ -226,6 +226,11 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
+      else if (tokenType == TheRTokenTypes.LPAR) {
+        parseArgumentList();
+        expr.done(TheRElementTypes.CALL_EXPRESSION);
+        expr = expr.precede();
+      }
       else {
         expr.drop();
         break;
@@ -233,4 +238,52 @@ public class TheRExpressionParsing extends Parsing {
     }
     return true;
   }
+
+  public void parseArgumentList() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
+    final PsiBuilder.Marker arglist = myBuilder.mark();
+    myBuilder.advanceLexer();
+    PsiBuilder.Marker genexpr = myBuilder.mark();
+    int argNumber = 0;
+    while (myBuilder.getTokenType() != TheRTokenTypes.RPAR) {
+      argNumber++;
+      if (argNumber > 1) {
+        if (matchToken(TheRTokenTypes.COMMA)) {
+          if (atToken(TheRTokenTypes.RPAR)) {
+            break;
+          }
+        }
+        else {
+          myBuilder.error("',' or ')' expected");
+          break;
+        }
+      }
+      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
+        final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
+        myBuilder.advanceLexer();
+        if (myBuilder.getTokenType() == TheRTokenTypes.EQ) {
+          myBuilder.advanceLexer();
+          if (!parseExpression()) {
+            myBuilder.error(EXPRESSION_EXPECTED);
+          }
+          keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
+          continue;
+        }
+        keywordArgMarker.rollbackTo();
+      }
+      if (!parseExpression()) {
+        myBuilder.error(EXPRESSION_EXPECTED);
+        break;
+      }
+    }
+
+
+    if (genexpr != null) {
+      genexpr.drop();
+    }
+    checkMatches(TheRTokenTypes.RPAR, "')' expected");
+    arglist.done(TheRElementTypes.ARGUMENT_LIST);
+  }
+
+
 }

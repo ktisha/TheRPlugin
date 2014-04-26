@@ -32,6 +32,9 @@ public class TheRParsingTest extends ParsingTestCase {
   public void testBinarySlice() {
     doTest();
   }
+  public void testFunctionCall() {
+    doTest();
+  }
 
 
   public void doTest() {

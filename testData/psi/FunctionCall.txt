@@ -1,0 +1,23 @@
+TheRFile:FunctionCall.r
+  TheR:EXPRESSION_STATEMENT
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('print')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:INTEGER_LITERAL_EXPRESSION
+          PsiElement(TheR:NUMERIC_LITERAL)('1')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:INTEGER_LITERAL_EXPRESSION
+          PsiElement(TheR:NUMERIC_LITERAL)('2')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('b')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:EQ)('=')
+          PsiWhiteSpace(' ')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('2')
+        PsiElement(TheR:RPAR)(')')

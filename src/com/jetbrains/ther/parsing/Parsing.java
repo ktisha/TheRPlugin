@@ -52,7 +52,14 @@ public class Parsing {
     }
     return false;
   }
-
+  protected boolean checkMatches(final IElementType token, final String message) {
+    if (myBuilder.getTokenType() == token) {
+      myBuilder.advanceLexer();
+      return true;
+    }
+    myBuilder.error(message);
+    return false;
+  }
   protected boolean atToken(@Nullable final IElementType tokenType) {
     return myBuilder.getTokenType() == tokenType;
   }

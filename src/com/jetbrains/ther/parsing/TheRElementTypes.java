@@ -18,6 +18,9 @@ public interface TheRElementTypes {
   TheRElementType REFERENCE_EXPRESSION = new TheRElementType("REFERENCE_EXPRESSION", TheRReferenceExpressionImpl.class);
   TheRElementType SLICE_EXPRESSION = new TheRElementType("SLICE_EXPRESSION", TheRSliceExpressionImpl.class);
   TheRElementType BINARY_EXPRESSION = new TheRElementType("BINARY_EXPRESSION", TheRBinaryExpressionImpl.class);
-
   TheRElementType PREFIX_EXPRESSION = new TheRElementType("PREFIX_EXPRESSION", TheRPrefixExpressionImpl.class);
+  TheRElementType CALL_EXPRESSION = new TheRElementType("CALL_EXPRESSION", TheRCallExpressionImpl.class);
+  TheRElementType KEYWORD_ARGUMENT_EXPRESSION = new TheRElementType("KEYWORD_ARGUMENT_EXPRESSION", TheRKeywordExpressionImpl.class);
+
+  TheRElementType ARGUMENT_LIST = new TheRElementType("ARGUMENT_LIST", TheRArgumentListImpl.class);
 }
