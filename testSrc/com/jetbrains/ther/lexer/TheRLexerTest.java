@@ -1,9 +1,9 @@
 package com.jetbrains.ther.lexer;
 
 import com.intellij.lexer.Lexer;
-import com.intellij.testFramework.PlatformLiteFixture;
+import junit.framework.TestCase;
 
-public class TheRLexerTest extends PlatformLiteFixture {
+public class TheRLexerTest extends TestCase {
 
   public void testLogicTrue() {
     doTest("TRUE", "TheR:TRUE_KEYWORD");

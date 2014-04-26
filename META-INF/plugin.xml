@@ -10,12 +10,15 @@
       ]]></description>
 
   <change-notes><![CDATA[
-          1. Syntax highlighting
+          <ul>
+          <li> Lexer-based syntax highlighting </li>
+          <li> Parser </li>
+          </ul>
       ]]>
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="133.331"/>
+  <!--<idea-version since-build="133.331"/>-->
 
   <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -38,5 +41,6 @@
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.jetbrains.ther.TheRFileTypeFactory"/>
     <lang.syntaxHighlighterFactory key="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRSyntaxHighlighterFactory"/>
+    <lang.parserDefinition language="TheR" implementationClass="com.jetbrains.ther.parsing.TheRParserDefinition"/>
   </extensions>
 </idea-plugin>

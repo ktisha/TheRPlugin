@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRFileTypeFactory extends FileTypeFactory {
+  @Override
   public void createFileTypes(@NonNls @NotNull final FileTypeConsumer consumer) {
     consumer.consume(TheRFileType.INSTANCE, "r");
   }

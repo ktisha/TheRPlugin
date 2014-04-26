@@ -45,11 +45,13 @@ public class TheRHighlighter extends SyntaxHighlighterBase {
     ATTRIBUTES.put(TheRTokenTypes.BAD_CHARACTER, TheRSyntaxHighlighterColors.BAD_CHARACTER);
   }
 
+  @Override
   @NotNull
   public Lexer getHighlightingLexer() {
     return new TheRLexer();
   }
 
+  @Override
   @NotNull
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     return pack(ATTRIBUTES.get(tokenType));
