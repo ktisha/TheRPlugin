@@ -51,6 +51,22 @@ public class TheRExpressionParsing extends Parsing {
   }
 
   public boolean parseExpression() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+      final PsiBuilder.Marker mark = myBuilder.mark();
+      myBuilder.advanceLexer();
+      if (parseOrExpression()) {
+        mark.done(TheRElementTypes.HELP_EXPRESSION);
+        return true;
+      }
+      else {
+        myBuilder.error(EXPRESSION_EXPECTED);
+        return false;
+      }
+    }
+    return parseOrExpression();
+  }
+
+  public boolean parseOrExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
     if (!parseANDExpression()) {
       expr.drop();
@@ -234,9 +250,41 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
+      if (tokenType == TheRTokenTypes.LIST_SUBSET) {
+        myBuilder.advanceLexer();
+        expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
+        expr = expr.precede();
+      }
       else if (tokenType == TheRTokenTypes.LPAR) {
         parseArgumentList();
         expr.done(TheRElementTypes.CALL_EXPRESSION);
+        expr = expr.precede();
+      }
+      else if (tokenType == TheRTokenTypes.LDBRACKET) {
+        myBuilder.advanceLexer();
+        parseExpression();
+        checkMatches(TheRTokenTypes.RDBRACKET, "]] expected");
+        expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
+        expr = expr.precede();
+      }
+      else if (tokenType == TheRTokenTypes.LBRACKET) {
+        myBuilder.advanceLexer();
+        if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+          myBuilder.advanceLexer();
+          PsiBuilder.Marker marker = myBuilder.mark();
+          marker.done(TheRElementTypes.EMPTY_EXPRESSION);
+        }
+        while (parseExpression()) {
+          if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+            myBuilder.advanceLexer();
+          }
+          else {
+            break;
+          }
+        }
+
+        checkMatches(TheRTokenTypes.RBRACKET, "] expected");
+        expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
         expr = expr.precede();
       }
       else {

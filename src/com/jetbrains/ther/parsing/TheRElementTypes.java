@@ -25,6 +25,10 @@ public interface TheRElementTypes {
   TheRElementType PREFIX_EXPRESSION = new TheRElementType("PREFIX_EXPRESSION", TheRPrefixExpressionImpl.class);
   TheRElementType CALL_EXPRESSION = new TheRElementType("CALL_EXPRESSION", TheRCallExpressionImpl.class);
   TheRElementType KEYWORD_ARGUMENT_EXPRESSION = new TheRElementType("KEYWORD_ARGUMENT_EXPRESSION", TheRKeywordExpressionImpl.class);
+  TheRElementType SUBSCRIPTION_EXPRESSION = new TheRElementType("SUBSCRIPTION_EXPRESSION", TheRSubscriptionExpressionImpl.class);
+  TheRElementType EMPTY_EXPRESSION = new TheRElementType("EMPTY_EXPRESSION", TheREmptyExpressionImpl.class);
+  TheRElementType HELP_EXPRESSION = new TheRElementType("HELP_EXPRESSION", TheRHelpExpressionImpl.class);
+
 
   TheRElementType ARGUMENT_LIST = new TheRElementType("ARGUMENT_LIST", TheRArgumentListImpl.class);
   TheRElementType PARAMETER_LIST = new TheRElementType("PARAMETER_LIST", TheRParameterListImpl.class);

@@ -169,7 +169,6 @@ public class TheRTokenTypes {
   public static final TokenSet POWER_OPERATIONS = TokenSet.create(EXP, MODULUS);
   public static final TokenSet UNARY_OPERATIONS = TokenSet.create(PLUS, MINUS, TILDE);
   public static final TokenSet EQUALITY_OPERATIONS = TokenSet.create(EQEQ, NOTEQ);
-  public static final TokenSet RELATIONAL_OPERATIONS = TokenSet.create(LT, GT, LE, GE);
 
   public static final TokenSet OR_OPERATIONS = TokenSet.create(OR, OROR);
   public static final TokenSet AND_OPERATIONS = TokenSet.create(AND, ANDAND);
