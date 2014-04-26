@@ -35,6 +35,14 @@ public class TheRExpressionParsing extends Parsing {
       buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
       return true;
     }
+    else if (firstToken == TheRTokenTypes.NA_KEYWORD) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (TheRTokenTypes.SPECIAL_CONSTANTS.contains(firstToken)) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
 
     else {
       myBuilder.advanceLexer();
@@ -48,7 +56,7 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
-    while (myBuilder.getTokenType() == TheRTokenTypes.OR) {
+    while (TheRTokenTypes.OR_OPERATIONS.contains(myBuilder.getTokenType())) {
       myBuilder.advanceLexer();
       if (!parseANDExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
@@ -67,7 +75,7 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
-    while (myBuilder.getTokenType() == TheRTokenTypes.AND) {
+    while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
       myBuilder.advanceLexer();
       if (!parseNOTExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
@@ -198,7 +206,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
 
-    if (myBuilder.getTokenType() == TheRTokenTypes.EXP) {
+    if (TheRTokenTypes.POWER_OPERATIONS.contains(myBuilder.getTokenType())) {
       myBuilder.advanceLexer();
       if (!parseUnaryExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);

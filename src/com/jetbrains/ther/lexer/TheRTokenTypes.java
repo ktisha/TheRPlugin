@@ -165,9 +165,15 @@ public class TheRTokenTypes {
     LT, GT, EQEQ, GE, LE, NOTEQ);
 
   public static final TokenSet ADDITIVE_OPERATIONS = TokenSet.create(PLUS, MINUS);
-  public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV);
+  public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV, INT_DIV);
+  public static final TokenSet POWER_OPERATIONS = TokenSet.create(EXP, MODULUS);
   public static final TokenSet UNARY_OPERATIONS = TokenSet.create(PLUS, MINUS, TILDE);
   public static final TokenSet EQUALITY_OPERATIONS = TokenSet.create(EQEQ, NOTEQ);
   public static final TokenSet RELATIONAL_OPERATIONS = TokenSet.create(LT, GT, LE, GE);
+
+  public static final TokenSet OR_OPERATIONS = TokenSet.create(OR, OROR);
+  public static final TokenSet AND_OPERATIONS = TokenSet.create(AND, ANDAND);
+
+  public static final TokenSet SPECIAL_CONSTANTS = TokenSet.create(NA_KEYWORD, NAN_KEYWORD, INF_KEYWORD, NULL_KEYWORD, TRUE_KEYWORD, FALSE_KEYWORD);
 
 }
