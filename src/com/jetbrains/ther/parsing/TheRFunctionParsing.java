@@ -18,7 +18,7 @@ public class TheRFunctionParsing extends Parsing {
     myBuilder.advanceLexer();
 
     parseParameterList();
-    parseFunctionBody();
+    getStatementParser().parseBlock();
     functionMarker.done(TheRElementTypes.FUNCTION_DECLARATION);
   }
 
@@ -66,34 +66,4 @@ public class TheRFunctionParsing extends Parsing {
     parameterList.done(TheRElementTypes.PARAMETER_LIST);
   }
 
-  private void parseFunctionBody() {
-    if (myBuilder.getTokenType() != TheRTokenTypes.LBRACE) {
-      myBuilder.error("statements block expected");
-      return;
-    }
-
-    final PsiBuilder.Marker block = myBuilder.mark();
-    myBuilder.advanceLexer();
-    while (myBuilder.getTokenType() != TheRTokenTypes.RBRACE) {
-      if (myBuilder.eof()) {
-        myBuilder.error("missing }");
-        block.done(TheRElementTypes.BLOCK);
-        return;
-      }
-
-      parseSourceElement();
-    }
-
-    myBuilder.advanceLexer();
-    block.done(TheRElementTypes.BLOCK);
-  }
-
-  public void parseSourceElement() {
-    if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
-      parseFunctionDeclaration();
-    }
-    else {
-      getStatementParser().parseStatement();
-    }
-  }
 }

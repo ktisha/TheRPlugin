@@ -1,0 +1,54 @@
+TheRFile:WhileStatement.r
+  TheR:WHILE_STATEMENT
+    PsiElement(TheR:WHILE_KEYWORD)('while')
+    PsiElement(TheR:LPAR)('(')
+    TheR:BINARY_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('from')
+      PsiElement(TheR:NOTEQ)('!=')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('0')
+    PsiElement(TheR:RPAR)(')')
+    PsiWhiteSpace('\n')
+    TheR:BLOCK
+      PsiElement(TheR:LBRACE)('{')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('Sys.sleep')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:ASSIGNMENT_STATEMENT
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('from')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:LEFT_ASSIGN)('<-')
+        PsiWhiteSpace(' ')
+        TheR:BINARY_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('from')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:MINUS)('-')
+          PsiWhiteSpace(' ')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('print')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('from')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiElement(TheR:RBRACE)('}')

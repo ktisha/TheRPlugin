@@ -1,0 +1,41 @@
+TheRFile:IfStatement.r
+  TheR:IF_STATEMENT
+    PsiElement(TheR:IF_KEYWORD)('if')
+    PsiElement(TheR:LPAR)('(')
+    TheR:BINARY_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('A')
+      PsiElement(TheR:GT)('>')
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('a')
+    PsiElement(TheR:RPAR)(')')
+    PsiWhiteSpace(' ')
+    PsiComment(TheR:END_OF_LINE_COMMENT)('# true, 84 > 42')
+    PsiWhiteSpace('\n')
+    TheR:BLOCK
+      PsiElement(TheR:LBRACE)('{')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('cat')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('A')
+            PsiElement(TheR:COMMA)(',')
+            PsiWhiteSpace(' ')
+            TheR:STRING_LITERAL_EXPRESSION
+              PsiElement(TheR:STRING_LITERAL)('">"')
+            PsiElement(TheR:COMMA)(',')
+            PsiWhiteSpace(' ')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('a')
+            PsiElement(TheR:COMMA)(',')
+            PsiWhiteSpace(' ')
+            TheR:STRING_LITERAL_EXPRESSION
+              PsiElement(TheR:STRING_LITERAL)('"\n"')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiElement(TheR:RBRACE)('}')
