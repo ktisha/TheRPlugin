@@ -23,4 +23,8 @@ public interface TheRElementTypes {
   TheRElementType KEYWORD_ARGUMENT_EXPRESSION = new TheRElementType("KEYWORD_ARGUMENT_EXPRESSION", TheRKeywordExpressionImpl.class);
 
   TheRElementType ARGUMENT_LIST = new TheRElementType("ARGUMENT_LIST", TheRArgumentListImpl.class);
+  TheRElementType PARAMETER_LIST = new TheRElementType("PARAMETER_LIST", TheRParameterListImpl.class);
+  TheRElementType PARAMETER = new TheRElementType("PARAMETER", TheRParameterImpl.class);
+  TheRElementType FUNCTION_DECLARATION = new TheRElementType("FUNCTION_DECLARATION", TheRFunctionImpl.class);
+  TheRElementType BLOCK = new TheRElementType("BLOCK", TheRBlockImpl.class);
 }

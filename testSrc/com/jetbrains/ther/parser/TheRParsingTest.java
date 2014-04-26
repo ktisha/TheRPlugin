@@ -36,6 +36,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testFunctionDefinition() {
+    doTest();
+  }
+
 
   public void doTest() {
     doTest(true);

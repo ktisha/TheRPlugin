@@ -36,7 +36,10 @@ public class TheRStatementParsing extends Parsing {
     if (successfull) {
       if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
         myBuilder.advanceLexer();
-        if (!expressionParser.parseExpression()) {
+        if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
+          getFunctionParser().parseFunctionDeclaration();
+        }
+        else if (!expressionParser.parseExpression()) {
           myBuilder.error(EXPRESSION_EXPECTED);
         }
         exprStatement.done(TheRElementTypes.ASSIGNMENT_STATEMENT);
