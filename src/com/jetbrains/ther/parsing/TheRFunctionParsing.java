@@ -62,6 +62,10 @@ public class TheRFunctionParsing extends Parsing {
         }
         parameter.done(TheRElementTypes.PARAMETER);
       }
+      else if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
+        myBuilder.advanceLexer();
+        parameter.done(TheRElementTypes.PARAMETER);
+      }
       else {
         myBuilder.error("parameter name expected");
         parameter.rollbackTo();
