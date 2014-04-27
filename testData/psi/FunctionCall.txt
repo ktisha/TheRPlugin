@@ -14,7 +14,8 @@ TheRFile:FunctionCall.r
         PsiElement(TheR:COMMA)(',')
         PsiWhiteSpace(' ')
         TheR:KEYWORD_ARGUMENT_EXPRESSION
-          PsiElement(TheR:IDENTIFIER)('b')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('b')
           PsiWhiteSpace(' ')
           PsiElement(TheR:EQ)('=')
           PsiWhiteSpace(' ')

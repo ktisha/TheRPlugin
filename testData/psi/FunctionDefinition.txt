@@ -27,7 +27,8 @@ TheRFile:FunctionDefinition.r
             TheR:ARGUMENT_LIST
               PsiElement(TheR:LPAR)('(')
               TheR:KEYWORD_ARGUMENT_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('prompt')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('prompt')
                 PsiElement(TheR:EQ)('=')
                 TheR:STRING_LITERAL_EXPRESSION
                   PsiElement(TheR:STRING_LITERAL)('"Enter an integer: "')

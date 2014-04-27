@@ -247,6 +247,7 @@ public class TheRExpressionParsing extends Parsing {
       final IElementType tokenType = myBuilder.getTokenType();
       if (tokenType == TheRTokenTypes.LIST_SUBSET) {
         myBuilder.advanceLexer();
+        parseExpression();
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
@@ -323,7 +324,8 @@ public class TheRExpressionParsing extends Parsing {
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
-        myBuilder.advanceLexer();
+        parseExpression();
+
         if (myBuilder.getTokenType() == TheRTokenTypes.EQ) {
           myBuilder.advanceLexer();
           if (!parseExpression()) {
