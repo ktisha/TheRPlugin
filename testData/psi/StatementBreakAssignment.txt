@@ -1,0 +1,44 @@
+TheRFile:StatementBreakAssignment.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('b')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace('\n')
+    TheR:SLICE_EXPRESSION
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiElement(TheR:COLON)(':')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('5')
+  PsiElement(TheR:STATEMENT_BREAK)('\n')
+  PsiWhiteSpace('\n')
+  TheR:EXPRESSION_STATEMENT
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('print')
+      PsiWhiteSpace(' ')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        PsiWhiteSpace('\n')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('a')
+        PsiWhiteSpace('\n')
+        PsiElement(TheR:RPAR)(')')
+  PsiElement(TheR:STATEMENT_BREAK)('\n')
+  PsiWhiteSpace('\n')
+  TheR:EXPRESSION_STATEMENT
+    TheR:BINARY_EXPRESSION
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:PLUS)('+')
+      PsiWhiteSpace(' ')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('2')
+  PsiElement(TheR:STATEMENT_BREAK)('\n')
+  TheR:EXPRESSION_STATEMENT
+    TheR:PREFIX_EXPRESSION
+      PsiElement(TheR:MINUS)('-')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('3')

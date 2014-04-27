@@ -73,6 +73,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testStatementBreakAssignment() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

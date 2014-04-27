@@ -10,7 +10,7 @@ TheRFile:FunctionDefinition.r
       TheR:PARAMETER_LIST
         PsiElement(TheR:LPAR)('(')
         PsiElement(TheR:RPAR)(')')
-      PsiElement(TheR:STATEMENT_BREAK)('\n')
+      PsiWhiteSpace('\n')
       TheR:BLOCK
         PsiElement(TheR:LBRACE)('{')
         PsiWhiteSpace('\n  ')

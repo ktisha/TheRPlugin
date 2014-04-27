@@ -17,6 +17,7 @@ public class TheRLexer extends MergingLexerAdapter {
   }
 
   protected int myBraceLevel;
+  protected boolean inAssignment = false;
   protected boolean myLineHasSignificantTokens;
   protected List<PendingToken> myTokenQueue = new ArrayList<PendingToken>();
   protected boolean myProcessSpecialTokensPending = false;
@@ -136,6 +137,9 @@ public class TheRLexer extends MergingLexerAdapter {
     else if (TheRTokenTypes.CLOSE_BRACES.contains(getTokenType())) {
       myBraceLevel--;
     }
+    else if (TheRTokenTypes.ASSIGNMENTS.contains(getTokenType())) {
+      inAssignment = true;
+    }
   }
 
   private void checkSignificantTokens() {
@@ -171,7 +175,11 @@ public class TheRLexer extends MergingLexerAdapter {
   }
 
   protected void processLineBreak(int startPos) {
-    if (myBraceLevel == 0) {
+    if (inAssignment) {
+      processInsignificantLineBreak(startPos);
+      inAssignment = false;
+    }
+    else if (myBraceLevel == 0) {
       if (myLineHasSignificantTokens) {
         pushToken(TheRTokenTypes.STATEMENT_BREAK, startPos, startPos);
       }
@@ -179,24 +187,16 @@ public class TheRLexer extends MergingLexerAdapter {
       advanceBase();
     }
     else {
-      processInsignificantLineBreak(startPos, false);
+      processInsignificantLineBreak(startPos);
     }
   }
 
-  protected void processInsignificantLineBreak(int startPos,
-                                               boolean breakStatementOnLineBreak) {
+  protected void processInsignificantLineBreak(int startPos) {
     int end = getBaseTokenEnd();
     advanceBase();
-    while (getBaseTokenType() == TheRTokenTypes.SPACE || (!breakStatementOnLineBreak && getBaseTokenType() == TheRTokenTypes.LINE_BREAK)) {
+    while (getBaseTokenType() == TheRTokenTypes.SPACE || getBaseTokenType() == TheRTokenTypes.LINE_BREAK) {
       end = getBaseTokenEnd();
       advanceBase();
-    }
-    if (breakStatementOnLineBreak && getBaseTokenType() == TheRTokenTypes.LINE_BREAK) {
-      myTokenQueue.add(new PendingToken(TheRTokenTypes.STATEMENT_BREAK, startPos, startPos));
-      while (getBaseTokenType() == TheRTokenTypes.SPACE || getBaseTokenType() == TheRTokenTypes.LINE_BREAK) {
-        end = getBaseTokenEnd();
-        advanceBase();
-      }
     }
     myTokenQueue.add(new PendingToken(TheRTokenTypes.LINE_BREAK, startPos, end));
   }
