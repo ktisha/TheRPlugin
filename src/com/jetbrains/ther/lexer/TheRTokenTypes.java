@@ -1,5 +1,6 @@
 package com.jetbrains.ther.lexer;
 
+import com.google.common.collect.ImmutableMap;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -188,6 +189,11 @@ public class TheRTokenTypes {
   public static final TokenSet WHITESPACE = TokenSet.create(SPACE, TAB, FORMFEED);
   public static final TokenSet OPEN_BRACES = TokenSet.create(LBRACKET, LDBRACKET, LBRACE, LPAR);
   public static final TokenSet CLOSE_BRACES = TokenSet.create(RBRACKET, RDBRACKET, RBRACE, RPAR);
+
+  public static final TokenSet OPEN_BRACKETS = TokenSet.create(LBRACKET, LDBRACKET);
+
+  public static final ImmutableMap<IElementType, IElementType> BRACKER_PAIRS =
+    ImmutableMap.<IElementType, IElementType>builder().put(LBRACKET, RBRACKET).put(LDBRACKET, RDBRACKET).build();
 
   public static final TokenSet NAMESPACE_ACCESS = TokenSet.create(DOUBLECOLON, TRIPLECOLON);
 

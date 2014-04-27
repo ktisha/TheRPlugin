@@ -301,42 +301,29 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
-      else if (tokenType == TheRTokenTypes.LDBRACKET) {
+      else if (TheRTokenTypes.OPEN_BRACKETS.contains(tokenType)) {
         myBuilder.advanceLexer();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
           myBuilder.advanceLexer();
           PsiBuilder.Marker marker = myBuilder.mark();
           marker.done(TheRElementTypes.EMPTY_EXPRESSION);
         }
-        while (parseExpression()) {
-          if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-            myBuilder.advanceLexer();
-          }
-          else {
-            break;
-          }
-        }
-        checkMatches(TheRTokenTypes.RDBRACKET, "]] expected");
-        expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
-        expr = expr.precede();
-      }
-      else if (tokenType == TheRTokenTypes.LBRACKET) {
-        myBuilder.advanceLexer();
-        if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-          myBuilder.advanceLexer();
-          PsiBuilder.Marker marker = myBuilder.mark();
-          marker.done(TheRElementTypes.EMPTY_EXPRESSION);
-        }
-        while (parseExpression()) {
-          if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-            myBuilder.advanceLexer();
+        final IElementType CLOSE_BRACKET = TheRTokenTypes.BRACKER_PAIRS.get(tokenType);
+        while (myBuilder.getTokenType() != CLOSE_BRACKET && !myBuilder.eof()) {
+          if (parseExpression()) {
+            if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+              myBuilder.advanceLexer();
+            }
+            else {
+              break;
+            }
           }
           else {
             break;
           }
         }
 
-        checkMatches(TheRTokenTypes.RBRACKET, "] expected");
+        checkMatches(CLOSE_BRACKET, "Closing ] or ]] expected");
         expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
         expr = expr.precede();
       }
