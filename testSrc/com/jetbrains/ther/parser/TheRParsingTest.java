@@ -109,6 +109,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testBlockAsArgument() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

@@ -382,6 +382,10 @@ public class TheRExpressionParsing extends Parsing {
         }
         keywordArgMarker.rollbackTo();
       }
+      if (myBuilder.getTokenType() == TheRTokenTypes.LBRACE) {
+        getStatementParser().parseBlock();
+        continue;
+      }
       if (!parseExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
         break;
