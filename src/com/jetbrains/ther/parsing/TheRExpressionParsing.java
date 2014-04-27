@@ -286,7 +286,9 @@ public class TheRExpressionParsing extends Parsing {
       final IElementType tokenType = myBuilder.getTokenType();
       if (tokenType == TheRTokenTypes.LIST_SUBSET) {
         myBuilder.advanceLexer();
-        parsePrimaryExpression();
+        if (!parseStringOrIdentifier()) {
+          myBuilder.error("Expected string or identifier");
+        }
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
@@ -333,6 +335,18 @@ public class TheRExpressionParsing extends Parsing {
       }
     }
     return true;
+  }
+
+  private boolean parseStringOrIdentifier() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
+      buildTokenElement(TheRElementTypes.STRING_LITERAL_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
+    return false;
   }
 
   public void parseArgumentList() {
