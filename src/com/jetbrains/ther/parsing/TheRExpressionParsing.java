@@ -445,7 +445,7 @@ public class TheRExpressionParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
-    parseExpression();
+    getStatementParser().parseStatement();
     checkMatches(TheRTokenTypes.RPAR, ") expected");
     expr.done(TheRElementTypes.PARENTHESIZED_EXPRESSION);
   }

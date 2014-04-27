@@ -75,6 +75,9 @@ public class TheRStatementParsing extends Parsing {
         if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
           getFunctionParser().parseFunctionDeclaration();
         }
+        else if (myBuilder.getTokenType() == TheRTokenTypes.IF_KEYWORD) {
+          getStatementParser().parseIfStatement();
+        }
         else if (!expressionParser.parseExpression()) {
           myBuilder.error(EXPRESSION_EXPECTED);
         }
@@ -136,7 +139,7 @@ public class TheRStatementParsing extends Parsing {
   }
 
   private void parseNextStatement() {
-    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.BREAK_KEYWORD);
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.NEXT_KEYWORD);
     final PsiBuilder.Marker statement = myBuilder.mark();
     myBuilder.advanceLexer();
     if (myBuilder.getTokenType() == TheRTokenTypes.LPAR) {
