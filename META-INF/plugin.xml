@@ -42,5 +42,6 @@
     <fileTypeFactory implementation="com.jetbrains.ther.TheRFileTypeFactory"/>
     <lang.syntaxHighlighterFactory key="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRSyntaxHighlighterFactory"/>
     <lang.parserDefinition language="TheR" implementationClass="com.jetbrains.ther.parsing.TheRParserDefinition"/>
+    <lang.braceMatcher language="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRBraceMatcher"/>
   </extensions>
 </idea-plugin>
