@@ -9,11 +9,10 @@ TheRFile:WhileStatement.r
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('0')
     PsiElement(TheR:RPAR)(')')
-    PsiWhiteSpace('\n')
+    PsiElement(TheR:STATEMENT_BREAK)('\n')
     TheR:BLOCK
       PsiElement(TheR:LBRACE)('{')
-      PsiWhiteSpace('\n')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace('\n  ')
       TheR:EXPRESSION_STATEMENT
         TheR:CALL_EXPRESSION
           TheR:REFERENCE_EXPRESSION
@@ -23,8 +22,7 @@ TheRFile:WhileStatement.r
             TheR:INTEGER_LITERAL_EXPRESSION
               PsiElement(TheR:NUMERIC_LITERAL)('1')
             PsiElement(TheR:RPAR)(')')
-      PsiWhiteSpace('\n')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace('\n  ')
       TheR:ASSIGNMENT_STATEMENT
         TheR:REFERENCE_EXPRESSION
           PsiElement(TheR:IDENTIFIER)('from')
@@ -39,8 +37,7 @@ TheRFile:WhileStatement.r
           PsiWhiteSpace(' ')
           TheR:INTEGER_LITERAL_EXPRESSION
             PsiElement(TheR:NUMERIC_LITERAL)('1')
-      PsiWhiteSpace('\n')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace('\n  ')
       TheR:EXPRESSION_STATEMENT
         TheR:CALL_EXPRESSION
           TheR:REFERENCE_EXPRESSION

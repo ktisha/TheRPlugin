@@ -16,10 +16,11 @@ public class TheRStatementParsing extends Parsing {
   }
 
   public void parseStatement() {
-    final IElementType firstToken = myBuilder.getTokenType();
+    IElementType firstToken = myBuilder.getTokenType();
     if (firstToken == null) return;
     if (firstToken == TheRTokenTypes.STATEMENT_BREAK) {
       myBuilder.advanceLexer();
+      firstToken = myBuilder.getTokenType();
     }
     if (firstToken == TheRTokenTypes.IF_KEYWORD) {
       parseIfStatement();
@@ -137,6 +138,9 @@ public class TheRStatementParsing extends Parsing {
   }
   
   public void parseBlock() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.STATEMENT_BREAK) {
+      myBuilder.advanceLexer();
+    }
     if (myBuilder.getTokenType() != TheRTokenTypes.LBRACE) {
       myBuilder.error("statements block expected");
       return;

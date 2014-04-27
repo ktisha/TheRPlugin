@@ -11,11 +11,10 @@ TheRFile:IfStatement.r
     PsiElement(TheR:RPAR)(')')
     PsiWhiteSpace(' ')
     PsiComment(TheR:END_OF_LINE_COMMENT)('# true, 84 > 42')
-    PsiWhiteSpace('\n')
+    PsiElement(TheR:STATEMENT_BREAK)('\n')
     TheR:BLOCK
       PsiElement(TheR:LBRACE)('{')
-      PsiWhiteSpace('\n')
-      PsiWhiteSpace('  ')
+      PsiWhiteSpace('\n  ')
       TheR:EXPRESSION_STATEMENT
         TheR:CALL_EXPRESSION
           TheR:REFERENCE_EXPRESSION
