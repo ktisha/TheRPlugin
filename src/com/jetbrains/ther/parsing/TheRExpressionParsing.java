@@ -43,7 +43,14 @@ public class TheRExpressionParsing extends Parsing {
       buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
       return true;
     }
-
+    else if (firstToken == TheRTokenTypes.INFIX_OP) {
+      buildTokenElement(TheRElementTypes.OPERATOR_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.TICK) {
+      parseReprExpression(myBuilder);
+      return true;
+    }
     else {
       myBuilder.advanceLexer();
     }
@@ -96,11 +103,30 @@ public class TheRExpressionParsing extends Parsing {
 
   private boolean parseANDExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseNOTExpression()) {
+    if (!parseUserDefinedExpression()) {
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
+      myBuilder.advanceLexer();
+      if (!parseUserDefinedExpression()) {
+        myBuilder.error(EXPRESSION_EXPECTED);
+      }
+      expr.done(TheRElementTypes.BINARY_EXPRESSION);
+      expr = expr.precede();
+    }
+
+    expr.drop();
+    return true;
+  }
+
+  private boolean parseUserDefinedExpression() {
+    PsiBuilder.Marker expr = myBuilder.mark();
+    if (!parseNOTExpression()) {
+      expr.drop();
+      return false;
+    }
+    while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
       myBuilder.advanceLexer();
       if (!parseNOTExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
@@ -365,5 +391,13 @@ public class TheRExpressionParsing extends Parsing {
     arglist.done(TheRElementTypes.ARGUMENT_LIST);
   }
 
+  private void parseReprExpression(PsiBuilder builder) {
+    LOG.assertTrue(builder.getTokenType() == TheRTokenTypes.TICK);
+    final PsiBuilder.Marker expr = builder.mark();
+    builder.advanceLexer();
+    parseExpression();
+    checkMatches(TheRTokenTypes.TICK, "'`' (backtick) expected");
+    expr.done(TheRElementTypes.REPR_EXPRESSION);
+  }
 
 }

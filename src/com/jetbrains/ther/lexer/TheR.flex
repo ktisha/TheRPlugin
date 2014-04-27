@@ -180,6 +180,7 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 ";"                         { return TheRTokenTypes.SEMICOLON; }
 
 "="                         { return TheRTokenTypes.EQ; }
+"`"                         { return TheRTokenTypes.TICK; }
 "?"                         { return TheRTokenTypes.HELP; }
 .                           { return TheRTokenTypes.BAD_CHARACTER; }
 

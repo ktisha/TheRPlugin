@@ -30,6 +30,8 @@ public interface TheRElementTypes {
   TheRElementType SUBSCRIPTION_EXPRESSION = new TheRElementType("SUBSCRIPTION_EXPRESSION", TheRSubscriptionExpressionImpl.class);
   TheRElementType EMPTY_EXPRESSION = new TheRElementType("EMPTY_EXPRESSION", TheREmptyExpressionImpl.class);
   TheRElementType HELP_EXPRESSION = new TheRElementType("HELP_EXPRESSION", TheRHelpExpressionImpl.class);
+  TheRElementType REPR_EXPRESSION = new TheRElementType("REPR_EXPRESSION", TheRReprExpressionImpl.class);
+  TheRElementType OPERATOR_EXPRESSION = new TheRElementType("OPERATOR_EXPRESSION", TheROperatorExpressionImpl.class);
 
 
   TheRElementType ARGUMENT_LIST = new TheRElementType("ARGUMENT_LIST", TheRArgumentListImpl.class);

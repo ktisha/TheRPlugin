@@ -122,6 +122,7 @@ public class TheRTokenTypes {
   public static final IElementType LEFT_ASSIGN = new TheRElementType("LEFT_ASSIGN");    // <-
   public static final IElementType RIGHT_ASSIGN = new TheRElementType("RIGHT_ASSIGN");  // ->
   public static final IElementType LIST_SUBSET = new TheRElementType("LIST_SUBSET");    // $
+  public static final IElementType TICK = new TheRElementType("TICK");    // `
 
   public static final IElementType AT = new TheRElementType("AT");    // @
   public static final IElementType DOUBLECOLON = new TheRElementType("DOUBLECOLON");    // ::
@@ -163,7 +164,7 @@ public class TheRTokenTypes {
 
   public static final TokenSet OPERATORS = TokenSet
     .create(MINUS, PLUS, NOT, TILDE, HELP, COLON, MULT, DIV, EXP, MODULUS, INT_DIV, MATRIX_PROD, OUTER_PROD, MATCHING, KRONECKER_PROD,
-            INFIX_OP, LT, GT, EQEQ, GE, LE, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT);
+            INFIX_OP, LT, GT, EQEQ, GE, LE, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT, TICK);
 
   public static final TokenSet KEYWORDS = TokenSet.create(NA_INTEGER_KEYWORD, NA_REAL_KEYWORD, NA_COMPLEX_KEYWORD, NA_CHARACTER_KEYWORD,
                                                           TRIPLE_DOTS, IF_KEYWORD, ELSE_KEYWORD, REPEAT_KEYWORD, WHILE_KEYWORD,
