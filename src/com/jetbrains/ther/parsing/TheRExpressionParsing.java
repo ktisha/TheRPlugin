@@ -372,7 +372,7 @@ public class TheRExpressionParsing extends Parsing {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
         parseExpression();
 
-        if (myBuilder.getTokenType() == TheRTokenTypes.EQ) {
+        if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
           myBuilder.advanceLexer();
           if (!parseExpression()) {
             myBuilder.error(EXPRESSION_EXPECTED);
