@@ -73,7 +73,7 @@ public class TheRExpressionParsing extends Parsing {
         mark.done(TheRElementTypes.HELP_EXPRESSION);
         return true;
       }
-      else if (parseOrExpression()) {
+      else if (parseModelFormulaeExpression()) {
         mark.done(TheRElementTypes.HELP_EXPRESSION);
         return true;
       }
@@ -83,7 +83,26 @@ public class TheRExpressionParsing extends Parsing {
         return false;
       }
     }
-    return parseOrExpression();
+    return parseModelFormulaeExpression();
+  }
+
+  public boolean parseModelFormulaeExpression() {
+    PsiBuilder.Marker expr = myBuilder.mark();
+    if (!parseOrExpression()) {
+      expr.drop();
+      return false;
+    }
+    while (TheRTokenTypes.TILDE == myBuilder.getTokenType()) {
+      myBuilder.advanceLexer();
+      if (!parseOrExpression()) {
+        myBuilder.error(EXPRESSION_EXPECTED);
+      }
+      expr.done(TheRElementTypes.BINARY_EXPRESSION);
+      expr = expr.precede();
+    }
+
+    expr.drop();
+    return true;
   }
 
   public boolean parseOrExpression() {
