@@ -32,6 +32,7 @@ public interface TheRElementTypes {
   TheRElementType HELP_EXPRESSION = new TheRElementType("HELP_EXPRESSION", TheRHelpExpressionImpl.class);
   TheRElementType REPR_EXPRESSION = new TheRElementType("REPR_EXPRESSION", TheRReprExpressionImpl.class);
   TheRElementType OPERATOR_EXPRESSION = new TheRElementType("OPERATOR_EXPRESSION", TheROperatorExpressionImpl.class);
+  TheRElementType PARENTHESIZED_EXPRESSION = new TheRElementType("PARENTHESIZED_EXPRESSION", TheRParenthesizedExpressionImpl.class);
 
 
   TheRElementType ARGUMENT_LIST = new TheRElementType("ARGUMENT_LIST", TheRArgumentListImpl.class);

@@ -89,6 +89,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testParenthesized() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

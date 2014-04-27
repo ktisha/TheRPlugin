@@ -48,7 +48,11 @@ public class TheRExpressionParsing extends Parsing {
       return true;
     }
     else if (firstToken == TheRTokenTypes.TICK) {
-      parseReprExpression(myBuilder);
+      parseReprExpression();
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.LPAR) {
+      parseParenthesizedExpression();
       return true;
     }
     else {
@@ -391,13 +395,22 @@ public class TheRExpressionParsing extends Parsing {
     arglist.done(TheRElementTypes.ARGUMENT_LIST);
   }
 
-  private void parseReprExpression(PsiBuilder builder) {
-    LOG.assertTrue(builder.getTokenType() == TheRTokenTypes.TICK);
-    final PsiBuilder.Marker expr = builder.mark();
-    builder.advanceLexer();
+  private void parseReprExpression() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.TICK);
+    final PsiBuilder.Marker expr = myBuilder.mark();
+    myBuilder.advanceLexer();
     parseExpression();
     checkMatches(TheRTokenTypes.TICK, "'`' (backtick) expected");
     expr.done(TheRElementTypes.REPR_EXPRESSION);
+  }
+
+  private void parseParenthesizedExpression() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
+    final PsiBuilder.Marker expr = myBuilder.mark();
+    myBuilder.advanceLexer();
+    parseExpression();
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    expr.done(TheRElementTypes.PARENTHESIZED_EXPRESSION);
   }
 
 }
