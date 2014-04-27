@@ -53,6 +53,15 @@ public class TheRStatementParsing extends Parsing {
     parseSimpleStatement();
   }
 
+  private void checkSemicolon() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
+      myBuilder.advanceLexer();
+      if (myBuilder.getTokenType() == TheRTokenTypes.STATEMENT_BREAK) {
+          myBuilder.advanceLexer();
+      }
+    }
+  }
+
   protected void parseSimpleStatement() {
     final IElementType tokenType = myBuilder.getTokenType();
     if (tokenType == null) return;
@@ -69,9 +78,11 @@ public class TheRStatementParsing extends Parsing {
         else if (!expressionParser.parseExpression()) {
           myBuilder.error(EXPRESSION_EXPECTED);
         }
+        checkSemicolon();
         exprStatement.done(TheRElementTypes.ASSIGNMENT_STATEMENT);
       }
       else {
+        checkSemicolon();
         exprStatement.done(TheRElementTypes.EXPRESSION_STATEMENT);
       }
       return;
@@ -98,7 +109,7 @@ public class TheRStatementParsing extends Parsing {
       myBuilder.advanceLexer();
       parseStatement();
     }
-
+    checkSemicolon();
     ifStatement.done(TheRElementTypes.IF_STATEMENT);
   }
   
@@ -108,6 +119,7 @@ public class TheRStatementParsing extends Parsing {
     myBuilder.advanceLexer();
 
     parseStatement();
+    checkSemicolon();
     statement.done(TheRElementTypes.REPEAT_STATEMENT);
   }
 
@@ -117,6 +129,7 @@ public class TheRStatementParsing extends Parsing {
     myBuilder.advanceLexer();
     checkMatches(TheRTokenTypes.LPAR, "( expected");
     checkMatches(TheRTokenTypes.RPAR, ") expected");
+    checkSemicolon();
     statement.done(TheRElementTypes.BREAK_STATEMENT);
   }
 
@@ -126,6 +139,7 @@ public class TheRStatementParsing extends Parsing {
     myBuilder.advanceLexer();
     checkMatches(TheRTokenTypes.LPAR, "( expected");
     checkMatches(TheRTokenTypes.RPAR, ") expected");
+    checkSemicolon();
     statement.done(TheRElementTypes.NEXT_STATEMENT);
   }
 
@@ -139,6 +153,7 @@ public class TheRStatementParsing extends Parsing {
     checkMatches(TheRTokenTypes.RPAR, ") expected");
 
     parseStatement();
+    checkSemicolon();
     statement.done(TheRElementTypes.WHILE_STATEMENT);
   }
 
@@ -160,6 +175,7 @@ public class TheRStatementParsing extends Parsing {
     checkMatches(TheRTokenTypes.RPAR, ") expected");
 
     parseStatement();
+    checkSemicolon();
     statement.done(TheRElementTypes.FOR_STATEMENT);
   }
   
@@ -185,6 +201,7 @@ public class TheRStatementParsing extends Parsing {
     }
 
     myBuilder.advanceLexer();
+    checkSemicolon();
     block.done(TheRElementTypes.BLOCK);
   }
 
