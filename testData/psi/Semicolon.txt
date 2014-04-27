@@ -1,0 +1,20 @@
+TheRFile:Semicolon.r
+  TheR:EXPRESSION_STATEMENT
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('print')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('a')
+        PsiElement(TheR:RPAR)(')')
+    PsiElement(TheR:SEMICOLON)(';')
+  TheR:EXPRESSION_STATEMENT
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('print')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('b')
+        PsiElement(TheR:RPAR)(')')
