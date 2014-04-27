@@ -405,6 +405,10 @@ public class TheRExpressionParsing extends Parsing {
         getStatementParser().parseBlock();
         continue;
       }
+      if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
+        myBuilder.advanceLexer();
+        continue;
+      }
       if (!parseExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
         break;
