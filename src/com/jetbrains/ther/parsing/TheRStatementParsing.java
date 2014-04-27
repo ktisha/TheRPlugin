@@ -127,8 +127,10 @@ public class TheRStatementParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.BREAK_KEYWORD);
     final PsiBuilder.Marker statement = myBuilder.mark();
     myBuilder.advanceLexer();
-    checkMatches(TheRTokenTypes.LPAR, "( expected");
-    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    if (myBuilder.getTokenType() == TheRTokenTypes.LPAR) {
+      myBuilder.advanceLexer();
+      checkMatches(TheRTokenTypes.RPAR, ") expected");
+    }
     checkSemicolon();
     statement.done(TheRElementTypes.BREAK_STATEMENT);
   }
