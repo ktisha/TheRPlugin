@@ -1,0 +1,52 @@
+TheRFile:Precedence.r
+  TheR:EXPRESSION_STATEMENT
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('table')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('replicate')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1000')
+            PsiElement(TheR:COMMA)(',')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                TheR:CALL_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('runs.test')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:CALL_EXPRESSION
+                      TheR:REFERENCE_EXPRESSION
+                        PsiElement(TheR:IDENTIFIER)('factor')
+                      TheR:ARGUMENT_LIST
+                        PsiElement(TheR:LPAR)('(')
+                        TheR:CALL_EXPRESSION
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:IDENTIFIER)('sign')
+                          TheR:ARGUMENT_LIST
+                            PsiElement(TheR:LPAR)('(')
+                            TheR:CALL_EXPRESSION
+                              TheR:REFERENCE_EXPRESSION
+                                PsiElement(TheR:IDENTIFIER)('one.ts')
+                              TheR:ARGUMENT_LIST
+                                PsiElement(TheR:LPAR)('(')
+                                PsiElement(TheR:RPAR)(')')
+                            PsiElement(TheR:RPAR)(')')
+                        PsiElement(TheR:RPAR)(')')
+                    PsiElement(TheR:RPAR)(')')
+                PsiElement(TheR:LIST_SUBSET)('$')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('p.value')
+              PsiWhiteSpace(' ')
+              PsiElement(TheR:LT)('<')
+              PsiWhiteSpace(' ')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('0.05')
+            PsiElement(TheR:RPAR)(')')
+        PsiElement(TheR:RPAR)(')')

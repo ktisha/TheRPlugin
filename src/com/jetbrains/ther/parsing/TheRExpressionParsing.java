@@ -286,7 +286,7 @@ public class TheRExpressionParsing extends Parsing {
       final IElementType tokenType = myBuilder.getTokenType();
       if (tokenType == TheRTokenTypes.LIST_SUBSET) {
         myBuilder.advanceLexer();
-        parseExpression();
+        parsePrimaryExpression();
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
