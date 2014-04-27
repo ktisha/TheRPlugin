@@ -3,7 +3,7 @@ package com.jetbrains.ther.lexer;
 import com.intellij.lexer.Lexer;
 import junit.framework.TestCase;
 
-public class TheRLexerTest extends TestCase {
+public class TheRHighlightingLexerTest extends TestCase {
 
   public void testLogicTrue() {
     doTest("TRUE", "TheR:TRUE_KEYWORD");
@@ -190,7 +190,7 @@ public class TheRLexerTest extends TestCase {
 
 
   private static void doTest(String text, String... expectedTokens) {
-    doLexerTest(text, new TheRLexer(), expectedTokens);
+    doLexerTest(text, new TheRHighlightingLexer(), expectedTokens);
   }
 
   public static void doLexerTest(String text, Lexer lexer, String... expectedTokens) {
