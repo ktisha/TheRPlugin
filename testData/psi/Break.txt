@@ -1,0 +1,60 @@
+TheRFile:Break.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('z')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('0')
+  PsiWhiteSpace('\n')
+  TheR:REPEAT_STATEMENT
+    PsiElement(TheR:REPEAT_KEYWORD)('repeat')
+    PsiWhiteSpace(' ')
+    TheR:BLOCK
+      PsiElement(TheR:LBRACE)('{')
+      PsiWhiteSpace('\n  ')
+      TheR:ASSIGNMENT_STATEMENT
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('z')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:LEFT_ASSIGN)('<-')
+        PsiWhiteSpace(' ')
+        TheR:BINARY_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('z')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:PLUS)('+')
+          PsiWhiteSpace(' ')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiWhiteSpace('\n  ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('print')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('z')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n  ')
+      TheR:IF_STATEMENT
+        PsiElement(TheR:IF_KEYWORD)('if')
+        PsiElement(TheR:LPAR)('(')
+        TheR:BINARY_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('z')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:GT)('>')
+          PsiWhiteSpace(' ')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('100')
+        PsiElement(TheR:RPAR)(')')
+        PsiWhiteSpace(' ')
+        TheR:BREAK_STATEMENT
+          PsiElement(TheR:BREAK_KEYWORD)('break')
+          PsiElement(TheR:LPAR)('(')
+          PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiElement(TheR:RBRACE)('}')

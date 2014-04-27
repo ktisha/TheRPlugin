@@ -265,6 +265,12 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.CALL_EXPRESSION);
         expr = expr.precede();
       }
+      else if (TheRTokenTypes.NAMESPACE_ACCESS.contains(tokenType)) {
+        myBuilder.advanceLexer();
+        parseExpression();
+        expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
+        expr = expr.precede();
+      }
       else if (tokenType == TheRTokenTypes.LDBRACKET) {
         myBuilder.advanceLexer();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {

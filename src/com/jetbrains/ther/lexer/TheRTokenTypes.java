@@ -124,7 +124,8 @@ public class TheRTokenTypes {
   public static final IElementType LIST_SUBSET = new TheRElementType("LIST_SUBSET");    // $
 
   public static final IElementType AT = new TheRElementType("AT");    // @
-  public static final IElementType COLONCOLON = new TheRElementType("COLONCOLON");    // ::
+  public static final IElementType DOUBLECOLON = new TheRElementType("DOUBLECOLON");    // ::
+  public static final IElementType TRIPLECOLON = new TheRElementType("TRIPLECOLON");    // :::
   public static final IElementType NOTEQ = new TheRElementType("NOTEQ");    // !=
   public static final IElementType RIGHT_COMPLEX_ASSING = new TheRElementType("RIGHT_COMPLEX_ASSING");    // ->>
   public static final IElementType LEFT_COMPLEX_ASSING = new TheRElementType("LEFT_COMPLEX_ASSING");    // <<-
@@ -186,5 +187,7 @@ public class TheRTokenTypes {
   public static final TokenSet WHITESPACE = TokenSet.create(SPACE, TAB, FORMFEED);
   public static final TokenSet OPEN_BRACES = TokenSet.create(LBRACKET, LDBRACKET, LBRACE, LPAR);
   public static final TokenSet CLOSE_BRACES = TokenSet.create(RBRACKET, RDBRACKET, RBRACE, RPAR);
+
+  public static final TokenSet NAMESPACE_ACCESS = TokenSet.create(DOUBLECOLON, TRIPLECOLON);
 
 }

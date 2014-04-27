@@ -13,6 +13,8 @@ public interface TheRElementTypes {
   TheRElementType WHILE_STATEMENT = new TheRElementType("WHILE_STATEMENT", TheRWhileStatementImpl.class);
   TheRElementType FOR_STATEMENT = new TheRElementType("FOR_STATEMENT", TheRForStatementImpl.class);
   TheRElementType REPEAT_STATEMENT = new TheRElementType("REPEAT_STATEMENT", TheRRepeatStatementImpl.class);
+  TheRElementType BREAK_STATEMENT = new TheRElementType("BREAK_STATEMENT", TheRBreakStatementImpl.class);
+  TheRElementType NEXT_STATEMENT = new TheRElementType("NEXT_STATEMENT", TheRNextStatementImpl.class);
 
   // expressions
   TheRElementType INTEGER_LITERAL_EXPRESSION = new TheRElementType("INTEGER_LITERAL_EXPRESSION", TheRNumericLiteralExpressionImpl.class);

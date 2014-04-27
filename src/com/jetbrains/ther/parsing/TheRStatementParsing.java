@@ -38,6 +38,14 @@ public class TheRStatementParsing extends Parsing {
       parseRepeatStatement();
       return;
     }
+    if (firstToken == TheRTokenTypes.BREAK_KEYWORD) {
+      parseBreakStatement();
+      return;
+    }
+    if (firstToken == TheRTokenTypes.NEXT_KEYWORD) {
+      parseNextStatement();
+      return;
+    }
     if (firstToken == TheRTokenTypes.LBRACE) {
       parseBlock();
       return;
@@ -101,6 +109,24 @@ public class TheRStatementParsing extends Parsing {
 
     parseStatement();
     statement.done(TheRElementTypes.REPEAT_STATEMENT);
+  }
+
+  private void parseBreakStatement() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.BREAK_KEYWORD);
+    final PsiBuilder.Marker statement = myBuilder.mark();
+    myBuilder.advanceLexer();
+    checkMatches(TheRTokenTypes.LPAR, "( expected");
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    statement.done(TheRElementTypes.BREAK_STATEMENT);
+  }
+
+  private void parseNextStatement() {
+    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.BREAK_KEYWORD);
+    final PsiBuilder.Marker statement = myBuilder.mark();
+    myBuilder.advanceLexer();
+    checkMatches(TheRTokenTypes.LPAR, "( expected");
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    statement.done(TheRElementTypes.NEXT_STATEMENT);
   }
 
   private void parseWhileStatement() {

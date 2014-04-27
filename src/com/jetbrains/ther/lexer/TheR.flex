@@ -120,7 +120,8 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "%"{LETTER}+"%"             { return TheRTokenTypes.INFIX_OP; }
 
 // Infix and prefix operators
-"::"                        { return TheRTokenTypes.COLONCOLON; }
+":::"                       { return TheRTokenTypes.TRIPLECOLON; }
+"::"                        { return TheRTokenTypes.DOUBLECOLON; }
 "@"                         { return TheRTokenTypes.AT; }
 "&&"                        { return TheRTokenTypes.ANDAND; }
 "||"                        { return TheRTokenTypes.OROR; }
