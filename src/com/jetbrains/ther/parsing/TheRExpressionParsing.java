@@ -245,11 +245,6 @@ public class TheRExpressionParsing extends Parsing {
 
     while (true) {
       final IElementType tokenType = myBuilder.getTokenType();
-      if (tokenType == TheRTokenTypes.DOT) {
-        myBuilder.advanceLexer();
-        expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
-        expr = expr.precede();
-      }
       if (tokenType == TheRTokenTypes.LIST_SUBSET) {
         myBuilder.advanceLexer();
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
@@ -262,7 +257,19 @@ public class TheRExpressionParsing extends Parsing {
       }
       else if (tokenType == TheRTokenTypes.LDBRACKET) {
         myBuilder.advanceLexer();
-        parseExpression();
+        if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+          myBuilder.advanceLexer();
+          PsiBuilder.Marker marker = myBuilder.mark();
+          marker.done(TheRElementTypes.EMPTY_EXPRESSION);
+        }
+        while (parseExpression()) {
+          if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+            myBuilder.advanceLexer();
+          }
+          else {
+            break;
+          }
+        }
         checkMatches(TheRTokenTypes.RDBRACKET, "]] expected");
         expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
         expr = expr.precede();
