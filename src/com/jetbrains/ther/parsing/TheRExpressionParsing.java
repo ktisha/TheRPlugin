@@ -354,7 +354,7 @@ public class TheRExpressionParsing extends Parsing {
           break;
         }
       }
-      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
+      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
         parseExpression();
 

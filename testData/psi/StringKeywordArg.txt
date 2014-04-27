@@ -1,0 +1,43 @@
+TheRFile:StringKeywordArg.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('person')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('list')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:STRING_LITERAL_EXPRESSION
+            PsiElement(TheR:STRING_LITERAL)('"3"')
+          PsiElement(TheR:EQ)('=')
+          TheR:STRING_LITERAL_EXPRESSION
+            PsiElement(TheR:STRING_LITERAL)('"payal"')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('x')
+          PsiElement(TheR:EQ)('=')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('2')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('y')
+          PsiElement(TheR:EQ)('=')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('9')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('year')
+          PsiElement(TheR:EQ)('=')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('1990')
+        PsiElement(TheR:RPAR)(')')
