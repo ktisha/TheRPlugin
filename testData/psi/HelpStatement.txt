@@ -1,0 +1,6 @@
+TheRFile:HelpStatement.r
+  TheR:EXPRESSION_STATEMENT
+    TheR:HELP_EXPRESSION
+      PsiElement(TheR:HELP)('?')
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('print')
