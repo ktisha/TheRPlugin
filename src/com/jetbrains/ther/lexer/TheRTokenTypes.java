@@ -148,6 +148,9 @@ public class TheRTokenTypes {
   public static final IElementType LINE_BREAK = new TheRElementType("LINE_BREAK");
   public static final IElementType SPACE = new TheRElementType("SPACE");
   public static final IElementType TAB = new TheRElementType("TAB");
+  public static final IElementType FORMFEED = new TheRElementType("FORMFEED");
+
+  public static final IElementType STATEMENT_BREAK = new TheRElementType("STATEMENT_BREAK");
 
   public static final IElementType END_OF_LINE_COMMENT = new TheRElementType("END_OF_LINE_COMMENT");
 
@@ -174,5 +177,10 @@ public class TheRTokenTypes {
   public static final TokenSet AND_OPERATIONS = TokenSet.create(AND, ANDAND);
 
   public static final TokenSet SPECIAL_CONSTANTS = TokenSet.create(NA_KEYWORD, NAN_KEYWORD, INF_KEYWORD, NULL_KEYWORD, TRUE_KEYWORD, FALSE_KEYWORD);
+
+  public static final TokenSet WHITESPACE_OR_LINEBREAK = TokenSet.create(SPACE, TAB, FORMFEED, LINE_BREAK);
+  public static final TokenSet WHITESPACE = TokenSet.create(SPACE, TAB, FORMFEED);
+  public static final TokenSet OPEN_BRACES = TokenSet.create(LBRACKET, LDBRACKET, LBRACE, LPAR);
+  public static final TokenSet CLOSE_BRACES = TokenSet.create(RBRACKET, RDBRACKET, RBRACE, RPAR);
 
 }

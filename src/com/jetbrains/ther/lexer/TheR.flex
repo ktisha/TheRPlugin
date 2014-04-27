@@ -68,6 +68,7 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 {END_OF_LINE_COMMENT}       { return TheRTokenTypes.END_OF_LINE_COMMENT; }
 [\ ]                        { return TheRTokenTypes.SPACE; }
 [\t]                        { return TheRTokenTypes.TAB; }
+[\f]                        { return TheRTokenTypes.FORMFEED; }
 
 // logical constants
 "TRUE"                      { return TheRTokenTypes.TRUE_KEYWORD; }

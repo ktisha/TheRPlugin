@@ -18,7 +18,9 @@ public class TheRStatementParsing extends Parsing {
   public void parseStatement() {
     final IElementType firstToken = myBuilder.getTokenType();
     if (firstToken == null) return;
-
+    if (firstToken == TheRTokenTypes.STATEMENT_BREAK) {
+      myBuilder.advanceLexer();
+    }
     if (firstToken == TheRTokenTypes.IF_KEYWORD) {
       parseIfStatement();
       return;

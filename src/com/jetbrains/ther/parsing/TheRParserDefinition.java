@@ -15,7 +15,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.jetbrains.ther.lexer.TheRLexer;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.psi.TheRElementType;
-import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.TheRFileImpl;
 import org.jetbrains.annotations.NotNull;
 
