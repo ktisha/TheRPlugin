@@ -117,6 +117,14 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testFunctionBodyAsExpression() {
+    doTest();
+  }
+
+  public void testFunctionAsCallArgument() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

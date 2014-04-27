@@ -1,0 +1,53 @@
+TheRFile:FunctionBodyAsExpression.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('d')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:FUNCTION_DECLARATION
+      PsiElement(TheR:FUNCTION_KEYWORD)('function')
+      TheR:PARAMETER_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('piece')
+        PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace(' ')
+      TheR:EXPRESSION_STATEMENT
+        TheR:PARENTHESIZED_EXPRESSION
+          PsiElement(TheR:LPAR)('(')
+          TheR:BINARY_EXPRESSION
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('sum')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:BINARY_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('piece')
+                    PsiElement(TheR:LIST_SUBSET)('$')
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('mktcap')
+                  PsiElement(TheR:MULT)('*')
+                  TheR:REFERENCE_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('piece')
+                    PsiElement(TheR:LIST_SUBSET)('$')
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('spread')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:DIV)('/')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('sum')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('piece')
+                  PsiElement(TheR:LIST_SUBSET)('$')
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('mktcap')
+                PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:RPAR)(')')

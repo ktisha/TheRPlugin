@@ -18,7 +18,7 @@ public class TheRFunctionParsing extends Parsing {
     myBuilder.advanceLexer();
 
     parseParameterList();
-    getStatementParser().parseBlock();
+    getStatementParser().parseStatement();
     functionMarker.done(TheRElementTypes.FUNCTION_DECLARATION);
   }
 
