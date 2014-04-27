@@ -164,6 +164,10 @@ public class TheRTokenTypes {
     .create(MINUS, PLUS, NOT, TILDE, HELP, COLON, MULT, DIV, EXP, MODULUS, INT_DIV, MATRIX_PROD, OUTER_PROD, MATCHING, KRONECKER_PROD,
             INFIX_OP, LT, GT, EQEQ, GE, LE, AND, ANDAND, OR, OROR, LEFT_ASSIGN, RIGHT_ASSIGN, LIST_SUBSET, AT);
 
+  public static final TokenSet KEYWORDS = TokenSet.create(NA_INTEGER_KEYWORD, NA_REAL_KEYWORD, NA_COMPLEX_KEYWORD, NA_CHARACTER_KEYWORD,
+                                                          TRIPLE_DOTS, IF_KEYWORD, ELSE_KEYWORD, REPEAT_KEYWORD, WHILE_KEYWORD,
+                                                          FUNCTION_KEYWORD, FOR_KEYWORD, IN_KEYWORD, NEXT_KEYWORD, BREAK_KEYWORD);
+
   public static final TokenSet COMPARISON_OPERATIONS = TokenSet.create(
     LT, GT, EQEQ, GE, LE, NOTEQ);
 

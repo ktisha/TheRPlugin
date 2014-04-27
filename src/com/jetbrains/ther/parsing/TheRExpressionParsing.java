@@ -54,12 +54,21 @@ public class TheRExpressionParsing extends Parsing {
     if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
       final PsiBuilder.Marker mark = myBuilder.mark();
       myBuilder.advanceLexer();
-      if (parseOrExpression()) {
+      if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+        myBuilder.advanceLexer();
+      }
+      if (TheRTokenTypes.KEYWORDS.contains(myBuilder.getTokenType())) {
+        myBuilder.advanceLexer();
+        mark.done(TheRElementTypes.HELP_EXPRESSION);
+        return true;
+      }
+      else if (parseOrExpression()) {
         mark.done(TheRElementTypes.HELP_EXPRESSION);
         return true;
       }
       else {
         myBuilder.error(EXPRESSION_EXPECTED);
+        mark.drop();
         return false;
       }
     }
