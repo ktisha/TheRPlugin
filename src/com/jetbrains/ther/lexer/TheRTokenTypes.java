@@ -175,7 +175,7 @@ public class TheRTokenTypes {
     LT, GT, EQEQ, GE, LE, NOTEQ);
 
   public static final TokenSet ADDITIVE_OPERATIONS = TokenSet.create(PLUS, MINUS);
-  public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV, INT_DIV);
+  public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV, INT_DIV, MATRIX_PROD);
   public static final TokenSet POWER_OPERATIONS = TokenSet.create(EXP, MODULUS);
   public static final TokenSet UNARY_OPERATIONS = TokenSet.create(PLUS, MINUS, TILDE);
   public static final TokenSet EQUALITY_OPERATIONS = TokenSet.create(EQEQ, NOTEQ);
