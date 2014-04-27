@@ -56,24 +56,24 @@ TheRFile:Subscription.r
       PsiElement(TheR:RBRACKET)(']]')
   PsiElement(TheR:STATEMENT_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
-    TheR:REFERENCE_EXPRESSION
+    TheR:SUBSCRIPTION_EXPRESSION
       TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('D')
-      PsiElement(TheR:LIST_SUBSET)('$')
-      TheR:SUBSCRIPTION_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('D')
+        PsiElement(TheR:LIST_SUBSET)('$')
         TheR:REFERENCE_EXPRESSION
           PsiElement(TheR:IDENTIFIER)('names')
-        PsiElement(TheR:LBRACKET)('[')
-        TheR:CALL_EXPRESSION
+      PsiElement(TheR:LBRACKET)('[')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('length')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
           TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('length')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
             TheR:REFERENCE_EXPRESSION
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('D')
-              PsiElement(TheR:LIST_SUBSET)('$')
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('names')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:RBRACKET)(']')
+              PsiElement(TheR:IDENTIFIER)('D')
+            PsiElement(TheR:LIST_SUBSET)('$')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('names')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RBRACKET)(']')
