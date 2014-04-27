@@ -393,6 +393,11 @@ public class TheRExpressionParsing extends Parsing {
 
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
           myBuilder.advanceLexer();
+          if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
+            getFunctionParser().parseFunctionDeclaration();
+            keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
+            continue;
+          }
           if (!parseExpression()) {
             myBuilder.error(EXPRESSION_EXPECTED);
           }
