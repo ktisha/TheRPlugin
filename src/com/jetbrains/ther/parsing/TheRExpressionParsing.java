@@ -105,11 +105,6 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  private void advanceAndSkipNewLine() {
-    myBuilder.advanceLexer();
-    skipNewLine();
-  }
-
   public boolean parseOrExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
     if (!parseANDExpression()) {
@@ -399,9 +394,9 @@ public class TheRExpressionParsing extends Parsing {
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
         parseExpression();
-
+        skipNewLine();
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
-          myBuilder.advanceLexer();
+          advanceAndSkipNewLine();
           if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
             getFunctionParser().parseFunctionDeclaration();
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);

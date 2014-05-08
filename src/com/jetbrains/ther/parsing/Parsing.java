@@ -76,4 +76,10 @@ public class Parsing {
       myBuilder.advanceLexer();
     }
   }
+
+  protected void advanceAndSkipNewLine() {
+    myBuilder.advanceLexer();
+    skipNewLine();
+  }
+
 }
