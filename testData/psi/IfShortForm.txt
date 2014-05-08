@@ -21,7 +21,8 @@ TheRFile:IfShortForm.r
             TheR:INTEGER_LITERAL_EXPRESSION
               PsiElement(TheR:NUMERIC_LITERAL)('0')
             PsiElement(TheR:RPAR)(')')
-      PsiWhiteSpace('\n    ')
+        PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('    ')
       PsiElement(TheR:ELSE_KEYWORD)('else')
       PsiWhiteSpace(' ')
       TheR:EXPRESSION_STATEMENT

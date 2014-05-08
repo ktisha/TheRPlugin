@@ -4,8 +4,8 @@ import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
-import com.jetbrains.ther.lexer.TheRHighlightingLexer;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
+import com.jetbrains.ther.lexer.TheRLexer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class TheRHighlighter extends SyntaxHighlighterBase {
   @Override
   @NotNull
   public Lexer getHighlightingLexer() {
-    return new TheRHighlightingLexer();
+    return new TheRLexer();
   }
 
   @Override

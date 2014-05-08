@@ -60,6 +60,9 @@ ANY_ESCAPE_SEQUENCE = \\[^]
 STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 //ESCAPE_SEQUENCE=\\([rntbafv\'\"\\]|{NONZERO_OCT_DIGIT}|{OCT_DIGIT}{2,3}|"x"{HEX_DIGIT}{1,2}|"u"{HEX_DIGIT}{1,4}|"u{"{HEX_DIGIT}{1,4}"}"|"U"{HEX_DIGIT}{1,8}|"U{"{HEX_DIGIT}{1,8}"}")
 
+%{
+private boolean inDoubleBracket = false;
+%}
 
 %%
 
@@ -125,8 +128,7 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "@"                         { return TheRTokenTypes.AT; }
 "&&"                        { return TheRTokenTypes.ANDAND; }
 "||"                        { return TheRTokenTypes.OROR; }
-"<<-"                       { return TheRTokenTypes.LEFT_COMPLEX_ASSING; }
-"->>"                       { return TheRTokenTypes.RIGHT_COMPLEX_ASSING; }
+
 
 //arithmetic
 "-"                         { return TheRTokenTypes.MINUS; }
@@ -153,8 +155,11 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "~"                         { return TheRTokenTypes.TILDE; }
 
 // assign
+"<<-"                       { return TheRTokenTypes.LEFT_COMPLEX_ASSING; }
+"->>"                       { return TheRTokenTypes.RIGHT_COMPLEX_ASSING; }
 "<-"                        { return TheRTokenTypes.LEFT_ASSIGN; }
 "->"                        { return TheRTokenTypes.RIGHT_ASSIGN; }
+"="                         { return TheRTokenTypes.EQ; }
 
 // list indexing
 "$"                         { return TheRTokenTypes.LIST_SUBSET; }
@@ -169,8 +174,16 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "}"                         { return TheRTokenTypes.RBRACE; }
 
 // indexing
-"[["                        { return TheRTokenTypes.LDBRACKET; }
-"]]"                        { return TheRTokenTypes.RDBRACKET; }
+"[["                        { inDoubleBracket = true; return TheRTokenTypes.LDBRACKET; }
+"]]"                        { if (inDoubleBracket) {
+                                inDoubleBracket = false;
+                                return TheRTokenTypes.RDBRACKET;
+                              }
+                              else {
+                                yypushback(1);
+                                return TheRTokenTypes.RBRACKET;
+                              }
+                              }
 "["                         { return TheRTokenTypes.LBRACKET; }
 "]"                         { return TheRTokenTypes.RBRACKET; }
 
@@ -179,7 +192,6 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 "."                         { return TheRTokenTypes.DOT; }
 ";"                         { return TheRTokenTypes.SEMICOLON; }
 
-"="                         { return TheRTokenTypes.EQ; }
 "`"                         { return TheRTokenTypes.TICK; }
 "?"                         { return TheRTokenTypes.HELP; }
 .                           { return TheRTokenTypes.BAD_CHARACTER; }

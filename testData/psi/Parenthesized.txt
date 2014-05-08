@@ -7,7 +7,7 @@ TheRFile:Parenthesized.r
     PsiWhiteSpace(' ')
     TheR:INTEGER_LITERAL_EXPRESSION
       PsiElement(TheR:NUMERIC_LITERAL)('2')
-  PsiWhiteSpace('\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:BINARY_EXPRESSION
       TheR:SLICE_EXPRESSION
@@ -19,11 +19,12 @@ TheRFile:Parenthesized.r
       PsiElement(TheR:MINUS)('-')
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('1')
-  PsiWhiteSpace(' ')
-  PsiComment(TheR:END_OF_LINE_COMMENT)('# this means (1:i) - 1, not 1:(i-1)')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
-  PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 0 1\n')
-  PsiWhiteSpace('\n')
+    PsiWhiteSpace(' ')
+    PsiComment(TheR:END_OF_LINE_COMMENT)('# this means (1:i) - 1, not 1:(i-1)')
+    PsiElement(TheR:LINE_BREAK)('\n')
+    PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 0 1')
+    PsiElement(TheR:LINE_BREAK)('\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:SLICE_EXPRESSION
       TheR:INTEGER_LITERAL_EXPRESSION
@@ -31,10 +32,11 @@ TheRFile:Parenthesized.r
       PsiElement(TheR:COLON)(':')
       TheR:PARENTHESIZED_EXPRESSION
         PsiElement(TheR:LPAR)('(')
-        TheR:BINARY_EXPRESSION
-          TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('i')
-          PsiElement(TheR:MINUS)('-')
-          TheR:INTEGER_LITERAL_EXPRESSION
-            PsiElement(TheR:NUMERIC_LITERAL)('1')
+        TheR:EXPRESSION_STATEMENT
+          TheR:BINARY_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('i')
+            PsiElement(TheR:MINUS)('-')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1')
         PsiElement(TheR:RPAR)(')')

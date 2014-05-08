@@ -13,9 +13,10 @@ TheRFile:ForStatement.r
     PsiWhiteSpace(' ')
     TheR:BLOCK
       PsiElement(TheR:LBRACE)('{')
-      PsiWhiteSpace('\n    ')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('    ')
       TheR:EXPRESSION_STATEMENT
         TheR:REFERENCE_EXPRESSION
           PsiElement(TheR:IDENTIFIER)('statements')
-      PsiWhiteSpace('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
       PsiElement(TheR:RBRACE)('}')

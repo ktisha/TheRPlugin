@@ -10,10 +10,11 @@ TheRFile:FunctionDefinition.r
       TheR:PARAMETER_LIST
         PsiElement(TheR:LPAR)('(')
         PsiElement(TheR:RPAR)(')')
-      PsiWhiteSpace('\n')
+      PsiElement(TheR:LINE_BREAK)('\n')
       TheR:BLOCK
         PsiElement(TheR:LBRACE)('{')
-        PsiWhiteSpace('\n  ')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiWhiteSpace('  ')
         TheR:ASSIGNMENT_STATEMENT
           TheR:REFERENCE_EXPRESSION
             PsiElement(TheR:IDENTIFIER)('n')
@@ -32,7 +33,8 @@ TheRFile:FunctionDefinition.r
                 TheR:STRING_LITERAL_EXPRESSION
                   PsiElement(TheR:STRING_LITERAL)('"Enter an integer: "')
               PsiElement(TheR:RPAR)(')')
-        PsiWhiteSpace('\n  ')
+          PsiElement(TheR:LINE_BREAK)('\n')
+        PsiWhiteSpace('  ')
         TheR:EXPRESSION_STATEMENT
           TheR:CALL_EXPRESSION
             TheR:REFERENCE_EXPRESSION
@@ -48,10 +50,10 @@ TheRFile:FunctionDefinition.r
                     PsiElement(TheR:IDENTIFIER)('n')
                   PsiElement(TheR:RPAR)(')')
               PsiElement(TheR:RPAR)(')')
-        PsiWhiteSpace('\n')
+          PsiElement(TheR:LINE_BREAK)('\n')
         PsiElement(TheR:RBRACE)('}')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
-  PsiWhiteSpace('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:CALL_EXPRESSION
       TheR:REFERENCE_EXPRESSION

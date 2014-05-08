@@ -153,8 +153,6 @@ public class TheRTokenTypes {
   public static final IElementType TAB = new TheRElementType("TAB");
   public static final IElementType FORMFEED = new TheRElementType("FORMFEED");
 
-  public static final IElementType STATEMENT_BREAK = new TheRElementType("STATEMENT_BREAK");
-
   public static final IElementType END_OF_LINE_COMMENT = new TheRElementType("END_OF_LINE_COMMENT");
 
   public static final TokenSet RESERVED_WORDS = TokenSet

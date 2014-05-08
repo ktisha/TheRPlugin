@@ -40,9 +40,10 @@ TheRFile:Operator.r
               TheR:REFERENCE_EXPRESSION
                 PsiElement(TheR:IDENTIFIER)('b')
         PsiElement(TheR:RBRACE)('}')
-  PsiWhiteSpace('\n\n')
-  PsiComment(TheR:END_OF_LINE_COMMENT)('# use own operator')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiComment(TheR:END_OF_LINE_COMMENT)('# use own operator')
+        PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:BINARY_EXPRESSION
       TheR:INTEGER_LITERAL_EXPRESSION
@@ -52,8 +53,9 @@ TheRFile:Operator.r
       PsiWhiteSpace(' ')
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('1')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
-  PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 4\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
+    PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 4')
+    PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:BINARY_EXPRESSION
       TheR:INTEGER_LITERAL_EXPRESSION
@@ -63,5 +65,5 @@ TheRFile:Operator.r
       PsiWhiteSpace(' ')
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('2')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
   PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 6')

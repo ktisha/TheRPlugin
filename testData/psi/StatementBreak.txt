@@ -8,21 +8,21 @@ TheRFile:StatementBreak.r
       PsiWhiteSpace(' ')
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('4')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:PREFIX_EXPRESSION
       PsiElement(TheR:MINUS)('-')
       TheR:INTEGER_LITERAL_EXPRESSION
         PsiElement(TheR:NUMERIC_LITERAL)('7')
-  PsiElement(TheR:STATEMENT_BREAK)('\n')
+    PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:CALL_EXPRESSION
       TheR:REFERENCE_EXPRESSION
         PsiElement(TheR:IDENTIFIER)('print')
       TheR:ARGUMENT_LIST
         PsiElement(TheR:LPAR)('(')
-        PsiWhiteSpace('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
         TheR:INTEGER_LITERAL_EXPRESSION
           PsiElement(TheR:NUMERIC_LITERAL)('1')
-        PsiWhiteSpace('\n')
+        PsiElement(TheR:LINE_BREAK)('\n')
         PsiElement(TheR:RPAR)(')')

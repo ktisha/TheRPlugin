@@ -3,6 +3,7 @@ package com.jetbrains.ther.parsing;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.tree.IElementType;
+import com.jetbrains.ther.lexer.TheRTokenTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,4 +65,15 @@ public class Parsing {
     return myBuilder.getTokenType() == tokenType;
   }
 
+  protected void skipNewLine() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
+      myBuilder.advanceLexer();
+      if (myBuilder.getTokenType() == TheRTokenTypes.LINE_BREAK) {
+        myBuilder.advanceLexer();
+      }
+    }
+    while (myBuilder.getTokenType() == TheRTokenTypes.LINE_BREAK) {
+      myBuilder.advanceLexer();
+    }
+  }
 }

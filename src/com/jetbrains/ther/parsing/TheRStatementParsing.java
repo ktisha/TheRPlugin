@@ -18,7 +18,7 @@ public class TheRStatementParsing extends Parsing {
   public void parseStatement() {
     IElementType firstToken = myBuilder.getTokenType();
     if (firstToken == null) return;
-    if (firstToken == TheRTokenTypes.STATEMENT_BREAK) {
+    while (firstToken == TheRTokenTypes.LINE_BREAK) {
       myBuilder.advanceLexer();
       firstToken = myBuilder.getTokenType();
     }
@@ -53,14 +53,6 @@ public class TheRStatementParsing extends Parsing {
     parseSimpleStatement();
   }
 
-  private void checkSemicolon() {
-    if (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
-      myBuilder.advanceLexer();
-      if (myBuilder.getTokenType() == TheRTokenTypes.STATEMENT_BREAK) {
-          myBuilder.advanceLexer();
-      }
-    }
-  }
 
   protected void parseSimpleStatement() {
     final IElementType tokenType = myBuilder.getTokenType();
@@ -72,6 +64,7 @@ public class TheRStatementParsing extends Parsing {
     if (successfull) {
       if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
         myBuilder.advanceLexer();
+        skipNewLine();
         if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
           getFunctionParser().parseFunctionDeclaration();
         }
@@ -81,11 +74,11 @@ public class TheRStatementParsing extends Parsing {
         else if (!expressionParser.parseExpression()) {
           myBuilder.error(EXPRESSION_EXPECTED);
         }
-        checkSemicolon();
+        skipNewLine();
         exprStatement.done(TheRElementTypes.ASSIGNMENT_STATEMENT);
       }
       else {
-        checkSemicolon();
+        skipNewLine();
         exprStatement.done(TheRElementTypes.EXPRESSION_STATEMENT);
       }
       return;
@@ -112,7 +105,7 @@ public class TheRStatementParsing extends Parsing {
       myBuilder.advanceLexer();
       parseStatement();
     }
-    checkSemicolon();
+    skipNewLine();
     ifStatement.done(TheRElementTypes.IF_STATEMENT);
   }
   
@@ -122,7 +115,7 @@ public class TheRStatementParsing extends Parsing {
     myBuilder.advanceLexer();
 
     parseStatement();
-    checkSemicolon();
+    skipNewLine();
     statement.done(TheRElementTypes.REPEAT_STATEMENT);
   }
 
@@ -134,7 +127,7 @@ public class TheRStatementParsing extends Parsing {
       myBuilder.advanceLexer();
       checkMatches(TheRTokenTypes.RPAR, ") expected");
     }
-    checkSemicolon();
+    skipNewLine();
     statement.done(TheRElementTypes.BREAK_STATEMENT);
   }
 
@@ -146,7 +139,7 @@ public class TheRStatementParsing extends Parsing {
       myBuilder.advanceLexer();
       checkMatches(TheRTokenTypes.RPAR, ") expected");
     }
-    checkSemicolon();
+    skipNewLine();
     statement.done(TheRElementTypes.NEXT_STATEMENT);
   }
 
@@ -160,7 +153,7 @@ public class TheRStatementParsing extends Parsing {
     checkMatches(TheRTokenTypes.RPAR, ") expected");
 
     parseStatement();
-    checkSemicolon();
+    skipNewLine();
     statement.done(TheRElementTypes.WHILE_STATEMENT);
   }
 
@@ -182,14 +175,11 @@ public class TheRStatementParsing extends Parsing {
     checkMatches(TheRTokenTypes.RPAR, ") expected");
 
     parseStatement();
-    checkSemicolon();
+    skipNewLine();
     statement.done(TheRElementTypes.FOR_STATEMENT);
   }
   
   public void parseBlock() {
-    if (myBuilder.getTokenType() == TheRTokenTypes.STATEMENT_BREAK) {
-      myBuilder.advanceLexer();
-    }
     if (myBuilder.getTokenType() != TheRTokenTypes.LBRACE) {
       myBuilder.error("statements block expected");
       return;
@@ -208,7 +198,7 @@ public class TheRStatementParsing extends Parsing {
     }
 
     myBuilder.advanceLexer();
-    checkSemicolon();
+    skipNewLine();
     block.done(TheRElementTypes.BLOCK);
   }
 

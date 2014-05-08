@@ -7,7 +7,8 @@ TheRFile:BlockAsArgument.r
         PsiElement(TheR:LPAR)('(')
         TheR:BLOCK
           PsiElement(TheR:LBRACE)('{')
-          PsiWhiteSpace('\n  ')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('  ')
           TheR:ASSIGNMENT_STATEMENT
             TheR:REFERENCE_EXPRESSION
               PsiElement(TheR:IDENTIFIER)('B')
@@ -60,6 +61,6 @@ TheRFile:BlockAsArgument.r
                         PsiElement(TheR:NUMERIC_LITERAL)('100000')
                       PsiElement(TheR:RPAR)(')')
                 PsiElement(TheR:RPAR)(')')
-          PsiWhiteSpace('\n')
+            PsiElement(TheR:LINE_BREAK)('\n')
           PsiElement(TheR:RBRACE)('}')
         PsiElement(TheR:RPAR)(')')

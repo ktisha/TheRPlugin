@@ -190,7 +190,7 @@ public class TheRHighlightingLexerTest extends TestCase {
 
 
   private static void doTest(String text, String... expectedTokens) {
-    doLexerTest(text, new TheRHighlightingLexer(), expectedTokens);
+    doLexerTest(text, new TheRLexer(), expectedTokens);
   }
 
   public static void doLexerTest(String text, Lexer lexer, String... expectedTokens) {

@@ -312,6 +312,7 @@ public class TheRExpressionParsing extends Parsing {
         expr = expr.precede();
       }
       else if (tokenType == TheRTokenTypes.LPAR) {
+        skipNewLine();
         parseArgumentList();
         expr.done(TheRElementTypes.CALL_EXPRESSION);
         expr = expr.precede();
@@ -324,8 +325,10 @@ public class TheRExpressionParsing extends Parsing {
       }
       else if (TheRTokenTypes.OPEN_BRACKETS.contains(tokenType)) {
         myBuilder.advanceLexer();
+        skipNewLine();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
           myBuilder.advanceLexer();
+          skipNewLine();
           PsiBuilder.Marker marker = myBuilder.mark();
           marker.done(TheRElementTypes.EMPTY_EXPRESSION);
         }
@@ -334,6 +337,7 @@ public class TheRExpressionParsing extends Parsing {
           if (parseExpression()) {
             if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
               myBuilder.advanceLexer();
+              skipNewLine();
             }
             else {
               break;
@@ -372,12 +376,13 @@ public class TheRExpressionParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
     final PsiBuilder.Marker arglist = myBuilder.mark();
     myBuilder.advanceLexer();
-    PsiBuilder.Marker genexpr = myBuilder.mark();
     int argNumber = 0;
+    skipNewLine();
     while (myBuilder.getTokenType() != TheRTokenTypes.RPAR) {
       argNumber++;
       if (argNumber > 1) {
         if (matchToken(TheRTokenTypes.COMMA)) {
+          skipNewLine();
           if (atToken(TheRTokenTypes.RPAR)) {
             break;
           }
@@ -422,12 +427,9 @@ public class TheRExpressionParsing extends Parsing {
         myBuilder.error(EXPRESSION_EXPECTED);
         break;
       }
+      skipNewLine();
     }
-
-
-    if (genexpr != null) {
-      genexpr.drop();
-    }
+    skipNewLine();
     checkMatches(TheRTokenTypes.RPAR, "')' expected");
     arglist.done(TheRElementTypes.ARGUMENT_LIST);
   }
