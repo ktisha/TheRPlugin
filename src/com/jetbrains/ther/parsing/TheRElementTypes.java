@@ -18,7 +18,6 @@ public interface TheRElementTypes {
 
   // expressions
   TheRElementType INTEGER_LITERAL_EXPRESSION = new TheRElementType("INTEGER_LITERAL_EXPRESSION", TheRNumericLiteralExpressionImpl.class);
-  TheRElementType FLOAT_LITERAL_EXPRESSION = new TheRElementType("FLOAT_LITERAL_EXPRESSION", TheRNumericLiteralExpressionImpl.class);
   TheRElementType IMAGINARY_LITERAL_EXPRESSION = new TheRElementType("IMAGINARY_LITERAL_EXPRESSION", TheRNumericLiteralExpressionImpl.class);
   TheRElementType STRING_LITERAL_EXPRESSION = new TheRElementType("STRING_LITERAL_EXPRESSION", TheRStringLiteralExpressionImpl.class);
   TheRElementType REFERENCE_EXPRESSION = new TheRElementType("REFERENCE_EXPRESSION", TheRReferenceExpressionImpl.class);

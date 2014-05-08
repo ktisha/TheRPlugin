@@ -2,8 +2,7 @@ TheRFile:Operator.r
   TheR:ASSIGNMENT_STATEMENT
     TheR:REPR_EXPRESSION
       PsiElement(TheR:TICK)('`')
-      TheR:OPERATOR_EXPRESSION
-        PsiElement(TheR:INFIX_OP)('%myop%')
+      PsiElement(TheR:INFIX_OP)('%myop%')
       PsiElement(TheR:TICK)('`')
     PsiWhiteSpace(' ')
     PsiElement(TheR:LEFT_ASSIGN)('<-')

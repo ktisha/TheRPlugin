@@ -19,8 +19,8 @@ public class TheRExpressionParsing extends Parsing {
       buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
       return true;
     }
-    else if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {
-      buildTokenElement(TheRElementTypes.FLOAT_LITERAL_EXPRESSION, myBuilder);
+    else if (firstToken == TheRTokenTypes.INTEGER_LITERAL) {
+      buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
       return true;
     }
     else if (firstToken == TheRTokenTypes.COMPLEX_LITERAL) {
@@ -437,7 +437,9 @@ public class TheRExpressionParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.TICK);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
-    parseExpression();
+    while (!atToken(TheRTokenTypes.TICK)) {
+      myBuilder.advanceLexer();
+    }
     checkMatches(TheRTokenTypes.TICK, "'`' (backtick) expected");
     expr.done(TheRElementTypes.REPR_EXPRESSION);
   }

@@ -6,7 +6,7 @@ TheRFile:HelpOnKeyword.r
       PsiElement(TheR:HELP)('?')
       TheR:REFERENCE_EXPRESSION
         PsiElement(TheR:IDENTIFIER)('seq')
-    PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:CALL_EXPRESSION
       TheR:REFERENCE_EXPRESSION
@@ -59,7 +59,7 @@ TheRFile:HelpOnKeyword.r
       PsiElement(TheR:HELP)('?')
       TheR:STRING_LITERAL_EXPRESSION
         PsiElement(TheR:STRING_LITERAL)('"multivariate normal"')
-    PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:CALL_EXPRESSION
       TheR:REFERENCE_EXPRESSION
@@ -86,8 +86,8 @@ TheRFile:HelpOnKeyword.r
       PsiElement(TheR:HELP)('?')
       TheR:REFERENCE_EXPRESSION
         PsiElement(TheR:IDENTIFIER)('Startup')
-    PsiElement(TheR:LINE_BREAK)('\n')
-    PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:LINE_BREAK)('\n')
   TheR:EXPRESSION_STATEMENT
     TheR:HELP_EXPRESSION
       PsiElement(TheR:HELP)('?')
