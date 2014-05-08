@@ -1,0 +1,78 @@
+TheRFile:AssignmentInSubscription.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:SUBSCRIPTION_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('fill')
+      PsiElement(TheR:LBRACKET)('[')
+      PsiWhiteSpace(' ')
+      TheR:EMPTY_EXPRESSION
+        <empty list>
+      PsiElement(TheR:COMMA)(',')
+      PsiWhiteSpace(' ')
+      TheR:ASSIGNMENT_STATEMENT
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('i2')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:LEFT_ASSIGN)('<-')
+        PsiWhiteSpace(' ')
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('c')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1')
+            PsiElement(TheR:COMMA)(',')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('ncol')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('fill')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RBRACKET)(']')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:STRING_LITERAL_EXPRESSION
+      PsiElement(TheR:STRING_LITERAL)('"gray"')
+    PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:SUBSCRIPTION_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('fill')
+      PsiElement(TheR:LBRACKET)('[')
+      TheR:ASSIGNMENT_STATEMENT
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('i1')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:LEFT_ASSIGN)('<-')
+        PsiWhiteSpace(' ')
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('c')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1')
+            PsiElement(TheR:COMMA)(',')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('nrow')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('fill')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:COMMA)(',')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:RBRACKET)(']')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:STRING_LITERAL_EXPRESSION
+      PsiElement(TheR:STRING_LITERAL)('"gray"')

@@ -35,10 +35,10 @@ TheRFile:Subscription.r
     TheR:REFERENCE_EXPRESSION
       PsiElement(TheR:IDENTIFIER)('mtcars')
     PsiElement(TheR:LBRACKET)('[')
-    PsiElement(TheR:COMMA)(',')
-    PsiWhiteSpace(' ')
     TheR:EMPTY_EXPRESSION
       <empty list>
+    PsiElement(TheR:COMMA)(',')
+    PsiWhiteSpace(' ')
     TheR:REFERENCE_EXPRESSION
       PsiElement(TheR:IDENTIFIER)('am')
     PsiElement(TheR:RBRACKET)(']')

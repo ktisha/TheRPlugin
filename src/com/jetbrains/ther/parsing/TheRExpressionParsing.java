@@ -435,22 +435,15 @@ public class TheRExpressionParsing extends Parsing {
       else if (TheRTokenTypes.OPEN_BRACKETS.contains(tokenType)) {
         advanceAndSkipNewLines();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-          advanceAndSkipNewLines();
           PsiBuilder.Marker marker = myBuilder.mark();
           marker.done(TheRElementTypes.EMPTY_EXPRESSION);
+          advanceAndSkipNewLines();
         }
         final IElementType CLOSE_BRACKET = TheRTokenTypes.BRACKER_PAIRS.get(tokenType);
         while (myBuilder.getTokenType() != CLOSE_BRACKET && !myBuilder.eof()) {
-          if (parseFormulaeExpression()) {
-            if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-              advanceAndSkipNewLines();
-            }
-            else {
-              break;
-            }
-          }
-          else {
-            break;
+          parseExpressionStatement();
+          if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+            advanceAndSkipNewLines();
           }
         }
 

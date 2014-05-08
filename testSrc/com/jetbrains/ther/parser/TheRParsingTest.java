@@ -129,6 +129,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testAssignmentInSubscription() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }
