@@ -116,6 +116,7 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
+    skipNewLine();
     while (TheRTokenTypes.OR_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLine();
       if (!parseANDExpression()) {
@@ -135,6 +136,7 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
+    skipNewLine();
     while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLine();
       if (!parseUserDefinedExpression()) {
