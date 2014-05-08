@@ -545,7 +545,6 @@ public class TheRExpressionParsing extends Parsing {
   }
 
   private void parseParenthesizedExpression() {
-    LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
     parseExpressionStatement();
@@ -594,6 +593,10 @@ public class TheRExpressionParsing extends Parsing {
     }
     else if (firstToken == TheRTokenTypes.LPAR) {
       parseParenthesizedExpression();
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.LBRACE) {
+      parseBlockExpression();
       return true;
     }
     else {
