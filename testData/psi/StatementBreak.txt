@@ -1,28 +1,25 @@
 TheRFile:StatementBreak.r
-  TheR:EXPRESSION_STATEMENT
-    TheR:BINARY_EXPRESSION
+  TheR:BINARY_EXPRESSION
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('13')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:PLUS)('+')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('4')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:PREFIX_EXPRESSION
+    PsiElement(TheR:MINUS)('-')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('7')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('print')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      PsiElement(TheR:LINE_BREAK)('\n')
       TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('13')
-      PsiWhiteSpace(' ')
-      PsiElement(TheR:PLUS)('+')
-      PsiWhiteSpace(' ')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('4')
-    PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:PREFIX_EXPRESSION
-      PsiElement(TheR:MINUS)('-')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('7')
-    PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:CALL_EXPRESSION
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('print')
-      TheR:ARGUMENT_LIST
-        PsiElement(TheR:LPAR)('(')
-        PsiElement(TheR:LINE_BREAK)('\n')
-        TheR:INTEGER_LITERAL_EXPRESSION
-          PsiElement(TheR:NUMERIC_LITERAL)('1')
-        PsiElement(TheR:LINE_BREAK)('\n')
-        PsiElement(TheR:RPAR)(')')
+        PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:RPAR)(')')

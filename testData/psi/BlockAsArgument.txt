@@ -1,66 +1,65 @@
 TheRFile:BlockAsArgument.r
-  TheR:EXPRESSION_STATEMENT
-    TheR:CALL_EXPRESSION
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('system.time')
-      TheR:ARGUMENT_LIST
-        PsiElement(TheR:LPAR)('(')
-        TheR:BLOCK
-          PsiElement(TheR:LBRACE)('{')
-          PsiElement(TheR:LINE_BREAK)('\n')
-          PsiWhiteSpace('  ')
-          TheR:ASSIGNMENT_STATEMENT
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('system.time')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:BLOCK
+        PsiElement(TheR:LBRACE)('{')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiWhiteSpace('  ')
+        TheR:ASSIGNMENT_STATEMENT
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('B')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:EQ)('=')
+          PsiWhiteSpace(' ')
+          TheR:CALL_EXPRESSION
             TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('B')
-            PsiWhiteSpace(' ')
-            PsiElement(TheR:EQ)('=')
-            PsiWhiteSpace(' ')
-            TheR:CALL_EXPRESSION
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('data.frame')
-              TheR:ARGUMENT_LIST
-                PsiElement(TheR:LPAR)('(')
-                TheR:KEYWORD_ARGUMENT_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('data.frame')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:KEYWORD_ARGUMENT_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('x1')
+                PsiElement(TheR:EQ)('=')
+                TheR:CALL_EXPRESSION
                   TheR:REFERENCE_EXPRESSION
-                    PsiElement(TheR:IDENTIFIER)('x1')
-                  PsiElement(TheR:EQ)('=')
-                  TheR:CALL_EXPRESSION
-                    TheR:REFERENCE_EXPRESSION
-                      PsiElement(TheR:IDENTIFIER)('runif')
-                    TheR:ARGUMENT_LIST
-                      PsiElement(TheR:LPAR)('(')
-                      TheR:INTEGER_LITERAL_EXPRESSION
-                        PsiElement(TheR:NUMERIC_LITERAL)('100000')
-                      PsiElement(TheR:RPAR)(')')
-                PsiElement(TheR:COMMA)(',')
-                PsiWhiteSpace(' ')
-                TheR:KEYWORD_ARGUMENT_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('runif')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:INTEGER_LITERAL_EXPRESSION
+                      PsiElement(TheR:NUMERIC_LITERAL)('100000')
+                    PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:KEYWORD_ARGUMENT_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('x2')
+                PsiElement(TheR:EQ)('=')
+                TheR:CALL_EXPRESSION
                   TheR:REFERENCE_EXPRESSION
-                    PsiElement(TheR:IDENTIFIER)('x2')
-                  PsiElement(TheR:EQ)('=')
-                  TheR:CALL_EXPRESSION
-                    TheR:REFERENCE_EXPRESSION
-                      PsiElement(TheR:IDENTIFIER)('runif')
-                    TheR:ARGUMENT_LIST
-                      PsiElement(TheR:LPAR)('(')
-                      TheR:INTEGER_LITERAL_EXPRESSION
-                        PsiElement(TheR:NUMERIC_LITERAL)('100000')
-                      PsiElement(TheR:RPAR)(')')
-                PsiElement(TheR:COMMA)(',')
-                PsiWhiteSpace(' ')
-                TheR:KEYWORD_ARGUMENT_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('runif')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:INTEGER_LITERAL_EXPRESSION
+                      PsiElement(TheR:NUMERIC_LITERAL)('100000')
+                    PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:KEYWORD_ARGUMENT_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('x3')
+                PsiElement(TheR:EQ)('=')
+                TheR:CALL_EXPRESSION
                   TheR:REFERENCE_EXPRESSION
-                    PsiElement(TheR:IDENTIFIER)('x3')
-                  PsiElement(TheR:EQ)('=')
-                  TheR:CALL_EXPRESSION
-                    TheR:REFERENCE_EXPRESSION
-                      PsiElement(TheR:IDENTIFIER)('runif')
-                    TheR:ARGUMENT_LIST
-                      PsiElement(TheR:LPAR)('(')
-                      TheR:INTEGER_LITERAL_EXPRESSION
-                        PsiElement(TheR:NUMERIC_LITERAL)('100000')
-                      PsiElement(TheR:RPAR)(')')
-                PsiElement(TheR:RPAR)(')')
-            PsiElement(TheR:LINE_BREAK)('\n')
-          PsiElement(TheR:RBRACE)('}')
-        PsiElement(TheR:RPAR)(')')
+                    PsiElement(TheR:IDENTIFIER)('runif')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:INTEGER_LITERAL_EXPRESSION
+                      PsiElement(TheR:NUMERIC_LITERAL)('100000')
+                    PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:LINE_BREAK)('\n')
+        PsiElement(TheR:RBRACE)('}')
+      PsiElement(TheR:RPAR)(')')

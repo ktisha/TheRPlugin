@@ -17,9 +17,9 @@ public class TheRParser implements PsiParser {
     final PsiBuilder.Marker rootMarker = builder.mark();
 
     final TheRParsingContext context = createParsingContext(builder);
-    final TheRStatementParsing statementParser = context.getStatementParser();
+    final TheRExpressionParsing statementParser = context.getExpressionParser();
     while (!builder.eof()) {
-      statementParser.parseStatement();
+      statementParser.parseExpressionStatement();
     }
     rootMarker.done(root);
     final ASTNode ast = builder.getTreeBuilt();

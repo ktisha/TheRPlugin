@@ -13,32 +13,29 @@ TheRFile:StatementBreakAssignment.r
         PsiElement(TheR:NUMERIC_LITERAL)('5')
     PsiElement(TheR:LINE_BREAK)('\n')
     PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:CALL_EXPRESSION
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('print')
+    PsiWhiteSpace(' ')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      PsiElement(TheR:LINE_BREAK)('\n')
       TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('print')
-      PsiWhiteSpace(' ')
-      TheR:ARGUMENT_LIST
-        PsiElement(TheR:LPAR)('(')
-        PsiElement(TheR:LINE_BREAK)('\n')
-        TheR:REFERENCE_EXPRESSION
-          PsiElement(TheR:IDENTIFIER)('a')
-        PsiElement(TheR:LINE_BREAK)('\n')
-        PsiElement(TheR:RPAR)(')')
-    PsiElement(TheR:LINE_BREAK)('\n')
-    PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:BINARY_EXPRESSION
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('1')
-      PsiWhiteSpace(' ')
-      PsiElement(TheR:PLUS)('+')
-      PsiWhiteSpace(' ')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('2')
-    PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:PREFIX_EXPRESSION
-      PsiElement(TheR:MINUS)('-')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('3')
+        PsiElement(TheR:IDENTIFIER)('a')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiElement(TheR:RPAR)(')')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:BINARY_EXPRESSION
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:PLUS)('+')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('2')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:PREFIX_EXPRESSION
+    PsiElement(TheR:MINUS)('-')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('3')

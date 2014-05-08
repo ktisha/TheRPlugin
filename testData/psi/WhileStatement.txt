@@ -14,16 +14,15 @@ TheRFile:WhileStatement.r
       PsiElement(TheR:LBRACE)('{')
       PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
-          TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('Sys.sleep')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:INTEGER_LITERAL_EXPRESSION
-              PsiElement(TheR:NUMERIC_LITERAL)('1')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:LINE_BREAK)('\n')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('Sys.sleep')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('1')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
       TheR:ASSIGNMENT_STATEMENT
         TheR:REFERENCE_EXPRESSION
@@ -41,14 +40,13 @@ TheRFile:WhileStatement.r
             PsiElement(TheR:NUMERIC_LITERAL)('1')
         PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('print')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
           TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('print')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('from')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:LINE_BREAK)('\n')
+            PsiElement(TheR:IDENTIFIER)('from')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
       PsiElement(TheR:RBRACE)('}')

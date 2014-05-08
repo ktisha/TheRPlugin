@@ -31,16 +31,15 @@ TheRFile:Break.r
             PsiElement(TheR:NUMERIC_LITERAL)('1')
         PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('print')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
           TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('print')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('z')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:LINE_BREAK)('\n')
+            PsiElement(TheR:IDENTIFIER)('z')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
       TheR:IF_STATEMENT
         PsiElement(TheR:IF_KEYWORD)('if')

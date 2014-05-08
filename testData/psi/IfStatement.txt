@@ -16,26 +16,25 @@ TheRFile:IfStatement.r
       PsiElement(TheR:LBRACE)('{')
       PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('  ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('cat')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
           TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('cat')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('A')
-            PsiElement(TheR:COMMA)(',')
-            PsiWhiteSpace(' ')
-            TheR:STRING_LITERAL_EXPRESSION
-              PsiElement(TheR:STRING_LITERAL)('">"')
-            PsiElement(TheR:COMMA)(',')
-            PsiWhiteSpace(' ')
-            TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('a')
-            PsiElement(TheR:COMMA)(',')
-            PsiWhiteSpace(' ')
-            TheR:STRING_LITERAL_EXPRESSION
-              PsiElement(TheR:STRING_LITERAL)('"\n"')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:LINE_BREAK)('\n')
+            PsiElement(TheR:IDENTIFIER)('A')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:STRING_LITERAL_EXPRESSION
+            PsiElement(TheR:STRING_LITERAL)('">"')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('a')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:STRING_LITERAL_EXPRESSION
+            PsiElement(TheR:STRING_LITERAL)('"\n"')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
       PsiElement(TheR:RBRACE)('}')

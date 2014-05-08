@@ -13,87 +13,194 @@ public class TheRExpressionParsing extends Parsing {
     super(context);
   }
 
-  public boolean parsePrimaryExpression() {
+  public void parseExpressionStatement() {
+    skipNewLines();
+
     final IElementType firstToken = myBuilder.getTokenType();
-    if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {
-      buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
-      return true;
+    if (firstToken == null) return;
+
+    if (firstToken == TheRTokenTypes.IF_KEYWORD) {
+      parseIfExpression();
     }
-    else if (firstToken == TheRTokenTypes.INTEGER_LITERAL) {
-      buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.WHILE_KEYWORD) {
+      parseWhileExpression();
     }
-    else if (firstToken == TheRTokenTypes.COMPLEX_LITERAL) {
-      buildTokenElement(TheRElementTypes.IMAGINARY_LITERAL_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.FOR_KEYWORD) {
+      parseForExpression();
     }
-    else if (firstToken == TheRTokenTypes.STRING_LITERAL) {
-      buildTokenElement(TheRElementTypes.STRING_LITERAL_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.REPEAT_KEYWORD) {
+      parseRepeatExpression();
     }
-    else if (firstToken == TheRTokenTypes.IDENTIFIER) {
-      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.BREAK_KEYWORD) {
+      parseBreakExpression();
     }
-    else if (firstToken == TheRTokenTypes.NA_KEYWORD) {
-      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.NEXT_KEYWORD) {
+      parseNextExpression();
     }
-    else if (TheRTokenTypes.SPECIAL_CONSTANTS.contains(firstToken)) {
-      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.LBRACE) {
+      parseBlockExpression();
     }
-    else if (firstToken == TheRTokenTypes.INFIX_OP) {
-      buildTokenElement(TheRElementTypes.OPERATOR_EXPRESSION, myBuilder);
-      return true;
+    else if (firstToken == TheRTokenTypes.FUNCTION_KEYWORD) {
+      getFunctionParser().parseFunctionDeclaration();
     }
-    else if (firstToken == TheRTokenTypes.TICK) {
-      parseReprExpression();
-      return true;
-    }
-    else if (firstToken == TheRTokenTypes.LPAR) {
-      parseParenthesizedExpression();
-      return true;
+    else if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+      parseHelpExpression();
     }
     else {
-      myBuilder.advanceLexer();
+      parseAssignmentExpression();
     }
-    return false;
   }
 
-  public boolean parseExpression() {
-    if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
-      final PsiBuilder.Marker mark = myBuilder.mark();
+  private void parseIfExpression() {
+    final PsiBuilder.Marker ifExpression = myBuilder.mark();
+    parseConditionExpression();
+    parseExpressionStatement();
+    skipNewLines();
+    if (myBuilder.getTokenType() == TheRTokenTypes.ELSE_KEYWORD) {
       myBuilder.advanceLexer();
-      if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+      parseExpressionStatement();
+    }
+    checkSemicolon();
+    ifExpression.done(TheRElementTypes.IF_STATEMENT);
+  }
+
+  private void parseWhileExpression() {
+    final PsiBuilder.Marker whileExpression = myBuilder.mark();
+    parseConditionExpression();
+    parseExpressionStatement();
+    checkSemicolon();
+    whileExpression.done(TheRElementTypes.WHILE_STATEMENT);
+  }
+
+  private void parseConditionExpression() {
+    advanceAndSkipNewLines();
+    checkMatches(TheRTokenTypes.LPAR, "( expected");
+    parseExpressionStatement();
+    skipNewLines();
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    skipNewLines();
+  }
+
+  private void parseForExpression() {
+    final PsiBuilder.Marker forExpression = myBuilder.mark();
+    advanceAndSkipNewLines();
+    checkMatches(TheRTokenTypes.LPAR, "( expected");
+    parseExpressionStatement();
+    skipNewLines();
+    if (checkMatches(TheRTokenTypes.IN_KEYWORD, "'in' expected")) {
+      parseExpressionStatement();
+    }
+    skipNewLines();
+    checkMatches(TheRTokenTypes.RPAR, ") expected");
+    parseExpressionStatement();
+    checkSemicolon();
+    forExpression.done(TheRElementTypes.FOR_STATEMENT);
+  }
+
+  private void parseRepeatExpression() {
+    final PsiBuilder.Marker repeatExpression = myBuilder.mark();
+    advanceAndSkipNewLines();
+    parseExpressionStatement();
+    checkSemicolon();
+    repeatExpression.done(TheRElementTypes.REPEAT_STATEMENT);
+  }
+
+  private void parseBreakExpression() {
+    final PsiBuilder.Marker breakExpression = myBuilder.mark();
+    myBuilder.advanceLexer();
+    parseNextBreakInnerExpression();
+    checkSemicolon();
+    breakExpression.done(TheRElementTypes.BREAK_STATEMENT);
+  }
+
+  private void parseNextExpression() {
+    final PsiBuilder.Marker statement = myBuilder.mark();
+    myBuilder.advanceLexer();
+    parseNextBreakInnerExpression();
+    skipNewLines();
+    statement.done(TheRElementTypes.NEXT_STATEMENT);
+  }
+
+  private void parseNextBreakInnerExpression() {
+    if (myBuilder.getTokenType() == TheRTokenTypes.LPAR) {
+      advanceAndSkipNewLines();
+      if (atToken(TheRTokenTypes.RPAR)) {
         myBuilder.advanceLexer();
+        return;
       }
-      if (TheRTokenTypes.KEYWORDS.contains(myBuilder.getTokenType())) {
-        myBuilder.advanceLexer();
-        mark.done(TheRElementTypes.HELP_EXPRESSION);
-        return true;
+      parseExpressionStatement();
+      skipNewLines();
+      checkMatches(TheRTokenTypes.RPAR, ") expected");
+    }
+  }
+
+  public void parseBlockExpression() {
+    final PsiBuilder.Marker blockExpression = myBuilder.mark();
+    advanceAndSkipNewLines();
+    while (myBuilder.getTokenType() != TheRTokenTypes.RBRACE) {
+      if (myBuilder.eof()) {
+        myBuilder.error("missing }");
+        blockExpression.done(TheRElementTypes.BLOCK);
+        return;
       }
-      else if (parseModelFormulaeExpression()) {
-        mark.done(TheRElementTypes.HELP_EXPRESSION);
-        return true;
+      parseExpressionStatement();
+    }
+
+    myBuilder.advanceLexer();
+    checkSemicolon();
+    blockExpression.done(TheRElementTypes.BLOCK);
+  }
+
+  public void parseHelpExpression() {
+    final PsiBuilder.Marker mark = myBuilder.mark();
+    advanceAndSkipNewLines();
+    if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+      advanceAndSkipNewLines();
+    }
+    if (TheRTokenTypes.KEYWORDS.contains(myBuilder.getTokenType())) {
+      myBuilder.advanceLexer();
+      mark.done(TheRElementTypes.HELP_EXPRESSION);
+    }
+    else if (parseFormulaeExpression()) {    // should we parse expression statement instead?
+      mark.done(TheRElementTypes.HELP_EXPRESSION);
+    }
+    else {
+      myBuilder.error(EXPRESSION_EXPECTED);
+      mark.drop();
+    }
+  }
+
+  protected void parseAssignmentExpression() {
+    final PsiBuilder.Marker assignmentExpression = myBuilder.mark();
+    final boolean successfull = parseFormulaeExpression();
+    if (successfull) {
+      if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
+        advanceAndSkipNewLines();
+        parseExpressionStatement();
+        checkSemicolon();
+        assignmentExpression.done(TheRElementTypes.ASSIGNMENT_STATEMENT);
       }
       else {
-        myBuilder.error(EXPRESSION_EXPECTED);
-        mark.drop();
-        return false;
+        checkSemicolon();
+        assignmentExpression.drop();
       }
+      return;
     }
-    return parseModelFormulaeExpression();
+    else
+      assignmentExpression.drop();
+
+    myBuilder.advanceLexer();
+    myBuilder.error(EXPRESSION_EXPECTED);
   }
 
-  public boolean parseModelFormulaeExpression() {
+  public boolean parseFormulaeExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
     if (!parseOrExpression()) {
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.TILDE == myBuilder.getTokenType()) {
-      advanceAndSkipNewLine();
+      advanceAndSkipNewLines();
       if (!parseOrExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -111,9 +218,9 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
-    skipNewLine();
+    skipNewLines();
     while (TheRTokenTypes.OR_OPERATIONS.contains(myBuilder.getTokenType())) {
-      advanceAndSkipNewLine();
+      advanceAndSkipNewLines();
       if (!parseANDExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -127,32 +234,13 @@ public class TheRExpressionParsing extends Parsing {
 
   private boolean parseANDExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseUserDefinedExpression()) {
-      expr.drop();
-      return false;
-    }
-    skipNewLine();
-    while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
-      advanceAndSkipNewLine();
-      if (!parseUserDefinedExpression()) {
-        myBuilder.error(EXPRESSION_EXPECTED);
-      }
-      expr.done(TheRElementTypes.BINARY_EXPRESSION);
-      expr = expr.precede();
-    }
-
-    expr.drop();
-    return true;
-  }
-
-  private boolean parseUserDefinedExpression() {
-    PsiBuilder.Marker expr = myBuilder.mark();
     if (!parseNOTExpression()) {
       expr.drop();
       return false;
     }
-    while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
-      advanceAndSkipNewLine();
+    skipNewLines();
+    while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
+      advanceAndSkipNewLines();
       if (!parseNOTExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -187,8 +275,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.COMPARISON_OPERATIONS.contains(myBuilder.getTokenType())) {
-      advanceAndSkipNewLine();
-
+      advanceAndSkipNewLines();
       if (!parseAdditiveExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -207,7 +294,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
-      advanceAndSkipNewLine();
+      advanceAndSkipNewLines();
       if (!parseMultiplicativeExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -221,13 +308,33 @@ public class TheRExpressionParsing extends Parsing {
 
   private boolean parseMultiplicativeExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseSliceExpression()) {
+    if (!parseUserDefinedExpression()) {
       expr.drop();
       return false;
     }
 
     while (TheRTokenTypes.MULTIPLICATIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
-      advanceAndSkipNewLine();
+      advanceAndSkipNewLines();
+      if (!parseUserDefinedExpression()) {
+        myBuilder.error(EXPRESSION_EXPECTED);
+      }
+      expr.done(TheRElementTypes.BINARY_EXPRESSION);
+      expr = expr.precede();
+    }
+
+    expr.drop();
+    return true;
+  }
+
+
+  private boolean parseUserDefinedExpression() {
+    PsiBuilder.Marker expr = myBuilder.mark();
+    if (!parseSliceExpression()) {
+      expr.drop();
+      return false;
+    }
+    while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
+      advanceAndSkipNewLines();
       if (!parseSliceExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -247,7 +354,7 @@ public class TheRExpressionParsing extends Parsing {
     }
 
     while (TheRTokenTypes.COLON == myBuilder.getTokenType()) {
-      advanceAndSkipNewLine();
+      advanceAndSkipNewLines();
       if (!parseUnaryExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -314,29 +421,29 @@ public class TheRExpressionParsing extends Parsing {
         expr = expr.precede();
       }
       else if (tokenType == TheRTokenTypes.LPAR) {
-        skipNewLine();
+        skipNewLines();
         parseArgumentList();
         expr.done(TheRElementTypes.CALL_EXPRESSION);
         expr = expr.precede();
       }
       else if (TheRTokenTypes.NAMESPACE_ACCESS.contains(tokenType)) {
         myBuilder.advanceLexer();
-        parseExpression();
+        parseFormulaeExpression();
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
       else if (TheRTokenTypes.OPEN_BRACKETS.contains(tokenType)) {
-        advanceAndSkipNewLine();
+        advanceAndSkipNewLines();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-          advanceAndSkipNewLine();
+          advanceAndSkipNewLines();
           PsiBuilder.Marker marker = myBuilder.mark();
           marker.done(TheRElementTypes.EMPTY_EXPRESSION);
         }
         final IElementType CLOSE_BRACKET = TheRTokenTypes.BRACKER_PAIRS.get(tokenType);
         while (myBuilder.getTokenType() != CLOSE_BRACKET && !myBuilder.eof()) {
-          if (parseExpression()) {
+          if (parseFormulaeExpression()) {
             if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-              advanceAndSkipNewLine();
+              advanceAndSkipNewLines();
             }
             else {
               break;
@@ -376,12 +483,12 @@ public class TheRExpressionParsing extends Parsing {
     final PsiBuilder.Marker arglist = myBuilder.mark();
     myBuilder.advanceLexer();
     int argNumber = 0;
-    skipNewLine();
+    skipNewLines();
     while (myBuilder.getTokenType() != TheRTokenTypes.RPAR) {
       argNumber++;
       if (argNumber > 1) {
         if (matchToken(TheRTokenTypes.COMMA)) {
-          skipNewLine();
+          skipNewLines();
           if (atToken(TheRTokenTypes.RPAR)) {
             break;
           }
@@ -393,16 +500,16 @@ public class TheRExpressionParsing extends Parsing {
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
-        parseExpression();
-        skipNewLine();
+        parseFormulaeExpression();
+        skipNewLines();
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
-          advanceAndSkipNewLine();
+          advanceAndSkipNewLines();
           if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
             getFunctionParser().parseFunctionDeclaration();
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
             continue;
           }
-          if (!parseExpression()) {
+          if (!parseFormulaeExpression()) {
             myBuilder.error(EXPRESSION_EXPECTED);
           }
           keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
@@ -411,7 +518,7 @@ public class TheRExpressionParsing extends Parsing {
         keywordArgMarker.rollbackTo();
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.LBRACE) {
-        getStatementParser().parseBlock();
+        parseBlockExpression();
         continue;
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
@@ -422,13 +529,13 @@ public class TheRExpressionParsing extends Parsing {
         getFunctionParser().parseFunctionDeclaration();
         continue;
       }
-      if (!parseExpression()) {
+      if (!parseFormulaeExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
         break;
       }
-      skipNewLine();
+      skipNewLines();
     }
-    skipNewLine();
+    skipNewLines();
     checkMatches(TheRTokenTypes.RPAR, "')' expected");
     arglist.done(TheRElementTypes.ARGUMENT_LIST);
   }
@@ -448,9 +555,58 @@ public class TheRExpressionParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.LPAR);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
-    getStatementParser().parseStatement();
+    parseExpressionStatement();
     checkMatches(TheRTokenTypes.RPAR, ") expected");
     expr.done(TheRElementTypes.PARENTHESIZED_EXPRESSION);
+  }
+
+
+  public boolean parsePrimaryExpression() {
+    final IElementType firstToken = myBuilder.getTokenType();
+    if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {
+      buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.INTEGER_LITERAL) {
+      buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.COMPLEX_LITERAL) {
+      buildTokenElement(TheRElementTypes.IMAGINARY_LITERAL_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.STRING_LITERAL) {
+      buildTokenElement(TheRElementTypes.STRING_LITERAL_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.IDENTIFIER) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.NA_KEYWORD) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (TheRTokenTypes.SPECIAL_CONSTANTS.contains(firstToken)) {
+      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.INFIX_OP) {
+      buildTokenElement(TheRElementTypes.OPERATOR_EXPRESSION, myBuilder);
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.TICK) {
+      parseReprExpression();
+      return true;
+    }
+    else if (firstToken == TheRTokenTypes.LPAR) {
+      parseParenthesizedExpression();
+      return true;
+    }
+    else {
+      myBuilder.advanceLexer();
+    }
+    return false;
   }
 
 }

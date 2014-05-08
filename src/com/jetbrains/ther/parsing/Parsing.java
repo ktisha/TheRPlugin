@@ -1,7 +1,6 @@
 package com.jetbrains.ther.parsing;
 
 import com.intellij.lang.PsiBuilder;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.tree.IElementType;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
 import org.jetbrains.annotations.NotNull;
@@ -9,11 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class Parsing {
   protected static final String EXPRESSION_EXPECTED = "Expression expected";
-  protected static final String IDENTIFIER_EXPECTED = "Identifier expected";
 
   private final TheRParsingContext myContext;
   protected final PsiBuilder myBuilder;
-  private static final Logger LOG = Logger.getInstance(Parsing.class.getName());
 
   public Parsing(@NotNull final TheRParsingContext context) {
     myContext = context;
@@ -28,11 +25,6 @@ public class Parsing {
   @NotNull
   public TheRExpressionParsing getExpressionParser() {
     return getParsingContext().getExpressionParser();
-  }
-
-  @NotNull
-  public TheRStatementParsing getStatementParser() {
-    return getParsingContext().getStatementParser();
   }
 
   @NotNull
@@ -65,10 +57,16 @@ public class Parsing {
     return myBuilder.getTokenType() == tokenType;
   }
 
-  protected void skipNewLine() {
-    if (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
+  protected void skipNewLines() {
+    while (myBuilder.getTokenType() == TheRTokenTypes.LINE_BREAK) {
       myBuilder.advanceLexer();
-      if (myBuilder.getTokenType() == TheRTokenTypes.LINE_BREAK) {
+    }
+  }
+
+  protected void checkSemicolon() {
+    while (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
+      myBuilder.advanceLexer();
+      while (myBuilder.getTokenType() == TheRTokenTypes.LINE_BREAK) {
         myBuilder.advanceLexer();
       }
     }
@@ -77,9 +75,9 @@ public class Parsing {
     }
   }
 
-  protected void advanceAndSkipNewLine() {
+  protected void advanceAndSkipNewLines() {
     myBuilder.advanceLexer();
-    skipNewLine();
+    skipNewLines();
   }
 
 }

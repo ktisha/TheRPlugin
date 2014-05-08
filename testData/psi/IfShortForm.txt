@@ -12,55 +12,53 @@ TheRFile:IfShortForm.r
         PsiElement(TheR:IDENTIFIER)('true.only')
       PsiElement(TheR:RPAR)(')')
       PsiWhiteSpace(' ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
-          TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('character')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:INTEGER_LITERAL_EXPRESSION
-              PsiElement(TheR:NUMERIC_LITERAL)('0')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:LINE_BREAK)('\n')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('character')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:INTEGER_LITERAL_EXPRESSION
+            PsiElement(TheR:NUMERIC_LITERAL)('0')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
       PsiWhiteSpace('    ')
       PsiElement(TheR:ELSE_KEYWORD)('else')
       PsiWhiteSpace(' ')
-      TheR:EXPRESSION_STATEMENT
-        TheR:CALL_EXPRESSION
-          TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('structure')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            TheR:CALL_EXPRESSION
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('vector')
-              TheR:ARGUMENT_LIST
-                PsiElement(TheR:LPAR)('(')
-                TheR:STRING_LITERAL_EXPRESSION
-                  PsiElement(TheR:STRING_LITERAL)('"list"')
-                PsiElement(TheR:COMMA)(',')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('structure')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:CALL_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('vector')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:STRING_LITERAL_EXPRESSION
+                PsiElement(TheR:STRING_LITERAL)('"list"')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:KEYWORD_ARGUMENT_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('length')
+                PsiElement(TheR:EQ)('=')
                 PsiWhiteSpace(' ')
-                TheR:KEYWORD_ARGUMENT_EXPRESSION
+                TheR:CALL_EXPRESSION
                   TheR:REFERENCE_EXPRESSION
                     PsiElement(TheR:IDENTIFIER)('length')
-                  PsiElement(TheR:EQ)('=')
-                  PsiWhiteSpace(' ')
-                  TheR:CALL_EXPRESSION
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
                     TheR:REFERENCE_EXPRESSION
-                      PsiElement(TheR:IDENTIFIER)('length')
-                    TheR:ARGUMENT_LIST
-                      PsiElement(TheR:LPAR)('(')
-                      TheR:REFERENCE_EXPRESSION
-                        PsiElement(TheR:IDENTIFIER)('use.fn')
-                      PsiElement(TheR:RPAR)(')')
-                PsiElement(TheR:RPAR)(')')
-            PsiElement(TheR:COMMA)(',')
+                      PsiElement(TheR:IDENTIFIER)('use.fn')
+                    PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('names')
+            PsiElement(TheR:EQ)('=')
             PsiWhiteSpace(' ')
-            TheR:KEYWORD_ARGUMENT_EXPRESSION
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('names')
-              PsiElement(TheR:EQ)('=')
-              PsiWhiteSpace(' ')
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('use.fn')
-            PsiElement(TheR:RPAR)(')')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('use.fn')
+          PsiElement(TheR:RPAR)(')')

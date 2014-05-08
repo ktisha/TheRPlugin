@@ -18,7 +18,7 @@ public class TheRFunctionParsing extends Parsing {
     myBuilder.advanceLexer();
 
     parseParameterList();
-    getStatementParser().parseStatement();
+    getExpressionParser().parseExpressionStatement();
     functionMarker.done(TheRElementTypes.FUNCTION_DECLARATION);
   }
 
@@ -34,7 +34,7 @@ public class TheRFunctionParsing extends Parsing {
     }
 
     boolean first = true;
-    skipNewLine();
+    skipNewLines();
     while (myBuilder.getTokenType() != TheRTokenTypes.RPAR) {
       if (first) {
         first = false;
@@ -42,7 +42,7 @@ public class TheRFunctionParsing extends Parsing {
       else {
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
           myBuilder.advanceLexer();
-          skipNewLine();
+          skipNewLines();
         }
         else {
           myBuilder.error(", or ) expected");
@@ -52,10 +52,10 @@ public class TheRFunctionParsing extends Parsing {
 
       final PsiBuilder.Marker parameter = myBuilder.mark();
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
-        advanceAndSkipNewLine();
+        advanceAndSkipNewLines();
         if (matchToken(TheRTokenTypes.EQ)) {
-          skipNewLine();
-          if (!getExpressionParser().parseExpression()) {
+          skipNewLines();
+          if (!getExpressionParser().parseFormulaeExpression()) {
             PsiBuilder.Marker invalidElements = myBuilder.mark();
             while(!atToken(TheRTokenTypes.COMMA)) {
               myBuilder.advanceLexer();
@@ -73,7 +73,7 @@ public class TheRFunctionParsing extends Parsing {
         myBuilder.error("parameter name expected");
         parameter.rollbackTo();
       }
-      skipNewLine();
+      skipNewLines();
     }
 
     if (myBuilder.getTokenType() == TheRTokenTypes.RPAR) {

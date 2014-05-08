@@ -25,6 +25,7 @@ IDENT_START = {LETTER}|"."{LETTER}|"._"|".."
 IDENT_CONTINUE = {LETTER}|[0-9_"."]
 IDENTIFIER = {IDENT_START}{IDENT_CONTINUE}**
 
+LETTER_OR_OP = {LETTER} | "+"|"-"|"*"|"&"|"^"|"$"|"/"|"~"|">"|"<"|"="|"."
 END_OF_LINE_COMMENT="#"[^\r\n]*
 
 
@@ -120,7 +121,7 @@ private boolean inDoubleBracket = false;
 "%in%"                      { return TheRTokenTypes.MATCHING; }
 "%x%"                       { return TheRTokenTypes.KRONECKER_PROD; }
 // user-defined
-"%"{LETTER}+"%"             { return TheRTokenTypes.INFIX_OP; }
+"%"{LETTER_OR_OP}+"%"             { return TheRTokenTypes.INFIX_OP; }
 
 // Infix and prefix operators
 ":::"                       { return TheRTokenTypes.TRIPLECOLON; }

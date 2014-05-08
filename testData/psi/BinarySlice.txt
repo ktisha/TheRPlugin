@@ -1,14 +1,13 @@
 TheRFile:BinarySlice.r
-  TheR:EXPRESSION_STATEMENT
-    TheR:BINARY_EXPRESSION
-      TheR:SLICE_EXPRESSION
-        TheR:INTEGER_LITERAL_EXPRESSION
-          PsiElement(TheR:NUMERIC_LITERAL)('1')
-        PsiElement(TheR:COLON)(':')
-        TheR:INTEGER_LITERAL_EXPRESSION
-          PsiElement(TheR:NUMERIC_LITERAL)('20')
-      PsiWhiteSpace(' ')
-      PsiElement(TheR:MULT)('*')
-      PsiWhiteSpace(' ')
+  TheR:BINARY_EXPRESSION
+    TheR:SLICE_EXPRESSION
       TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('3')
+        PsiElement(TheR:NUMERIC_LITERAL)('1')
+      PsiElement(TheR:COLON)(':')
+      TheR:INTEGER_LITERAL_EXPRESSION
+        PsiElement(TheR:NUMERIC_LITERAL)('20')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:MULT)('*')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('3')

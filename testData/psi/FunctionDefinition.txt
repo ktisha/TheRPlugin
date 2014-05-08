@@ -35,35 +35,33 @@ TheRFile:FunctionDefinition.r
               PsiElement(TheR:RPAR)(')')
           PsiElement(TheR:LINE_BREAK)('\n')
         PsiWhiteSpace('  ')
-        TheR:EXPRESSION_STATEMENT
-          TheR:CALL_EXPRESSION
-            TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('return')
-            TheR:ARGUMENT_LIST
-              PsiElement(TheR:LPAR)('(')
-              TheR:CALL_EXPRESSION
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('return')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('as.integer')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
                 TheR:REFERENCE_EXPRESSION
-                  PsiElement(TheR:IDENTIFIER)('as.integer')
-                TheR:ARGUMENT_LIST
-                  PsiElement(TheR:LPAR)('(')
-                  TheR:REFERENCE_EXPRESSION
-                    PsiElement(TheR:IDENTIFIER)('n')
-                  PsiElement(TheR:RPAR)(')')
-              PsiElement(TheR:RPAR)(')')
-          PsiElement(TheR:LINE_BREAK)('\n')
+                  PsiElement(TheR:IDENTIFIER)('n')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+        PsiElement(TheR:LINE_BREAK)('\n')
         PsiElement(TheR:RBRACE)('}')
         PsiElement(TheR:LINE_BREAK)('\n')
         PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:CALL_EXPRESSION
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('print')
-      TheR:ARGUMENT_LIST
-        PsiElement(TheR:LPAR)('(')
-        TheR:CALL_EXPRESSION
-          TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('readinteger')
-          TheR:ARGUMENT_LIST
-            PsiElement(TheR:LPAR)('(')
-            PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:RPAR)(')')
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('print')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('readinteger')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')

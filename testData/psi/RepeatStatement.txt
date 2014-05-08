@@ -2,6 +2,5 @@ TheRFile:RepeatStatement.r
   TheR:REPEAT_STATEMENT
     PsiElement(TheR:REPEAT_KEYWORD)('repeat')
     PsiWhiteSpace(' ')
-    TheR:EXPRESSION_STATEMENT
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('statement')
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('statement')

@@ -21,48 +21,45 @@ TheRFile:Operator.r
       PsiWhiteSpace(' ')
       TheR:BLOCK
         PsiElement(TheR:LBRACE)('{')
-        TheR:EXPRESSION_STATEMENT
+        TheR:BINARY_EXPRESSION
           TheR:BINARY_EXPRESSION
-            TheR:BINARY_EXPRESSION
-              TheR:INTEGER_LITERAL_EXPRESSION
-                PsiElement(TheR:NUMERIC_LITERAL)('2')
-              PsiElement(TheR:MULT)('*')
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('a')
-            PsiWhiteSpace(' ')
-            PsiElement(TheR:PLUS)('+')
-            PsiWhiteSpace(' ')
-            TheR:BINARY_EXPRESSION
-              TheR:INTEGER_LITERAL_EXPRESSION
-                PsiElement(TheR:NUMERIC_LITERAL)('2')
-              PsiElement(TheR:MULT)('*')
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('b')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('2')
+            PsiElement(TheR:MULT)('*')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:PLUS)('+')
+          PsiWhiteSpace(' ')
+          TheR:BINARY_EXPRESSION
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('2')
+            PsiElement(TheR:MULT)('*')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('b')
         PsiElement(TheR:RBRACE)('}')
         PsiElement(TheR:LINE_BREAK)('\n')
         PsiElement(TheR:LINE_BREAK)('\n')
         PsiComment(TheR:END_OF_LINE_COMMENT)('# use own operator')
         PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:BINARY_EXPRESSION
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('1')
-      PsiWhiteSpace(' ')
-      PsiElement(TheR:INFIX_OP)('%myop%')
-      PsiWhiteSpace(' ')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('1')
-    PsiElement(TheR:LINE_BREAK)('\n')
-    PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 4')
-    PsiElement(TheR:LINE_BREAK)('\n')
-  TheR:EXPRESSION_STATEMENT
-    TheR:BINARY_EXPRESSION
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('1')
-      PsiWhiteSpace(' ')
-      PsiElement(TheR:INFIX_OP)('%myop%')
-      PsiWhiteSpace(' ')
-      TheR:INTEGER_LITERAL_EXPRESSION
-        PsiElement(TheR:NUMERIC_LITERAL)('2')
-    PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:BINARY_EXPRESSION
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:INFIX_OP)('%myop%')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 4')
+  PsiElement(TheR:LINE_BREAK)('\n')
+  TheR:BINARY_EXPRESSION
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:INFIX_OP)('%myop%')
+    PsiWhiteSpace(' ')
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('2')
+  PsiElement(TheR:LINE_BREAK)('\n')
   PsiComment(TheR:END_OF_LINE_COMMENT)('#[1] 6')

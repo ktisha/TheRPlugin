@@ -1,36 +1,35 @@
 TheRFile:KeywordArg.r
-  TheR:EXPRESSION_STATEMENT
-    TheR:CALL_EXPRESSION
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('print')
-      TheR:ARGUMENT_LIST
-        PsiElement(TheR:LPAR)('(')
-        TheR:KEYWORD_ARGUMENT_EXPRESSION
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('print')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:KEYWORD_ARGUMENT_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('z')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:LEFT_ASSIGN)('<-')
+        PsiWhiteSpace(' ')
+        TheR:CALL_EXPRESSION
           TheR:REFERENCE_EXPRESSION
-            PsiElement(TheR:IDENTIFIER)('z')
-          PsiWhiteSpace(' ')
-          PsiElement(TheR:LEFT_ASSIGN)('<-')
-          PsiWhiteSpace(' ')
-          TheR:CALL_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('nsz')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('14.084')
+            PsiElement(TheR:COMMA)(',')
+            TheR:PREFIX_EXPRESSION
+              PsiElement(TheR:MINUS)('-')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('3.4107')
+            PsiElement(TheR:COMMA)(',')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('0.0015')
+            PsiElement(TheR:COMMA)(',')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('1.8832')
+            PsiElement(TheR:COMMA)(',')
             TheR:REFERENCE_EXPRESSION
-              PsiElement(TheR:IDENTIFIER)('nsz')
-            TheR:ARGUMENT_LIST
-              PsiElement(TheR:LPAR)('(')
-              TheR:INTEGER_LITERAL_EXPRESSION
-                PsiElement(TheR:NUMERIC_LITERAL)('14.084')
-              PsiElement(TheR:COMMA)(',')
-              TheR:PREFIX_EXPRESSION
-                PsiElement(TheR:MINUS)('-')
-                TheR:INTEGER_LITERAL_EXPRESSION
-                  PsiElement(TheR:NUMERIC_LITERAL)('3.4107')
-              PsiElement(TheR:COMMA)(',')
-              TheR:INTEGER_LITERAL_EXPRESSION
-                PsiElement(TheR:NUMERIC_LITERAL)('0.0015')
-              PsiElement(TheR:COMMA)(',')
-              TheR:INTEGER_LITERAL_EXPRESSION
-                PsiElement(TheR:NUMERIC_LITERAL)('1.8832')
-              PsiElement(TheR:COMMA)(',')
-              TheR:REFERENCE_EXPRESSION
-                PsiElement(TheR:IDENTIFIER)('timepoints')
-              PsiElement(TheR:RPAR)(')')
-        PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:IDENTIFIER)('timepoints')
+            PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')
