@@ -93,7 +93,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.TILDE == myBuilder.getTokenType()) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseOrExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -105,6 +105,11 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
+  private void advanceAndSkipNewLine() {
+    myBuilder.advanceLexer();
+    skipNewLine();
+  }
+
   public boolean parseOrExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
     if (!parseANDExpression()) {
@@ -112,7 +117,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.OR_OPERATIONS.contains(myBuilder.getTokenType())) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseANDExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -131,7 +136,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseUserDefinedExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -150,7 +155,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseNOTExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -185,7 +190,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.COMPARISON_OPERATIONS.contains(myBuilder.getTokenType())) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
 
       if (!parseAdditiveExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
@@ -205,7 +210,7 @@ public class TheRExpressionParsing extends Parsing {
       return false;
     }
     while (TheRTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseMultiplicativeExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -225,7 +230,7 @@ public class TheRExpressionParsing extends Parsing {
     }
 
     while (TheRTokenTypes.MULTIPLICATIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseSliceExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -245,7 +250,7 @@ public class TheRExpressionParsing extends Parsing {
     }
 
     while (TheRTokenTypes.COLON == myBuilder.getTokenType()) {
-      myBuilder.advanceLexer();
+      advanceAndSkipNewLine();
       if (!parseUnaryExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
@@ -324,11 +329,9 @@ public class TheRExpressionParsing extends Parsing {
         expr = expr.precede();
       }
       else if (TheRTokenTypes.OPEN_BRACKETS.contains(tokenType)) {
-        myBuilder.advanceLexer();
-        skipNewLine();
+        advanceAndSkipNewLine();
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-          myBuilder.advanceLexer();
-          skipNewLine();
+          advanceAndSkipNewLine();
           PsiBuilder.Marker marker = myBuilder.mark();
           marker.done(TheRElementTypes.EMPTY_EXPRESSION);
         }
@@ -336,8 +339,7 @@ public class TheRExpressionParsing extends Parsing {
         while (myBuilder.getTokenType() != CLOSE_BRACKET && !myBuilder.eof()) {
           if (parseExpression()) {
             if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
-              myBuilder.advanceLexer();
-              skipNewLine();
+              advanceAndSkipNewLine();
             }
             else {
               break;

@@ -34,6 +34,7 @@ public class TheRFunctionParsing extends Parsing {
     }
 
     boolean first = true;
+    skipNewLine();
     while (myBuilder.getTokenType() != TheRTokenTypes.RPAR) {
       if (first) {
         first = false;
@@ -41,6 +42,7 @@ public class TheRFunctionParsing extends Parsing {
       else {
         if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
           myBuilder.advanceLexer();
+          skipNewLine();
         }
         else {
           myBuilder.error(", or ) expected");
@@ -70,6 +72,7 @@ public class TheRFunctionParsing extends Parsing {
         myBuilder.error("parameter name expected");
         parameter.rollbackTo();
       }
+      skipNewLine();
     }
 
     if (myBuilder.getTokenType() == TheRTokenTypes.RPAR) {
