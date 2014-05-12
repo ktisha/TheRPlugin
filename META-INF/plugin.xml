@@ -43,5 +43,8 @@
     <lang.syntaxHighlighterFactory key="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRSyntaxHighlighterFactory"/>
     <lang.parserDefinition language="TheR" implementationClass="com.jetbrains.ther.parsing.TheRParserDefinition"/>
     <lang.braceMatcher language="TheR" implementationClass="com.jetbrains.ther.highlighting.TheRBraceMatcher"/>
+    <projectConfigurable instance="com.jetbrains.ther.interpreter.TheRInterpreterConfigurable"/>
+    <applicationService serviceInterface="com.jetbrains.ther.interpreter.TheRInterpreterService"
+                        serviceImplementation="com.jetbrains.ther.interpreter.TheRInterpreterService"/>
   </extensions>
 </idea-plugin>
