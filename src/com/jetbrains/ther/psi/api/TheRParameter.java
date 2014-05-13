@@ -1,4 +1,6 @@
 package com.jetbrains.ther.psi.api;
 
-public interface TheRParameter extends TheRElement {
+import com.intellij.psi.PsiNamedElement;
+
+public interface TheRParameter extends TheRElement, PsiNamedElement {
 }
