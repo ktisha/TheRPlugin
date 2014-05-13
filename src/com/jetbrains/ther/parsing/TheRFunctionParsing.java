@@ -55,6 +55,12 @@ public class TheRFunctionParsing extends Parsing {
         advanceAndSkipNewLines();
         if (matchToken(TheRTokenTypes.EQ)) {
           skipNewLines();
+          if (myBuilder.getTokenType() == TheRTokenTypes.RPAR) {
+            PsiBuilder.Marker invalidElements = myBuilder.mark();
+            invalidElements.error(EXPRESSION_EXPECTED);
+            parameter.done(TheRElementTypes.PARAMETER);
+            break;
+          }
           if (!getExpressionParser().parseFormulaeExpression()) {
             PsiBuilder.Marker invalidElements = myBuilder.mark();
             while(!atToken(TheRTokenTypes.COMMA)) {
