@@ -537,7 +537,7 @@ public class TheRExpressionParsing extends Parsing {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.TICK);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
-    while (!atToken(TheRTokenTypes.TICK)) {
+    while (!atToken(TheRTokenTypes.TICK) && !myBuilder.eof()) {
       myBuilder.advanceLexer();
     }
     checkMatches(TheRTokenTypes.TICK, "'`' (backtick) expected");
