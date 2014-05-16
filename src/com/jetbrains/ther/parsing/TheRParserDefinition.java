@@ -16,6 +16,7 @@ import com.jetbrains.ther.lexer.TheRLexer;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.psi.TheRElementType;
 import com.jetbrains.ther.psi.TheRFileImpl;
+import com.jetbrains.ther.psi.stubs.TheRStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRParserDefinition implements ParserDefinition {
@@ -71,6 +72,9 @@ public class TheRParserDefinition implements ParserDefinition {
     if (type instanceof TheRElementType) {
       TheRElementType elementType = (TheRElementType)type;
       return elementType.createElement(node);
+    }
+    else if (type instanceof TheRStubElementType) {
+      return ((TheRStubElementType)type).createElement(node);
     }
     return new ASTWrapperPsiElement(node);
   }

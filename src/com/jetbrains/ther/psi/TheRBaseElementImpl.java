@@ -1,16 +1,22 @@
 package com.jetbrains.ther.psi;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.stubs.StubElement;
 import com.jetbrains.ther.TheRFileType;
 import com.jetbrains.ther.psi.api.TheRElement;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRBaseElementImpl extends ASTWrapperPsiElement implements TheRElement {
+public class TheRBaseElementImpl<T extends StubElement> extends StubBasedPsiElementBase<T> implements TheRElement {
   public TheRBaseElementImpl(@NotNull final ASTNode node) {
     super(node);
+  }
+
+  public TheRBaseElementImpl(@NotNull final T stub, @NotNull final IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   @NotNull

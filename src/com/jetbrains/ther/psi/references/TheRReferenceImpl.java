@@ -1,14 +1,22 @@
 package com.jetbrains.ther.psi.references;
 
+import com.intellij.openapi.module.impl.scopes.LibraryScope;
+import com.intellij.openapi.roots.ModifiableModelsProvider;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference {
@@ -58,13 +66,29 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       }
       if (!result.isEmpty())
         return result.toArray(new ResolveResult[result.size()]);
-
-      //final Collection<TheRAssignmentStatement> assignmentStatements = TheRAssignmentNameIndex.find(name, myElement.getProject());
-      //for (TheRAssignmentStatement statement : assignmentStatements) {
-      //  result.add(new PsiElementResolveResult(statement));
-      //}
+      addFromLibrary(result, name);
     }
     return result.toArray(new ResolveResult[result.size()]);
+  }
+
+  private void addFromLibrary(@NotNull final List<ResolveResult> result, @NotNull final String name) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+    if (model != null) {
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      if (library != null) {
+        final Collection<TheRAssignmentStatement> assignmentStatements = TheRAssignmentNameIndex.find(name, myElement.getProject(),
+                                                                                        new LibraryScope(myElement.getProject(), library));
+        for (TheRAssignmentStatement statement : assignmentStatements) {
+          final PsiFile containingFile = statement.getContainingFile();
+          if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name)) {
+            result.add(0, new PsiElementResolveResult(statement));
+          }
+          else
+            result.add(new PsiElementResolveResult(statement));
+        }
+      }
+    }
   }
 
   @Override

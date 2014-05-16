@@ -2,13 +2,16 @@ package com.jetbrains.ther.parsing;
 
 import com.intellij.psi.tree.IFileElementType;
 import com.jetbrains.ther.psi.*;
+import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
+import com.jetbrains.ther.psi.stubs.TheRAssignmentElementType;
+import com.jetbrains.ther.psi.stubs.TheRAssignmentStub;
+import com.jetbrains.ther.psi.stubs.TheRStubElementType;
 
 public interface TheRElementTypes {
   IFileElementType FILE = new TheRFileElementType();
+  TheRStubElementType<TheRAssignmentStub, TheRAssignmentStatement> ASSIGNMENT_STATEMENT = new TheRAssignmentElementType();
 
   // statements
-  TheRElementType EXPRESSION_STATEMENT = new TheRElementType("EXPRESSION_STATEMENT", TheRExpressionStatementImpl.class);
-  TheRElementType ASSIGNMENT_STATEMENT = new TheRElementType("ASSIGNMENT_STATEMENT", TheRAssignmentStatementImpl.class);
   TheRElementType IF_STATEMENT = new TheRElementType("IF_STATEMENT", TheRIfStatementImpl.class);
   TheRElementType WHILE_STATEMENT = new TheRElementType("WHILE_STATEMENT", TheRWhileStatementImpl.class);
   TheRElementType FOR_STATEMENT = new TheRElementType("FOR_STATEMENT", TheRForStatementImpl.class);

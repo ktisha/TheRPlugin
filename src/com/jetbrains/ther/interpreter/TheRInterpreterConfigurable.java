@@ -1,25 +1,36 @@
 package com.jetbrains.ther.interpreter;
 
+import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModifiableModelsProvider;
+import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.libraries.Library;
+import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class TheRInterpreterConfigurable implements SearchableConfigurable, Configurable.NoScroll{
   private JPanel myMainPanel;
   private final Project myProject;
   private final TextFieldWithBrowseButton myInterpreterField;
   private final TextFieldWithBrowseButton mySourcesField;
+  public static final String THE_R_LIBRARY = "R Library";
 
   TheRInterpreterConfigurable(Project project) {
     myProject = project;
@@ -108,11 +119,14 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   public void apply() throws ConfigurationException {
     final TheRInterpreterService interpreterService = TheRInterpreterService.getInstance();
     final String interpreterPath = myInterpreterField.getText();
-    if (!StringUtil.isEmptyOrSpaces(interpreterPath))
-      interpreterService.setInterpreterPath(interpreterPath);
+    interpreterService.setInterpreterPath(interpreterPath);
     final String sourcesPath = mySourcesField.getText();
-    if (!StringUtil.isEmptyOrSpaces(sourcesPath))
-      interpreterService.setSourcesPath(sourcesPath);
+    interpreterService.setSourcesPath(sourcesPath);
+
+    if (!StringUtil.isEmptyOrSpaces(sourcesPath)) {
+      final ArrayList<String> paths = Lists.newArrayList(sourcesPath);
+      attachLibrary(myProject, THE_R_LIBRARY, paths);
+    }
   }
 
   @Override
@@ -127,4 +141,47 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   @Override
   public void disposeUIResources() {
   }
+
+  public static void attachLibrary(final Project project,
+                                   final String libraryName,
+                                   final List<String> paths) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        // add all paths to library
+        final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(project);
+        final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+          // update existing
+        if (library != null) {
+          fillLibrary(library, paths);
+          model.commit();
+          return;
+        }
+        // create new
+        Library lib = model.createLibrary(libraryName);
+        fillLibrary(lib, paths);
+        model.commit();
+      }
+
+    });
+  }
+
+  private static void fillLibrary(@NotNull final Library lib, @NotNull final List<String> paths) {
+    Library.ModifiableModel modifiableModel = lib.getModifiableModel();
+    for (String root : lib.getUrls(OrderRootType.CLASSES)) {
+      modifiableModel.removeRoot(root, OrderRootType.CLASSES);
+    }
+    for (String dir : paths) {
+      final VirtualFile pathEntry = LocalFileSystem.getInstance().findFileByPath(dir);
+      if (pathEntry != null) {
+        modifiableModel.addRoot(pathEntry, OrderRootType.CLASSES);
+      }
+      else {
+        modifiableModel.addRoot("file://"+dir, OrderRootType.CLASSES);
+      }
+    }
+    modifiableModel.commit();
+  }
+
 }
