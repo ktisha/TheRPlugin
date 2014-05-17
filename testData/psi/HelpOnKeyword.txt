@@ -5,7 +5,7 @@ TheRFile:HelpOnKeyword.r
     PsiElement(TheR:HELP)('?')
     TheR:REFERENCE_EXPRESSION
       PsiElement(TheR:IDENTIFIER)('seq')
-    PsiElement(TheR:LINE_BREAK)('\n')
+  PsiElement(TheR:LINE_BREAK)('\n')
   TheR:CALL_EXPRESSION
     TheR:REFERENCE_EXPRESSION
       PsiElement(TheR:IDENTIFIER)('help')

@@ -63,6 +63,10 @@ public class Parsing {
     }
   }
 
+  protected void skipNewLines(boolean shouldSkip) {
+    if (shouldSkip) skipNewLines();
+  }
+
   protected void checkSemicolon() {
     while (myBuilder.getTokenType() == TheRTokenTypes.SEMICOLON) {
       myBuilder.advanceLexer();
