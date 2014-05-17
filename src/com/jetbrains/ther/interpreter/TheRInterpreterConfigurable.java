@@ -12,7 +12,9 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.impl.OrderEntryUtil;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -122,14 +124,22 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   public void apply() throws ConfigurationException {
     final TheRInterpreterService interpreterService = TheRInterpreterService.getInstance();
     final String interpreterPath = myInterpreterField.getText();
-    interpreterService.setInterpreterPath(interpreterPath);
     final String sourcesPath = mySourcesField.getText();
-    interpreterService.setSourcesPath(sourcesPath);
 
-    if (!StringUtil.isEmptyOrSpaces(sourcesPath)) {
-      final ArrayList<String> paths = Lists.newArrayList(sourcesPath);
-      attachLibrary(myProject, THE_R_LIBRARY, paths);
+    final String oldSourcesPath = interpreterService.getSourcesPath();
+    if (!sourcesPath.equals(oldSourcesPath)) {
+      if (!StringUtil.isEmptyOrSpaces(oldSourcesPath)) {
+        detachLibrary();
+      }
+      if (!StringUtil.isEmptyOrSpaces(sourcesPath)) {
+        final ArrayList<String> paths = Lists.newArrayList(sourcesPath);
+        if (!paths.isEmpty())
+          attachLibrary(paths);
+      }
     }
+
+    interpreterService.setSourcesPath(sourcesPath);
+    interpreterService.setInterpreterPath(interpreterPath);
   }
 
   @Override
@@ -145,25 +155,51 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   public void disposeUIResources() {
   }
 
-  public static void attachLibrary(@NotNull final Project project,
-                                   @NotNull final String libraryName,
-                                   @NotNull final List<String> paths) {
+  public void detachLibrary() {
     final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       @Override
       public void run() {
         // add all paths to library
-        final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(project);
+        final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
+        final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+        if (library != null) {
+
+          final Module[] modules = ModuleManager.getInstance(myProject).getModules();
+          for (Module module : modules) {
+            final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
+            OrderEntry entry = OrderEntryUtil.findLibraryOrderEntry(modifiableModel, TheRInterpreterConfigurable.THE_R_LIBRARY);
+            if (entry != null) {
+              modifiableModel.removeOrderEntry(entry);
+              modelsProvider.commitModuleModifiableModel(modifiableModel);
+            }
+            else {
+              modelsProvider.disposeModuleModifiableModel(modifiableModel);
+            }
+          }
+          model.removeLibrary(library);
+          model.commit();
+        }
+      }
+    });
+  }
+
+  public void attachLibrary(@NotNull final List<String> paths) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        // add all paths to library
+        final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
         Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
         if (library == null) {
-          library = model.createLibrary(libraryName);
+          library = model.createLibrary(TheRInterpreterConfigurable.THE_R_LIBRARY);
         }
         fillLibrary(library, paths);
         model.commit();
         final Library.ModifiableModel libModel = library.getModifiableModel();
         libModel.commit();
-        final Module[] modules = ModuleManager.getInstance(project).getModules();
-        final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+        final Module[] modules = ModuleManager.getInstance(myProject).getModules();
         for (Module module : modules) {
           final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
           modifiableModel.addLibraryEntry(library);
