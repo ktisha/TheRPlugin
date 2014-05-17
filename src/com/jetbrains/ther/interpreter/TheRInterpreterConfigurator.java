@@ -1,4 +1,4 @@
-package com.jetbrains.ther;
+package com.jetbrains.ther.interpreter;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;

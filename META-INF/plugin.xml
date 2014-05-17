@@ -46,7 +46,7 @@
     <projectConfigurable instance="com.jetbrains.ther.interpreter.TheRInterpreterConfigurable"/>
     <applicationService serviceInterface="com.jetbrains.ther.interpreter.TheRInterpreterService"
                         serviceImplementation="com.jetbrains.ther.interpreter.TheRInterpreterService"/>
-    <directoryProjectConfigurator implementation="com.jetbrains.ther.TheRInterpreterConfigurator" id="interpreter"
+    <directoryProjectConfigurator implementation="com.jetbrains.ther.interpreter.TheRInterpreterConfigurator" id="interpreter"
                                   order="after PlatformProjectConfigurator"/>
     <stubIndex implementation="com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex"/>
     <stubElementTypeHolder class="com.jetbrains.ther.parsing.TheRElementTypes"/>
