@@ -420,6 +420,14 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
+      else if (tokenType == TheRTokenTypes.AT) {
+        myBuilder.advanceLexer();
+        if (!parseStringOrIdentifier()) {
+          myBuilder.error("Expected string or identifier");
+        }
+        expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
+        expr = expr.precede();
+      }
       else if (tokenType == TheRTokenTypes.LPAR) {
         skipNewLines();
         parseArgumentList();
