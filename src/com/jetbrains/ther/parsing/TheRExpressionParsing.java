@@ -523,8 +523,8 @@ public class TheRExpressionParsing extends Parsing {
         myBuilder.advanceLexer();
         continue;
       }
-      if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
-        getFunctionParser().parseFunctionDeclaration();
+      if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
+        parseExpressionStatement();
         continue;
       }
       if (!parseFormulaeExpression()) {
