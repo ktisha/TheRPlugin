@@ -52,7 +52,7 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
   @Override
   public void indexStub(@NotNull final TheRAssignmentStub stub, @NotNull final IndexSink sink) {
     final String name = stub.getName();
-    if (name != null) {
+    if (name != null && stub.getParentStub() instanceof PsiFileStub) {
       sink.occurrence(TheRAssignmentNameIndex.KEY, name);
     }
   }
