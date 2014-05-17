@@ -502,8 +502,13 @@ public class TheRExpressionParsing extends Parsing {
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
             continue;
           }
+          final PsiBuilder.Marker keywordValue = myBuilder.mark();
           if (!parseFormulaeExpression()) {
             myBuilder.error(EXPRESSION_EXPECTED);
+            keywordValue.rollbackTo();
+          }
+          else {
+            keywordValue.drop();
           }
           keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
           continue;
