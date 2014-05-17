@@ -61,7 +61,7 @@ public class TheRFunctionParsing extends Parsing {
             parameter.done(TheRElementTypes.PARAMETER);
             break;
           }
-          if (!getExpressionParser().parseFormulaeExpression(true)) {
+          if (!getExpressionParser().parseFormulaeExpression()) {
             PsiBuilder.Marker invalidElements = myBuilder.mark();
             while(!atToken(TheRTokenTypes.COMMA)) {
               myBuilder.advanceLexer();

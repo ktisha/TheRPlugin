@@ -32,14 +32,6 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     final List<ResolveResult> result = new ArrayList<ResolveResult>();
     final String name = myElement.getText();
     if (name != null) {
-      TheRAssignmentStatement assignmentStatement = PsiTreeUtil.getParentOfType(myElement, TheRAssignmentStatement.class);
-      while (assignmentStatement != null) {
-        final PsiElement assignee = assignmentStatement.getAssignee();
-        if (assignee != null && assignee.getText().equals(name)) {
-          result.add(new PsiElementResolveResult(assignee));
-        }
-        assignmentStatement = PsiTreeUtil.getParentOfType(assignmentStatement, TheRAssignmentStatement.class);
-      }
 
       TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
       while (rBlock != null) {
