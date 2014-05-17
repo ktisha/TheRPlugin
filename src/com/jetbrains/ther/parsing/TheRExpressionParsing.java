@@ -575,7 +575,7 @@ public class TheRExpressionParsing extends Parsing {
       buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
       return true;
     }
-    else if (firstToken == TheRTokenTypes.NA_KEYWORD) {
+    else if (TheRTokenTypes.NA_KEYWORDS.contains(firstToken)) {
       buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
       return true;
     }

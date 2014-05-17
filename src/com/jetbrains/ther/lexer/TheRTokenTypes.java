@@ -173,6 +173,9 @@ public class TheRTokenTypes {
 
   public static final TokenSet COMPARISON_OPERATIONS = TokenSet.create(LT, GT, EQEQ, GE, LE, NOTEQ, MATCHING);
 
+  public static final TokenSet NA_KEYWORDS = TokenSet.create(NA_KEYWORD, NA_CHARACTER_KEYWORD, NA_COMPLEX_KEYWORD, NA_INTEGER_KEYWORD,
+                                                             NA_REAL_KEYWORD);
+
   public static final TokenSet ADDITIVE_OPERATIONS = TokenSet.create(PLUS, MINUS);
   public static final TokenSet MULTIPLICATIVE_OPERATIONS = TokenSet.create(MULT, DIV, INT_DIV, MATRIX_PROD, KRONECKER_PROD, OUTER_PROD);
   public static final TokenSet POWER_OPERATIONS = TokenSet.create(EXP, MODULUS);
