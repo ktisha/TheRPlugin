@@ -161,7 +161,7 @@ public class TheRExpressionParsing extends Parsing {
       myBuilder.advanceLexer();
       mark.done(TheRElementTypes.HELP_EXPRESSION);
     }
-    else if (parseFormulaeExpression()) {    // should we parse expression statement instead?
+    else if (parseFormulaeExpression(true)) {    // should we parse expression statement instead?
       mark.done(TheRElementTypes.HELP_EXPRESSION);
     }
     else {
@@ -172,7 +172,7 @@ public class TheRExpressionParsing extends Parsing {
 
   protected void parseAssignmentExpression() {
     final PsiBuilder.Marker assignmentExpression = myBuilder.mark();
-    final boolean successfull = parseFormulaeExpression();
+    final boolean successfull = parseFormulaeExpression(true);
     if (successfull) {
       if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
         advanceAndSkipNewLines();
@@ -193,15 +193,15 @@ public class TheRExpressionParsing extends Parsing {
     myBuilder.error(EXPRESSION_EXPECTED);
   }
 
-  public boolean parseFormulaeExpression() {
+  public boolean parseFormulaeExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseOrExpression()) {
+    if (!parseOrExpression(isReference)) {
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.TILDE == myBuilder.getTokenType()) {
       advanceAndSkipNewLines();
-      if (!parseOrExpression()) {
+      if (!parseOrExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -212,16 +212,16 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  public boolean parseOrExpression() {
+  public boolean parseOrExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseANDExpression()) {
+    if (!parseANDExpression(isReference)) {
       expr.drop();
       return false;
     }
     skipNewLines();
     while (TheRTokenTypes.OR_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLines();
-      if (!parseANDExpression()) {
+      if (!parseANDExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -232,16 +232,16 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  private boolean parseANDExpression() {
+  private boolean parseANDExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseNOTExpression()) {
+    if (!parseNOTExpression(isReference)) {
       expr.drop();
       return false;
     }
     skipNewLines();
     while (TheRTokenTypes.AND_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLines();
-      if (!parseNOTExpression()) {
+      if (!parseNOTExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -252,31 +252,31 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  private boolean parseNOTExpression() {
+  private boolean parseNOTExpression(boolean isReference) {
     if (myBuilder.getTokenType() == TheRTokenTypes.NOT) {
       final PsiBuilder.Marker expr = myBuilder.mark();
       myBuilder.advanceLexer();
-      if (!parseNOTExpression()) {
+      if (!parseNOTExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.PREFIX_EXPRESSION);
       return true;
     }
     else {
-      return parseComparisonExpression();
+      return parseComparisonExpression(isReference);
     }
   }
 
-  private boolean parseComparisonExpression() {
+  private boolean parseComparisonExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseAdditiveExpression()) {
+    if (!parseAdditiveExpression(isReference)) {
       myBuilder.error(EXPRESSION_EXPECTED);
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.COMPARISON_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLines();
-      if (!parseAdditiveExpression()) {
+      if (!parseAdditiveExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -287,15 +287,15 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  private boolean parseAdditiveExpression() {
+  private boolean parseAdditiveExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseMultiplicativeExpression()) {
+    if (!parseMultiplicativeExpression(isReference)) {
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.ADDITIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLines();
-      if (!parseMultiplicativeExpression()) {
+      if (!parseMultiplicativeExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -306,16 +306,16 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  private boolean parseMultiplicativeExpression() {
+  private boolean parseMultiplicativeExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseUserDefinedExpression()) {
+    if (!parseUserDefinedExpression(isReference)) {
       expr.drop();
       return false;
     }
 
     while (TheRTokenTypes.MULTIPLICATIVE_OPERATIONS.contains(myBuilder.getTokenType())) {
       advanceAndSkipNewLines();
-      if (!parseUserDefinedExpression()) {
+      if (!parseUserDefinedExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -327,15 +327,15 @@ public class TheRExpressionParsing extends Parsing {
   }
 
 
-  private boolean parseUserDefinedExpression() {
+  private boolean parseUserDefinedExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseSliceExpression()) {
+    if (!parseSliceExpression(isReference)) {
       expr.drop();
       return false;
     }
     while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
       advanceAndSkipNewLines();
-      if (!parseSliceExpression()) {
+      if (!parseSliceExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -346,16 +346,16 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  protected boolean parseSliceExpression() {
+  protected boolean parseSliceExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseUnaryExpression()) {
+    if (!parseUnaryExpression(isReference)) {
       expr.drop();
       return false;
     }
 
     while (TheRTokenTypes.COLON == myBuilder.getTokenType()) {
       advanceAndSkipNewLines();
-      if (!parseUnaryExpression()) {
+      if (!parseUnaryExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.SLICE_EXPRESSION);
@@ -366,32 +366,32 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  protected boolean parseUnaryExpression() {
+  protected boolean parseUnaryExpression(boolean isReference) {
     final IElementType tokenType = myBuilder.getTokenType();
     if (TheRTokenTypes.UNARY_OPERATIONS.contains(tokenType)) {
       final PsiBuilder.Marker expr = myBuilder.mark();
       myBuilder.advanceLexer();
-      if (!parseUnaryExpression()) {
+      if (!parseUnaryExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.PREFIX_EXPRESSION);
       return true;
     }
     else {
-      return parsePowerExpression();
+      return parsePowerExpression(isReference);
     }
   }
 
-  private boolean parsePowerExpression() {
+  private boolean parsePowerExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parseMemberExpression()) {
+    if (!parseMemberExpression(isReference)) {
       expr.drop();
       return false;
     }
 
     if (TheRTokenTypes.POWER_OPERATIONS.contains(myBuilder.getTokenType())) {
       myBuilder.advanceLexer();
-      if (!parseUnaryExpression()) {
+      if (!parseUnaryExpression(isReference)) {
         myBuilder.error(EXPRESSION_EXPECTED);
       }
       expr.done(TheRElementTypes.BINARY_EXPRESSION);
@@ -403,9 +403,9 @@ public class TheRExpressionParsing extends Parsing {
     return true;
   }
 
-  public boolean parseMemberExpression() {
+  public boolean parseMemberExpression(boolean isReference) {
     PsiBuilder.Marker expr = myBuilder.mark();
-    if (!parsePrimaryExpression()) {
+    if (!parsePrimaryExpression(isReference)) {
       expr.drop();
       return false;
     }
@@ -428,7 +428,7 @@ public class TheRExpressionParsing extends Parsing {
       }
       else if (TheRTokenTypes.NAMESPACE_ACCESS.contains(tokenType)) {
         myBuilder.advanceLexer();
-        parseFormulaeExpression();
+        parseFormulaeExpression(true);
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
@@ -493,7 +493,7 @@ public class TheRExpressionParsing extends Parsing {
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
-        parseFormulaeExpression();
+        parseFormulaeExpression(false);
         skipNewLines();
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
           advanceAndSkipNewLines();
@@ -502,7 +502,7 @@ public class TheRExpressionParsing extends Parsing {
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
             continue;
           }
-          if (!parseFormulaeExpression()) {
+          if (!parseFormulaeExpression(true)) {
             myBuilder.error(EXPRESSION_EXPECTED);
           }
           keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
@@ -522,7 +522,7 @@ public class TheRExpressionParsing extends Parsing {
         getFunctionParser().parseFunctionDeclaration();
         continue;
       }
-      if (!parseFormulaeExpression()) {
+      if (!parseFormulaeExpression(true)) {
         myBuilder.error(EXPRESSION_EXPECTED);
         break;
       }
@@ -553,7 +553,7 @@ public class TheRExpressionParsing extends Parsing {
   }
 
 
-  public boolean parsePrimaryExpression() {
+  public boolean parsePrimaryExpression(boolean isReference) {
     final IElementType firstToken = myBuilder.getTokenType();
     if (firstToken == TheRTokenTypes.NUMERIC_LITERAL) {
       buildTokenElement(TheRElementTypes.INTEGER_LITERAL_EXPRESSION, myBuilder);
@@ -572,7 +572,10 @@ public class TheRExpressionParsing extends Parsing {
       return true;
     }
     else if (firstToken == TheRTokenTypes.IDENTIFIER) {
-      buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+       if (isReference)
+        buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
+      else
+        myBuilder.advanceLexer();
       return true;
     }
     else if (firstToken == TheRTokenTypes.NA_KEYWORD) {

@@ -3,6 +3,7 @@ package com.jetbrains.ther.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
+import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentStub;
@@ -39,6 +40,25 @@ public class TheRAssignmentStatementImpl extends TheRBaseElementImpl<TheRAssignm
 
   @Nullable
   public ASTNode getNameNode() {
-    return getNode().findChildByType(TheRElementTypes.REFERENCE_EXPRESSION);
+    final ASTNode node = getNode();
+    if (isLeft()) {
+      return node.findChildByType(TheRElementTypes.REFERENCE_EXPRESSION);
+    }
+    for(ASTNode element = node.getLastChildNode(); element != null; element = element.getTreePrev()){
+      if (element.getElementType() == TheRElementTypes.REFERENCE_EXPRESSION) return element;
+    }
+    return null;
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getAssignee() {
+    final ASTNode nameNode = getNameNode();
+    return nameNode != null ? nameNode.getPsi() : null;
+  }
+
+  private boolean isLeft() {
+    final ASTNode operator = getNode().findChildByType(TheRTokenTypes.LEFT_ASSIGNMENTS);
+    return operator != null;
   }
 }

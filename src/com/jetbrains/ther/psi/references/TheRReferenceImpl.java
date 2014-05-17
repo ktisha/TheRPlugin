@@ -32,14 +32,23 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     final List<ResolveResult> result = new ArrayList<ResolveResult>();
     final String name = myElement.getText();
     if (name != null) {
+      TheRAssignmentStatement assignmentStatement = PsiTreeUtil.getParentOfType(myElement, TheRAssignmentStatement.class);
+      while (assignmentStatement != null) {
+        final PsiElement assignee = assignmentStatement.getAssignee();
+        if (assignee != null && assignee.getText().equals(name)) {
+          result.add(new PsiElementResolveResult(assignee));
+        }
+        assignmentStatement = PsiTreeUtil.getParentOfType(assignmentStatement, TheRAssignmentStatement.class);
+      }
+
       TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
       while (rBlock != null) {
         final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
         if (statements != null) {
           for (TheRAssignmentStatement statement : statements) {
-            final PsiElement child = statement.getFirstChild();
-            if (child.getText().equals(name)) {
-              result.add(new PsiElementResolveResult(statement));
+            final PsiElement assignee = statement.getAssignee();
+            if (assignee != null && assignee.getText().equals(name)) {
+              result.add(new PsiElementResolveResult(assignee));
             }
           }
         }
@@ -58,9 +67,9 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(file, TheRAssignmentStatement.class);
       if (statements != null) {
         for (TheRAssignmentStatement statement : statements) {
-          final PsiElement child = statement.getFirstChild();
-          if (child.getText().equals(name)) {
-            result.add(new PsiElementResolveResult(statement));
+          final PsiElement assignee = statement.getAssignee();
+          if (assignee != null && assignee.getText().equals(name)) {
+            result.add(new PsiElementResolveResult(assignee));
           }
         }
       }
@@ -81,11 +90,13 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
                                                                                         new LibraryScope(myElement.getProject(), library));
         for (TheRAssignmentStatement statement : assignmentStatements) {
           final PsiFile containingFile = statement.getContainingFile();
+          final PsiElement assignee = statement.getAssignee();
+          if(assignee == null) continue;
           if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name)) {
-            result.add(0, new PsiElementResolveResult(statement));
+            result.add(0, new PsiElementResolveResult(assignee));
           }
           else
-            result.add(new PsiElementResolveResult(statement));
+            result.add(new PsiElementResolveResult(assignee));
         }
       }
     }

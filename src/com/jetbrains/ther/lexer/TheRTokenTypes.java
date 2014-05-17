@@ -160,6 +160,7 @@ public class TheRTokenTypes {
             BREAK_KEYWORD);
 
   public static final TokenSet ASSIGNMENTS = TokenSet.create(LEFT_ASSIGN, LEFT_COMPLEX_ASSING, RIGHT_ASSIGN, RIGHT_COMPLEX_ASSING, EQ);
+  public static final TokenSet LEFT_ASSIGNMENTS = TokenSet.create(LEFT_ASSIGN, LEFT_COMPLEX_ASSING, EQ);
 
   public static final TokenSet OPERATORS = TokenSet
     .create(MINUS, PLUS, NOT, TILDE, HELP, COLON, MULT, DIV, EXP, MODULUS, INT_DIV, MATRIX_PROD, OUTER_PROD, MATCHING, KRONECKER_PROD,
