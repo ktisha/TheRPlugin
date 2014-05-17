@@ -157,6 +157,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testEmptyExpressionInSubscription() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

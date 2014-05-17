@@ -449,6 +449,11 @@ public class TheRExpressionParsing extends Parsing {
         }
         final IElementType CLOSE_BRACKET = TheRTokenTypes.BRACKER_PAIRS.get(tokenType);
         while (myBuilder.getTokenType() != CLOSE_BRACKET && !myBuilder.eof()) {
+          while (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
+            PsiBuilder.Marker marker = myBuilder.mark();
+            marker.done(TheRElementTypes.EMPTY_EXPRESSION);
+            advanceAndSkipNewLines();
+          }
           parseExpressionStatement();
           if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
             advanceAndSkipNewLines();

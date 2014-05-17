@@ -1,0 +1,39 @@
+TheRFile:EmptyExpressionInSubscription.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('DF2')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('rbind')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('DF')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:SUBSCRIPTION_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('DF')
+          PsiElement(TheR:LBRACKET)('[')
+          TheR:SLICE_EXPRESSION
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('7')
+            PsiElement(TheR:COLON)(':')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('8')
+          PsiElement(TheR:COMMA)(',')
+          TheR:EMPTY_EXPRESSION
+            <empty list>
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:ASSIGNMENT_STATEMENT
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('drop')
+            PsiElement(TheR:EQ)('=')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:FALSE_KEYWORD)('FALSE')
+          PsiElement(TheR:RBRACKET)(']')
+        PsiElement(TheR:RPAR)(')')
