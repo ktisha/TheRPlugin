@@ -503,7 +503,8 @@ public class TheRExpressionParsing extends Parsing {
         myBuilder.error(EXPRESSION_EXPECTED);
         continue;
       }
-      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
+      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL ||
+        myBuilder.getTokenType() == TheRTokenTypes.TICK) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
         parseFormulaeExpression();
         skipNewLines();

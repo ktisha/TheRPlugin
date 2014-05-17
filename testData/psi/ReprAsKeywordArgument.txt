@@ -1,0 +1,53 @@
+TheRFile:ReprAsKeywordArgument.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('DF')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('data.frame')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('y')
+          PsiElement(TheR:EQ)('=')
+          TheR:CALL_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('rnorm')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('21')
+              PsiElement(TheR:RPAR)(')')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REPR_EXPRESSION
+            PsiElement(TheR:TICK)('`')
+            PsiElement(TheR:IDENTIFIER)('x')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:NUMERIC_LITERAL)('1')
+            PsiElement(TheR:TICK)('`')
+          PsiElement(TheR:EQ)('=')
+          TheR:SLICE_EXPRESSION
+            TheR:PREFIX_EXPRESSION
+              PsiElement(TheR:MINUS)('-')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('10')
+            PsiElement(TheR:COLON)(':')
+            TheR:INTEGER_LITERAL_EXPRESSION
+              PsiElement(TheR:NUMERIC_LITERAL)('10.')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:KEYWORD_ARGUMENT_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('check.names')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:EQ)('=')
+          PsiWhiteSpace(' ')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:FALSE_KEYWORD)('FALSE')
+        PsiElement(TheR:RPAR)(')')
