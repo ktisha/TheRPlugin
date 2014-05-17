@@ -333,7 +333,7 @@ public class TheRExpressionParsing extends Parsing {
       expr.drop();
       return false;
     }
-    while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType()) {
+    while (TheRTokenTypes.INFIX_OP == myBuilder.getTokenType() || TheRTokenTypes.MATCHING == myBuilder.getTokenType()) {
       advanceAndSkipNewLines();
       if (!parseSliceExpression()) {
         myBuilder.error(EXPRESSION_EXPECTED);
