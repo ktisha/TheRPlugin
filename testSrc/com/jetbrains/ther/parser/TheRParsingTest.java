@@ -133,6 +133,14 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testEmptyKeywordArgument() {
+    doTest();
+  }
+
+  public void testIfInKeywordArgument() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

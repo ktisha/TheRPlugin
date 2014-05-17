@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmentStub, TheRAssignmentStatement> {
   public TheRAssignmentElementType() {
-    this("ASSIGNMENT");
+    this("ASSIGNMENT_STATEMENT");
   }
 
   public TheRAssignmentElementType(@NotNull final String debugName) {

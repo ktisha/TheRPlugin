@@ -1,0 +1,50 @@
+TheRFile:IfInKeywordArgument.r
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('a')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:KEYWORD_ARGUMENT_EXPRESSION
+        TheR:STRING_LITERAL_EXPRESSION
+          PsiElement(TheR:STRING_LITERAL)('"\\cite"')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:EQ)('=')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiWhiteSpace('                   ')
+        TheR:IF_STATEMENT
+          PsiElement(TheR:IF_KEYWORD)('if')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:LPAR)('(')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('inCodeBlock')
+          PsiElement(TheR:RPAR)(')')
+          PsiWhiteSpace(' ')
+          TheR:CALL_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('writeContent')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('block')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('tag')
+              PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                   ')
+          PsiElement(TheR:ELSE_KEYWORD)('else')
+          PsiWhiteSpace(' ')
+          TheR:CALL_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('writeWrapped')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('block')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('tag')
+              PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')

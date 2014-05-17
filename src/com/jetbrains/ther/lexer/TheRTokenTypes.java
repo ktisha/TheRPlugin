@@ -171,6 +171,9 @@ public class TheRTokenTypes {
                                                           TRIPLE_DOTS, IF_KEYWORD, ELSE_KEYWORD, REPEAT_KEYWORD, WHILE_KEYWORD,
                                                           FUNCTION_KEYWORD, FOR_KEYWORD, IN_KEYWORD, NEXT_KEYWORD, BREAK_KEYWORD);
 
+  public static final TokenSet STATEMENT_START_TOKENS = TokenSet.create(IF_KEYWORD, WHILE_KEYWORD, FOR_KEYWORD, REPEAT_KEYWORD,
+                                                                        BREAK_KEYWORD, NEXT_KEYWORD, LBRACE, FUNCTION_KEYWORD, HELP);
+
   public static final TokenSet COMPARISON_OPERATIONS = TokenSet.create(LT, GT, EQEQ, GE, LE, NOTEQ, MATCHING);
 
   public static final TokenSet NA_KEYWORDS = TokenSet.create(NA_KEYWORD, NA_CHARACTER_KEYWORD, NA_COMPLEX_KEYWORD, NA_INTEGER_KEYWORD,

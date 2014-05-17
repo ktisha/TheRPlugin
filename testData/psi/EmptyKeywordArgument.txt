@@ -1,0 +1,71 @@
+TheRFile:EmptyKeywordArgument.r
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('switch')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('tag')
+      PsiElement(TheR:COMMA)(',')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('               ')
+      TheR:KEYWORD_ARGUMENT_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('UNKNOWN')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:EQ)('=')
+      PsiElement(TheR:COMMA)(',')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('               ')
+      TheR:KEYWORD_ARGUMENT_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('VERB')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:EQ)('=')
+        PsiWhiteSpace(' ')
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('of1')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('texify')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('block')
+                PsiElement(TheR:COMMA)(',')
+                PsiWhiteSpace(' ')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:TRUE_KEYWORD)('TRUE')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:COMMA)(',')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('               ')
+      TheR:KEYWORD_ARGUMENT_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('RCODE')
+        PsiWhiteSpace(' ')
+        PsiElement(TheR:EQ)('=')
+        PsiWhiteSpace(' ')
+        TheR:CALL_EXPRESSION
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('of1')
+          TheR:ARGUMENT_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('texify')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('block')
+                PsiElement(TheR:COMMA)(',')
+                PsiWhiteSpace(' ')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:TRUE_KEYWORD)('TRUE')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')

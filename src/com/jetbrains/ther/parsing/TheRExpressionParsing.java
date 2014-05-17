@@ -43,7 +43,7 @@ public class TheRExpressionParsing extends Parsing {
     else if (firstToken == TheRTokenTypes.FUNCTION_KEYWORD) {
       getFunctionParser().parseFunctionDeclaration();
     }
-    else if (myBuilder.getTokenType() == TheRTokenTypes.HELP) {
+    else if (firstToken == TheRTokenTypes.HELP) {
       parseHelpExpression();
     }
     else {
@@ -497,8 +497,8 @@ public class TheRExpressionParsing extends Parsing {
         skipNewLines();
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
           advanceAndSkipNewLines();
-          if (myBuilder.getTokenType() == TheRTokenTypes.FUNCTION_KEYWORD) {
-            getFunctionParser().parseFunctionDeclaration();
+          if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
+            parseExpressionStatement();
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
             continue;
           }
