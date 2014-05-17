@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
+import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
@@ -22,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TheRInterpreterConfigurable implements SearchableConfigurable, Configurable.NoScroll{
@@ -142,29 +145,34 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   public void disposeUIResources() {
   }
 
-  public static void attachLibrary(final Project project,
-                                   final String libraryName,
-                                   final List<String> paths) {
+  public static void attachLibrary(@NotNull final Project project,
+                                   @NotNull final String libraryName,
+                                   @NotNull final List<String> paths) {
     final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       @Override
       public void run() {
         // add all paths to library
         final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(project);
-        final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
-          // update existing
-        if (library != null) {
-          fillLibrary(library, paths);
-          model.commit();
-          return;
+        Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+        if (library == null) {
+          library = model.createLibrary(libraryName);
         }
-        // create new
-        Library lib = model.createLibrary(libraryName);
-        fillLibrary(lib, paths);
+        fillLibrary(library, paths);
         model.commit();
+        final Library.ModifiableModel libModel = library.getModifiableModel();
+        libModel.commit();
+        final Module[] modules = ModuleManager.getInstance(project).getModules();
+        final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+        for (Module module : modules) {
+          final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
+          modifiableModel.addLibraryEntry(library);
+          modelsProvider.commitModuleModifiableModel(modifiableModel);
+        }
       }
 
     });
+
   }
 
   private static void fillLibrary(@NotNull final Library lib, @NotNull final List<String> paths) {
