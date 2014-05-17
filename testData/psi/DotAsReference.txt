@@ -1,0 +1,43 @@
+TheRFile:DotAsReference.r
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('step')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('aov')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:BINARY_EXPRESSION
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('log')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:BINARY_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('Days')
+                  PsiElement(TheR:PLUS)('+')
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('2.5')
+                PsiElement(TheR:RPAR)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:TILDE)('~')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:DOT)('.')
+              PsiElement(TheR:EXP)('^')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('4')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('data')
+            PsiElement(TheR:EQ)('=')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('Quine')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')

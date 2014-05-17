@@ -149,6 +149,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testDotAsReference() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }
