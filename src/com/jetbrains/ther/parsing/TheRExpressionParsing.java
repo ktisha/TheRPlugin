@@ -499,6 +499,10 @@ public class TheRExpressionParsing extends Parsing {
           break;
         }
       }
+      if (atToken(TheRTokenTypes.COMMA)) {
+        myBuilder.error(EXPRESSION_EXPECTED);
+        continue;
+      }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL) {
         final PsiBuilder.Marker keywordArgMarker = myBuilder.mark();
         parseFormulaeExpression();
