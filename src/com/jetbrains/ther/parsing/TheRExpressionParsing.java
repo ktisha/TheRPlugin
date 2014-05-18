@@ -498,6 +498,10 @@ public class TheRExpressionParsing extends Parsing {
       buildTokenElement(TheRElementTypes.REFERENCE_EXPRESSION, myBuilder);
       return true;
     }
+    else if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
+      myBuilder.advanceLexer();
+      return true;
+    }
     return false;
   }
 
