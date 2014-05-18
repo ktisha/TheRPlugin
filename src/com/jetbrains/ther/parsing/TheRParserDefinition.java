@@ -25,7 +25,7 @@ public class TheRParserDefinition implements ParserDefinition {
   private final TokenSet myStringLiteralTokens;
 
   public TheRParserDefinition() {
-    myWhitespaceTokens = TokenSet.create(TheRTokenTypes.SPACE, TheRTokenTypes.TAB);
+    myWhitespaceTokens = TokenSet.create(TheRTokenTypes.SPACE, TheRTokenTypes.TAB, TheRTokenTypes.FORMFEED);
     myCommentTokens = TokenSet.create(TheRTokenTypes.END_OF_LINE_COMMENT);
     myStringLiteralTokens = TokenSet.create(TheRTokenTypes.STRING_LITERAL);
   }

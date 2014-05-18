@@ -466,6 +466,10 @@ public class TheRExpressionParsing extends Parsing {
             advanceAndSkipNewLines();
             continue;
           }
+          else if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
+            advanceAndSkipNewLines();
+            continue;
+          }
           parseExpressionStatement(true);
           if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
             advanceAndSkipNewLines();
