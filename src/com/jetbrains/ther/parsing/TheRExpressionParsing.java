@@ -480,11 +480,6 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
         expr = expr.precede();
       }
-      //else if (myBuilder.getTokenType() == TheRTokenTypes.IF_KEYWORD) {
-      //  parseIfExpression();
-      //  expr.done(TheRElementTypes.IF_STATEMENT);
-      //  expr = expr.precede();
-      //}
       else {
         expr.drop();
         break;
@@ -504,6 +499,10 @@ public class TheRExpressionParsing extends Parsing {
     }
     else if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
       myBuilder.advanceLexer();
+      return true;
+    }
+    else if (myBuilder.getTokenType() == TheRTokenTypes.TICK) {
+      parseReprExpression();
       return true;
     }
     return false;

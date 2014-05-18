@@ -193,6 +193,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testReprInSublist() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }
