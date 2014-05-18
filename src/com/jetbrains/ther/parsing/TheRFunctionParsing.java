@@ -51,7 +51,7 @@ public class TheRFunctionParsing extends Parsing {
       }
 
       final PsiBuilder.Marker parameter = myBuilder.mark();
-      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER) {
+      if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.DOT) {
         advanceAndSkipNewLines();
         if (matchToken(TheRTokenTypes.EQ)) {
           skipNewLines();

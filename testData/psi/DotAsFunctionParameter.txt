@@ -1,0 +1,103 @@
+TheRFile:DotAsFunctionParameter.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('not.Ident')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:FUNCTION_DECLARATION
+      PsiElement(TheR:FUNCTION_KEYWORD)('function')
+      TheR:PARAMETER_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('ch')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('TRAFO')
+          PsiElement(TheR:EQ)('=')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('identity')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:TRIPLE_DOTS)('...')
+        PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      PsiWhiteSpace('\t')
+      PsiWhiteSpace('\t')
+      PsiWhiteSpace('    ')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('vapply')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('ch')
+          PsiElement(TheR:COMMA)(',')
+          PsiWhiteSpace(' ')
+          TheR:FUNCTION_DECLARATION
+            PsiElement(TheR:FUNCTION_KEYWORD)('function')
+            TheR:PARAMETER_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:PARAMETER
+                PsiElement(TheR:DOT)('.')
+              PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:LINE_BREAK)('\n')
+            PsiWhiteSpace('                           ')
+            TheR:PREFIX_EXPRESSION
+              PsiElement(TheR:NOT)('!')
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('identical')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:CALL_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('TRAFO')
+                    TheR:ARGUMENT_LIST
+                      PsiElement(TheR:LPAR)('(')
+                      TheR:CALL_EXPRESSION
+                        TheR:REFERENCE_EXPRESSION
+                          PsiElement(TheR:IDENTIFIER)('get')
+                        TheR:ARGUMENT_LIST
+                          PsiElement(TheR:LPAR)('(')
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:DOT)('.')
+                          PsiElement(TheR:COMMA)(',')
+                          PsiWhiteSpace(' ')
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:IDENTIFIER)('i')
+                          PsiElement(TheR:RPAR)(')')
+                      PsiElement(TheR:RPAR)(')')
+                  PsiElement(TheR:COMMA)(',')
+                  PsiElement(TheR:LINE_BREAK)('\n')
+                  PsiWhiteSpace('                                      ')
+                  TheR:CALL_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('TRAFO')
+                    TheR:ARGUMENT_LIST
+                      PsiElement(TheR:LPAR)('(')
+                      TheR:CALL_EXPRESSION
+                        TheR:REFERENCE_EXPRESSION
+                          PsiElement(TheR:IDENTIFIER)('get')
+                        TheR:ARGUMENT_LIST
+                          PsiElement(TheR:LPAR)('(')
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:DOT)('.')
+                          PsiElement(TheR:COMMA)(',')
+                          PsiWhiteSpace(' ')
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:IDENTIFIER)('lib.pos')
+                          PsiElement(TheR:RPAR)(')')
+                      PsiElement(TheR:RPAR)(')')
+                  PsiElement(TheR:COMMA)(',')
+                  PsiWhiteSpace(' ')
+                  PsiElement(TheR:TRIPLE_DOTS)('...')
+                  PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                           ')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:NA_KEYWORD)('NA')
+          PsiElement(TheR:RPAR)(')')
