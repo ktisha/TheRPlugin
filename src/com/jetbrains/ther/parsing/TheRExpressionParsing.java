@@ -512,7 +512,8 @@ public class TheRExpressionParsing extends Parsing {
         }
       }
       if (atToken(TheRTokenTypes.COMMA)) {
-        myBuilder.error(EXPRESSION_EXPECTED);
+        final PsiBuilder.Marker mark = myBuilder.mark();
+        mark.done(TheRElementTypes.EMPTY_EXPRESSION);
         continue;
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL ||
