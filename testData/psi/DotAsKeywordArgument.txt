@@ -1,0 +1,65 @@
+TheRFile:DotAsKeywordArgument.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('missE')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:CALL_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('lapply')
+      TheR:ARGUMENT_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('nf')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:FUNCTION_DECLARATION
+          PsiElement(TheR:FUNCTION_KEYWORD)('function')
+          TheR:PARAMETER_LIST
+            PsiElement(TheR:LPAR)('(')
+            TheR:PARAMETER
+              PsiElement(TheR:IDENTIFIER)('n')
+            PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('\t')
+          PsiWhiteSpace('\t')
+          PsiWhiteSpace('\t')
+          PsiWhiteSpace('    ')
+          TheR:CALL_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('substitute')
+            TheR:ARGUMENT_LIST
+              PsiElement(TheR:LPAR)('(')
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('missing')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:DOT)('.')
+                  PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:COMMA)(',')
+              PsiWhiteSpace(' ')
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('list')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:KEYWORD_ARGUMENT_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:DOT)('.')
+                    PsiWhiteSpace(' ')
+                    PsiElement(TheR:EQ)('=')
+                    PsiWhiteSpace(' ')
+                    TheR:CALL_EXPRESSION
+                      TheR:REFERENCE_EXPRESSION
+                        PsiElement(TheR:IDENTIFIER)('as.name')
+                      TheR:ARGUMENT_LIST
+                        PsiElement(TheR:LPAR)('(')
+                        TheR:REFERENCE_EXPRESSION
+                          PsiElement(TheR:IDENTIFIER)('n')
+                        PsiElement(TheR:RPAR)(')')
+                  PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:RPAR)(')')
+        PsiElement(TheR:RPAR)(')')

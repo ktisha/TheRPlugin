@@ -189,6 +189,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testDotAsKeywordArgument() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }
