@@ -13,7 +13,7 @@ public class TheRExpressionParsing extends Parsing {
     super(context);
   }
 
-  public void parseExpressionStatement() {
+  public void parseExpressionStatement(boolean skipLineBreak) {
     skipNewLines();
 
     final IElementType firstToken = myBuilder.getTokenType();
@@ -47,18 +47,18 @@ public class TheRExpressionParsing extends Parsing {
       parseHelpExpression();
     }
     else {
-      parseAssignmentExpression();
+      parseAssignmentExpression(skipLineBreak);
     }
   }
 
   private void parseIfExpression() {
     final PsiBuilder.Marker ifExpression = myBuilder.mark();
     parseConditionExpression();
-    parseExpressionStatement();
+    parseExpressionStatement(false);
     skipNewLines();
     if (myBuilder.getTokenType() == TheRTokenTypes.ELSE_KEYWORD) {
       myBuilder.advanceLexer();
-      parseExpressionStatement();
+      parseExpressionStatement(false);
     }
     checkSemicolon();
     ifExpression.done(TheRElementTypes.IF_STATEMENT);
@@ -67,7 +67,7 @@ public class TheRExpressionParsing extends Parsing {
   private void parseWhileExpression() {
     final PsiBuilder.Marker whileExpression = myBuilder.mark();
     parseConditionExpression();
-    parseExpressionStatement();
+    parseExpressionStatement(false);
     checkSemicolon();
     whileExpression.done(TheRElementTypes.WHILE_STATEMENT);
   }
@@ -75,7 +75,7 @@ public class TheRExpressionParsing extends Parsing {
   private void parseConditionExpression() {
     advanceAndSkipNewLines();
     checkMatches(TheRTokenTypes.LPAR, "( expected");
-    parseExpressionStatement();
+    parseExpressionStatement(true);
     skipNewLines();
     checkMatches(TheRTokenTypes.RPAR, ") expected");
     skipNewLines();
@@ -85,14 +85,14 @@ public class TheRExpressionParsing extends Parsing {
     final PsiBuilder.Marker forExpression = myBuilder.mark();
     advanceAndSkipNewLines();
     checkMatches(TheRTokenTypes.LPAR, "( expected");
-    parseExpressionStatement();
+    parseExpressionStatement(true);
     skipNewLines();
     if (checkMatches(TheRTokenTypes.IN_KEYWORD, "'in' expected")) {
-      parseExpressionStatement();
+      parseExpressionStatement(true);
     }
     skipNewLines();
     checkMatches(TheRTokenTypes.RPAR, ") expected");
-    parseExpressionStatement();
+    parseExpressionStatement(false);
     checkSemicolon();
     forExpression.done(TheRElementTypes.FOR_STATEMENT);
   }
@@ -100,7 +100,7 @@ public class TheRExpressionParsing extends Parsing {
   private void parseRepeatExpression() {
     final PsiBuilder.Marker repeatExpression = myBuilder.mark();
     advanceAndSkipNewLines();
-    parseExpressionStatement();
+    parseExpressionStatement(false);
     checkSemicolon();
     repeatExpression.done(TheRElementTypes.REPEAT_STATEMENT);
   }
@@ -128,7 +128,7 @@ public class TheRExpressionParsing extends Parsing {
         myBuilder.advanceLexer();
         return;
       }
-      parseExpressionStatement();
+      parseExpressionStatement(false);
       skipNewLines();
       checkMatches(TheRTokenTypes.RPAR, ") expected");
     }
@@ -143,7 +143,7 @@ public class TheRExpressionParsing extends Parsing {
         blockExpression.done(TheRElementTypes.BLOCK);
         return;
       }
-      parseExpressionStatement();
+      parseExpressionStatement(false);
     }
 
     myBuilder.advanceLexer();
@@ -170,13 +170,13 @@ public class TheRExpressionParsing extends Parsing {
     }
   }
 
-  protected void parseAssignmentExpression() {
+  protected void parseAssignmentExpression(boolean skipLineBreak) {
     final PsiBuilder.Marker assignmentExpression = myBuilder.mark();
-    final boolean successfull = parseFormulaeExpression(false);
+    final boolean successfull = parseFormulaeExpression(skipLineBreak);
     if (successfull) {
       if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
         advanceAndSkipNewLines();
-        parseExpressionStatement();
+        parseExpressionStatement(skipLineBreak);
         checkSemicolon();
         assignmentExpression.done(TheRElementTypes.ASSIGNMENT_STATEMENT);
       }
@@ -461,7 +461,7 @@ public class TheRExpressionParsing extends Parsing {
             advanceAndSkipNewLines();
             continue;
           }
-          parseExpressionStatement();
+          parseExpressionStatement(true);
           if (myBuilder.getTokenType() == TheRTokenTypes.COMMA) {
             advanceAndSkipNewLines();
           }
@@ -524,7 +524,7 @@ public class TheRExpressionParsing extends Parsing {
         if (TheRTokenTypes.ASSIGNMENTS.contains(myBuilder.getTokenType())) {
           advanceAndSkipNewLines();
           if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
-            parseExpressionStatement();
+            parseExpressionStatement(false);
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
             continue;
           }
@@ -550,7 +550,7 @@ public class TheRExpressionParsing extends Parsing {
         continue;
       }
       if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
-        parseExpressionStatement();
+        parseExpressionStatement(false);
         continue;
       }
       if (!parseFormulaeExpression(true)) {
@@ -578,7 +578,7 @@ public class TheRExpressionParsing extends Parsing {
   private void parseParenthesizedExpression() {
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
-    parseExpressionStatement();
+    parseExpressionStatement(true);
     checkMatches(TheRTokenTypes.RPAR, ") expected");
     expr.done(TheRElementTypes.PARENTHESIZED_EXPRESSION);
   }
