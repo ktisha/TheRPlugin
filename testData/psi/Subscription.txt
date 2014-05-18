@@ -46,10 +46,10 @@ TheRFile:Subscription.r
   TheR:SUBSCRIPTION_EXPRESSION
     TheR:REFERENCE_EXPRESSION
       PsiElement(TheR:IDENTIFIER)('mtcars')
-    PsiElement(TheR:LBRACKET)('[[')
+    PsiElement(TheR:LDBRACKET)('[[')
     TheR:INTEGER_LITERAL_EXPRESSION
       PsiElement(TheR:NUMERIC_LITERAL)('9')
-    PsiElement(TheR:RBRACKET)(']]')
+    PsiElement(TheR:RDBRACKET)(']]')
   PsiElement(TheR:LINE_BREAK)('\n')
   TheR:SUBSCRIPTION_EXPRESSION
     TheR:REFERENCE_EXPRESSION

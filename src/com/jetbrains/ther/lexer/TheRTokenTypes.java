@@ -135,9 +135,9 @@ public class TheRTokenTypes {
   public static final IElementType LPAR = new TheRElementType("LPAR");    // (
   public static final IElementType RPAR = new TheRElementType("RPAR");    // )
   public static final IElementType LBRACKET = new TheRElementType("LBRACKET");    // [
-  public static final IElementType LDBRACKET = new TheRElementType("LBRACKET");    // [[
+  public static final IElementType LDBRACKET = new TheRElementType("LDBRACKET");    // [[
   public static final IElementType RBRACKET = new TheRElementType("RBRACKET");    // ]
-  public static final IElementType RDBRACKET = new TheRElementType("RBRACKET");    // ]]
+  public static final IElementType RDBRACKET = new TheRElementType("RDBRACKET");    // ]]
   public static final IElementType LBRACE = new TheRElementType("LBRACE");    // {
   public static final IElementType RBRACE = new TheRElementType("RBRACE");    // }
   public static final IElementType COMMA = new TheRElementType("COMMA");    // ,

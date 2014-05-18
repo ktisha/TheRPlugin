@@ -1,0 +1,21 @@
+TheRFile:DoubleDoubleBracket.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('vjj')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:SUBSCRIPTION_EXPRESSION
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('value')
+      PsiElement(TheR:LDBRACKET)('[[')
+      PsiWhiteSpace(' ')
+      TheR:SUBSCRIPTION_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('jvseq')
+        PsiElement(TheR:LDBRACKET)('[[')
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('jjj')
+        PsiElement(TheR:RDBRACKET)(']]')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:RDBRACKET)(']]')

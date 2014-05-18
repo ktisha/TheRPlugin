@@ -62,7 +62,7 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 //ESCAPE_SEQUENCE=\\([rntbafv\'\"\\]|{NONZERO_OCT_DIGIT}|{OCT_DIGIT}{2,3}|"x"{HEX_DIGIT}{1,2}|"u"{HEX_DIGIT}{1,4}|"u{"{HEX_DIGIT}{1,4}"}"|"U"{HEX_DIGIT}{1,8}|"U{"{HEX_DIGIT}{1,8}"}")
 
 %{
-private boolean inDoubleBracket = false;
+private int doubleBracketCounter = 0;
 %}
 
 %%
@@ -175,9 +175,9 @@ private boolean inDoubleBracket = false;
 "}"                         { return TheRTokenTypes.RBRACE; }
 
 // indexing
-"[["                        { inDoubleBracket = true; return TheRTokenTypes.LDBRACKET; }
-"]]"                        { if (inDoubleBracket) {
-                                inDoubleBracket = false;
+"[["                        { doubleBracketCounter += 1; return TheRTokenTypes.LDBRACKET; }
+"]]"                        { if (doubleBracketCounter > 0) {
+                                doubleBracketCounter -= 1;
                                 return TheRTokenTypes.RDBRACKET;
                               }
                               else {

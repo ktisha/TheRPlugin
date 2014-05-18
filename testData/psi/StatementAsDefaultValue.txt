@@ -1,0 +1,69 @@
+TheRFile:StatementAsDefaultValue.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REPR_EXPRESSION
+      PsiElement(TheR:TICK)('`')
+      PsiElement(TheR:LBRACKET)('[')
+      PsiElement(TheR:IDENTIFIER)('.data.frame')
+      PsiElement(TheR:TICK)('`')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiElement(TheR:LINE_BREAK)('\n')
+    PsiWhiteSpace('    ')
+    TheR:FUNCTION_DECLARATION
+      PsiElement(TheR:FUNCTION_KEYWORD)('function')
+      TheR:PARAMETER_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('x')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('i')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('j')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:IDENTIFIER)('drop')
+          PsiWhiteSpace(' ')
+          PsiElement(TheR:EQ)('=')
+          PsiWhiteSpace(' ')
+          TheR:IF_STATEMENT
+            PsiElement(TheR:IF_KEYWORD)('if')
+            PsiElement(TheR:LPAR)('(')
+            TheR:CALL_EXPRESSION
+              TheR:REFERENCE_EXPRESSION
+                PsiElement(TheR:IDENTIFIER)('missing')
+              TheR:ARGUMENT_LIST
+                PsiElement(TheR:LPAR)('(')
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('i')
+                PsiElement(TheR:RPAR)(')')
+            PsiElement(TheR:RPAR)(')')
+            PsiWhiteSpace(' ')
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:TRUE_KEYWORD)('TRUE')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:ELSE_KEYWORD)('else')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('length')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('cols')
+                  PsiElement(TheR:RPAR)(')')
+              PsiWhiteSpace(' ')
+              PsiElement(TheR:EQEQ)('==')
+              PsiWhiteSpace(' ')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('1')
+        PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      TheR:BLOCK
+        PsiElement(TheR:LBRACE)('{')
+        PsiElement(TheR:RBRACE)('}')

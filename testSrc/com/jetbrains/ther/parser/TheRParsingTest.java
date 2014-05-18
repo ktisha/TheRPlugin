@@ -165,6 +165,14 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testStatementAsDefaultValue() {
+    doTest();
+  }
+
+  public void testDoubleDoubleBracket() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }
