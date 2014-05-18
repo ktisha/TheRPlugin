@@ -528,6 +528,7 @@ public class TheRExpressionParsing extends Parsing {
       if (atToken(TheRTokenTypes.COMMA)) {
         final PsiBuilder.Marker mark = myBuilder.mark();
         mark.done(TheRElementTypes.EMPTY_EXPRESSION);
+        skipNewLines();
         continue;
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.IDENTIFIER || myBuilder.getTokenType() == TheRTokenTypes.STRING_LITERAL ||
@@ -540,6 +541,7 @@ public class TheRExpressionParsing extends Parsing {
           if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
             parseExpressionStatement(false);
             keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
+            skipNewLines();
             continue;
           }
           final PsiBuilder.Marker keywordValue = myBuilder.mark();
@@ -551,20 +553,24 @@ public class TheRExpressionParsing extends Parsing {
             keywordValue.drop();
           }
           keywordArgMarker.done(TheRElementTypes.KEYWORD_ARGUMENT_EXPRESSION);
+          skipNewLines();
           continue;
         }
         keywordArgMarker.rollbackTo();
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.LBRACE) {
         parseBlockExpression();
+        skipNewLines();
         continue;
       }
       if (myBuilder.getTokenType() == TheRTokenTypes.TRIPLE_DOTS) {
         myBuilder.advanceLexer();
+        skipNewLines();
         continue;
       }
       if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
         parseExpressionStatement(false);
+        skipNewLines();
         continue;
       }
       if (!parseFormulaeExpression(true)) {

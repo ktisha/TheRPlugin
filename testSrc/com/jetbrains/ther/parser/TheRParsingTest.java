@@ -185,6 +185,10 @@ public class TheRParsingTest extends ParsingTestCase {
     doTest();
   }
 
+  public void testNewLineAfterKeywordArgument() {
+    doTest();
+  }
+
   public void doTest() {
     doTest(true);
   }

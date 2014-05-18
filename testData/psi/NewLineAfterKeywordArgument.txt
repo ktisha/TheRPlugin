@@ -1,0 +1,224 @@
+TheRFile:NewLineAfterKeywordArgument.r
+  TheR:CALL_EXPRESSION
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('return')
+    TheR:ARGUMENT_LIST
+      PsiElement(TheR:LPAR)('(')
+      TheR:CALL_EXPRESSION
+        TheR:REFERENCE_EXPRESSION
+          PsiElement(TheR:IDENTIFIER)('switch')
+        TheR:ARGUMENT_LIST
+          PsiElement(TheR:LPAR)('(')
+          TheR:REFERENCE_EXPRESSION
+            PsiElement(TheR:IDENTIFIER)('kernel')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('gaussian')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('1')
+              PsiElement(TheR:DIV)('/')
+              TheR:PARENTHESIZED_EXPRESSION
+                PsiElement(TheR:LPAR)('(')
+                TheR:BINARY_EXPRESSION
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('2')
+                  PsiElement(TheR:MULT)('*')
+                  TheR:CALL_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('sqrt')
+                    TheR:ARGUMENT_LIST
+                      PsiElement(TheR:LPAR)('(')
+                      TheR:REFERENCE_EXPRESSION
+                        PsiElement(TheR:IDENTIFIER)('pi')
+                      PsiElement(TheR:RPAR)(')')
+                PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('rectangular')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('sqrt')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('3')
+                  PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:DIV)('/')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('6')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('triangular')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('sqrt')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('6')
+                  PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:DIV)('/')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('9')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('epanechnikov')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('3')
+              PsiElement(TheR:DIV)('/')
+              TheR:PARENTHESIZED_EXPRESSION
+                PsiElement(TheR:LPAR)('(')
+                TheR:BINARY_EXPRESSION
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('5')
+                  PsiElement(TheR:MULT)('*')
+                  TheR:CALL_EXPRESSION
+                    TheR:REFERENCE_EXPRESSION
+                      PsiElement(TheR:IDENTIFIER)('sqrt')
+                    TheR:ARGUMENT_LIST
+                      PsiElement(TheR:LPAR)('(')
+                      TheR:INTEGER_LITERAL_EXPRESSION
+                        PsiElement(TheR:NUMERIC_LITERAL)('5')
+                      PsiElement(TheR:RPAR)(')')
+                PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('biweight')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:BINARY_EXPRESSION
+                TheR:INTEGER_LITERAL_EXPRESSION
+                  PsiElement(TheR:NUMERIC_LITERAL)('5')
+                PsiElement(TheR:MULT)('*')
+                TheR:CALL_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('sqrt')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:INTEGER_LITERAL_EXPRESSION
+                      PsiElement(TheR:NUMERIC_LITERAL)('7')
+                    PsiElement(TheR:RPAR)(')')
+              PsiElement(TheR:DIV)('/')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('49')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('cosine')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:BINARY_EXPRESSION
+                TheR:INTEGER_LITERAL_EXPRESSION
+                  PsiElement(TheR:NUMERIC_LITERAL)('3')
+                PsiElement(TheR:DIV)('/')
+                TheR:INTEGER_LITERAL_EXPRESSION
+                  PsiElement(TheR:NUMERIC_LITERAL)('4')
+              PsiElement(TheR:MULT)('*')
+              TheR:CALL_EXPRESSION
+                TheR:REFERENCE_EXPRESSION
+                  PsiElement(TheR:IDENTIFIER)('sqrt')
+                TheR:ARGUMENT_LIST
+                  PsiElement(TheR:LPAR)('(')
+                  TheR:BINARY_EXPRESSION
+                    TheR:BINARY_EXPRESSION
+                      TheR:INTEGER_LITERAL_EXPRESSION
+                        PsiElement(TheR:NUMERIC_LITERAL)('1')
+                      PsiElement(TheR:DIV)('/')
+                      TheR:INTEGER_LITERAL_EXPRESSION
+                        PsiElement(TheR:NUMERIC_LITERAL)('3')
+                    PsiWhiteSpace(' ')
+                    PsiElement(TheR:MINUS)('-')
+                    PsiWhiteSpace(' ')
+                    TheR:BINARY_EXPRESSION
+                      TheR:INTEGER_LITERAL_EXPRESSION
+                        PsiElement(TheR:NUMERIC_LITERAL)('2')
+                      PsiElement(TheR:DIV)('/')
+                      TheR:BINARY_EXPRESSION
+                        TheR:REFERENCE_EXPRESSION
+                          PsiElement(TheR:IDENTIFIER)('pi')
+                        PsiElement(TheR:EXP)('^')
+                        TheR:INTEGER_LITERAL_EXPRESSION
+                          PsiElement(TheR:NUMERIC_LITERAL)('2')
+                  PsiElement(TheR:RPAR)(')')
+          PsiElement(TheR:COMMA)(',')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          TheR:KEYWORD_ARGUMENT_EXPRESSION
+            TheR:REFERENCE_EXPRESSION
+              PsiElement(TheR:IDENTIFIER)('optcosine')
+            PsiWhiteSpace(' ')
+            PsiElement(TheR:EQ)('=')
+            PsiWhiteSpace(' ')
+            TheR:BINARY_EXPRESSION
+              TheR:BINARY_EXPRESSION
+                TheR:CALL_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('sqrt')
+                  TheR:ARGUMENT_LIST
+                    PsiElement(TheR:LPAR)('(')
+                    TheR:BINARY_EXPRESSION
+                      TheR:INTEGER_LITERAL_EXPRESSION
+                        PsiElement(TheR:NUMERIC_LITERAL)('1')
+                      PsiElement(TheR:MINUS)('-')
+                      TheR:BINARY_EXPRESSION
+                        TheR:INTEGER_LITERAL_EXPRESSION
+                          PsiElement(TheR:NUMERIC_LITERAL)('8')
+                        PsiElement(TheR:DIV)('/')
+                        TheR:BINARY_EXPRESSION
+                          TheR:REFERENCE_EXPRESSION
+                            PsiElement(TheR:IDENTIFIER)('pi')
+                          PsiElement(TheR:EXP)('^')
+                          TheR:INTEGER_LITERAL_EXPRESSION
+                            PsiElement(TheR:NUMERIC_LITERAL)('2')
+                    PsiElement(TheR:RPAR)(')')
+                PsiElement(TheR:MULT)('*')
+                TheR:BINARY_EXPRESSION
+                  TheR:REFERENCE_EXPRESSION
+                    PsiElement(TheR:IDENTIFIER)('pi')
+                  PsiElement(TheR:EXP)('^')
+                  TheR:INTEGER_LITERAL_EXPRESSION
+                    PsiElement(TheR:NUMERIC_LITERAL)('2')
+              PsiElement(TheR:DIV)('/')
+              TheR:INTEGER_LITERAL_EXPRESSION
+                PsiElement(TheR:NUMERIC_LITERAL)('16')
+          PsiElement(TheR:LINE_BREAK)('\n')
+          PsiWhiteSpace('                      ')
+          PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:RPAR)(')')
