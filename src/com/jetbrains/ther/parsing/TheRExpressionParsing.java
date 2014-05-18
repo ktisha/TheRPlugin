@@ -411,6 +411,11 @@ public class TheRExpressionParsing extends Parsing {
 
   public boolean parseMemberExpression() {
     PsiBuilder.Marker expr = myBuilder.mark();
+    if (TheRTokenTypes.STATEMENT_START_TOKENS.contains(myBuilder.getTokenType())) {
+      parseExpressionStatement(false);
+      expr.drop();
+      return true;
+    }
     if (!parsePrimaryExpression()) {
       expr.drop();
       return false;
@@ -471,6 +476,11 @@ public class TheRExpressionParsing extends Parsing {
         expr.done(TheRElementTypes.SUBSCRIPTION_EXPRESSION);
         expr = expr.precede();
       }
+      //else if (myBuilder.getTokenType() == TheRTokenTypes.IF_KEYWORD) {
+      //  parseIfExpression();
+      //  expr.done(TheRElementTypes.IF_STATEMENT);
+      //  expr = expr.precede();
+      //}
       else {
         expr.drop();
         break;

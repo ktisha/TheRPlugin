@@ -1,0 +1,26 @@
+TheRFile:ExpressionAsBinaryExpressionPart.r
+  TheR:BINARY_EXPRESSION
+    TheR:INTEGER_LITERAL_EXPRESSION
+      PsiElement(TheR:NUMERIC_LITERAL)('1')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:PLUS)('+')
+    PsiWhiteSpace(' ')
+    TheR:FOR_STATEMENT
+      PsiElement(TheR:FOR_KEYWORD)('for')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:LPAR)('(')
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('x')
+      PsiWhiteSpace(' ')
+      PsiElement(TheR:IN_KEYWORD)('in')
+      PsiWhiteSpace(' ')
+      TheR:SLICE_EXPRESSION
+        TheR:INTEGER_LITERAL_EXPRESSION
+          PsiElement(TheR:NUMERIC_LITERAL)('1')
+        PsiElement(TheR:COLON)(':')
+        TheR:INTEGER_LITERAL_EXPRESSION
+          PsiElement(TheR:NUMERIC_LITERAL)('4')
+      PsiElement(TheR:RPAR)(')')
+      PsiWhiteSpace(' ')
+      TheR:REFERENCE_EXPRESSION
+        PsiElement(TheR:IDENTIFIER)('x')
