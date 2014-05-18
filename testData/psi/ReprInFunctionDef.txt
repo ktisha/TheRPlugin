@@ -1,0 +1,28 @@
+TheRFile:ReprInFunctionDef.r
+  TheR:ASSIGNMENT_STATEMENT
+    TheR:REFERENCE_EXPRESSION
+      PsiElement(TheR:IDENTIFIER)('transform.data.frame')
+    PsiWhiteSpace(' ')
+    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiWhiteSpace(' ')
+    TheR:FUNCTION_DECLARATION
+      PsiElement(TheR:FUNCTION_KEYWORD)('function')
+      PsiWhiteSpace(' ')
+      TheR:PARAMETER_LIST
+        PsiElement(TheR:LPAR)('(')
+        TheR:PARAMETER
+          TheR:REPR_EXPRESSION
+            PsiElement(TheR:TICK)('`')
+            PsiElement(TheR:UNDERSCORE)('_')
+            PsiElement(TheR:IDENTIFIER)('data')
+            PsiElement(TheR:TICK)('`')
+        PsiElement(TheR:COMMA)(',')
+        PsiWhiteSpace(' ')
+        TheR:PARAMETER
+          PsiElement(TheR:TRIPLE_DOTS)('...')
+        PsiElement(TheR:RPAR)(')')
+      PsiElement(TheR:LINE_BREAK)('\n')
+      TheR:BLOCK
+        PsiElement(TheR:LBRACE)('{')
+        PsiElement(TheR:LINE_BREAK)('\n')
+        PsiElement(TheR:RBRACE)('}')

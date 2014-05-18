@@ -144,6 +144,7 @@ public class TheRTokenTypes {
   public static final IElementType DOT = new TheRElementType("DOT");    // .
   public static final IElementType EQ = new TheRElementType("EQ");    // =
   public static final IElementType SEMICOLON = new TheRElementType("SEMICOLON");    // ;
+  public static final IElementType UNDERSCORE = new TheRElementType("UNDERSCORE");    // _
 
   public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
 

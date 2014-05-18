@@ -195,6 +195,7 @@ private boolean inDoubleBracket = false;
 
 "`"                         { return TheRTokenTypes.TICK; }
 "?"                         { return TheRTokenTypes.HELP; }
+"_"                         { return TheRTokenTypes.UNDERSCORE; }
 .                           { return TheRTokenTypes.BAD_CHARACTER; }
 
 }

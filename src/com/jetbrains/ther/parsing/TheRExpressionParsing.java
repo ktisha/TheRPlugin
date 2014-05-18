@@ -564,7 +564,7 @@ public class TheRExpressionParsing extends Parsing {
     arglist.done(TheRElementTypes.ARGUMENT_LIST);
   }
 
-  private void parseReprExpression() {
+  public void parseReprExpression() {
     LOG.assertTrue(myBuilder.getTokenType() == TheRTokenTypes.TICK);
     final PsiBuilder.Marker expr = myBuilder.mark();
     myBuilder.advanceLexer();
