@@ -92,11 +92,11 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(5000);
       if (output.getExitCode() != 0) {
-        LOG.error("Failed to obtain function definition from runtime: " + output.getStderr());
+        LOG.info("Failed to obtain function definition from runtime: " + output.getStderr());
         return;
       }
       if (output.isTimeout()) {
-        LOG.error("Failed to obtain function definition from runtime because of timeout.");
+        LOG.info("Failed to obtain function definition from runtime because of timeout.");
         return;
       }
 
@@ -112,7 +112,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
         result.add(new PsiElementResolveResult(psiFile));
     }
     catch (IOException e) {
-      LOG.error("Failed to obtain function definition from runtime because: \n" +
+      LOG.info("Failed to obtain function definition from runtime because: \n" +
                 "Interpreter path " + path + "\n" +
                 "Exception occured: " + e.getMessage());
     }
