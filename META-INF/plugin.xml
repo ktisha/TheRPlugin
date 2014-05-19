@@ -50,5 +50,6 @@
                                   order="after PlatformProjectConfigurator"/>
     <stubIndex implementation="com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex"/>
     <stubElementTypeHolder class="com.jetbrains.ther.parsing.TheRElementTypes"/>
+    <lang.commenter language="TheR" implementationClass="com.jetbrains.ther.TheRCommenter"/>
   </extensions>
 </idea-plugin>
