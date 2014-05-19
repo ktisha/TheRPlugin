@@ -114,7 +114,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     catch (IOException e) {
       LOG.info("Failed to obtain function definition from runtime because: \n" +
                 "Interpreter path " + path + "\n" +
-                "Exception occured: " + e.getMessage());
+                "Exception occurred: " + e.getMessage());
     }
 
   }
