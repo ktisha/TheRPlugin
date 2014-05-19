@@ -93,9 +93,12 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       final ProcessOutput output = processHandler.runProcess(5000);
       if (output.getExitCode() != 0) {
         LOG.error("Failed to obtain function definition from runtime: " + output.getStderr());
+        return;
       }
-      if (output.isTimeout())
+      if (output.isTimeout()) {
         LOG.error("Failed to obtain function definition from runtime because of timeout.");
+        return;
+      }
 
       String stdout = output.getStdout();
       final int byteCodeIndex = stdout.indexOf("<bytecode");
@@ -186,6 +189,6 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   @Override
   public boolean isSoft() {
-    return false;
+    return true;
   }
 }
