@@ -447,7 +447,7 @@ public class TheRExpressionParsing extends Parsing {
       }
       else if (TheRTokenTypes.NAMESPACE_ACCESS.contains(tokenType)) {
         myBuilder.advanceLexer();
-        parseFormulaeExpression(false);
+        parsePrimaryExpression();
         expr.done(TheRElementTypes.REFERENCE_EXPRESSION);
         expr = expr.precede();
       }
