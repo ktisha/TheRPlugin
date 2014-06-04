@@ -3,6 +3,7 @@ package com.jetbrains.ther.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
+import java.util.Stack;
 
 %%
 
@@ -62,7 +63,7 @@ STRING=({QUOTED_LITERAL} | {DOUBLE_QUOTED_LITERAL})
 //ESCAPE_SEQUENCE=\\([rntbafv\'\"\\]|{NONZERO_OCT_DIGIT}|{OCT_DIGIT}{2,3}|"x"{HEX_DIGIT}{1,2}|"u"{HEX_DIGIT}{1,4}|"u{"{HEX_DIGIT}{1,4}"}"|"U"{HEX_DIGIT}{1,8}|"U{"{HEX_DIGIT}{1,8}"}")
 
 %{
-private int doubleBracketCounter = 0;
+private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
 %}
 
 %%
@@ -175,9 +176,12 @@ private int doubleBracketCounter = 0;
 "}"                         { return TheRTokenTypes.RBRACE; }
 
 // indexing
-"[["                        { doubleBracketCounter += 1; return TheRTokenTypes.LDBRACKET; }
-"]]"                        { if (doubleBracketCounter > 0) {
-                                doubleBracketCounter -= 1;
+"[["                        { myExpectedBracketsStack.add(TheRTokenTypes.RDBRACKET); return TheRTokenTypes.LDBRACKET; }
+"]]"                        {
+                              if (myExpectedBracketsStack.isEmpty()) return TheRTokenTypes.RDBRACKET;
+                              final IElementType expectedBracket = myExpectedBracketsStack.pop();
+                              if (expectedBracket == TheRTokenTypes.RDBRACKET) {
+                                //doubleBracketCounter -= 1;
                                 return TheRTokenTypes.RDBRACKET;
                               }
                               else {
@@ -185,7 +189,7 @@ private int doubleBracketCounter = 0;
                                 return TheRTokenTypes.RBRACKET;
                               }
                               }
-"["                         { return TheRTokenTypes.LBRACKET; }
+"["                         { myExpectedBracketsStack.add(TheRTokenTypes.RBRACKET); return TheRTokenTypes.LBRACKET; }
 "]"                         { return TheRTokenTypes.RBRACKET; }
 
 // separators

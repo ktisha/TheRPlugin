@@ -181,6 +181,10 @@ public class TheRHighlightingLexerTest extends TestCase {
     doTest("cat(A, \"\\n\") # \"84\" is concatenated with \"\\n\"\n", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:RPAR", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK");
   }
 
+  public void testDoubleBrackets() {
+    doTest("profile[[pnames[pm]]]", "TheR:IDENTIFIER", "TheR:LDBRACKET", "TheR:IDENTIFIER", "TheR:LBRACKET", "TheR:IDENTIFIER", "TheR:RBRACKET", "TheR:RDBRACKET");
+  }
+
   public void testIf() {
     doTest("if(A>a) # true, 84 > 42\n" +
            "{\n" +
@@ -201,6 +205,7 @@ public class TheRHighlightingLexerTest extends TestCase {
                                  Lexer lexer,
                                  boolean checkTokenText,
                                  String... expectedTokens) {
+
     lexer.start(text);
     int idx = 0;
     int tokenPos = 0;
