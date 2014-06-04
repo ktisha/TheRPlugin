@@ -1,5 +1,7 @@
 package com.jetbrains.ther.psi.references;
 
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
@@ -212,7 +214,83 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
   @NotNull
   @Override
   public Object[] getVariants() {
-    return new Object[0];
+    List<LookupElement> result = new ArrayList<LookupElement>();
+    final String namespace = myElement.getNamespace();
+    final String name = myElement.getName();
+    if (name == null) return ResolveResult.EMPTY_ARRAY;
+    if (namespace != null) {
+      final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+      final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      if (library != null) {
+        final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
+        for (VirtualFile child : files) {
+          if (namespace.equals(child.getParent().getName())) {
+            final VirtualFile file = child.findChild(name + ".R");
+            if (file != null) {
+              final PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(file);
+              final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(psiFile, TheRAssignmentStatement.class);
+              if (statements != null) {
+                for (TheRAssignmentStatement statement : statements) {
+                  final PsiElement assignee = statement.getAssignee();
+                  if (assignee != null)
+                    result.add(LookupElementBuilder.create(assignee.getText()));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
+    while (rBlock != null) {
+      final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
+      if (statements != null) {
+        for (TheRAssignmentStatement statement : statements) {
+          final PsiElement assignee = statement.getAssignee();
+          if (assignee != null)
+            result.add(LookupElementBuilder.create(assignee.getText()));
+        }
+      }
+      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
+    }
+    final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
+    if (rFunction != null) {
+      final TheRParameterList list = rFunction.getParameterList();
+      for (TheRParameter parameter : list.getParameters()) {
+        result.add(LookupElementBuilder.create(parameter));
+      }
+    }
+    final PsiFile file = myElement.getContainingFile();
+    final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(file, TheRAssignmentStatement.class);
+    if (statements != null) {
+      for (TheRAssignmentStatement statement : statements) {
+        final PsiElement assignee = statement.getAssignee();
+        if (assignee != null)
+          result.add(LookupElementBuilder.create(assignee.getText()));
+      }
+    }
+    addVariantsFromLibrary(result);
+    return result.toArray();
+  }
+
+  private void addVariantsFromLibrary(List<LookupElement> result) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+    if (model != null) {
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      if (library != null) {
+        final Collection<String> assignmentStatements = TheRAssignmentNameIndex.allKeys(myElement.getProject());
+        for (String statement : assignmentStatements) {
+          final Collection<TheRAssignmentStatement> statements =
+            TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
+          for (TheRAssignmentStatement assignmentStatement : statements) {
+            result.add(LookupElementBuilder.create(assignmentStatement));
+          }
+        }
+      }
+    }
   }
 
   @Override
