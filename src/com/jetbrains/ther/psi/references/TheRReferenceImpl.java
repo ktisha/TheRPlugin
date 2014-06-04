@@ -5,10 +5,12 @@ import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.impl.scopes.LibraryScope;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
+import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -29,9 +31,9 @@ import java.util.List;
 
 public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference {
   private static final Logger LOG = Logger.getInstance(TheRReferenceImpl.class.getName());
-  protected final TheRElement myElement;
+  protected final TheRReferenceExpression myElement;
 
-  public TheRReferenceImpl(TheRElement element) {
+  public TheRReferenceImpl(TheRReferenceExpression element) {
     myElement = element;
   }
 
@@ -39,33 +41,39 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
   @Override
   public ResolveResult[] multiResolve(boolean incompleteCode) {
     final List<ResolveResult> result = new ArrayList<ResolveResult>();
-    final String name = myElement.getText();
-    if (name != null) {
 
-      TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
-      while (rBlock != null) {
-        final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
-        if (statements != null) {
-          for (TheRAssignmentStatement statement : statements) {
-            final PsiElement assignee = statement.getAssignee();
-            if (assignee != null && assignee.getText().equals(name)) {
-              result.add(new PsiElementResolveResult(assignee));
+    final String namespace = myElement.getNamespace();
+    final String name = myElement.getName();
+    if (name == null) return ResolveResult.EMPTY_ARRAY;
+    if (namespace != null) {
+      final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+      final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      if (library != null) {
+        final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
+        for (VirtualFile child : files) {
+          if (namespace.equals(child.getParent().getName())) {
+            final VirtualFile file = child.findChild(name + ".R");
+            if (file != null) {
+              final PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(file);
+              final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(psiFile, TheRAssignmentStatement.class);
+              if (statements != null) {
+                for (TheRAssignmentStatement statement : statements) {
+                  final PsiElement assignee = statement.getAssignee();
+                  if (assignee != null && assignee.getText().equals(name)) {
+                    result.add(new PsiElementResolveResult(assignee));
+                  }
+                }
+              }
             }
           }
         }
-        rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
       }
-      final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
-      if (rFunction != null) {
-        final TheRParameterList list = rFunction.getParameterList();
-        for (TheRParameter parameter : list.getParameters()) {
-          if (name.equals(parameter.getName())) {
-            result.add(new PsiElementResolveResult(parameter));
-          }
-        }
-      }
-      final PsiFile file = myElement.getContainingFile();
-      final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(file, TheRAssignmentStatement.class);
+    }
+
+    TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
+    while (rBlock != null) {
+      final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
       if (statements != null) {
         for (TheRAssignmentStatement statement : statements) {
           final PsiElement assignee = statement.getAssignee();
@@ -74,12 +82,32 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           }
         }
       }
-      if (!result.isEmpty())
-        return result.toArray(new ResolveResult[result.size()]);
-      addFromLibrary(result, name);
-      if (result.isEmpty()) {
-        addRuntimeDefinition(result, name);
+      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
+    }
+    final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
+    if (rFunction != null) {
+      final TheRParameterList list = rFunction.getParameterList();
+      for (TheRParameter parameter : list.getParameters()) {
+        if (name.equals(parameter.getName())) {
+          result.add(new PsiElementResolveResult(parameter));
+        }
       }
+    }
+    final PsiFile file = myElement.getContainingFile();
+    final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(file, TheRAssignmentStatement.class);
+    if (statements != null) {
+      for (TheRAssignmentStatement statement : statements) {
+        final PsiElement assignee = statement.getAssignee();
+        if (assignee != null && assignee.getText().equals(name)) {
+          result.add(new PsiElementResolveResult(assignee));
+        }
+      }
+    }
+    if (!result.isEmpty())
+      return result.toArray(new ResolveResult[result.size()]);
+    addFromLibrary(result, name);
+    if (result.isEmpty()) {
+      addRuntimeDefinition(result, name);
     }
     return result.toArray(new ResolveResult[result.size()]);
   }
