@@ -22,4 +22,8 @@ public class TheRAssignmentNameIndex extends StringStubIndexExtension<TheRAssign
   public static Collection<TheRAssignmentStatement> find(String name, Project project, GlobalSearchScope scope) {
     return StubIndex.getElements(KEY, name, project, scope, TheRAssignmentStatement.class);
   }
+
+  public static Collection<String> allKeys(Project project) {
+    return StubIndex.getInstance().getAllKeys(KEY, project);
+  }
 }

@@ -9,4 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public interface TheRAssignmentStatement extends TheRStatement, PsiNamedElement, StubBasedPsiElement<TheRAssignmentStub> {
   @Nullable
   public PsiElement getAssignee();
+
+  @Nullable
+  public TheRElement getAssignedValue();
 }

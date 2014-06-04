@@ -2,10 +2,14 @@ package com.jetbrains.ther.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
 import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
+import com.jetbrains.ther.psi.api.TheRElement;
+import com.jetbrains.ther.psi.api.TheRExpression;
+import com.jetbrains.ther.psi.api.TheRFunction;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentStub;
 import org.apache.commons.lang.NotImplementedException;
 import org.jetbrains.annotations.NonNls;
@@ -55,6 +59,28 @@ public class TheRAssignmentStatementImpl extends TheRBaseElementImpl<TheRAssignm
   public PsiElement getAssignee() {
     final ASTNode nameNode = getNameNode();
     return nameNode != null ? nameNode.getPsi() : null;
+  }
+
+  @Nullable
+  @Override
+  public TheRElement getAssignedValue() {
+    PsiElement child;
+    if (isLeft()) {
+      child = getLastChild();
+      while (child != null && !(child instanceof TheRExpression) && !(child instanceof TheRFunction)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getPrevSibling();
+      }
+    }
+    else {
+      child = getFirstChild();
+      while (child != null && !(child instanceof TheRExpression) && !(child instanceof TheRFunction)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getNextSibling();
+      }
+
+    }
+    return (TheRElement)child;
   }
 
   private boolean isLeft() {
