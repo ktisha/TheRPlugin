@@ -132,7 +132,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
         detachLibrary();
       }
       if (!StringUtil.isEmptyOrSpaces(sourcesPath)) {
-        final ArrayList<String> paths = Lists.newArrayList(sourcesPath);
+        final ArrayList<String> paths = getSourcePaths(sourcesPath);
         if (!paths.isEmpty())
           attachLibrary(paths);
       }
@@ -140,6 +140,23 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
 
     interpreterService.setSourcesPath(sourcesPath);
     interpreterService.setInterpreterPath(interpreterPath);
+  }
+
+  private ArrayList<String> getSourcePaths(@NotNull final String sourcesPath) {
+    final ArrayList<String> paths = Lists.newArrayList();
+    final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(sourcesPath);
+    if (file != null) {
+      final VirtualFile libFile = file.findFileByRelativePath("src/library");
+      if (libFile != null) {
+        final VirtualFile[] children = libFile.getChildren();
+        for (VirtualFile child : children) {
+          final VirtualFile rDirectory = child.findFileByRelativePath("R");
+          if (rDirectory != null)
+            paths.add(rDirectory.getPath());
+        }
+      }
+    }
+    return paths;
   }
 
   @Override
