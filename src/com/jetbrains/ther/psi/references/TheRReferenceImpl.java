@@ -217,6 +217,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     List<LookupElement> result = new ArrayList<LookupElement>();
     final String namespace = myElement.getNamespace();
     final String name = myElement.getName();
+    if (myElement.getParent() instanceof TheRReferenceExpression) return ResolveResult.EMPTY_ARRAY;
     if (name == null) return ResolveResult.EMPTY_ARRAY;
     if (namespace != null) {
       final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
@@ -226,21 +227,14 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
         final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
         for (VirtualFile child : files) {
           if (namespace.equals(child.getParent().getName())) {
-            final VirtualFile file = child.findChild(name + ".R");
-            if (file != null) {
-              final PsiFile psiFile = PsiManager.getInstance(myElement.getProject()).findFile(file);
-              final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(psiFile, TheRAssignmentStatement.class);
-              if (statements != null) {
-                for (TheRAssignmentStatement statement : statements) {
-                  final PsiElement assignee = statement.getAssignee();
-                  if (assignee != null)
-                    result.add(LookupElementBuilder.create(assignee.getText()));
-                }
-              }
+            final VirtualFile[] children = child.getChildren();
+            for (VirtualFile file : children) {
+              result.add(LookupElementBuilder.create(namespace + "::" + file.getNameWithoutExtension()));
             }
           }
         }
       }
+      return result.toArray();
     }
 
     TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);

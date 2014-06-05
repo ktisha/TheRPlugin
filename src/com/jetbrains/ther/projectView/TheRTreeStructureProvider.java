@@ -32,7 +32,8 @@ public class TheRTreeStructureProvider implements TreeStructureProvider, DumbAwa
               final VirtualFile file = ((PsiDirectoryNode)child).getVirtualFile();
               if (file != null) {
                 final VirtualFile fileParent = file.getParent();
-                data.setPresentableText(fileParent.getName());
+                if (fileParent != null)
+                  data.setPresentableText(fileParent.getName());
               }
               data.setLocationString("");
             }
