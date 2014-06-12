@@ -52,5 +52,7 @@
     <stubElementTypeHolder class="com.jetbrains.ther.parsing.TheRElementTypes"/>
     <lang.commenter language="TheR" implementationClass="com.jetbrains.ther.TheRCommenter"/>
     <treeStructureProvider implementation="com.jetbrains.ther.projectView.TheRTreeStructureProvider"/>
+    <quoteHandler className="com.jetbrains.ther.completion.TheRQuoteHandler" fileType="The R"/>
+    <!--<typedHandler implementation="com.jetbrains.ther.completion.TheRBracesHandler" id="TheRBracesHandler"/>-->
   </extensions>
 </idea-plugin>
