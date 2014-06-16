@@ -40,7 +40,7 @@ public class TheRCommandLineState extends CommandLineState {
     final GeneralCommandLine commandLine = new GeneralCommandLine();
     final String interpreterPath = getInterpreterPath();
     commandLine.setExePath(FileUtil.toSystemDependentName(interpreterPath));
-
+    commandLine.setWorkDirectory(myConfig.getProject().getBasePath());
     buildCommandLineParameters(commandLine);
     initEnvironment(commandLine);
     return commandLine;
