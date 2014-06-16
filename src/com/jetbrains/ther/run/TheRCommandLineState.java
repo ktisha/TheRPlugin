@@ -66,6 +66,10 @@ public class TheRCommandLineState extends CommandLineState {
     if (!StringUtil.isEmptyOrSpaces(scriptName)) {
       scriptParameters.addParameter(scriptName);
     }
+    final String parameters = myConfig.getScriptParameters();
+    if (!StringUtil.isEmptyOrSpaces(parameters)) {
+      scriptParameters.addParametersString(parameters);
+    }
   }
 
   protected void initEnvironment(@NotNull final GeneralCommandLine commandLine) {
