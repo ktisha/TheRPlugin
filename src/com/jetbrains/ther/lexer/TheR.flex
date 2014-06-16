@@ -181,7 +181,6 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
                               if (myExpectedBracketsStack.isEmpty()) return TheRTokenTypes.RDBRACKET;
                               final IElementType expectedBracket = myExpectedBracketsStack.pop();
                               if (expectedBracket == TheRTokenTypes.RDBRACKET) {
-                                //doubleBracketCounter -= 1;
                                 return TheRTokenTypes.RDBRACKET;
                               }
                               else {
@@ -190,7 +189,10 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
                               }
                               }
 "["                         { myExpectedBracketsStack.add(TheRTokenTypes.RBRACKET); return TheRTokenTypes.LBRACKET; }
-"]"                         { return TheRTokenTypes.RBRACKET; }
+"]"                         {
+                              if (myExpectedBracketsStack.isEmpty()) return TheRTokenTypes.RBRACKET;
+                              myExpectedBracketsStack.pop();
+                              return TheRTokenTypes.RBRACKET; }
 
 // separators
 ","                         { return TheRTokenTypes.COMMA; }

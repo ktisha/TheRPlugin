@@ -185,6 +185,10 @@ public class TheRHighlightingLexerTest extends TestCase {
     doTest("profile[[pnames[pm]]]", "TheR:IDENTIFIER", "TheR:LDBRACKET", "TheR:IDENTIFIER", "TheR:LBRACKET", "TheR:IDENTIFIER", "TheR:RBRACKET", "TheR:RDBRACKET");
   }
 
+  public void testDoubleBracketsSeparated() {
+    doTest("return(invisible(dll_list[[ seq_along(dll_list)[ind] ]]))", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:LDBRACKET", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:LBRACKET", "TheR:IDENTIFIER", "TheR:RBRACKET", "TheR:SPACE", "TheR:RDBRACKET", "TheR:RPAR", "TheR:RPAR");
+  }
+
   public void testIf() {
     doTest("if(A>a) # true, 84 > 42\n" +
            "{\n" +
