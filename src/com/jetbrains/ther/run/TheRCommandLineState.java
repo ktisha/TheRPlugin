@@ -68,7 +68,7 @@ public class TheRCommandLineState extends CommandLineState {
     }
     final String parameters = myConfig.getScriptParameters();
     if (!StringUtil.isEmptyOrSpaces(parameters)) {
-      scriptParameters.addParametersString(parameters);
+      scriptParameters.addParametersString("--args " + parameters);
     }
   }
 
