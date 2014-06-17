@@ -7,9 +7,9 @@ is.identifier <- function(str) {
 }
 
 for (name in packageNames) {
+    if (name == "base") next
     loadLibrary = FALSE
     pName = paste("package", name, sep=":")
-    print(pName)
     if (!pName %in% searchPath)
         loadLibrary = TRUE
 
