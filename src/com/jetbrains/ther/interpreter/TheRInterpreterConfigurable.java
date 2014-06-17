@@ -1,6 +1,7 @@
 package com.jetbrains.ther.interpreter;
 
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -36,6 +37,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   private final TextFieldWithBrowseButton myInterpreterField;
   private final TextFieldWithBrowseButton mySourcesField;
   public static final String THE_R_LIBRARY = "R Library";
+  public static final String THE_R_SKELETONS = "R Skeletons";
 
   TheRInterpreterConfigurable(Project project) {
     myProject = project;
@@ -138,8 +140,49 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
       }
     }
 
+    generateSkeletons();
     interpreterService.setSourcesPath(sourcesPath);
     interpreterService.setInterpreterPath(interpreterPath);
+  }
+
+  private void generateSkeletons() {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    final Application application = ApplicationManager.getApplication();
+    application.executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        final TheRSkeletonGenerator generator = new TheRSkeletonGenerator();
+        generator.runSkeletonGeneration();
+
+        application.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            application.runWriteAction(new Runnable() {
+              @Override
+              public void run() {
+                // add all paths to library
+                final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
+                Library library = model.getLibraryByName(THE_R_SKELETONS);
+                if (library == null) {
+                  library = model.createLibrary(THE_R_SKELETONS);
+                }
+                final String path = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
+                fillLibrary(library, Lists.newArrayList(path));
+                model.commit();
+                final Library.ModifiableModel libModel = library.getModifiableModel();
+                libModel.commit();
+                final Module[] modules = ModuleManager.getInstance(myProject).getModules();
+                for (Module module : modules) {
+                  final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
+                  modifiableModel.addLibraryEntry(library);
+                  modelsProvider.commitModuleModifiableModel(modifiableModel);
+                }
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   private ArrayList<String> getSourcePaths(@NotNull final String sourcesPath) {
@@ -179,13 +222,13 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
       public void run() {
         // add all paths to library
         final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
-        final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+        final Library library = model.getLibraryByName(THE_R_LIBRARY);
         if (library != null) {
 
           final Module[] modules = ModuleManager.getInstance(myProject).getModules();
           for (Module module : modules) {
             final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
-            OrderEntry entry = OrderEntryUtil.findLibraryOrderEntry(modifiableModel, TheRInterpreterConfigurable.THE_R_LIBRARY);
+            OrderEntry entry = OrderEntryUtil.findLibraryOrderEntry(modifiableModel, THE_R_LIBRARY);
             if (entry != null) {
               modifiableModel.removeOrderEntry(entry);
               modelsProvider.commitModuleModifiableModel(modifiableModel);
@@ -208,9 +251,9 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
       public void run() {
         // add all paths to library
         final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
-        Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+        Library library = model.getLibraryByName(THE_R_LIBRARY);
         if (library == null) {
-          library = model.createLibrary(TheRInterpreterConfigurable.THE_R_LIBRARY);
+          library = model.createLibrary(THE_R_LIBRARY);
         }
         fillLibrary(library, paths);
         model.commit();
