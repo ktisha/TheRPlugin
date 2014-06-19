@@ -225,7 +225,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           }
         }
       }
-      return result.toArray();
+      if (!result.isEmpty())
+        return result.toArray();
     }
 
     TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
