@@ -206,28 +206,9 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
   @Override
   public Object[] getVariants() {
     List<LookupElement> result = new ArrayList<LookupElement>();
-    final String namespace = myElement.getNamespace();
     final String name = myElement.getName();
     if (myElement.getParent() instanceof TheRReferenceExpression) return ResolveResult.EMPTY_ARRAY;
     if (name == null) return ResolveResult.EMPTY_ARRAY;
-    if (namespace != null) {
-      final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
-      final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
-      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
-      if (library != null) {
-        final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
-        for (VirtualFile child : files) {
-          if (namespace.equals(child.getParent().getName())) {
-            final VirtualFile[] children = child.getChildren();
-            for (VirtualFile file : children) {
-              result.add(LookupElementBuilder.create(namespace + "::" + file.getNameWithoutExtension()));
-            }
-          }
-        }
-      }
-      if (!result.isEmpty())
-        return result.toArray();
-    }
 
     TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
     while (rBlock != null) {
@@ -257,29 +238,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           result.add(LookupElementBuilder.create(assignee.getText()));
       }
     }
-    addVariantsFromLibrary(result);
     addVariantsFromSkeletons(result);
     return result.toArray();
-  }
-
-  private void addVariantsFromLibrary(@NotNull final List<LookupElement> result) {
-    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
-    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
-    if (model != null) {
-      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
-      if (library != null) {
-        final Collection<String> assignmentStatements = TheRAssignmentNameIndex.allKeys(myElement.getProject());
-        for (String statement : assignmentStatements) {
-          final Collection<TheRAssignmentStatement> statements =
-            TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
-          for (TheRAssignmentStatement assignmentStatement : statements) {
-            final String name = assignmentStatement.getName();
-            if (name != null && !name.startsWith("."))
-              result.add(LookupElementBuilder.create(assignmentStatement));
-          }
-        }
-      }
-    }
   }
 
   private void addVariantsFromSkeletons(@NotNull final List<LookupElement> result) {
