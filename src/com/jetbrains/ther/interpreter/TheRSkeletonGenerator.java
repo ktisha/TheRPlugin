@@ -18,6 +18,8 @@ public class TheRSkeletonGenerator {
 
   public static final String SKELETON_DIR_NAME = "r_skeletons";
 
+  protected static final int MINUTE = 60 * 1000;
+
   public static String getSkeletonsPath(@NotNull final String interpreterHome) {
     final String basePath = PathManager.getSystemPath();
     return getSkeletonsRootPath(basePath) + File.separator + FileUtil.toSystemIndependentName(interpreterHome).hashCode() + File.separator;
@@ -39,7 +41,7 @@ public class TheRSkeletonGenerator {
       }
       final Process process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + skeletonsPath);
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-      processHandler.runProcess(5000);
+      processHandler.runProcess(MINUTE * 5);
     }
     catch (IOException e) {
       LOG.error(e);

@@ -8,21 +8,21 @@ is.identifier <- function(str) {
 
 for (name in packageNames) {
     if (name == "base") next
-    loadLibrary = FALSE
+    shouldLoadLibrary = FALSE
     pName = paste("package", name, sep=":")
     if (!pName %in% searchPath)
-        loadLibrary = TRUE
-
-    if (loadLibrary) {
+        shouldLoadLibrary = TRUE
+    if (shouldLoadLibrary) {
         library(package=name, character.only=TRUE)
     }
 
     symbolList <- ls(pName)
 
+    dirName = paste(args[1], name, sep="/")
+    dir.create(dirName)
+
     for(symbol in symbolList) {
         obj <- get(symbol)
-        dirName = paste(args[1], name, sep="/")
-        dir.create(dirName)
         fileName <- paste(paste(dirName, symbol, sep="/"), "r", sep=".")
         sink("tmp")
         if (is.identifier(symbol))
@@ -44,15 +44,12 @@ for (name in packageNames) {
         for (line in lines) {
             sub <- substring(line, 0, 10)
             if (sub == "<bytecode:"  || sub == "<environme") break
-            # print("HERE")
-            # print(line)
             cat(line, append=TRUE)
             cat("\n", append=TRUE)
         }
         sink()
     }
-
-    if (loadLibrary) {
+    if (shouldLoadLibrary) {
         detach(pName, character.only=TRUE)
         diff <- setdiff(search(), searchPath)
         for (p in diff) {
