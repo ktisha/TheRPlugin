@@ -257,8 +257,29 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           result.add(LookupElementBuilder.create(assignee.getText()));
       }
     }
+    addVariantsFromLibrary(result);
     addVariantsFromSkeletons(result);
     return result.toArray();
+  }
+
+  private void addVariantsFromLibrary(@NotNull final List<LookupElement> result) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+    if (model != null) {
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      if (library != null) {
+        final Collection<String> assignmentStatements = TheRAssignmentNameIndex.allKeys(myElement.getProject());
+        for (String statement : assignmentStatements) {
+          final Collection<TheRAssignmentStatement> statements =
+            TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
+          for (TheRAssignmentStatement assignmentStatement : statements) {
+            final String name = assignmentStatement.getName();
+            if (name != null && !name.startsWith("."))
+              result.add(LookupElementBuilder.create(assignmentStatement));
+          }
+        }
+      }
+    }
   }
 
   private void addVariantsFromSkeletons(@NotNull final List<LookupElement> result) {
