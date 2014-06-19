@@ -106,7 +106,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     }
     if (!result.isEmpty())
       return result.toArray(new ResolveResult[result.size()]);
-    addFromLibrary(result, name);
+    addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
+    addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_SKELETONS);
     if (result.isEmpty()) {
       addRuntimeDefinition(result, name);
     }
@@ -139,11 +140,11 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   }
 
-  private void addFromLibrary(@NotNull final List<ResolveResult> result, @NotNull final String name) {
+  private void addFromLibrary(@NotNull final List<ResolveResult> result, @NotNull final String name, @NotNull final String libraryName) {
     final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
     final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
     if (model != null) {
-      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_LIBRARY);
+      final Library library = model.getLibraryByName(libraryName);
       if (library != null) {
         final Collection<TheRAssignmentStatement> assignmentStatements = TheRAssignmentNameIndex.find(name, myElement.getProject(),
                                                                                         new LibraryScope(myElement.getProject(), library));
@@ -256,10 +257,11 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       }
     }
     addVariantsFromLibrary(result);
+    addVariantsFromSkeletons(result);
     return result.toArray();
   }
 
-  private void addVariantsFromLibrary(List<LookupElement> result) {
+  private void addVariantsFromLibrary(@NotNull final List<LookupElement> result) {
     final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
     final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
     if (model != null) {
@@ -271,6 +273,25 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
             TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
           for (TheRAssignmentStatement assignmentStatement : statements) {
             result.add(LookupElementBuilder.create(assignmentStatement));
+          }
+        }
+      }
+    }
+  }
+
+  private void addVariantsFromSkeletons(@NotNull final List<LookupElement> result) {
+    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
+    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
+    if (model != null) {
+      final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_SKELETONS);
+      if (library != null) {
+        final Collection<String> assignmentStatements = TheRAssignmentNameIndex.allKeys(myElement.getProject());
+        for (String statement : assignmentStatements) {
+          final Collection<TheRAssignmentStatement> statements =
+            TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
+          for (TheRAssignmentStatement assignmentStatement : statements) {
+            final PsiDirectory directory = assignmentStatement.getContainingFile().getParent();
+            result.add(LookupElementBuilder.create(assignmentStatement, directory.getName() + "::" + assignmentStatement.getName()));
           }
         }
       }
