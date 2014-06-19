@@ -7,7 +7,6 @@ is.identifier <- function(str) {
 }
 
 for (name in packageNames) {
-    if (name == "base") next
     shouldLoadLibrary = FALSE
     pName = paste("package", name, sep=":")
     if (!pName %in% searchPath)
@@ -40,14 +39,16 @@ for (name in packageNames) {
         lines <- readLines(fileObj)
         close(fileObj)
 
-        sink(fileName)
-        for (line in lines) {
-            sub <- substring(line, 0, 10)
-            if (sub == "<bytecode:"  || sub == "<environme") break
-            cat(line, append=TRUE)
-            cat("\n", append=TRUE)
+        errors <- try(sink(fileName))
+        if (!inherits(errors, "try-error")) {
+            for (line in lines) {
+                sub <- substring(line, 0, 10)
+                if (sub == "<bytecode:"  || sub == "<environme") break
+                cat(line, append=TRUE)
+                cat("\n", append=TRUE)
+            }
+            sink()
         }
-        sink()
     }
     if (shouldLoadLibrary) {
         detach(pName, character.only=TRUE)
