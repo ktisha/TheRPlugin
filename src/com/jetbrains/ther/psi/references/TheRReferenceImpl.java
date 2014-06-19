@@ -291,6 +291,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
             TheRAssignmentNameIndex.find(statement, myElement.getProject(), new LibraryScope(myElement.getProject(), library));
           for (TheRAssignmentStatement assignmentStatement : statements) {
             final PsiDirectory directory = assignmentStatement.getContainingFile().getParent();
+            assert directory != null;
             result.add(LookupElementBuilder.create(assignmentStatement, directory.getName() + "::" + assignmentStatement.getName()));
           }
         }
