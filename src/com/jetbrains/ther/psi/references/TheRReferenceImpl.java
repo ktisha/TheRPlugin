@@ -85,6 +85,13 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       }
       rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
     }
+    TheRForStatement rLoop = PsiTreeUtil.getParentOfType(myElement, TheRForStatement.class);
+    while (rLoop != null) {
+      final TheRExpression target = rLoop.getTarget();
+      if (target != null && name.equals(target.getName()))
+        result.add(new PsiElementResolveResult(target));
+      rLoop = PsiTreeUtil.getParentOfType(rLoop, TheRForStatement.class);
+    }
     final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
     if (rFunction != null) {
       final TheRParameterList list = rFunction.getParameterList();
