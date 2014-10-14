@@ -29,7 +29,7 @@
   <application-components>
     <!-- Add your application components here -->
   </application-components>
-
+  <depends optional="true">com.intellij.modules.python</depends>
   <project-components>
     <!-- Add your project components here -->
   </project-components>
@@ -56,5 +56,6 @@
 
     <configurationType implementation="com.jetbrains.ther.run.TheRConfigurationType"/>
     <runConfigurationProducer implementation="com.jetbrains.ther.run.TheRRunConfigurationProducer"/>
+    <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
   </extensions>
 </idea-plugin>
