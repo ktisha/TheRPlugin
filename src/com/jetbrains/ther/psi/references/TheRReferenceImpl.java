@@ -125,6 +125,10 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (path == null) return;
     final ProcessOutput output = TheRUtils.getProcessOutput(name);
+    if (output == null) {
+      LOG.info("Failed to obtain function definition from runtime: ");
+      return;
+    }
     if (output.getExitCode() != 0) {
       LOG.info("Failed to obtain function definition from runtime: " + output.getStderr());
       return;

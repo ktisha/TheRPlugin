@@ -67,6 +67,7 @@ public class TheRUtils {
     return installedPackages;
   }
 
+  @Nullable
   public static ProcessOutput getProcessOutput(@NotNull final String scriptText) {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     return getProcessOutput(scriptText, path);
