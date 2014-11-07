@@ -35,7 +35,10 @@
   </project-components>
 
   <actions>
-    <!-- Add your actions here -->
+    <action id="com.jetbrains.ther.console.TheRConsoleAction" class="com.jetbrains.ther.console.TheRConsoleAction"
+            text="Run R Console..." description="Starts R interactive console">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
