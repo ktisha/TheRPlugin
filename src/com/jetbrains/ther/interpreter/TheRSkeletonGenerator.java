@@ -1,6 +1,7 @@
 package com.jetbrains.ther.interpreter;
 
 import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
@@ -41,7 +42,11 @@ public class TheRSkeletonGenerator {
       }
       final Process process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + skeletonsPath);
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-      processHandler.runProcess(MINUTE * 5);
+      final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
+      if (output.getExitCode() != 0) {
+        LOG.error("Failed to generate skeletons");
+        LOG.error(output.getStderrLines());
+      }
     }
     catch (IOException e) {
       LOG.error(e);

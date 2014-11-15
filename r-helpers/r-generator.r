@@ -23,7 +23,8 @@ for (name in packageNames) {
     for(symbol in symbolList) {
         obj <- get(symbol)
         fileName <- paste(paste(dirName, symbol, sep="/"), "r", sep=".")
-        sink("tmp")
+        tmpFileName <- tempfile(pattern = "tmp", tmpdir = tempdir(), fileext = "")
+        sink(tmpFileName)
         if (is.identifier(symbol))
             cat(symbol)
         else {
@@ -35,7 +36,7 @@ for (name in packageNames) {
         print(obj)
         sink()
 
-        fileObj <- file("tmp")
+        fileObj <- file(tmpFileName)
         lines <- readLines(fileObj)
         close(fileObj)
 
