@@ -4,7 +4,7 @@ import com.intellij.codeInsight.generation.IndentedCommenter;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.tree.IElementType;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
+import com.jetbrains.ther.parsing.TheRParserDefinition;
 import org.jetbrains.annotations.Nullable;
 
 public class TheRCommenter implements CodeDocumentationAwareCommenter, IndentedCommenter {
@@ -35,7 +35,7 @@ public class TheRCommenter implements CodeDocumentationAwareCommenter, IndentedC
 
   @Override
   public IElementType getLineCommentTokenType() {
-    return TheRTokenTypes.END_OF_LINE_COMMENT;
+    return TheRParserDefinition.END_OF_LINE_COMMENT;
   }
 
   @Override

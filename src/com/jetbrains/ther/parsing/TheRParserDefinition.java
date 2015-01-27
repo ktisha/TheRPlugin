@@ -1,6 +1,5 @@
 package com.jetbrains.ther.parsing;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
@@ -13,10 +12,9 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.jetbrains.ther.lexer.TheRLexer;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.psi.TheRElementType;
+import com.jetbrains.ther.psi.TheRFileElementType;
 import com.jetbrains.ther.psi.TheRFileImpl;
-import com.jetbrains.ther.psi.stubs.TheRStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRParserDefinition implements ParserDefinition {
@@ -24,10 +22,18 @@ public class TheRParserDefinition implements ParserDefinition {
   private final TokenSet myCommentTokens;
   private final TokenSet myStringLiteralTokens;
 
+  public static IFileElementType FILE = new TheRFileElementType();
+  public static IElementType END_OF_LINE_COMMENT = new TheRElementType("END_OF_LINE_COMMENT");
+  public static IElementType BAD_CHARACTER = new TheRElementType("BAD_CHARACTER");
+  public static IElementType SPACE = new TheRElementType("SPACE");
+  public static IElementType TAB = new TheRElementType("TAB");
+  public static IElementType FORMFEED = new TheRElementType("FORMFEED");
+
+
   public TheRParserDefinition() {
-    myWhitespaceTokens = TokenSet.create(TheRTokenTypes.SPACE, TheRTokenTypes.TAB, TheRTokenTypes.FORMFEED);
-    myCommentTokens = TokenSet.create(TheRTokenTypes.END_OF_LINE_COMMENT);
-    myStringLiteralTokens = TokenSet.create(TheRTokenTypes.STRING_LITERAL);
+    myWhitespaceTokens = TokenSet.create(SPACE, TAB, FORMFEED);
+    myCommentTokens = TokenSet.create(END_OF_LINE_COMMENT);
+    myStringLiteralTokens = TokenSet.create(TheRElementTypes.THE_R_STRING);
   }
 
   @Override
@@ -38,7 +44,7 @@ public class TheRParserDefinition implements ParserDefinition {
 
   @Override
   public IFileElementType getFileNodeType() {
-    return TheRElementTypes.FILE;
+    return FILE;
   }
 
   @Override
@@ -68,15 +74,7 @@ public class TheRParserDefinition implements ParserDefinition {
   @Override
   @NotNull
   public PsiElement createElement(@NotNull ASTNode node) {
-    final IElementType type = node.getElementType();
-    if (type instanceof TheRElementType) {
-      TheRElementType elementType = (TheRElementType)type;
-      return elementType.createElement(node);
-    }
-    else if (type instanceof TheRStubElementType) {
-      return ((TheRStubElementType)type).createElement(node);
-    }
-    return new ASTWrapperPsiElement(node);
+    return TheRElementTypes.Factory.createElement(node);
   }
 
   @Override

@@ -4,16 +4,16 @@ import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
+import com.jetbrains.ther.parsing.TheRElementTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TheRBraceMatcher implements PairedBraceMatcher {
   private final BracePair[] PAIRS = new BracePair[]{
-    new BracePair(TheRTokenTypes.LPAR, TheRTokenTypes.RPAR, false),
-      new BracePair(TheRTokenTypes.LBRACKET, TheRTokenTypes.RBRACKET, false),
-      new BracePair(TheRTokenTypes.LDBRACKET, TheRTokenTypes.RDBRACKET, false),
-      new BracePair(TheRTokenTypes.LBRACE, TheRTokenTypes.RBRACE, false)};
+    new BracePair(TheRElementTypes.THE_R_LPAR, TheRElementTypes.THE_R_RPAR, false),
+      new BracePair(TheRElementTypes.THE_R_LBRACKET, TheRElementTypes.THE_R_RBRACKET, false),
+      new BracePair(TheRElementTypes.THE_R_LDBRACKET, TheRElementTypes.THE_R_RDBRACKET, false),
+      new BracePair(TheRElementTypes.THE_R_LBRACE, TheRElementTypes.THE_R_RBRACE, false)};
 
   @Override
   public BracePair[] getPairs() {

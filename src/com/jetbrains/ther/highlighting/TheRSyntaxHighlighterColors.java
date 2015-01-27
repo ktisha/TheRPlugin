@@ -17,7 +17,6 @@ public class TheRSyntaxHighlighterColors {
   private static final String R_BRACKETS = "R_BRACKETS";
   private static final String R_BRACES = "R_BRACES";
   private static final String R_COMMA = "R_COMMA";
-  private static final String R_DOT = "R_DOT";
   private static final String R_SEMICOLON = "R_SEMICOLON";
   private static final String R_BAD_CHARACTER = "R_BAD_CHARACTER";
 
@@ -38,7 +37,6 @@ public class TheRSyntaxHighlighterColors {
   public static final TextAttributesKey BRACES =
     createTextAttributesKey(R_BRACES, DefaultLanguageHighlighterColors.BRACES);
   public static final TextAttributesKey COMMA = createTextAttributesKey(R_COMMA, DefaultLanguageHighlighterColors.COMMA);
-  public static final TextAttributesKey DOT = createTextAttributesKey(R_DOT, DefaultLanguageHighlighterColors.DOT);
   public static final TextAttributesKey SEMICOLON =
     createTextAttributesKey(R_SEMICOLON, DefaultLanguageHighlighterColors.SEMICOLON);
   public static final TextAttributesKey BAD_CHARACTER =

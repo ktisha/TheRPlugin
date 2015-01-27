@@ -4,6 +4,8 @@ package com.jetbrains.ther.lexer;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import java.util.Stack;
+import com.jetbrains.ther.parsing.TheRElementTypes;
+import com.jetbrains.ther.parsing.TheRParserDefinition;
 
 %%
 
@@ -24,7 +26,8 @@ WHITE_SPACE_CHAR=[\ \n\r\t\f]
 LETTER = [a-zA-Z]|[:unicode_uppercase_letter:]|[:unicode_lowercase_letter:]|[:unicode_titlecase_letter:]|[:unicode_modifier_letter:]|[:unicode_other_letter:]|[:unicode_letter_number:]
 IDENT_START = {LETTER}|"."{LETTER}|"._"|".."
 IDENT_CONTINUE = {LETTER}|[0-9_"."]
-IDENTIFIER = {IDENT_START}{IDENT_CONTINUE}**
+QUOTED_IDENTIFIER = "`" [^`]* "`"
+IDENTIFIER = {IDENT_START}{IDENT_CONTINUE}** | {QUOTED_IDENTIFIER} | "."
 
 LETTER_OR_OP = {LETTER} | "+"|"-"|"*"|"&"|"^"|"$"|"/"|"~"|">"|"<"|"="|"."
 END_OF_LINE_COMMENT="#"[^\r\n]*
@@ -69,139 +72,136 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
 %%
 
 <YYINITIAL> {
-[\n]                        { return TheRTokenTypes.LINE_BREAK; }
-{END_OF_LINE_COMMENT}       { return TheRTokenTypes.END_OF_LINE_COMMENT; }
-[\ ]                        { return TheRTokenTypes.SPACE; }
-[\t]                        { return TheRTokenTypes.TAB; }
-[\f]                        { return TheRTokenTypes.FORMFEED; }
+[\n]                        { return TheRElementTypes.THE_R_NL; }
+{END_OF_LINE_COMMENT}       { return TheRParserDefinition.END_OF_LINE_COMMENT; }
+[\ ]                        { return TheRParserDefinition.SPACE; }
+[\t]                        { return TheRParserDefinition.TAB; }
+[\f]                        { return TheRParserDefinition.FORMFEED; }
 
 // logical constants
-"TRUE"                      { return TheRTokenTypes.TRUE_KEYWORD; }
-"FALSE"                     { return TheRTokenTypes.FALSE_KEYWORD; }
+"TRUE"                      { return TheRElementTypes.THE_R_TRUE; }
+"FALSE"                     { return TheRElementTypes.THE_R_FALSE; }
 
 // numeric constants
-{INTEGER}                   { return TheRTokenTypes.NUMERIC_LITERAL; }
-{FLOAT_NUMBER}              { return TheRTokenTypes.NUMERIC_LITERAL; }
+{INTEGER}                   { return TheRElementTypes.THE_R_NUMERIC; }
+{FLOAT_NUMBER}              { return TheRElementTypes.THE_R_NUMERIC; }
 
 // complex constants
-{COMPLEX_NUMBER}            { return TheRTokenTypes.COMPLEX_LITERAL; }
+{COMPLEX_NUMBER}            { return TheRElementTypes.THE_R_COMPLEX; }
 
 // integer constants
-{LONG_INTEGER}              { return TheRTokenTypes.INTEGER_LITERAL; }
+{LONG_INTEGER}              { return TheRElementTypes.THE_R_INTEGER; }
 
 // string constants
-{STRING}                    { return TheRTokenTypes.STRING_LITERAL; }
+{STRING}                    { return TheRElementTypes.THE_R_STRING; }
 // special constants
-"NULL"                      { return TheRTokenTypes.NULL_KEYWORD; }
-"NA"                        { return TheRTokenTypes.NA_KEYWORD; }
-"Inf"                       { return TheRTokenTypes.INF_KEYWORD; }
-"NaN"                       { return TheRTokenTypes.NAN_KEYWORD; }
+"NULL"                      { return TheRElementTypes.THE_R_NULL; }
+"NA"                        { return TheRElementTypes.THE_R_NA; }
+"Inf"                       { return TheRElementTypes.THE_R_INF; }
+"NaN"                       { return TheRElementTypes.THE_R_NAN; }
 
-"NA_integer_"               { return TheRTokenTypes.NA_INTEGER_KEYWORD; }
-"NA_real_"                  { return TheRTokenTypes.NA_REAL_KEYWORD; }
-"NA_complex_"               { return TheRTokenTypes.NA_COMPLEX_KEYWORD; }
-"NA_character_"             { return TheRTokenTypes.NA_CHARACTER_KEYWORD; }
+"NA_integer_"               { return TheRElementTypes.THE_R_NA_INTEGER; }
+"NA_real_"                  { return TheRElementTypes.THE_R_NA_REAL; }
+"NA_complex_"               { return TheRElementTypes.THE_R_NA_COMPLEX; }
+"NA_character_"             { return TheRElementTypes.THE_R_NA_CHARACTER; }
 
-"if"                        { return TheRTokenTypes.IF_KEYWORD; }
-"else"                      { return TheRTokenTypes.ELSE_KEYWORD; }
-"repeat"                    { return TheRTokenTypes.REPEAT_KEYWORD; }
-"while"                     { return TheRTokenTypes.WHILE_KEYWORD; }
-"function"                  { return TheRTokenTypes.FUNCTION_KEYWORD; }
-"for"                       { return TheRTokenTypes.FOR_KEYWORD; }
-"in"                        { return TheRTokenTypes.IN_KEYWORD; }
-"next"                      { return TheRTokenTypes.NEXT_KEYWORD; }
-"break"                     { return TheRTokenTypes.BREAK_KEYWORD; }
-"..."                       { return TheRTokenTypes.TRIPLE_DOTS; }
+"if"                        { return TheRElementTypes.THE_R_IF; }
+"else"                      { return TheRElementTypes.THE_R_ELSE; }
+"repeat"                    { return TheRElementTypes.THE_R_REPEAT; }
+"while"                     { return TheRElementTypes.THE_R_WHILE; }
+"function"                  { return TheRElementTypes.THE_R_FUNCTION; }
+"for"                       { return TheRElementTypes.THE_R_FOR; }
+"in"                        { return TheRElementTypes.THE_R_IN; }
+"next"                      { return TheRElementTypes.THE_R_NEXT; }
+"break"                     { return TheRElementTypes.THE_R_BREAK; }
+"..."                       { return TheRElementTypes.THE_R_TRIPLE_DOTS; }
 
-{IDENTIFIER}                { return TheRTokenTypes.IDENTIFIER; }
+{IDENTIFIER}                { return TheRElementTypes.THE_R_IDENTIFIER; }
 
 //special operators
-"%/%"                       { return TheRTokenTypes.INT_DIV; }
-"%*%"                       { return TheRTokenTypes.MATRIX_PROD; }
-"%o%"                       { return TheRTokenTypes.OUTER_PROD; }
-"%in%"                      { return TheRTokenTypes.MATCHING; }
-"%x%"                       { return TheRTokenTypes.KRONECKER_PROD; }
+"%/%"                       { return TheRElementTypes.THE_R_INT_DIV; }
+"%*%"                       { return TheRElementTypes.THE_R_MATRIX_PROD; }
+"%o%"                       { return TheRElementTypes.THE_R_OUTER_PROD; }
+"%in%"                      { return TheRElementTypes.THE_R_MATCHING; }
+"%x%"                       { return TheRElementTypes.THE_R_KRONECKER_PROD; }
 // user-defined
-"%"{LETTER_OR_OP}+"%"             { return TheRTokenTypes.INFIX_OP; }
+"%"{LETTER_OR_OP}+"%"       { return TheRElementTypes.THE_R_INFIX_OP; }
 
 // Infix and prefix operators
-":::"                       { return TheRTokenTypes.TRIPLECOLON; }
-"::"                        { return TheRTokenTypes.DOUBLECOLON; }
-"@"                         { return TheRTokenTypes.AT; }
-"&&"                        { return TheRTokenTypes.ANDAND; }
-"||"                        { return TheRTokenTypes.OROR; }
+":::"                       { return TheRElementTypes.THE_R_TRIPLECOLON; }
+"::"                        { return TheRElementTypes.THE_R_DOUBLECOLON; }
+"@"                         { return TheRElementTypes.THE_R_AT; }
+"&&"                        { return TheRElementTypes.THE_R_ANDAND; }
+"||"                        { return TheRElementTypes.THE_R_OROR; }
 
 
 //arithmetic
-"-"                         { return TheRTokenTypes.MINUS; }
-"+"                         { return TheRTokenTypes.PLUS; }
-"*"                         { return TheRTokenTypes.MULT; }
-"/"                         { return TheRTokenTypes.DIV; }
-"^"                         { return TheRTokenTypes.EXP; }
-"%%"                        { return TheRTokenTypes.MODULUS; }
+"-"                         { return TheRElementTypes.THE_R_MINUS; }
+"+"                         { return TheRElementTypes.THE_R_PLUS; }
+"*"                         { return TheRElementTypes.THE_R_MULT; }
+"/"                         { return TheRElementTypes.THE_R_DIV; }
+"^"                         { return TheRElementTypes.THE_R_EXP; }
+"%%"                        { return TheRElementTypes.THE_R_MODULUS; }
 
 // relational
-"<"                         { return TheRTokenTypes.LT; }
-">"                         { return TheRTokenTypes.GT; }
-"=="                        { return TheRTokenTypes.EQEQ; }
-">="                        { return TheRTokenTypes.GE; }
-"<="                        { return TheRTokenTypes.LE; }
-"!="                        { return TheRTokenTypes.NOTEQ; }
+"<"                         { return TheRElementTypes.THE_R_LT; }
+">"                         { return TheRElementTypes.THE_R_GT; }
+"=="                        { return TheRElementTypes.THE_R_EQEQ; }
+">="                        { return TheRElementTypes.THE_R_GE; }
+"<="                        { return TheRElementTypes.THE_R_LE; }
+"!="                        { return TheRElementTypes.THE_R_NOTEQ; }
 
 // logical
-"!"                         { return TheRTokenTypes.NOT; }
-"|"                         { return TheRTokenTypes.OR; }
-"&"                         { return TheRTokenTypes.AND; }
+"!"                         { return TheRElementTypes.THE_R_NOT; }
+"|"                         { return TheRElementTypes.THE_R_OR; }
+"&"                         { return TheRElementTypes.THE_R_AND; }
 
 // model formulae
-"~"                         { return TheRTokenTypes.TILDE; }
+"~"                         { return TheRElementTypes.THE_R_TILDE; }
 
 // assign
-"<<-"                       { return TheRTokenTypes.LEFT_COMPLEX_ASSING; }
-"->>"                       { return TheRTokenTypes.RIGHT_COMPLEX_ASSING; }
-"<-"                        { return TheRTokenTypes.LEFT_ASSIGN; }
-"->"                        { return TheRTokenTypes.RIGHT_ASSIGN; }
-"="                         { return TheRTokenTypes.EQ; }
+"<<-"                       { return TheRElementTypes.THE_R_LEFT_COMPLEX_ASSIGN; }
+"->>"                       { return TheRElementTypes.THE_R_RIGHT_COMPLEX_ASSIGN; }
+"<-"                        { return TheRElementTypes.THE_R_LEFT_ASSIGN; }
+"->"                        { return TheRElementTypes.THE_R_RIGHT_ASSIGN; }
+"="                         { return TheRElementTypes.THE_R_EQ; }
 
 // list indexing
-"$"                         { return TheRTokenTypes.LIST_SUBSET; }
+"$"                         { return TheRElementTypes.THE_R_LIST_SUBSET; }
 
 // sequence
-":"                         { return TheRTokenTypes.COLON; }
+":"                         { return TheRElementTypes.THE_R_COLON; }
 
 // grouping
-"("                         { return TheRTokenTypes.LPAR; }
-")"                         { return TheRTokenTypes.RPAR; }
-"{"                         { return TheRTokenTypes.LBRACE; }
-"}"                         { return TheRTokenTypes.RBRACE; }
+"("                         { return TheRElementTypes.THE_R_LPAR; }
+")"                         { return TheRElementTypes.THE_R_RPAR; }
+"{"                         { return TheRElementTypes.THE_R_LBRACE; }
+"}"                         { return TheRElementTypes.THE_R_RBRACE; }
 
 // indexing
-"[["                        { myExpectedBracketsStack.add(TheRTokenTypes.RDBRACKET); return TheRTokenTypes.LDBRACKET; }
+"[["                        { myExpectedBracketsStack.add(TheRElementTypes.THE_R_RDBRACKET); return TheRElementTypes.THE_R_LDBRACKET; }
 "]]"                        {
-                              if (myExpectedBracketsStack.isEmpty()) return TheRTokenTypes.RDBRACKET;
+                              if (myExpectedBracketsStack.isEmpty()) return TheRElementTypes.THE_R_RDBRACKET;
                               final IElementType expectedBracket = myExpectedBracketsStack.pop();
-                              if (expectedBracket == TheRTokenTypes.RDBRACKET) {
-                                return TheRTokenTypes.RDBRACKET;
+                              if (expectedBracket == TheRElementTypes.THE_R_RDBRACKET) {
+                                return TheRElementTypes.THE_R_RDBRACKET;
                               }
                               else {
                                 yypushback(1);
-                                return TheRTokenTypes.RBRACKET;
+                                return TheRElementTypes.THE_R_RBRACKET;
                               }
                               }
-"["                         { myExpectedBracketsStack.add(TheRTokenTypes.RBRACKET); return TheRTokenTypes.LBRACKET; }
+"["                         { myExpectedBracketsStack.add(TheRElementTypes.THE_R_RBRACKET); return TheRElementTypes.THE_R_LBRACKET; }
 "]"                         {
-                              if (myExpectedBracketsStack.isEmpty()) return TheRTokenTypes.RBRACKET;
+                              if (myExpectedBracketsStack.isEmpty()) return TheRElementTypes.THE_R_RBRACKET;
                               myExpectedBracketsStack.pop();
-                              return TheRTokenTypes.RBRACKET; }
+                              return TheRElementTypes.THE_R_RBRACKET; }
 
 // separators
-","                         { return TheRTokenTypes.COMMA; }
-"."                         { return TheRTokenTypes.DOT; }
-";"                         { return TheRTokenTypes.SEMICOLON; }
+","                         { return TheRElementTypes.THE_R_COMMA; }
+";"                         { return TheRElementTypes.THE_R_SEMI; }
 
-"`"                         { return TheRTokenTypes.TICK; }
-"?"                         { return TheRTokenTypes.HELP; }
-"_"                         { return TheRTokenTypes.UNDERSCORE; }
-.                           { return TheRTokenTypes.BAD_CHARACTER; }
+"?"                         { return TheRElementTypes.THE_R_HELP; }
+.                           { return TheRParserDefinition.BAD_CHARACTER; }
 
 }

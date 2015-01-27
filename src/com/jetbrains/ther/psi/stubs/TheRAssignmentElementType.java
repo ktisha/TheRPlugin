@@ -4,11 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
-import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.TheRAssignmentStatementImpl;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRElement;
-import com.jetbrains.ther.psi.api.TheRFunction;
+import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,14 +28,14 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
 
   @Override
   public TheRAssignmentStatement createPsi(@NotNull final TheRAssignmentStub stub) {
-    return new TheRAssignmentStatementImpl(stub);
+    return null; //todo: implement me
   }
 
   @Override
   public TheRAssignmentStub createStub(@NotNull TheRAssignmentStatement psi, StubElement parentStub) {
     final String name = psi.getName();
     final TheRElement value = psi.getAssignedValue();
-    return new TheRAssignmentStubImpl(name, parentStub, getStubElementType(), value instanceof TheRFunction);
+    return new TheRAssignmentStubImpl(name, parentStub, getStubElementType(), value instanceof TheRFunctionExpression);
   }
 
   @Override
@@ -63,6 +62,6 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
   }
 
   protected IStubElementType getStubElementType() {
-    return TheRElementTypes.ASSIGNMENT_STATEMENT;
+    return null;
   }
 }

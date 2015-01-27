@@ -1,0 +1,161 @@
+{
+  parserClass="com.jetbrains.ther.parsing.TheRParser"
+  parserUtilClass="com.jetbrains.ther.parsing.TheRParserUtil"
+
+  implements="com.jetbrains.ther.psi.api.TheRElement"
+  extends="com.jetbrains.ther.psi.TheRElementImpl"
+
+  elementTypeHolderClass="com.jetbrains.ther.parsing.TheRElementTypes"
+  elementTypePrefix="THE_R_"
+  elementTypeClass="com.jetbrains.ther.psi.TheRElementType"
+  tokenTypeClass="com.jetbrains.ther.psi.TheRElementType"
+
+  psiImplUtilClass="com.jetbrains.ther.psi.TheRPsiImplUtil"
+
+  psiClassPrefix="TheR"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.jetbrains.ther.psi.api"
+  psiImplPackage="com.jetbrains.ther.psi"
+
+  SEMI=";"
+  LEFT_ASSIGN="<-"
+  LEFT_COMPLEX_ASSIGN="<<-"
+  EQ="="
+  RIGHT_ASSIGN="->"
+  RIGHT_COMPLEX_ASSIGN="->>"
+  TILDE="~"
+  AND="&"
+  OR="|"
+  NOT="!"
+  LE="<="
+  GE=">="
+  EQEQ="=="
+  GT=">"
+  LT="<"
+  NOTEQ="!="
+  INT_DIV="%/%"
+  MATRIX_PROD="%*%"
+  OUTER_PROD="%o%"
+  MATCHING="%in%"
+  KRONECKER_PROD="%x%"
+  COMMA=","
+  TICK="`"
+  UNDERSCORE="_"
+  TRIPLECOLON=":::"
+  DOUBLECOLON="::"
+  AT="@"
+  ANDAND="&&"
+  OROR="||"
+  MINUS="-"
+  PLUS="+"
+  MULT="*"
+  DIV="/"
+  EXP="^"
+  MODULUS="%%"
+  LIST_SUBSET="$"
+  COLON=":"
+  LPAR="("
+  RPAR=")"
+  LBRACE="{"
+  RBRACE="}"
+  RDBRACKET="]]"
+  LDBRACKET="[["
+  RBRACKET="]"
+  LBRACKET="["
+  
+
+  extends(".*statement|.*expression")=expression
+  implements("assignment_statement|parameter")="com.jetbrains.ther.psi.api.TheRNamedElement"
+
+  generateTokenAccessors=true
+}
+
+root ::= expression_list
+private expression_list ::= expression? (semicolon+ expression?)*
+
+private constant ::= numeric_literal_expression | string_literal_expression
+numeric_literal_expression ::= integer | numeric | complex
+string_literal_expression ::= string
+private special_constant ::= NULL | TRUE | FALSE | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
+  TRIPLE_DOTS | if | else | repeat | while |
+  function | for | in | next | break
+
+expression ::=
+  if_statement | while_statement | for_statement | repeat_statement | break_statement | next_statement |
+  block_expression | help_expression | parenthesized_expression | subscription_expression |
+  call_expression | function_expression |
+  left_assign_expression | eq_assign_expression | right_assign_expression |
+  tilde_group | or_expression | and_expression | unary_not_expression | compare_expression | plusminus_expression |
+  muldiv_expression | user_defined_expression | slice_expression | unary_plusminus_expression | exp_expression |
+  member_expression | at_expression | namespace_access_expression | primitive_expression
+
+//operators
+assignment_statement ::= expression {  //todo: fake node to generate psi, how to remove it?
+  methods=[isLeft getAssignedValue getAssignee getName setName getNameNode]   //todo: stub
+}
+binary_expression ::= expression //todo: fake not to generate psi, how to remove it?
+prefix_expression ::= expression //todo: fake not to generate psi, how to remove it?
+left_assign_expression ::= expression ('<-' | '<<-') nl* expression { rightAssociative=true; elementType=assignment_statement }
+eq_assign_expression ::= expression '=' nl* (expression | external_empty_expression) { rightAssociative=true; elementType=assignment_statement }
+right_assign_expression ::= expression ('->' | '->>') nl* expression { elementType=assignment_statement }
+private tilde_group ::= unary_tilde_expression | tilde_expression
+unary_tilde_expression ::= '~' nl* expression { elementType=prefix_expression }
+tilde_expression ::= expression '~' nl* expression { elementType=binary_expression }
+or_expression ::= expression ('|' | '||') nl* expression { elementType=binary_expression }
+and_expression ::= expression ('&' | '&&') nl* expression { elementType=binary_expression }
+unary_not_expression ::= '!' nl* expression  { elementType=prefix_expression }
+compare_expression ::= expression ('>' | '>=' | '<' | '<=' | '==' | '!=') nl* expression { elementType=binary_expression }
+plusminus_expression ::= expression ('+' | '-') nl* expression { elementType=binary_expression }
+muldiv_expression ::= expression ('*' | '/') nl* expression { elementType=binary_expression }
+user_defined_expression ::= expression (INFIX_OP | MODULUS | INT_DIV | MATRIX_PROD | OUTER_PROD | MATCHING | KRONECKER_PROD) nl* expression { elementType=binary_expression }
+slice_expression ::= expression ':' nl* expression
+unary_plusminus_expression ::= ('+' | '-') nl* expression { elementType=prefix_expression }
+exp_expression ::= expression '^' nl* expression { elementType=binary_expression }
+private member_tag ::= identifier | string | '...'
+member_expression ::= expression '$' nl* member_tag { elementType=reference_expression }
+at_expression ::= expression '@' nl* expression { elementType=reference_expression }
+namespace_access_expression ::= expression ('::' | ':::') identifier { elementType=reference_expression }
+
+//statements
+if_statement ::= if nl* '(' nl* expression nl* ')' nl* expression (nl* else nl* expression)?
+while_statement ::= while nl* '(' nl* expression nl* ')' nl* expression
+for_statement ::= for nl* '(' nl* expression 'in' nl* expression ')' nl* expression {
+  methods=[ target = "expression[0]" ]
+}
+repeat_statement ::= repeat nl* expression
+break_statement ::= break break_next_expression?
+next_statement ::= next break_next_expression?
+private break_next_expression ::= nl* '(' nl* (expression nl*)? ')'
+block_expression ::= '{' nl* expression_list? nl* '}'
+help_expression ::= help (nl* help)? nl* (keyword | expression) //todo: check that here is expr
+
+//other expressions
+reference_expression ::= identifier | special_constant {
+  methods = [ getReference getNamespace getName ]
+}
+private primitive_expression ::= reference_expression | constant
+parenthesized_expression ::= '(' nl* expression nl* ')'
+
+empty_expression ::= expression //todo: required to generate PSI, how to simplify this?
+external external_empty_expression ::= parseEmptyExpression { elementType=empty_expression }
+private subscription_expr_elem ::= '...' | expression | external_empty_expression
+private subscription_expr_list ::= subscription_expr_elem nl* (',' nl* subscription_expr_elem nl*)*
+subscription_expression ::= expression (('[' nl* subscription_expr_list ']') | ('[[' nl* subscription_expr_list ']]'))
+
+private arg ::= '...' | expression | external_empty_expression
+argument_list ::= '(' nl* arg nl* (',' nl* arg nl*)* ')'
+call_expression ::= expression argument_list
+
+parameter ::= (identifier '=' expression) | identifier | '...' {
+  methods = [ getNameNode getName setName]
+}
+parameter_list ::= ('(' ')') | ('(' parameter nl* (',' nl* parameter nl*)* ')')
+function_expression ::= function parameter_list nl* expression
+
+private semicolon ::= ';' | nl
+
+//todo: directives?
+//todo: user-defined operations as primitive expr, in old parser it was OPERATOR_EXPRESSION, do we really need them?
+//todo: what is underscore, was in lexer earlier?
+//todo: is '...' actually identifier?
