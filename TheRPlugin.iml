@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" />
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
     <output url="file://out/production/TheRPlugin" />
     <output-test url="file://out/test/TheRPlugin" />
     <exclude-output />
@@ -11,6 +11,8 @@
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/r-helpers" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
+      <excludeFolder url="file://$MODULE_DIR$/out" />
+      <excludeFolder url="file://$MODULE_DIR$/out/test" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

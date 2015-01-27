@@ -6,194 +6,194 @@ import junit.framework.TestCase;
 public class TheRHighlightingLexerTest extends TestCase {
 
   public void testLogicTrue() {
-    doTest("TRUE", "TheR:TRUE_KEYWORD");
+    doTest("TRUE", "TheR:TRUE");
   }
 
   public void testLogicFalse() {
-    doTest("FALSE", "TheR:FALSE_KEYWORD");
+    doTest("FALSE", "TheR:FALSE");
   }
 
   public void testNumeric1() {
-    doTest("1", "TheR:NUMERIC_LITERAL");
+    doTest("1", "TheR:numeric");
   }
 
   public void testNumeric10() {
-    doTest("10", "TheR:NUMERIC_LITERAL");
+    doTest("10", "TheR:numeric");
   }
 
   public void testNumericFloat() {
-    doTest("0.1", "TheR:NUMERIC_LITERAL");
+    doTest("0.1", "TheR:numeric");
   }
 
   public void testNumericFloat2() {
-    doTest(".2", "TheR:NUMERIC_LITERAL");
+    doTest(".2", "TheR:numeric");
   }
 
   public void testNumericExponent() {
-    doTest("1e-7", "TheR:NUMERIC_LITERAL");
+    doTest("1e-7", "TheR:numeric");
   }
 
   public void testNumericFloatExponent() {
-    doTest("1.2e+7", "TheR:NUMERIC_LITERAL");
+    doTest("1.2e+7", "TheR:numeric");
   }
 
   public void testNumericHexExponent() {
-    doTest("0x1.1p-2", "TheR:NUMERIC_LITERAL");
+    doTest("0x1.1p-2", "TheR:numeric");
   }
 
   public void testNumericBinaryExponent() {
-    doTest("0x123p456", "TheR:NUMERIC_LITERAL");
+    doTest("0x123p456", "TheR:numeric");
   }
 
   public void testNumericHex() {
-    doTest("0x1", "TheR:NUMERIC_LITERAL");
+    doTest("0x1", "TheR:numeric");
   }
 
   public void testInteger1() {
-    doTest("1L", "TheR:INTEGER_LITERAL");
+    doTest("1L", "TheR:integer");
   }
 
   public void testIntegerHex() {
-    doTest("0x10L", "TheR:INTEGER_LITERAL");
+    doTest("0x10L", "TheR:integer");
   }
 
   public void testIntegerLong() {
-    doTest("1000000L", "TheR:INTEGER_LITERAL");
+    doTest("1000000L", "TheR:integer");
   }
 
   public void testIntegerExponent() {
-    doTest("1e6L", "TheR:INTEGER_LITERAL");
+    doTest("1e6L", "TheR:integer");
   }
 
   public void testNumericWithWarn() {         // TODO: inspection. Actually, it's numeric one
-    doTest("1.1L", "TheR:INTEGER_LITERAL");
+    doTest("1.1L", "TheR:integer");
   }
 
   public void testNumericWithWarnExp() {      // TODO: inspection. Actually, it's numeric one
-    doTest("1e-3L", "TheR:INTEGER_LITERAL");
+    doTest("1e-3L", "TheR:integer");
   }
 
   public void testSyntaxError() {
-    doTest("12iL", "TheR:COMPLEX_LITERAL", "TheR:IDENTIFIER");
+    doTest("12iL", "TheR:complex", "TheR:identifier");
   }
 
   public void testUnnecessaryDecimalPoint() {  // TODO: inspection. Unnecessary Decimal Point warning runtime
-    doTest("1.L", "TheR:INTEGER_LITERAL");
+    doTest("1.L", "TheR:integer");
   }
 
   public void testComplex() {
-    doTest("1i", "TheR:COMPLEX_LITERAL");
+    doTest("1i", "TheR:complex");
   }
 
   public void testFloatComplex() {
-    doTest("4.1i", "TheR:COMPLEX_LITERAL");
+    doTest("4.1i", "TheR:complex");
   }
 
   public void testExponentComplex() {
-    doTest("1e-2i", "TheR:COMPLEX_LITERAL");
+    doTest("1e-2i", "TheR:complex");
   }
 
   public void testHexLong() {
-    doTest("0xFL", "TheR:INTEGER_LITERAL");
+    doTest("0xFL", "TheR:integer");
   }
 
   public void testSingleQuotedString() {
-    doTest("'qwerty'", "TheR:STRING_LITERAL");
+    doTest("'qwerty'", "TheR:string");
   }
 
   public void testDoubleQuotedString() {
-    doTest("\"qwerty\"", "TheR:STRING_LITERAL");
+    doTest("\"qwerty\"", "TheR:string");
   }
 
   public void testEscapeStringDouble() {
-    doTest("\"\\\"\"", "TheR:STRING_LITERAL");
+    doTest("\"\\\"\"", "TheR:string");
   }
 
   public void testEscapeStringSingle() {
-    doTest("'\\\''", "TheR:STRING_LITERAL");
+    doTest("'\\\''", "TheR:string");
   }
 
   public void testEscapeString() {
-    doTest("'\\r\\n\\t\\b\\a\\f\\v'", "TheR:STRING_LITERAL");
+    doTest("'\\r\\n\\t\\b\\a\\f\\v'", "TheR:string");
   }
 
   public void testEscapeOctString() {
-    doTest("'\\123'", "TheR:STRING_LITERAL");
+    doTest("'\\123'", "TheR:string");
   }
 
   public void testEscapeHexString() {
-    doTest("'\\x1'", "TheR:STRING_LITERAL");
+    doTest("'\\x1'", "TheR:string");
   }
 
   public void testEscapeUnicodeString() {
-    doTest("'\\u1234'", "TheR:STRING_LITERAL");
+    doTest("'\\u1234'", "TheR:string");
   }
 
   public void testEscapeBigUnicodeString() {
-    doTest("'\\u12345678'", "TheR:STRING_LITERAL");
+    doTest("'\\u12345678'", "TheR:string");
   }
 
   public void testErrorInString() {             //TODO: inspection. string errors
-    doTest("'\\0'", "TheR:STRING_LITERAL");
+    doTest("'\\0'", "TheR:string");
   }
 
   public void testIdentifier() {
-    doTest("a1", "TheR:IDENTIFIER");
+    doTest("a1", "TheR:identifier");
   }
 
   public void testIdentifierDot() {
-    doTest("a.1", "TheR:IDENTIFIER");
+    doTest("a.1", "TheR:identifier");
   }
 
   public void testIdentifierUnderscore() {
-    doTest("a_1", "TheR:IDENTIFIER");
+    doTest("a_1", "TheR:identifier");
   }
 
   public void testIdentifierDotDot() {
-    doTest("..", "TheR:IDENTIFIER");
+    doTest("..", "TheR:identifier");
   }
 
   public void testIdentifierDotUnderscore() {
-    doTest("._", "TheR:IDENTIFIER");
+    doTest("._", "TheR:identifier");
   }
 
   public void testIdentifierDotLetter() {
-    doTest(".x", "TheR:IDENTIFIER");
+    doTest(".x", "TheR:identifier");
   }
 
   public void testIdentifierDotDigit() {
-    doTest(".1", "TheR:NUMERIC_LITERAL");
+    doTest(".1", "TheR:numeric");
   }
 
   public void testAssignment() {
-    doTest("a <- 42\n", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:LEFT_ASSIGN", "TheR:SPACE", "TheR:NUMERIC_LITERAL", "TheR:LINE_BREAK");
+    doTest("a <- 42\n", "TheR:identifier", "TheR:SPACE", "TheR:<-", "TheR:SPACE", "TheR:numeric", "TheR:nl");
   }
 
   public void testAssignmentComment() {
-    doTest("A <- a * 2  # R is case sensitive\n", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:LEFT_ASSIGN", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:SPACE", "TheR:MULT", "TheR:SPACE", "TheR:NUMERIC_LITERAL", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK");
+    doTest("A <- a * 2  # R is case sensitive\n", "TheR:identifier", "TheR:SPACE", "TheR:<-", "TheR:SPACE", "TheR:identifier", "TheR:SPACE", "TheR:*", "TheR:SPACE", "TheR:numeric", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:nl");
   }
 
   public void testPrintFunction() {
-    doTest("print(a)\n", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:LINE_BREAK");
+    doTest("print(a)\n", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:)", "TheR:nl");
   }
 
   public void testCat() {
-    doTest("cat(A, \"\\n\") # \"84\" is concatenated with \"\\n\"\n", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:RPAR", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK");
+    doTest("cat(A, \"\\n\") # \"84\" is concatenated with \"\\n\"\n", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:,", "TheR:SPACE", "TheR:string", "TheR:)", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:nl");
   }
 
   public void testDoubleBrackets() {
-    doTest("profile[[pnames[pm]]]", "TheR:IDENTIFIER", "TheR:LDBRACKET", "TheR:IDENTIFIER", "TheR:LBRACKET", "TheR:IDENTIFIER", "TheR:RBRACKET", "TheR:RDBRACKET");
+    doTest("profile[[pnames[pm]]]", "TheR:identifier", "TheR:[[", "TheR:identifier", "TheR:[", "TheR:identifier", "TheR:]", "TheR:]]");
   }
 
   public void testDoubleBracketsSeparated() {
-    doTest("return(invisible(dll_list[[ seq_along(dll_list)[ind] ]]))", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:LDBRACKET", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:LBRACKET", "TheR:IDENTIFIER", "TheR:RBRACKET", "TheR:SPACE", "TheR:RDBRACKET", "TheR:RPAR", "TheR:RPAR");
+    doTest("return(invisible(dll_list[[ seq_along(dll_list)[ind] ]]))", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:[[", "TheR:SPACE", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:)", "TheR:[", "TheR:identifier", "TheR:]", "TheR:SPACE", "TheR:]]", "TheR:)", "TheR:)");
   }
 
   public void testIf() {
     doTest("if(A>a) # true, 84 > 42\n" +
            "{\n" +
            "  cat(A, \">\", a, \"\\n\")\n" +
-           "} ", "TheR:IF_KEYWORD", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:GT", "TheR:IDENTIFIER", "TheR:RPAR", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:LINE_BREAK", "TheR:LBRACE", "TheR:LINE_BREAK", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:LPAR", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:COMMA", "TheR:SPACE", "TheR:IDENTIFIER", "TheR:COMMA", "TheR:SPACE", "TheR:STRING_LITERAL", "TheR:RPAR", "TheR:LINE_BREAK", "TheR:RBRACE", "TheR:SPACE");
+           "} ", "TheR:if", "TheR:(", "TheR:identifier", "TheR:>", "TheR:identifier", "TheR:)", "TheR:SPACE", "TheR:END_OF_LINE_COMMENT", "TheR:nl", "TheR:{", "TheR:nl", "TheR:SPACE", "TheR:identifier", "TheR:(", "TheR:identifier", "TheR:,", "TheR:SPACE", "TheR:string", "TheR:,", "TheR:SPACE", "TheR:identifier", "TheR:,", "TheR:SPACE", "TheR:string", "TheR:)", "TheR:nl", "TheR:}", "TheR:SPACE");
   }
 
 
