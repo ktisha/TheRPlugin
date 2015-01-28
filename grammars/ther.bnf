@@ -83,12 +83,11 @@ private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
 
 expression ::=
   if_statement | while_statement | for_statement | repeat_statement | break_statement | next_statement |
-  block_expression | help_expression | parenthesized_expression | subscription_expression |
-  call_expression | function_expression |
-  left_assign_expression | eq_assign_expression | right_assign_expression |
+  block_expression | help_expression | parenthesized_expression |
+  function_expression | left_assign_expression | eq_assign_expression | right_assign_expression |
   tilde_group | or_expression | and_expression | unary_not_expression | compare_expression | plusminus_expression |
-  muldiv_expression | user_defined_expression | slice_expression | unary_plusminus_expression | exp_expression |
-  member_expression | at_expression | namespace_access_expression | primitive_expression
+  muldiv_expression | user_defined_expression | slice_expression | unary_plusminus_expression | exp_expression | subscription_expression |
+  call_expression | member_expression | at_expression | namespace_access_expression | primitive_expression
 
 //operators
 assignment_statement ::= expression {  //todo: fake node to generate psi, how to remove it?
@@ -141,10 +140,11 @@ empty_expression ::= expression //todo: required to generate PSI, how to simplif
 external external_empty_expression ::= parseEmptyExpression { elementType=empty_expression }
 private subscription_expr_elem ::= '...' | expression | external_empty_expression
 private subscription_expr_list ::= subscription_expr_elem nl* (',' nl* subscription_expr_elem nl*)*
-subscription_expression ::= expression (('[' nl* subscription_expr_list ']') | ('[[' nl* subscription_expr_list ']]'))
+subscription_expression ::= expression ('[' nl* ']' | '[' nl* subscription_expr_list ']' |
+  '[[' nl* ']]' | '[[' nl* subscription_expr_list ']]')
 
 private arg ::= '...' | expression | external_empty_expression
-argument_list ::= '(' nl* arg nl* (',' nl* arg nl*)* ')'
+argument_list ::= '(' nl* ')' | '(' nl* arg nl* (',' nl* arg nl*)* ')'
 call_expression ::= expression argument_list
 
 parameter ::= (identifier '=' expression) | identifier | '...' {

@@ -38,7 +38,7 @@ public class TheRParser implements PsiParser {
       r = break_statement(b, 0);
     }
     else if (t == THE_R_CALL_EXPRESSION) {
-      r = expression(b, 0, 9);
+      r = expression(b, 0, 24);
     }
     else if (t == THE_R_EMPTY_EXPRESSION) {
       r = empty_expression(b, 0);
@@ -83,13 +83,13 @@ public class TheRParser implements PsiParser {
       r = repeat_statement(b, 0);
     }
     else if (t == THE_R_SLICE_EXPRESSION) {
-      r = expression(b, 0, 22);
+      r = expression(b, 0, 20);
     }
     else if (t == THE_R_STRING_LITERAL_EXPRESSION) {
       r = string_literal_expression(b, 0);
     }
     else if (t == THE_R_SUBSCRIPTION_EXPRESSION) {
-      r = expression(b, 0, 8);
+      r = expression(b, 0, 23);
     }
     else if (t == THE_R_WHILE_STATEMENT) {
       r = while_statement(b, 0);
@@ -127,90 +127,125 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // '(' nl* arg nl* (',' nl* arg nl*)* ')'
+  // '(' nl* ')' | '(' nl* arg nl* (',' nl* arg nl*)* ')'
   public static boolean argument_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "argument_list")) return false;
     if (!nextTokenIs(b, THE_R_LPAR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, THE_R_LPAR);
-    r = r && argument_list_1(b, l + 1);
-    r = r && arg(b, l + 1);
-    r = r && argument_list_3(b, l + 1);
-    r = r && argument_list_4(b, l + 1);
-    r = r && consumeToken(b, THE_R_RPAR);
+    r = argument_list_0(b, l + 1);
+    if (!r) r = argument_list_1(b, l + 1);
     exit_section_(b, m, THE_R_ARGUMENT_LIST, r);
     return r;
   }
 
+  // '(' nl* ')'
+  private static boolean argument_list_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_LPAR);
+    r = r && argument_list_0_1(b, l + 1);
+    r = r && consumeToken(b, THE_R_RPAR);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   // nl*
-  private static boolean argument_list_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_1")) return false;
+  private static boolean argument_list_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_0_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "argument_list_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_0_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // '(' nl* arg nl* (',' nl* arg nl*)* ')'
+  private static boolean argument_list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_LPAR);
+    r = r && argument_list_1_1(b, l + 1);
+    r = r && arg(b, l + 1);
+    r = r && argument_list_1_3(b, l + 1);
+    r = r && argument_list_1_4(b, l + 1);
+    r = r && consumeToken(b, THE_R_RPAR);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // nl*
+  private static boolean argument_list_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, THE_R_NL)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_1_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // nl*
-  private static boolean argument_list_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_3")) return false;
+  private static boolean argument_list_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_3")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "argument_list_3", c)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_1_3", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // (',' nl* arg nl*)*
-  private static boolean argument_list_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_4")) return false;
+  private static boolean argument_list_1_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_4")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!argument_list_4_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "argument_list_4", c)) break;
+      if (!argument_list_1_4_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_1_4", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // ',' nl* arg nl*
-  private static boolean argument_list_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_4_0")) return false;
+  private static boolean argument_list_1_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, THE_R_COMMA);
-    r = r && argument_list_4_0_1(b, l + 1);
+    r = r && argument_list_1_4_0_1(b, l + 1);
     r = r && arg(b, l + 1);
-    r = r && argument_list_4_0_3(b, l + 1);
+    r = r && argument_list_1_4_0_3(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // nl*
-  private static boolean argument_list_4_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_4_0_1")) return false;
+  private static boolean argument_list_1_4_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_4_0_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "argument_list_4_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_1_4_0_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // nl*
-  private static boolean argument_list_4_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argument_list_4_0_3")) return false;
+  private static boolean argument_list_1_4_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argument_list_1_4_0_3")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "argument_list_4_0_3", c)) break;
+      if (!empty_element_parsed_guard_(b, "argument_list_1_4_0_3", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -696,23 +731,23 @@ public class TheRParser implements PsiParser {
   // 6: ATOM(block_expression)
   // 7: ATOM(help_expression)
   // 8: PREFIX(parenthesized_expression)
-  // 9: POSTFIX(subscription_expression)
-  // 10: POSTFIX(call_expression)
-  // 11: PREFIX(function_expression)
-  // 12: BINARY(left_assign_expression)
-  // 13: POSTFIX(eq_assign_expression)
-  // 14: BINARY(right_assign_expression)
-  // 15: PREFIX(unary_tilde_expression) BINARY(tilde_expression)
-  // 16: BINARY(or_expression)
-  // 17: BINARY(and_expression)
-  // 18: PREFIX(unary_not_expression)
-  // 19: BINARY(compare_expression)
-  // 20: BINARY(plusminus_expression)
-  // 21: BINARY(muldiv_expression)
-  // 22: BINARY(user_defined_expression)
-  // 23: BINARY(slice_expression)
-  // 24: PREFIX(unary_plusminus_expression)
-  // 25: BINARY(exp_expression)
+  // 9: PREFIX(function_expression)
+  // 10: BINARY(left_assign_expression)
+  // 11: POSTFIX(eq_assign_expression)
+  // 12: BINARY(right_assign_expression)
+  // 13: PREFIX(unary_tilde_expression) BINARY(tilde_expression)
+  // 14: BINARY(or_expression)
+  // 15: BINARY(and_expression)
+  // 16: PREFIX(unary_not_expression)
+  // 17: BINARY(compare_expression)
+  // 18: BINARY(plusminus_expression)
+  // 19: BINARY(muldiv_expression)
+  // 20: BINARY(user_defined_expression)
+  // 21: BINARY(slice_expression)
+  // 22: PREFIX(unary_plusminus_expression)
+  // 23: BINARY(exp_expression)
+  // 24: POSTFIX(subscription_expression)
+  // 25: POSTFIX(call_expression)
   // 26: POSTFIX(member_expression)
   // 27: BINARY(at_expression)
   // 28: POSTFIX(namespace_access_expression)
@@ -750,61 +785,61 @@ public class TheRParser implements PsiParser {
     boolean r = true;
     while (true) {
       Marker m = enter_section_(b, l, _LEFT_, null);
-      if (g < 9 && subscription_expression_0(b, l + 1)) {
-        r = true;
-        exit_section_(b, l, m, THE_R_SUBSCRIPTION_EXPRESSION, r, true, null);
-      }
-      else if (g < 10 && argument_list(b, l + 1)) {
-        r = true;
-        exit_section_(b, l, m, THE_R_CALL_EXPRESSION, r, true, null);
-      }
-      else if (g < 12 && left_assign_expression_0(b, l + 1)) {
-        r = expression(b, l, 11);
+      if (g < 10 && left_assign_expression_0(b, l + 1)) {
+        r = expression(b, l, 9);
         exit_section_(b, l, m, THE_R_ASSIGNMENT_STATEMENT, r, true, null);
       }
-      else if (g < 13 && eq_assign_expression_0(b, l + 1)) {
+      else if (g < 11 && eq_assign_expression_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, THE_R_ASSIGNMENT_STATEMENT, r, true, null);
       }
-      else if (g < 14 && right_assign_expression_0(b, l + 1)) {
+      else if (g < 12 && right_assign_expression_0(b, l + 1)) {
+        r = expression(b, l, 12);
+        exit_section_(b, l, m, THE_R_ASSIGNMENT_STATEMENT, r, true, null);
+      }
+      else if (g < 13 && tilde_expression_0(b, l + 1)) {
+        r = expression(b, l, 13);
+        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
+      }
+      else if (g < 14 && or_expression_0(b, l + 1)) {
         r = expression(b, l, 14);
-        exit_section_(b, l, m, THE_R_ASSIGNMENT_STATEMENT, r, true, null);
+        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
-      else if (g < 15 && tilde_expression_0(b, l + 1)) {
+      else if (g < 15 && and_expression_0(b, l + 1)) {
         r = expression(b, l, 15);
         exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
-      else if (g < 16 && or_expression_0(b, l + 1)) {
-        r = expression(b, l, 16);
-        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
-      }
-      else if (g < 17 && and_expression_0(b, l + 1)) {
+      else if (g < 17 && compare_expression_0(b, l + 1)) {
         r = expression(b, l, 17);
         exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
-      else if (g < 19 && compare_expression_0(b, l + 1)) {
+      else if (g < 18 && plusminus_expression_0(b, l + 1)) {
+        r = expression(b, l, 18);
+        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
+      }
+      else if (g < 19 && muldiv_expression_0(b, l + 1)) {
         r = expression(b, l, 19);
         exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
-      else if (g < 20 && plusminus_expression_0(b, l + 1)) {
+      else if (g < 20 && user_defined_expression_0(b, l + 1)) {
         r = expression(b, l, 20);
         exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
-      else if (g < 21 && muldiv_expression_0(b, l + 1)) {
+      else if (g < 21 && slice_expression_0(b, l + 1)) {
         r = expression(b, l, 21);
-        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
-      }
-      else if (g < 22 && user_defined_expression_0(b, l + 1)) {
-        r = expression(b, l, 22);
-        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
-      }
-      else if (g < 23 && slice_expression_0(b, l + 1)) {
-        r = expression(b, l, 23);
         exit_section_(b, l, m, THE_R_SLICE_EXPRESSION, r, true, null);
       }
-      else if (g < 25 && exp_expression_0(b, l + 1)) {
-        r = expression(b, l, 25);
+      else if (g < 23 && exp_expression_0(b, l + 1)) {
+        r = expression(b, l, 23);
         exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
+      }
+      else if (g < 24 && subscription_expression_0(b, l + 1)) {
+        r = true;
+        exit_section_(b, l, m, THE_R_SUBSCRIPTION_EXPRESSION, r, true, null);
+      }
+      else if (g < 25 && argument_list(b, l + 1)) {
+        r = true;
+        exit_section_(b, l, m, THE_R_CALL_EXPRESSION, r, true, null);
       }
       else if (g < 26 && member_expression_0(b, l + 1)) {
         r = true;
@@ -1319,67 +1354,6 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('[' nl* subscription_expr_list ']') | ('[[' nl* subscription_expr_list ']]')
-  private static boolean subscription_expression_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "subscription_expression_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = subscription_expression_0_0(b, l + 1);
-    if (!r) r = subscription_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '[' nl* subscription_expr_list ']'
-  private static boolean subscription_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "subscription_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_LBRACKET);
-    r = r && subscription_expression_0_0_1(b, l + 1);
-    r = r && subscription_expr_list(b, l + 1);
-    r = r && consumeToken(b, THE_R_RBRACKET);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // nl*
-  private static boolean subscription_expression_0_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "subscription_expression_0_0_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeTokenSmart(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "subscription_expression_0_0_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // '[[' nl* subscription_expr_list ']]'
-  private static boolean subscription_expression_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "subscription_expression_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_LDBRACKET);
-    r = r && subscription_expression_0_1_1(b, l + 1);
-    r = r && subscription_expr_list(b, l + 1);
-    r = r && consumeToken(b, THE_R_RDBRACKET);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // nl*
-  private static boolean subscription_expression_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "subscription_expression_0_1_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeTokenSmart(b, THE_R_NL)) break;
-      if (!empty_element_parsed_guard_(b, "subscription_expression_0_1_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
   public static boolean function_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_expression")) return false;
     if (!nextTokenIsFast(b, THE_R_FUNCTION)) return false;
@@ -1387,7 +1361,7 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = function_expression_0(b, l + 1);
     p = r;
-    r = p && expression(b, l, 11);
+    r = p && expression(b, l, 9);
     exit_section_(b, l, m, THE_R_FUNCTION_EXPRESSION, r, p, null);
     return r || p;
   }
@@ -1526,7 +1500,7 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = unary_tilde_expression_0(b, l + 1);
     p = r;
-    r = p && expression(b, l, 15);
+    r = p && expression(b, l, 13);
     exit_section_(b, l, m, THE_R_PREFIX_EXPRESSION, r, p, null);
     return r || p;
   }
@@ -1652,7 +1626,7 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = unary_not_expression_0(b, l + 1);
     p = r;
-    r = p && expression(b, l, 18);
+    r = p && expression(b, l, 16);
     exit_section_(b, l, m, THE_R_PREFIX_EXPRESSION, r, p, null);
     return r || p;
   }
@@ -1855,7 +1829,7 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = unary_plusminus_expression_0(b, l + 1);
     p = r;
-    r = p && expression(b, l, 24);
+    r = p && expression(b, l, 22);
     exit_section_(b, l, m, THE_R_PREFIX_EXPRESSION, r, p, null);
     return r || p;
   }
@@ -1912,6 +1886,118 @@ public class TheRParser implements PsiParser {
     while (true) {
       if (!consumeTokenSmart(b, THE_R_NL)) break;
       if (!empty_element_parsed_guard_(b, "exp_expression_0_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // '[' nl* ']' | '[' nl* subscription_expr_list ']' |
+  //   '[[' nl* ']]' | '[[' nl* subscription_expr_list ']]'
+  private static boolean subscription_expression_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = subscription_expression_0_0(b, l + 1);
+    if (!r) r = subscription_expression_0_1(b, l + 1);
+    if (!r) r = subscription_expression_0_2(b, l + 1);
+    if (!r) r = subscription_expression_0_3(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // '[' nl* ']'
+  private static boolean subscription_expression_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, THE_R_LBRACKET);
+    r = r && subscription_expression_0_0_1(b, l + 1);
+    r = r && consumeToken(b, THE_R_RBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // nl*
+  private static boolean subscription_expression_0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_0_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, THE_R_NL)) break;
+      if (!empty_element_parsed_guard_(b, "subscription_expression_0_0_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // '[' nl* subscription_expr_list ']'
+  private static boolean subscription_expression_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, THE_R_LBRACKET);
+    r = r && subscription_expression_0_1_1(b, l + 1);
+    r = r && subscription_expr_list(b, l + 1);
+    r = r && consumeToken(b, THE_R_RBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // nl*
+  private static boolean subscription_expression_0_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_1_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, THE_R_NL)) break;
+      if (!empty_element_parsed_guard_(b, "subscription_expression_0_1_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // '[[' nl* ']]'
+  private static boolean subscription_expression_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, THE_R_LDBRACKET);
+    r = r && subscription_expression_0_2_1(b, l + 1);
+    r = r && consumeToken(b, THE_R_RDBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // nl*
+  private static boolean subscription_expression_0_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_2_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, THE_R_NL)) break;
+      if (!empty_element_parsed_guard_(b, "subscription_expression_0_2_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // '[[' nl* subscription_expr_list ']]'
+  private static boolean subscription_expression_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, THE_R_LDBRACKET);
+    r = r && subscription_expression_0_3_1(b, l + 1);
+    r = r && subscription_expr_list(b, l + 1);
+    r = r && consumeToken(b, THE_R_RDBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // nl*
+  private static boolean subscription_expression_0_3_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "subscription_expression_0_3_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, THE_R_NL)) break;
+      if (!empty_element_parsed_guard_(b, "subscription_expression_0_3_1", c)) break;
       c = current_position_(b);
     }
     return true;
