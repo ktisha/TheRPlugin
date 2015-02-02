@@ -1,22 +1,21 @@
 TheRFile:DotsInSublist.r
-  TheR:ASSIGNMENT_STATEMENT
-    TheR:REFERENCE_EXPRESSION
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:IDENTIFIER)('m')
-      PsiElement(TheR:LIST_SUBSET)('$')
+  TheR:THE_R_ASSIGNMENT_STATEMENT
+    TheR:THE_R_REFERENCE_EXPRESSION
+      TheR:THE_R_REFERENCE_EXPRESSION
+        PsiElement(TheR:identifier)('m')
+      PsiElement(TheR:$)('$')
       PsiElement(TheR:TRIPLE_DOTS)('...')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:LEFT_ASSIGN)('<-')
+    PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
-    TheR:ASSIGNMENT_STATEMENT
-      TheR:REFERENCE_EXPRESSION
-        TheR:REFERENCE_EXPRESSION
-          PsiElement(TheR:IDENTIFIER)('m')
-        PsiElement(TheR:LIST_SUBSET)('$')
-        TheR:REFERENCE_EXPRESSION
-          PsiElement(TheR:IDENTIFIER)('FUN')
+    TheR:THE_R_ASSIGNMENT_STATEMENT
+      TheR:THE_R_REFERENCE_EXPRESSION
+        TheR:THE_R_REFERENCE_EXPRESSION
+          PsiElement(TheR:identifier)('m')
+        PsiElement(TheR:$)('$')
+        PsiElement(TheR:identifier)('FUN')
       PsiWhiteSpace(' ')
-      PsiElement(TheR:LEFT_ASSIGN)('<-')
+      PsiElement(TheR:<-)('<-')
       PsiWhiteSpace(' ')
-      TheR:REFERENCE_EXPRESSION
-        PsiElement(TheR:NULL_KEYWORD)('NULL')
+      TheR:THE_R_REFERENCE_EXPRESSION
+        PsiElement(TheR:NULL)('NULL')

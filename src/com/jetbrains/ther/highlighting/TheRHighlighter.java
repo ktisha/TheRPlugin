@@ -4,8 +4,10 @@ import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
 import com.jetbrains.ther.lexer.TheRLexer;
+import com.jetbrains.ther.parsing.TheRElementTypes;
+import com.jetbrains.ther.parsing.TheRParserDefinition;
+import com.jetbrains.ther.psi.TheRPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -15,34 +17,33 @@ public class TheRHighlighter extends SyntaxHighlighterBase {
   private static final Map<IElementType, TextAttributesKey> ATTRIBUTES = new HashMap<IElementType, TextAttributesKey>();
 
   static {
-    fillMap(ATTRIBUTES, TheRTokenTypes.RESERVED_WORDS, TheRSyntaxHighlighterColors.KEYWORD);
+    fillMap(ATTRIBUTES, TheRPsiImplUtil.RESERVED_WORDS, TheRSyntaxHighlighterColors.KEYWORD);
 
-    fillMap(ATTRIBUTES, TheRTokenTypes.OPERATORS, TheRSyntaxHighlighterColors.OPERATION_SIGN);
+    fillMap(ATTRIBUTES, TheRPsiImplUtil.OPERATORS, TheRSyntaxHighlighterColors.OPERATION_SIGN);
 
-    ATTRIBUTES.put(TheRTokenTypes.STRING_LITERAL, TheRSyntaxHighlighterColors.STRING);
-    ATTRIBUTES.put(TheRTokenTypes.NUMERIC_LITERAL, TheRSyntaxHighlighterColors.NUMBER);
-    ATTRIBUTES.put(TheRTokenTypes.COMPLEX_LITERAL, TheRSyntaxHighlighterColors.NUMBER);
-    ATTRIBUTES.put(TheRTokenTypes.INTEGER_LITERAL, TheRSyntaxHighlighterColors.NUMBER);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_STRING, TheRSyntaxHighlighterColors.STRING);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_NUMERIC, TheRSyntaxHighlighterColors.NUMBER);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_COMPLEX, TheRSyntaxHighlighterColors.NUMBER);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_INTEGER, TheRSyntaxHighlighterColors.NUMBER);
 
 
-    ATTRIBUTES.put(TheRTokenTypes.LPAR, TheRSyntaxHighlighterColors.PARENTHS);
-    ATTRIBUTES.put(TheRTokenTypes.RPAR, TheRSyntaxHighlighterColors.PARENTHS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_LPAR, TheRSyntaxHighlighterColors.PARENTHS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_RPAR, TheRSyntaxHighlighterColors.PARENTHS);
 
-    ATTRIBUTES.put(TheRTokenTypes.LBRACE, TheRSyntaxHighlighterColors.BRACES);
-    ATTRIBUTES.put(TheRTokenTypes.RBRACE, TheRSyntaxHighlighterColors.BRACES);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_LBRACE, TheRSyntaxHighlighterColors.BRACES);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_RBRACE, TheRSyntaxHighlighterColors.BRACES);
 
-    ATTRIBUTES.put(TheRTokenTypes.LBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
-    ATTRIBUTES.put(TheRTokenTypes.LDBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
-    ATTRIBUTES.put(TheRTokenTypes.RBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
-    ATTRIBUTES.put(TheRTokenTypes.RDBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_LBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_LDBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_RBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_RDBRACKET, TheRSyntaxHighlighterColors.BRACKETS);
 
-    ATTRIBUTES.put(TheRTokenTypes.COMMA, TheRSyntaxHighlighterColors.COMMA);
-    ATTRIBUTES.put(TheRTokenTypes.DOT, TheRSyntaxHighlighterColors.DOT);
-    ATTRIBUTES.put(TheRTokenTypes.SEMICOLON, TheRSyntaxHighlighterColors.SEMICOLON);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_COMMA, TheRSyntaxHighlighterColors.COMMA);
+    ATTRIBUTES.put(TheRElementTypes.THE_R_SEMI, TheRSyntaxHighlighterColors.SEMICOLON);
 
-    ATTRIBUTES.put(TheRTokenTypes.END_OF_LINE_COMMENT, TheRSyntaxHighlighterColors.LINE_COMMENT);
+    ATTRIBUTES.put(TheRParserDefinition.END_OF_LINE_COMMENT, TheRSyntaxHighlighterColors.LINE_COMMENT);
 
-    ATTRIBUTES.put(TheRTokenTypes.BAD_CHARACTER, TheRSyntaxHighlighterColors.BAD_CHARACTER);
+    ATTRIBUTES.put(TheRParserDefinition.BAD_CHARACTER, TheRSyntaxHighlighterColors.BAD_CHARACTER);
   }
 
   @Override

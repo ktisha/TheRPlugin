@@ -4,11 +4,11 @@ import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
+import com.jetbrains.ther.parsing.TheRElementTypes;
 
 public class TheRQuoteHandler extends SimpleTokenSetQuoteHandler {
   public TheRQuoteHandler() {
-    super(TheRTokenTypes.STRING_LITERAL);
+    super(TheRElementTypes.THE_R_STRING);
   }
 
   @Override

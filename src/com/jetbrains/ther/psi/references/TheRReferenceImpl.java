@@ -72,7 +72,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       }
     }
 
-    TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
+    TheRBlockExpression rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlockExpression.class);
     while (rBlock != null) {
       final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
       if (statements != null) {
@@ -83,7 +83,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           }
         }
       }
-      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
+      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlockExpression.class);
     }
     TheRForStatement rLoop = PsiTreeUtil.getParentOfType(myElement, TheRForStatement.class);
     while (rLoop != null) {
@@ -92,10 +92,10 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
         result.add(new PsiElementResolveResult(target));
       rLoop = PsiTreeUtil.getParentOfType(rLoop, TheRForStatement.class);
     }
-    final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
+    final TheRFunctionExpression rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunctionExpression.class);
     if (rFunction != null) {
       final TheRParameterList list = rFunction.getParameterList();
-      for (TheRParameter parameter : list.getParameters()) {
+      for (TheRParameter parameter : list.getParameterList()) {
         if (name.equals(parameter.getName())) {
           result.add(new PsiElementResolveResult(parameter));
         }
@@ -221,7 +221,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     if (myElement.getParent() instanceof TheRReferenceExpression) return ResolveResult.EMPTY_ARRAY;
     if (name == null) return ResolveResult.EMPTY_ARRAY;
 
-    TheRBlock rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlock.class);
+    TheRBlockExpression rBlock = PsiTreeUtil.getParentOfType(myElement, TheRBlockExpression.class);
     while (rBlock != null) {
       final TheRAssignmentStatement[] statements = PsiTreeUtil.getChildrenOfType(rBlock, TheRAssignmentStatement.class);
       if (statements != null) {
@@ -231,12 +231,12 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
             result.add(LookupElementBuilder.create(assignee.getText()));
         }
       }
-      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlock.class);
+      rBlock = PsiTreeUtil.getParentOfType(rBlock, TheRBlockExpression.class);
     }
-    final TheRFunction rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunction.class);
+    final TheRFunctionExpression rFunction = PsiTreeUtil.getParentOfType(myElement, TheRFunctionExpression.class);
     if (rFunction != null) {
       final TheRParameterList list = rFunction.getParameterList();
-      for (TheRParameter parameter : list.getParameters()) {
+      for (TheRParameter parameter : list.getParameterList()) {
         result.add(LookupElementBuilder.create(parameter));
       }
     }

@@ -10,7 +10,7 @@ import javax.swing.*;
 public class TheRFileType extends LanguageFileType {
   public static final TheRFileType INSTANCE = new TheRFileType();
 
-  public TheRFileType() {
+  private TheRFileType() {
     this(new TheRLanguage());
   }
 
