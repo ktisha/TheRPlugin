@@ -2,7 +2,7 @@
   parserClass="com.jetbrains.ther.parsing.TheRParser"
   parserUtilClass="com.jetbrains.ther.parsing.TheRParserUtil"
 
-  implements="com.jetbrains.ther.psi.api.TheRElement"
+  implements="com.jetbrains.ther.psi.api.TheRPsiElement"
   extends="com.jetbrains.ther.psi.TheRElementImpl"
 
   elementTypeHolderClass="com.jetbrains.ther.parsing.TheRElementTypes"

@@ -7,10 +7,10 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.jetbrains.ther.TheRFileType;
-import com.jetbrains.ther.psi.api.TheRElement;
+import com.jetbrains.ther.psi.api.TheRPsiElement;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRBaseElementImpl<T extends StubElement> extends StubBasedPsiElementBase<T> implements TheRElement {
+public class TheRBaseElementImpl<T extends StubElement> extends StubBasedPsiElementBase<T> implements TheRPsiElement {
   public TheRBaseElementImpl(@NotNull final ASTNode node) {
     super(node);
   }

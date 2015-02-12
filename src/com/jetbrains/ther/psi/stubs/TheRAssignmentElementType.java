@@ -6,7 +6,7 @@ import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.jetbrains.ther.psi.TheRAssignmentStatementImpl;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
-import com.jetbrains.ther.psi.api.TheRElement;
+import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
   @Override
   public TheRAssignmentStub createStub(@NotNull TheRAssignmentStatement psi, StubElement parentStub) {
     final String name = psi.getName();
-    final TheRElement value = psi.getAssignedValue();
+    final TheRPsiElement value = psi.getAssignedValue();
     return new TheRAssignmentStubImpl(name, parentStub, getStubElementType(), value instanceof TheRFunctionExpression);
   }
 

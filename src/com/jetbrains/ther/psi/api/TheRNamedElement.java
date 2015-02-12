@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Alefas
  * @since 27/01/15.
  */
-public interface TheRNamedElement extends TheRElement, PsiNamedElement {
+public interface TheRNamedElement extends TheRPsiElement, PsiNamedElement {
   @Nullable
   ASTNode getNameNode();
 }

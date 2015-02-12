@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElementVisitor;
 public class TheRVisitor extends PsiElementVisitor {
 
   public void visitArgumentList(@NotNull TheRArgumentList o) {
-    visitElement(o);
+    visitPsiElement(o);
   }
 
   public void visitAssignmentStatement(@NotNull TheRAssignmentStatement o) {
@@ -36,7 +36,7 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitExpression(@NotNull TheRExpression o) {
-    visitElement(o);
+    visitPsiElement(o);
   }
 
   public void visitForStatement(@NotNull TheRForStatement o) {
@@ -68,7 +68,7 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitParameterList(@NotNull TheRParameterList o) {
-    visitElement(o);
+    visitPsiElement(o);
   }
 
   public void visitParenthesizedExpression(@NotNull TheRParenthesizedExpression o) {
@@ -104,10 +104,10 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitNamedElement(@NotNull TheRNamedElement o) {
-    visitElement(o);
+    visitPsiElement(o);
   }
 
-  public void visitElement(@NotNull TheRElement o) {
+  public void visitPsiElement(@NotNull TheRPsiElement o) {
     visitElement(o);
   }
 

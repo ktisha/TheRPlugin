@@ -6,11 +6,11 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.StubElement;
 import com.jetbrains.ther.TheRFileType;
-import com.jetbrains.ther.psi.api.TheRElement;
+import com.jetbrains.ther.psi.api.TheRPsiElement;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class TheRStubElementType<StubT extends StubElement, PsiT extends TheRElement> extends IStubElementType<StubT, PsiT> {
+public abstract class TheRStubElementType<StubT extends StubElement, PsiT extends TheRPsiElement> extends IStubElementType<StubT, PsiT> {
   public TheRStubElementType(@NonNls final String debugName) {
     super(debugName, TheRFileType.INSTANCE.getLanguage());
   }

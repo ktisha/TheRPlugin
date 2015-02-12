@@ -38,7 +38,7 @@ public class TheRPsiImplUtil {
     return operator != null;
   }
 
-  public static TheRElement getAssignedValue(TheRAssignmentStatement assignment) {
+  public static TheRPsiElement getAssignedValue(TheRAssignmentStatement assignment) {
     PsiElement child;
     if (assignment.isLeft()) {
       child = assignment.getLastChild();
@@ -53,7 +53,7 @@ public class TheRPsiImplUtil {
         child = child.getNextSibling();
       }
     }
-    return (TheRElement)child;
+    return (TheRPsiElement)child;
   }
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
