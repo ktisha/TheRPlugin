@@ -47,9 +47,11 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
             if (assignedValue != null && assignedValue instanceof  TheRFunctionExpression) {
               TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
               List<TheRExpression> arguments = o.getArgumentList().getExpressionList();
-              List<TheRParameter> suppliedParameters = function.getParameterList().getParameterList();
-              if (!TheRTypeChecker.matchTypes(suppliedParameters, arguments)) {
-                registerProblem(myProblemHolder, o, "Types mismatch");
+              List<TheRParameter> parameters = function.getParameterList().getParameterList();
+
+              String errorMessage = TheRTypeChecker.matchTypes(parameters, arguments);
+              if (errorMessage != null) {
+                registerProblem(myProblemHolder, o, errorMessage);
               }
             }
           }
