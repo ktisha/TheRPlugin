@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.typing.MatchingException;
 import com.jetbrains.ther.typing.TheRTypeChecker;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +36,8 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
     }
 
     @Override
-    public void visitCallExpression(@NotNull TheRCallExpression o) {
-      PsiReference referenceToFunction = o.getExpression().getReference();
+    public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
+      PsiReference referenceToFunction = callExpression.getExpression().getReference();
       if (referenceToFunction != null) {
         PsiElement resolve = referenceToFunction.resolve();
         if (resolve instanceof TheRReferenceExpression) {
@@ -46,12 +47,13 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
             TheRPsiElement assignedValue = assignment.getAssignedValue();
             if (assignedValue != null && assignedValue instanceof  TheRFunctionExpression) {
               TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
-              List<TheRExpression> arguments = o.getArgumentList().getExpressionList();
+              List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
               List<TheRParameter> parameters = function.getParameterList().getParameterList();
-
-              String errorMessage = TheRTypeChecker.matchTypes(parameters, arguments);
-              if (errorMessage != null) {
-                registerProblem(myProblemHolder, o, errorMessage);
+              try {
+                TheRTypeChecker.matchTypes(parameters, arguments);
+              }
+              catch (MatchingException e) {
+                registerProblem(myProblemHolder, callExpression, e.getMessage());
               }
             }
           }

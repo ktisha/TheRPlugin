@@ -12,40 +12,24 @@ import java.util.Map;
 
 public class TheRTypeChecker {
 
-  /**
-   * @param parameters formal arguments of function
-   * @param arguments  supplied arguments of function
-   * @return null if everything is OK and error message otherwise
-   */
   @Nullable
-  public static String matchTypes(List<TheRParameter> parameters, List<TheRExpression> arguments) {
+  public static void matchTypes(List<TheRParameter> parameters, List<TheRExpression> arguments) throws MatchingException {
     ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(parameters);
     ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
 
-    //exact matching
-    String message = matchParams(formalArguments, suppliedArguments, false, matchedParams);
-    if (message != null) {
-      return message;
-    }
+    exactMatching(formalArguments, suppliedArguments, matchedParams);
 
-    //partial matching
-    message = matchParams(formalArguments, suppliedArguments, true, matchedParams);
-    if (message != null) {
-      return message;
-    }
+    partialMatching(formalArguments, suppliedArguments, matchedParams);
 
-    message = checkUnmatchedArgs(getNamedArguments(suppliedArguments));
-    if (message != null) {
-      return message;
-    }
+    checkUnmatchedArgs(getNamedArguments(suppliedArguments));
 
     //TODO:check for triple dot
     int i = 0;
     List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
     for (TheRParameter param : formalArguments) {
       if (i >= suppliedArguments.size()) {
-        return generateMissingArgErrorMessage(formalArguments, i);
+        throw new MatchingException(generateMissingArgErrorMessage(formalArguments, i));
       }
       TheRExpression arg = suppliedArguments.get(i);
       matchedArguments.add(arg);
@@ -56,10 +40,7 @@ public class TheRTypeChecker {
       for (TheRExpression expression : matchedArguments) {
         suppliedArguments.remove(expression);
       }
-      message = checkUnmatchedArgs(suppliedArguments);
-      if (message != null) {
-        return message;
-      }
+      checkUnmatchedArgs(suppliedArguments);
     }
 
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
@@ -70,11 +51,23 @@ public class TheRTypeChecker {
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
       if (argType != null && !argType.equals(TheRType.UNKNOWN)) {
         if (!argType.getName().equals(paramType.getName())) {
-          return "types mismatch";
+          //TODO: generate correct message
+          throw new MatchingException("types mismatch");
         }
       }
     }
-    return null;
+  }
+
+  private static void partialMatching(ArrayList<TheRParameter> formalArguments,
+                                      ArrayList<TheRExpression> suppliedArguments,
+                                      Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+    matchParams(formalArguments, suppliedArguments, true, matchedParams);
+  }
+
+  private static void exactMatching(ArrayList<TheRParameter> formalArguments,
+                                    ArrayList<TheRExpression> suppliedArguments,
+                                    Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+    matchParams(formalArguments, suppliedArguments, false, matchedParams);
   }
 
   private static String generateMissingArgErrorMessage(ArrayList<TheRParameter> parameters, int i) {
@@ -122,21 +115,15 @@ public class TheRTypeChecker {
     return namedArgs;
   }
 
-  /**
-   * @param parameters
-   * @param arguments
-   * @param usePartialMatching
-   * @return error message or null if everything is OK
-   */
-  private static String matchParams(List<TheRParameter> parameters, List<TheRExpression> arguments,
-                                    boolean usePartialMatching,
-                                    Map<TheRExpression, TheRParameter> matchedParams) {
+  private static void matchParams(List<TheRParameter> parameters, List<TheRExpression> arguments,
+                                  boolean usePartialMatching,
+                                  Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
     List<TheRExpression> namedArguments = getNamedArguments(arguments);
     for (TheRExpression namedArg : namedArguments) {
       String name = namedArg.getName();
       List<TheRParameter> matches = getMatches(name, parameters, usePartialMatching);
       if (matches.size() > 1) {
-        return "formal argument " + name + " matched by multiply actual arguments";
+        throw new MatchingException("formal argument " + name + " matched by multiply actual arguments");
       }
       if (matches.size() == 1) {
         matchedParams.put(namedArg, matches.get(0));
@@ -147,27 +134,20 @@ public class TheRTypeChecker {
       arguments.remove(entry.getKey());
       parameters.remove(entry.getValue());
     }
-    return null;
   }
 
-  /**
-   *
-   * @param arguments
-   * @return error message or null if everything is OK
-   */
-  private static String checkUnmatchedArgs(List<TheRExpression> arguments) {
+  private static void checkUnmatchedArgs(List<TheRExpression> arguments) throws MatchingException {
     int size = arguments.size();
     if (size > 0) {
       if (size == 1) {
-        return "unused argument " + arguments.get(0).getText();
+        throw new MatchingException("unused argument " + arguments.get(0).getText());
       }
       StringBuilder errorMessage = new StringBuilder("unused arguments: ");
       for (TheRExpression expression : arguments) {
         errorMessage.append(expression.getText()).append(", ");
       }
       int lastComma = errorMessage.lastIndexOf(",");
-      return errorMessage.delete(lastComma, lastComma + 1).toString();
+      throw new MatchingException(errorMessage.delete(lastComma, lastComma + 1).toString());
     }
-    return null;
   }
 }
