@@ -3,7 +3,6 @@ package com.jetbrains.ther.typing;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 public class TheRTypeChecker {
 
-  @Nullable
   public static void matchTypes(List<TheRParameter> parameters, List<TheRExpression> arguments) throws MatchingException {
     ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(parameters);
     ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
@@ -22,9 +20,6 @@ public class TheRTypeChecker {
 
     partialMatching(formalArguments, suppliedArguments, matchedParams);
 
-    checkUnmatchedArgs(getNamedArguments(suppliedArguments));
-
-    //TODO:check for triple dot
     int i = 0;
     List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
     for (TheRParameter param : formalArguments) {
@@ -36,7 +31,7 @@ public class TheRTypeChecker {
       matchedParams.put(arg, param);
       i++;
     }
-    if (i != suppliedArguments.size()) {
+    if (i != suppliedArguments.size() && !containsTripleDot(formalArguments)) {
       for (TheRExpression expression : matchedArguments) {
         suppliedArguments.remove(expression);
       }
@@ -44,18 +39,28 @@ public class TheRTypeChecker {
     }
 
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
-      TheRType paramType = TheRTypeProvider.getParamType(entry.getValue());
+      TheRParameter parameter = entry.getValue();
+      TheRType paramType = TheRTypeProvider.getParamType(parameter);
       if (paramType == null || paramType.equals(TheRType.UNKNOWN)) {
         continue;
       }
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
       if (argType != null && !argType.equals(TheRType.UNKNOWN)) {
         if (!argType.getName().equals(paramType.getName())) {
-          //TODO: generate correct message
-          throw new MatchingException("types mismatch");
+          throw new MatchingException(parameter.getText() + " expected to be of type " + paramType.getName() +
+                                      ", found type " + argType.getName());
         }
       }
     }
+  }
+
+  private static boolean containsTripleDot(ArrayList<TheRParameter> formalArguments) {
+    for (TheRParameter parameter: formalArguments) {
+      if (parameter.getText().equals("...")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static void partialMatching(ArrayList<TheRParameter> formalArguments,
@@ -84,10 +89,12 @@ public class TheRTypeChecker {
     return stringBuilder.delete(length - 2, length - 1).append("are").append(noDefaultMessage).toString();
   }
 
-  //TODO:check for "..." in partial matching
   private static List<TheRParameter> getMatches(String name, List<TheRParameter> parameters, boolean usePartial) {
     List<TheRParameter> matches = new ArrayList<TheRParameter>();
     for (TheRParameter param : parameters) {
+      if (usePartial && param.getText().equals("...")) {
+        return matches;
+      }
       String paramName = param.getName();
       if (paramName != null) {
         if (usePartial) {
