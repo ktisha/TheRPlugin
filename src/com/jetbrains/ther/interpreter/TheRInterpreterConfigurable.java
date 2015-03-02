@@ -10,6 +10,9 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
@@ -22,6 +25,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.jetbrains.python.PyBundle;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -148,37 +152,38 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
   private void generateSkeletons() {
     final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
     final Application application = ApplicationManager.getApplication();
-    application.executeOnPooledThread(new Runnable() {
+
+    application.invokeLater(new Runnable() {
       @Override
       public void run() {
-        final TheRSkeletonGenerator generator = new TheRSkeletonGenerator();
-        generator.runSkeletonGeneration();
+        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, PyBundle.message("sdk.gen.updating.skels"), false) {
+          @Override
+          public void run(@NotNull ProgressIndicator indicator) {
 
-        application.invokeLater(new Runnable() {
+            final TheRSkeletonGenerator generator = new TheRSkeletonGenerator();
+            generator.runSkeletonGeneration();
+          }});
+
+        application.runWriteAction(new Runnable() {
           @Override
           public void run() {
-            application.runWriteAction(new Runnable() {
-              @Override
-              public void run() {
-                // add all paths to library
-                final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
-                Library library = model.getLibraryByName(THE_R_SKELETONS);
-                if (library == null) {
-                  library = model.createLibrary(THE_R_SKELETONS);
-                }
-                final String path = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
-                fillLibrary(library, Lists.newArrayList(path));
-                model.commit();
-                final Library.ModifiableModel libModel = library.getModifiableModel();
-                libModel.commit();
-                final Module[] modules = ModuleManager.getInstance(myProject).getModules();
-                for (Module module : modules) {
-                  final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
-                  modifiableModel.addLibraryEntry(library);
-                  modelsProvider.commitModuleModifiableModel(modifiableModel);
-                }
-              }
-            });
+            // add all paths to library
+            final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
+            Library library = model.getLibraryByName(THE_R_SKELETONS);
+            if (library == null) {
+              library = model.createLibrary(THE_R_SKELETONS);
+            }
+            final String path = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
+            fillLibrary(library, Lists.newArrayList(path));
+            model.commit();
+            final Library.ModifiableModel libModel = library.getModifiableModel();
+            libModel.commit();
+            final Module[] modules = ModuleManager.getInstance(myProject).getModules();
+            for (Module module : modules) {
+              final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
+              modifiableModel.addLibraryEntry(library);
+              modelsProvider.commitModuleModifiableModel(modifiableModel);
+            }
           }
         });
       }
