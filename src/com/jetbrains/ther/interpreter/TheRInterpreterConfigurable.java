@@ -25,7 +25,6 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.python.PyBundle;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -156,7 +155,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
     application.invokeLater(new Runnable() {
       @Override
       public void run() {
-        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, PyBundle.message("sdk.gen.updating.skels"), false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Updating skeletons", false) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {
 
