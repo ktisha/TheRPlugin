@@ -3,8 +3,10 @@ package com.jetbrains.ther.psi.api;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
+import com.jetbrains.ther.psi.stubs.TheRAssignmentStub;
 
-public interface TheRAssignmentStatement extends TheRExpression, TheRNamedElement {
+public interface TheRAssignmentStatement extends TheRNamedElement, StubBasedPsiElement<TheRAssignmentStub> {
 
   boolean isLeft();
 
