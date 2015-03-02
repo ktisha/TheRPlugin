@@ -5,12 +5,13 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import com.jetbrains.ther.psi.TheRElementType;
+import com.jetbrains.ther.psi.stubs.TheRElementTypeFactory;
 import com.jetbrains.ther.psi.*;
 
 public interface TheRElementTypes {
 
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
-  IElementType THE_R_ASSIGNMENT_STATEMENT = new TheRElementType("THE_R_ASSIGNMENT_STATEMENT");
+  IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
   IElementType THE_R_BINARY_EXPRESSION = new TheRElementType("THE_R_BINARY_EXPRESSION");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");

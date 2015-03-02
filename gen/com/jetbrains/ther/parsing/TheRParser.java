@@ -105,12 +105,11 @@ public class TheRParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(THE_R_ASSIGNMENT_STATEMENT, THE_R_BINARY_EXPRESSION, THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT,
-      THE_R_CALL_EXPRESSION, THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT,
-      THE_R_FUNCTION_EXPRESSION, THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_NEXT_STATEMENT,
-      THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION, THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION,
-      THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION,
-      THE_R_WHILE_STATEMENT),
+    create_token_set_(THE_R_BINARY_EXPRESSION, THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION,
+      THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION,
+      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_NEXT_STATEMENT, THE_R_NUMERIC_LITERAL_EXPRESSION,
+      THE_R_PARENTHESIZED_EXPRESSION, THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT,
+      THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_WHILE_STATEMENT),
   };
 
   /* ********************************************************** */
@@ -252,14 +251,10 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // expression
   public static boolean assignment_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, "<assignment statement>");
-    r = expression(b, l + 1, -1);
-    exit_section_(b, l, m, THE_R_ASSIGNMENT_STATEMENT, r, false, null);
-    return r;
+    Marker m = enter_section_(b);
+    exit_section_(b, m, THE_R_ASSIGNMENT_STATEMENT, true);
+    return true;
   }
 
   /* ********************************************************** */

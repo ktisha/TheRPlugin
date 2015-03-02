@@ -10,6 +10,6 @@ public class TheRFileElementType extends IStubFileElementType {
 
   @Override
   public int getStubVersion() {
-    return 1;
+    return 2;
   }
 }
