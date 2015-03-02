@@ -88,7 +88,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     TheRForStatement rLoop = PsiTreeUtil.getParentOfType(myElement, TheRForStatement.class);
     while (rLoop != null) {
       final TheRExpression target = rLoop.getTarget();
-      if (target != null && name.equals(target.getName()))
+      if (name.equals(target.getName()))
         result.add(new PsiElementResolveResult(target));
       rLoop = PsiTreeUtil.getParentOfType(rLoop, TheRForStatement.class);
     }

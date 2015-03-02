@@ -1,6 +1,8 @@
 package com.jetbrains.ther.psi;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiWhiteSpace;
@@ -9,6 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -104,6 +107,31 @@ public class TheRPsiImplUtil {
     final PsiElement prevElement = PsiTreeUtil.skipSiblingsBackward(referenceExpression, PsiWhiteSpace.class);
     if (prevElement != null && RIGHT_ASSIGNMENTS.contains(prevElement.getNode().getElementType())) return null;
     return new TheRReferenceImpl(referenceExpression);
+  }
+
+  public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
+    final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
+    if (statement == null) return null;
+
+    PsiComment comment = null;
+    for (PsiElement sibling = statement.getPrevSibling(); sibling != null && !(sibling instanceof TheRExpression);
+         sibling = sibling.getPrevSibling()) {
+      if (sibling instanceof PsiComment) {
+        comment = (PsiComment)sibling;
+      }
+    }
+
+    if (comment == null) return null;
+    return getCommentText(comment);
+  }
+
+  private static String getCommentText(@NotNull final PsiComment comment) {
+    final StringBuilder stringBuilder = new StringBuilder();
+    final String[] strings = StringUtil.splitByLines(comment.getText());
+    for (String string : strings) {
+      stringBuilder.append(StringUtil.trimStart(string, "# "));
+    }
+    return stringBuilder.toString();
   }
 
   @Nullable

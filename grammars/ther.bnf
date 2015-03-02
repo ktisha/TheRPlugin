@@ -153,7 +153,9 @@ parameter ::= (identifier '=' expression) | identifier | '...' {
   methods = [ getNameNode getName setName]
 }
 parameter_list ::= ('(' ')') | ('(' parameter nl* (',' nl* parameter nl*)* ')')
-function_expression ::= function parameter_list nl* expression
+function_expression ::= function parameter_list nl* expression {
+methods = [ getDocStringValue]
+}
 
 private semicolon ::= ';' | nl
 
