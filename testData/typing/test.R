@@ -1,7 +1,9 @@
 # @type x : numeric
-
-f <- function(x) {
-  x + 1
+# @type y : numeric
+test_function <- function(x, y, z, d) {
+    x + 1 + 1
+    z
 }
 
-<warning descr="x expected to be of type numeric, found type character">f("d")</warning>
+z <- 10
+test_function(z, 2, 1, 1)
