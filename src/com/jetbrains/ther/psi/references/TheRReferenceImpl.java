@@ -210,7 +210,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   @Override
   public boolean isReferenceTo(PsiElement element) {
-    return false;
+    //TODO: check some conditions
+    return resolve() == element;
   }
 
   @NotNull

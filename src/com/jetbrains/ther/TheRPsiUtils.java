@@ -19,6 +19,19 @@ public class TheRPsiUtils {
 
   @Nullable
   public static TheRAssignmentStatement getAssignmentStatement(@NotNull final TheRParameter parameter) {
+    TheRFunctionExpression functionExpression = getFunction(parameter);
+    if (functionExpression == null) {
+      return null;
+    }
+    PsiElement assignmentStatement = functionExpression.getParent();
+    if (assignmentStatement == null || !(assignmentStatement instanceof TheRAssignmentStatement)) {
+      return null;
+    }
+    return (TheRAssignmentStatement)assignmentStatement;
+  }
+
+  @Nullable
+  public static TheRFunctionExpression getFunction(TheRParameter parameter) {
     PsiElement parameterList = parameter.getParent();
     if (parameterList == null || !(parameterList instanceof TheRParameterList)) {
       return null;
@@ -27,10 +40,6 @@ public class TheRPsiUtils {
     if (functionExpression == null || !(functionExpression instanceof TheRFunctionExpression)) {
       return null;
     }
-    PsiElement assignmentStatement = functionExpression.getParent();
-    if (assignmentStatement == null || !(assignmentStatement instanceof TheRAssignmentStatement)) {
-      return null;
-    }
-    return (TheRAssignmentStatement)assignmentStatement;
+    return (TheRFunctionExpression) functionExpression;
   }
 }
