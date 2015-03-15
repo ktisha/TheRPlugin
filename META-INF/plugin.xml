@@ -62,6 +62,8 @@
     <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
+    <localInspection language="TheR" shortName="RUnusedInspection" displayName="R Unused Inspection" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.ther.inspections.TheRUnusedInspection" groupKey=""/>
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
   </extensions>
 </idea-plugin>

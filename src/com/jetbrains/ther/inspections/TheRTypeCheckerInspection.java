@@ -1,6 +1,5 @@
 package com.jetbrains.ther.inspections;
 
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class TheRTypeCheckerInspection extends LocalInspectionTool {
+public class TheRTypeCheckerInspection extends TheRLocalInspection {
   @Nls
   @NotNull
   @Override
@@ -62,18 +61,5 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
   @Override
   public boolean isEnabledByDefault() {
     return true;
-  }
-
-  private void registerProblem(ProblemsHolder holder, PsiElement element, String message) {
-    if (holder != null) {
-      holder.registerProblem(element, message);
-    }
-  }
-
-  @Nls
-  @NotNull
-  @Override
-  public String getGroupDisplayName() {
-    return "R inspections";
   }
 }
