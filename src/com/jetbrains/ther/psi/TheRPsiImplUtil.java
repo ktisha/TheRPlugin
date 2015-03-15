@@ -2,12 +2,10 @@ package com.jetbrains.ther.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
@@ -74,7 +72,19 @@ public class TheRPsiImplUtil {
   }
 
   public static PsiElement setName(TheRAssignmentStatement assignment, String name) {
-    throw new UnsupportedOperationException(); //todo: implement me
+    ASTNode nameNode = assignment.getNameNode();
+    if (nameNode == null) {
+      return assignment;
+    }
+    final ASTNode oldNameIdentifier = nameNode.findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+    if (oldNameIdentifier != null) {
+      final PsiFile dummyFile = TheRElementGenerator.createDummyFile(name, false, assignment.getProject());
+      ASTNode identifier = dummyFile.getNode().getFirstChildNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+      if (identifier != null) {
+        nameNode.replaceChild(oldNameIdentifier, identifier);
+      }
+    }
+    return assignment;
   }
 
   public static String getName(TheRAssignmentStatement assignment) {
@@ -98,7 +108,15 @@ public class TheRPsiImplUtil {
   }
 
   public static PsiElement setName(TheRParameter parameter, String name) {
-    throw new UnsupportedOperationException(); //todo: implement me
+    final ASTNode oldNameIdentifier = parameter.getNameNode();
+    if (oldNameIdentifier != null) {
+      final PsiFile dummyFile = TheRElementGenerator.createDummyFile(name, false, parameter.getProject());
+      ASTNode identifier = dummyFile.getNode().getFirstChildNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+      if (identifier != null) {
+        parameter.getNode().replaceChild(oldNameIdentifier, identifier);
+      }
+    }
+    return parameter;
   }
 
   public static TheRReferenceImpl getReference(TheRReferenceExpression referenceExpression) {
