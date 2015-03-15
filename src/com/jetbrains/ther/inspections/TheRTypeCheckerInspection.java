@@ -39,22 +39,19 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
       PsiReference referenceToFunction = callExpression.getExpression().getReference();
       if (referenceToFunction != null) {
-        PsiElement resolve = referenceToFunction.resolve();
-        if (resolve instanceof TheRReferenceExpression) {
-          PsiElement assignmentStatement = resolve.getParent();
-          if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
-            TheRAssignmentStatement assignment = (TheRAssignmentStatement) assignmentStatement;
-            TheRPsiElement assignedValue = assignment.getAssignedValue();
-            if (assignedValue != null && assignedValue instanceof  TheRFunctionExpression) {
-              TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
-              List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
-              List<TheRParameter> parameters = function.getParameterList().getParameterList();
-              try {
-                TheRTypeChecker.matchTypes(parameters, arguments);
-              }
-              catch (MatchingException e) {
-                registerProblem(myProblemHolder, callExpression, e.getMessage());
-              }
+        PsiElement assignmentStatement = referenceToFunction.resolve();
+        if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
+          TheRAssignmentStatement assignment = (TheRAssignmentStatement)assignmentStatement;
+          TheRPsiElement assignedValue = assignment.getAssignedValue();
+          if (assignedValue != null && assignedValue instanceof TheRFunctionExpression) {
+            TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
+            List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
+            List<TheRParameter> parameters = function.getParameterList().getParameterList();
+            try {
+              TheRTypeChecker.matchTypes(parameters, arguments);
+            }
+            catch (MatchingException e) {
+              registerProblem(myProblemHolder, callExpression, e.getMessage());
             }
           }
         }
@@ -68,8 +65,15 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
   }
 
   private void registerProblem(ProblemsHolder holder, PsiElement element, String message) {
-    if (holder!= null) {
+    if (holder != null) {
       holder.registerProblem(element, message);
     }
+  }
+
+  @Nls
+  @NotNull
+  @Override
+  public String getGroupDisplayName() {
+    return "R inspections";
   }
 }

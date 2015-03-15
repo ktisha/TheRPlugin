@@ -36,12 +36,8 @@ public class TheRTypeProvider {
         return TheRType.UNKNOWN;
       }
       PsiElement resolve = reference.resolve();
-      if (resolve == null) {
-        return TheRType.UNKNOWN;
-      }
-      PsiElement parent = resolve.getParent();
-      if (parent != null && parent instanceof TheRAssignmentStatement) {
-        TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)parent;
+      if (resolve != null && resolve instanceof TheRAssignmentStatement) {
+        TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)resolve;
         TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
         if (assignedValue != null) {
           return getType(assignedValue);

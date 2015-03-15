@@ -17,8 +17,8 @@ import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.IncorrectOperationException;
-import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.TheRLanguage;
+import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.psi.api.*;
@@ -107,7 +107,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       for (TheRAssignmentStatement statement : statements) {
         final PsiElement assignee = statement.getAssignee();
         if (assignee != null && assignee.getText().equals(name)) {
-          result.add(new PsiElementResolveResult(assignee));
+          result.add(new PsiElementResolveResult(statement));
         }
       }
     }
