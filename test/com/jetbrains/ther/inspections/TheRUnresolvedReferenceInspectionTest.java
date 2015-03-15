@@ -2,11 +2,10 @@ package com.jetbrains.ther.inspections;
 
 import org.jetbrains.annotations.NotNull;
 
-public class TheRUnusedInspectionTest extends TheRInspectionTest {
-
+public class TheRUnresolvedReferenceInspectionTest extends TheRInspectionTest {
   @Override
   protected String getTestDataPath() {
-    return super.getTestDataPath() + "/inspections/unusedInspection";
+    return super.getTestDataPath() + "/inspections/unresolvedReferenceInspection";
   }
 
   public void test() {
@@ -16,6 +15,6 @@ public class TheRUnusedInspectionTest extends TheRInspectionTest {
   @NotNull
   @Override
   Class<? extends TheRLocalInspection> getInspection() {
-    return TheRUnusedInspection.class;
+    return TheRUnresolvedReferenceInspection.class;
   }
 }
