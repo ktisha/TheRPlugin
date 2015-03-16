@@ -33,16 +33,7 @@ public class TheRPsiUtils {
 
   @Nullable
   public static TheRFunctionExpression getFunction(TheRParameter parameter) {
-    final TheRFunctionExpression functionExpression = PsiTreeUtil.getParentOfType(parameter, TheRFunctionExpression.class);
-    return functionExpression;
-    //PsiElement parameterList = parameter.getParent();
-    //if (parameterList == null || !(parameterList instanceof TheRParameterList)) {
-    //  return null;
-    //}
-    //PsiElement functionExpression = parameterList.getParent();
-    //if (functionExpression == null || !(functionExpression instanceof TheRFunctionExpression)) {
-    //  return null;
-    //}
-    //return (TheRFunctionExpression)functionExpression;
+    //TODO: check some conditions when we should stop
+    return PsiTreeUtil.getParentOfType(parameter, TheRFunctionExpression.class);
   }
 }
