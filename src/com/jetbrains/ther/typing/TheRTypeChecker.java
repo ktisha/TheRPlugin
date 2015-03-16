@@ -20,7 +20,9 @@ public class TheRTypeChecker {
 
     partialMatching(formalArguments, suppliedArguments, matchedParams);
 
+    //TODO: extract method
     int i = 0;
+    //TODO: rename to positionalMatched
     List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
     for (TheRParameter param : formalArguments) {
       if (i >= suppliedArguments.size()) {
@@ -35,8 +37,9 @@ public class TheRTypeChecker {
       for (TheRExpression expression : matchedArguments) {
         suppliedArguments.remove(expression);
       }
-      checkUnmatchedArgs(suppliedArguments);
     }
+
+    checkUnmatchedArgs(suppliedArguments);
 
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
@@ -145,10 +148,10 @@ public class TheRTypeChecker {
 
   private static void checkUnmatchedArgs(List<TheRExpression> arguments) throws MatchingException {
     int size = arguments.size();
+    if (size == 1) {
+      throw new MatchingException("unused argument " + arguments.get(0).getText());
+    }
     if (size > 0) {
-      if (size == 1) {
-        throw new MatchingException("unused argument " + arguments.get(0).getText());
-      }
       StringBuilder errorMessage = new StringBuilder("unused arguments: ");
       for (TheRExpression expression : arguments) {
         errorMessage.append(expression.getText()).append(", ");

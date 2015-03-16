@@ -28,7 +28,7 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
     return new Visitor(holder);
   }
 
-  class Visitor extends TheRVisitor {
+  private class Visitor extends TheRVisitor {
     private final ProblemsHolder myProblemHolder;
 
     public Visitor(ProblemsHolder holder) {
