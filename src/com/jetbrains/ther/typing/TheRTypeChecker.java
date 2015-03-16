@@ -20,23 +20,7 @@ public class TheRTypeChecker {
 
     partialMatching(formalArguments, suppliedArguments, matchedParams);
 
-    int i = 0;
-    List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
-    for (TheRParameter param : formalArguments) {
-      if (i >= suppliedArguments.size()) {
-        throw new MatchingException(generateMissingArgErrorMessage(formalArguments, i));
-      }
-      TheRExpression arg = suppliedArguments.get(i);
-      matchedArguments.add(arg);
-      matchedParams.put(arg, param);
-      i++;
-    }
-    if (i != suppliedArguments.size() && !containsTripleDot(formalArguments)) {
-      for (TheRExpression expression : matchedArguments) {
-        suppliedArguments.remove(expression);
-      }
-      checkUnmatchedArgs(suppliedArguments);
-    }
+    positionalMatching(formalArguments, suppliedArguments, matchedParams);
 
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
@@ -54,7 +38,7 @@ public class TheRTypeChecker {
     }
   }
 
-  private static boolean containsTripleDot(ArrayList<TheRParameter> formalArguments) {
+  private static boolean containsTripleDot(List<TheRParameter> formalArguments) {
     for (TheRParameter parameter: formalArguments) {
       if (parameter.getText().equals("...")) {
         return true;
@@ -75,7 +59,27 @@ public class TheRTypeChecker {
     matchParams(formalArguments, suppliedArguments, false, matchedParams);
   }
 
-  private static String generateMissingArgErrorMessage(ArrayList<TheRParameter> parameters, int i) {
+  private static void positionalMatching(List<TheRParameter> formalArguments,
+                                         List<TheRExpression> suppliedArguments,
+                                         Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+    List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
+    for (int i = 0; i < formalArguments.size(); i++) {
+      if (i >= suppliedArguments.size()) {
+        throw new MatchingException(generateMissingArgErrorMessage(formalArguments, i));
+      }
+      TheRExpression arg = suppliedArguments.get(i);
+      matchedArguments.add(arg);
+      matchedParams.put(arg, formalArguments.get(i));
+    }
+    if (matchedArguments.size() != suppliedArguments.size() && !containsTripleDot(formalArguments)) {
+      for (TheRExpression expression : matchedArguments) {
+        suppliedArguments.remove(expression);
+      }
+      checkUnmatchedArgs(suppliedArguments);
+    }
+  }
+
+  private static String generateMissingArgErrorMessage(List<TheRParameter> parameters, int i) {
     String noDefaultMessage = " missing, with no default";
     if (i == parameters.size() - 1) {
       return "argument \'" + parameters.get(i).getText() + "\" is" + noDefaultMessage;
@@ -145,10 +149,10 @@ public class TheRTypeChecker {
 
   private static void checkUnmatchedArgs(List<TheRExpression> arguments) throws MatchingException {
     int size = arguments.size();
+    if (size == 1) {
+      throw new MatchingException("unused argument " + arguments.get(0).getText());
+    }
     if (size > 0) {
-      if (size == 1) {
-        throw new MatchingException("unused argument " + arguments.get(0).getText());
-      }
       StringBuilder errorMessage = new StringBuilder("unused arguments: ");
       for (TheRExpression expression : arguments) {
         errorMessage.append(expression.getText()).append(", ");

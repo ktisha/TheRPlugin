@@ -7,7 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.jetbrains.ther.lexer.TheRLexer;
-import com.jetbrains.ther.lexer.TheRTokenTypes;
+import com.jetbrains.ther.parsing.TheRElementTypes;
+import com.jetbrains.ther.parsing.TheRParserDefinition;
 import com.jetbrains.ther.psi.api.TheRReferenceExpression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,9 +17,9 @@ public class TheRFindUsagesProvider implements FindUsagesProvider {
   @Nullable
   @Override
   public WordsScanner getWordsScanner() {
-    return new DefaultWordsScanner(new TheRLexer(), TokenSet.create(TheRTokenTypes.IDENTIFIER),
-                                   TokenSet.create(TheRTokenTypes.END_OF_LINE_COMMENT),
-                                   TokenSet.create(TheRTokenTypes.STRING_LITERAL));
+    return new DefaultWordsScanner(new TheRLexer(), TokenSet.create(TheRElementTypes.THE_R_IDENTIFIER),
+                                   TokenSet.create(TheRParserDefinition.END_OF_LINE_COMMENT),
+                                   TokenSet.create(TheRElementTypes.THE_R_STRING_LITERAL_EXPRESSION));
   }
 
   @Override

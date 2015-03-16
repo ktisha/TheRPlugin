@@ -166,7 +166,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           final PsiFile containingFile = statement.getContainingFile();
           final PsiElement assignee = statement.getAssignee();
           if(assignee == null) continue;
-          if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name)) {
+          if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name) &&
+              TheRInterpreterConfigurable.THE_R_LIBRARY.equals(libraryName)) {
             result.add(0, new PsiElementResolveResult(assignee));
           }
           else
