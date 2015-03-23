@@ -4,11 +4,15 @@ import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.jetbrains.ther.psi.api.TheRReferenceExpression;
-import com.jetbrains.ther.psi.api.TheRVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.ther.TheRPsiUtils;
+import com.jetbrains.ther.parsing.TheRElementTypes;
+import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class TheRUnresolvedReferenceInspection extends TheRLocalInspection {
   @Nls
@@ -33,12 +37,32 @@ public class TheRUnresolvedReferenceInspection extends TheRLocalInspection {
     }
 
     @Override
-    public void visitReferenceExpression(@NotNull TheRReferenceExpression o) {
-      TheRReferenceImpl reference = o.getReference();
+    public void visitReferenceExpression(@NotNull TheRReferenceExpression element) {
+      PsiElement sibling = element.getNextSibling();
+      if (sibling != null && sibling.getNode().getElementType() == TheRElementTypes.THE_R_DOUBLECOLON) {
+        return;
+      }
+
+      if (TheRPsiUtils.isNamedArgument(element)) {
+        return;
+      }
+
+      TheRCallExpression callExpression = PsiTreeUtil.getParentOfType(element, TheRCallExpression.class);
+      if (callExpression != null) {
+        TheRFunctionExpression function = TheRPsiUtils.getFunction(callExpression);
+        if (function != null) {
+          List<TheRParameter> list = function.getParameterList().getParameterList();
+          if (TheRPsiUtils.containsTripleDot(list)) {
+            return;
+          }
+        }
+      }
+
+      TheRReferenceImpl reference = element.getReference();
       if (reference != null) {
         PsiElement resolve = reference.resolve();
         if (resolve == null) {
-          registerProblem(myProblemHolder, o, "Unresolved reference");
+          registerProblem(myProblemHolder, element, "Unresolved reference");
         }
       }
     }

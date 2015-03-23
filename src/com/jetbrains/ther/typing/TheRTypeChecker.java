@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing;
 
+import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
@@ -38,15 +39,6 @@ public class TheRTypeChecker {
     }
   }
 
-  private static boolean containsTripleDot(List<TheRParameter> formalArguments) {
-    for (TheRParameter parameter: formalArguments) {
-      if (parameter.getText().equals("...")) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private static void partialMatching(ArrayList<TheRParameter> formalArguments,
                                       ArrayList<TheRExpression> suppliedArguments,
                                       Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
@@ -71,7 +63,7 @@ public class TheRTypeChecker {
       matchedArguments.add(arg);
       matchedParams.put(arg, formalArguments.get(i));
     }
-    if (matchedArguments.size() != suppliedArguments.size() && !containsTripleDot(formalArguments)) {
+    if (matchedArguments.size() != suppliedArguments.size() && !TheRPsiUtils.containsTripleDot(formalArguments)) {
       for (TheRExpression expression : matchedArguments) {
         suppliedArguments.remove(expression);
       }
