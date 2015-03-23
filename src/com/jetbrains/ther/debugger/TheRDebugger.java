@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.*;
 
 public class TheRDebugger {
 
@@ -16,6 +17,9 @@ public class TheRDebugger {
   @NotNull
   private final BufferedReader mySourceReader;
 
+  @NotNull
+  private final Map<String, String> myVarToRepresentation;
+
   public TheRDebugger(@NotNull String interpreterPath, @NotNull String filePath) throws IOException, InterruptedException {
     ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
     Process process = builder.start();
@@ -24,6 +28,8 @@ public class TheRDebugger {
     myReceiver = new Receiver(process.getInputStream()); // TODO close
 
     mySourceReader = new BufferedReader(new FileReader(filePath)); // TODO close
+
+    myVarToRepresentation = new HashMap<>();
 
     mySender.send("browser()");
     myReceiver.receive();
@@ -46,17 +52,17 @@ public class TheRDebugger {
       mySender.send(command);
       String response = myReceiver.receive();
 
-      System.out.println("COMMAND");
-      System.out.println(command);
-      System.out.println("RESPONSE");
-      System.out.println(response);
-
       accepted = !nextCommandIsNeeded(response);
     }
 
     updateDebugInformation();
 
     return true;
+  }
+
+  @NotNull
+  public Map<String, String> getVarToRepresentation() {
+    return Collections.unmodifiableMap(myVarToRepresentation);
   }
 
   @Nullable
@@ -74,8 +80,51 @@ public class TheRDebugger {
     return response.length() < 2 || response.charAt(response.length() - 2) != '>';
   }
 
-  private void updateDebugInformation() {
-    System.out.println("UPDATE");
+  private void updateDebugInformation() throws IOException, InterruptedException {
+    mySender.send("ls()");
+    String response = removeLastLine(myReceiver.receive());
+
+    myVarToRepresentation.clear();
+
+    for (String var : calculateVariables(response)) {
+      mySender.send(var);
+      myVarToRepresentation.put(var, removeLastLine(myReceiver.receive()));
+    }
+  }
+
+  @NotNull
+  private List<String> calculateVariables(@NotNull String response) {
+    List<String> result = new ArrayList<>();
+
+    StringTokenizer lineTokenizer = new StringTokenizer(response, System.lineSeparator());
+
+    while (lineTokenizer.hasMoreTokens()) {
+      StringTokenizer variableTokenizer = new StringTokenizer(lineTokenizer.nextToken(), " ");
+
+      while (variableTokenizer.hasMoreTokens()) {
+        String token = variableTokenizer.nextToken();
+
+        if (isVariable(token)) {
+          result.add(getVariable(token));
+        }
+      }
+    }
+
+    return result;
+  }
+
+  @NotNull
+  private String removeLastLine(@NotNull String response) {
+    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
+  }
+
+  private boolean isVariable(@NotNull String token) {
+    return token.startsWith("\"") && token.endsWith("\"");
+  }
+
+  @NotNull
+  private String getVariable(@NotNull String token) {
+    return token.substring(1, token.length() - 1);
   }
 
   private static class Sender {
