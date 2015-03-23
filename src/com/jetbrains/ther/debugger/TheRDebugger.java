@@ -1,92 +1,57 @@
 package com.jetbrains.ther.debugger;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TheRDebugger {
 
   @NotNull
-  private final Map<String, String> myVarToType = new HashMap<>();
+  private final Sender mySender;
 
   @NotNull
-  private final Map<String, String> myVarToRepresentation = new HashMap<>();
-
-  @NotNull
-  private final InputStreamReader myReceiver;
-
-  @NotNull
-  private final OutputStreamWriter mySender;
+  private final Receiver myReceiver;
 
   @NotNull
   private final BufferedReader mySourceReader;
-
-  @NotNull
-  private final InputStreamReader myErrors;
 
   public TheRDebugger(@NotNull String interpreterPath, @NotNull String filePath) throws IOException, InterruptedException {
     ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
     Process process = builder.start();
 
-    myReceiver = new InputStreamReader(process.getInputStream()); // TODO close
-    mySender = new OutputStreamWriter(process.getOutputStream()); // TODO close
-    myErrors = new InputStreamReader(process.getErrorStream());
+    mySender = new Sender(process.getOutputStream()); // TODO close
+    myReceiver = new Receiver(process.getInputStream()); // TODO close
 
     mySourceReader = new BufferedReader(new FileReader(filePath)); // TODO close
 
-    mySender.write("browser()");
-    mySender.write(System.lineSeparator());
-    mySender.flush();
-
-    waitForResponse();
-
-    StringBuilder sb = new StringBuilder();
-
-    while (myReceiver.ready()) {
-      sb.append((char)myReceiver.read());
-    }
-
-    System.out.println("DROPPED: " + sb.toString());
+    mySender.send("browser()");
+    myReceiver.receive();
   }
 
   public boolean executeInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
-    char[] buffer = new char[1024];
 
     while (!accepted) {
-      String srcLine = mySourceReader.readLine();
+      String command = getNextCommand();
 
-      if (srcLine == null) {
+      if (command == null) {
         return false;
       }
 
-      if (srcLine.startsWith("#") || srcLine.isEmpty()) {
+      if (commandShouldBeSkipped(command)) {
         continue;
       }
 
-      mySender.write(srcLine);
-      mySender.write(System.lineSeparator());
-      mySender.flush();
+      mySender.send(command);
+      String response = myReceiver.receive();
 
-      waitForResponse();
-
-      StringBuilder sb = new StringBuilder();
-
-      while (myReceiver.ready()) {
-        int read = myReceiver.read(buffer);
-        sb.append(buffer, 0, read);
-      }
-
-      System.out.println("LINE:");
-      System.out.println(srcLine);
+      System.out.println("COMMAND");
+      System.out.println(command);
       System.out.println("RESPONSE");
-      System.out.println(sb.toString());
+      System.out.println(response);
 
-      accepted = sb.length() > 2 && sb.charAt(sb.length() - 2) == '>';
-
-      printErrors();
+      accepted = !nextCommandIsNeeded(response);
     }
 
     updateDebugInformation();
@@ -94,39 +59,75 @@ public class TheRDebugger {
     return true;
   }
 
-  @NotNull
-  public Map<String, String> getVarToType() {
-    return myVarToType; // TODO
+  @Nullable
+  private String getNextCommand() throws IOException {
+    String command = mySourceReader.readLine();
+
+    return command != null ? command.trim() : null;
   }
 
-  @NotNull
-  public Map<String, String> getVarToRepresentation() {
-    return myVarToRepresentation; // TODO
+  private boolean commandShouldBeSkipped(@NotNull String command) {
+    return command.startsWith("#") || command.isEmpty();
+  }
+
+  private boolean nextCommandIsNeeded(@NotNull String response) {
+    return response.length() < 2 || response.charAt(response.length() - 2) != '>';
   }
 
   private void updateDebugInformation() {
     System.out.println("UPDATE");
   }
 
-  private void waitForResponse() throws IOException, InterruptedException {
-    /*
-    while (!myReceiver.ready()) {
-      // TODO
+  private static class Sender {
+
+    @NotNull
+    private final OutputStreamWriter myWriter;
+
+    private Sender(@NotNull OutputStream stream) {
+      myWriter = new OutputStreamWriter(stream);
     }
-    */
-    Thread.sleep(1000);
+
+    public void send(@NotNull String command) throws IOException {
+      myWriter.write(command);
+      myWriter.write(System.lineSeparator());
+      myWriter.flush();
+    }
   }
 
-  private void printErrors() throws IOException {
-    StringBuilder sb = new StringBuilder();
+  private static class Receiver {
 
-    while (myErrors.ready()) {
-      sb.append(myErrors.read());
+    @NotNull
+    private final InputStream myStream;
+
+    @NotNull
+    private final InputStreamReader myReader;
+
+    @NotNull
+    private final char[] myBuffer;
+
+    private Receiver(@NotNull InputStream stream) {
+      myStream = stream;
+      myReader = new InputStreamReader(stream);
+      myBuffer = new char[1024];
     }
 
-    if (sb.length() != 0) {
-      System.out.print("ERROR");
-      System.out.println(sb.toString());
+    @NotNull
+    public String receive() throws IOException, InterruptedException {
+      long timeout = 50;
+
+      while (myStream.available() == 0) {
+        Thread.sleep(timeout);
+        timeout *= 2;
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      while (myReader.ready()) {
+        int read = myReader.read(myBuffer);
+        sb.append(myBuffer, 0, read);
+      }
+
+      return sb.substring(sb.indexOf(System.lineSeparator()) + 1);
     }
   }
 }
