@@ -25,7 +25,7 @@ public class TheRDebugger {
     Process process = builder.start();
 
     mySender = new Sender(process.getOutputStream()); // TODO close
-    myReceiver = new Receiver(process.getInputStream()); // TODO close
+    myReceiver = new Receiver(process.getInputStream(), mySender); // TODO close
 
     mySourceReader = new BufferedReader(new FileReader(filePath)); // TODO close
 
@@ -154,28 +154,64 @@ public class TheRDebugger {
     @NotNull
     private final char[] myBuffer;
 
-    private Receiver(@NotNull InputStream stream) {
+    @NotNull
+    private final Sender mySender;
+
+    private Receiver(@NotNull InputStream stream, @NotNull Sender sender) {
       myStream = stream;
       myReader = new InputStreamReader(stream);
       myBuffer = new char[1024];
+
+      mySender = sender;
     }
 
     @NotNull
     public String receive() throws IOException, InterruptedException {
+      StringBuilder sb = new StringBuilder();
+      int commentsCount = 0;
+
+      while (true) {
+        waitForResponse();
+
+        while (myStream.available() != 0) {
+          int read = myReader.read(myBuffer);
+          sb.append(myBuffer, 0, read);
+        }
+
+        if (responseIsComplete(sb)) {
+          break;
+        }
+
+        mySender.send("#");
+        commentsCount++;
+      }
+
+      removeComments(sb, commentsCount);
+
+      return removeFirstLine(sb);
+    }
+
+    private void waitForResponse() throws IOException, InterruptedException {
       long timeout = 50;
 
       while (myStream.available() == 0) {
         Thread.sleep(timeout);
         timeout *= 2;
       }
+    }
 
-      StringBuilder sb = new StringBuilder();
+    private boolean responseIsComplete(@NotNull StringBuilder sb) {
+      return sb.length() > 2 && (sb.charAt(sb.length() - 2) == '>' || sb.charAt(sb.length() - 2) == '+');
+    }
 
-      while (myReader.ready()) {
-        int read = myReader.read(myBuffer);
-        sb.append(myBuffer, 0, read);
+    private void removeComments(@NotNull StringBuilder sb, int commentsCount) {
+      for (int i = 0; i < commentsCount; i++) {
+        sb.setLength(sb.lastIndexOf(System.lineSeparator()) - 1);
       }
+    }
 
+    @NotNull
+    private String removeFirstLine(@NotNull StringBuilder sb) {
       return sb.substring(sb.indexOf(System.lineSeparator()) + 1);
     }
   }
