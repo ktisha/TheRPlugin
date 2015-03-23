@@ -20,6 +20,9 @@ public class TheRDebugger {
   @NotNull
   private final Map<String, String> myVarToRepresentation;
 
+  @NotNull
+  private final Map<String, String> myVarToType;
+
   public TheRDebugger(@NotNull String interpreterPath, @NotNull String filePath) throws IOException, InterruptedException {
     ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
     Process process = builder.start();
@@ -30,6 +33,7 @@ public class TheRDebugger {
     mySourceReader = new BufferedReader(new FileReader(filePath)); // TODO close
 
     myVarToRepresentation = new HashMap<>();
+    myVarToType = new HashMap<>();
 
     mySender.send("browser()");
     myReceiver.receive();
@@ -65,6 +69,11 @@ public class TheRDebugger {
     return Collections.unmodifiableMap(myVarToRepresentation);
   }
 
+  @NotNull
+  public Map<String, String> getVarToType() {
+    return Collections.unmodifiableMap(myVarToType);
+  }
+
   @Nullable
   private String getNextCommand() throws IOException {
     String command = mySourceReader.readLine();
@@ -85,10 +94,11 @@ public class TheRDebugger {
     String response = removeLastLine(myReceiver.receive());
 
     myVarToRepresentation.clear();
+    myVarToType.clear();
 
     for (String var : calculateVariables(response)) {
-      mySender.send(var);
-      myVarToRepresentation.put(var, removeLastLine(myReceiver.receive()));
+      updateRepresentation(var);
+      updateType(var);
     }
   }
 
@@ -113,9 +123,14 @@ public class TheRDebugger {
     return result;
   }
 
-  @NotNull
-  private String removeLastLine(@NotNull String response) {
-    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
+  private void updateRepresentation(@NotNull String var) throws IOException, InterruptedException {
+    mySender.send(var);
+    myVarToRepresentation.put(var, removeLastLine(myReceiver.receive()));
+  }
+
+  private void updateType(@NotNull String var) throws IOException, InterruptedException {
+    mySender.send("typeof(" + var + ")");
+    myVarToType.put(var, removeLastLine(myReceiver.receive()));
   }
 
   private boolean isVariable(@NotNull String token) {
@@ -125,6 +140,11 @@ public class TheRDebugger {
   @NotNull
   private String getVariable(@NotNull String token) {
     return token.substring(1, token.length() - 1);
+  }
+
+  @NotNull
+  private String removeLastLine(@NotNull String response) {
+    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
   }
 
   private static class Sender {
@@ -168,7 +188,7 @@ public class TheRDebugger {
     @NotNull
     public String receive() throws IOException, InterruptedException {
       StringBuilder sb = new StringBuilder();
-      int commentsCount = 0;
+      int pings = 0;
 
       while (true) {
         waitForResponse();
@@ -182,11 +202,11 @@ public class TheRDebugger {
           break;
         }
 
-        mySender.send("#");
-        commentsCount++;
+        ping(); // pings R interpreter to get tail of response
+        pings++;
       }
 
-      removeComments(sb, commentsCount);
+      removePings(sb, pings);
 
       return removeFirstLine(sb);
     }
@@ -204,8 +224,12 @@ public class TheRDebugger {
       return sb.length() > 2 && (sb.charAt(sb.length() - 2) == '>' || sb.charAt(sb.length() - 2) == '+');
     }
 
-    private void removeComments(@NotNull StringBuilder sb, int commentsCount) {
-      for (int i = 0; i < commentsCount; i++) {
+    private void ping() throws IOException {
+      mySender.send("#");
+    }
+
+    private void removePings(@NotNull StringBuilder sb, int pings) {
+      for (int i = 0; i < pings; i++) {
         sb.setLength(sb.lastIndexOf(System.lineSeparator()) - 1);
       }
     }
