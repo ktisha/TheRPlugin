@@ -44,6 +44,6 @@ TheRFile:ReprAsKeywordArgument.r
           PsiWhiteSpace(' ')
           PsiElement(TheR:=)('=')
           PsiWhiteSpace(' ')
-          TheR:THE_R_REFERENCE_EXPRESSION
+          TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
             PsiElement(TheR:FALSE)('FALSE')
         PsiElement(TheR:))(')')

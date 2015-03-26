@@ -1,11 +1,11 @@
 package com.jetbrains.ther.typing;
 
-public class TheRNumericType implements TheRType {
-  public static TheRNumericType INSTANCE = new TheRNumericType();
+public class TheRLogicalType implements  TheRType {
+  public static TheRType INSTANCE = new TheRLogicalType();
 
   @Override
   public String getName() {
-    return "numeric";
+    return "logical";
   }
 
   @Override

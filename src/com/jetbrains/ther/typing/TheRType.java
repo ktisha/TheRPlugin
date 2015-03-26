@@ -7,7 +7,14 @@ public interface TheRType {
     public String getName() {
       return "Unknown";
     }
+
+    @Override
+    public TheRType resolveType(TheRTypeEnvironment env) {
+      return this;
+    }
   };
 
   String getName();
+
+  TheRType resolveType(TheRTypeEnvironment env);
 }

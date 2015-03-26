@@ -30,6 +30,10 @@ public class TheRAssignmentStatementImpl extends TheRAssignmentBase implements T
     return TheRPsiImplUtil.isLeft(this);
   }
 
+  public boolean isRight() {
+    return TheRPsiImplUtil.isRight(this);
+  }
+
   public TheRPsiElement getAssignedValue() {
     return TheRPsiImplUtil.getAssignedValue(this);
   }

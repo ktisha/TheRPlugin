@@ -7,4 +7,9 @@ public class TheRCharacterType implements TheRType {
   public String getName() {
     return "character";
   }
+
+  @Override
+  public TheRType resolveType(TheRTypeEnvironment env) {
+    return INSTANCE;
+  }
 }

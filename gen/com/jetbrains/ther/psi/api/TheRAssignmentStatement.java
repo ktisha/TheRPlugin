@@ -10,6 +10,8 @@ public interface TheRAssignmentStatement extends TheRNamedElement, StubBasedPsiE
 
   boolean isLeft();
 
+  boolean isRight();
+
   TheRPsiElement getAssignedValue();
 
   PsiElement getAssignee();

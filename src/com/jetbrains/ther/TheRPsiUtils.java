@@ -56,6 +56,9 @@ public class TheRPsiUtils {
         return null;
       }
       PsiElement functionDef = reference.resolve();
+      if (functionDef instanceof TheRAssignmentStatement) {
+        return PsiTreeUtil.getChildOfType(functionDef, TheRFunctionExpression.class);
+      }
       if (functionDef != null) {
         PsiElement assignmentStatement = functionDef.getParent();
         return PsiTreeUtil.getChildOfType(assignmentStatement, TheRFunctionExpression.class);
@@ -71,5 +74,13 @@ public class TheRPsiUtils {
       }
     }
     return false;
+  }
+
+  public static TheRAssignmentStatement getAssignmentStatement(@NotNull final TheRFunctionExpression expression) {
+    PsiElement assignmentStatement = expression.getParent();
+    if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
+      return (TheRAssignmentStatement)assignmentStatement;
+    }
+    return null;
   }
 }

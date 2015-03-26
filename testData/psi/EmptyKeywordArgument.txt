@@ -39,7 +39,7 @@ TheRFile:EmptyKeywordArgument.r
                   PsiElement(TheR:identifier)('block')
                 PsiElement(TheR:,)(',')
                 PsiWhiteSpace(' ')
-                TheR:THE_R_REFERENCE_EXPRESSION
+                TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
                   PsiElement(TheR:TRUE)('TRUE')
                 PsiElement(TheR:))(')')
             PsiElement(TheR:))(')')
@@ -66,7 +66,7 @@ TheRFile:EmptyKeywordArgument.r
                   PsiElement(TheR:identifier)('block')
                 PsiElement(TheR:,)(',')
                 PsiWhiteSpace(' ')
-                TheR:THE_R_REFERENCE_EXPRESSION
+                TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
                   PsiElement(TheR:TRUE)('TRUE')
                 PsiElement(TheR:))(')')
             PsiElement(TheR:))(')')

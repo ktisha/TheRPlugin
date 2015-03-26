@@ -5,6 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface TheRExpression extends TheRPsiElement {
+public interface TheRBooleanLiteralExpression extends TheRExpression {
+
+  @Nullable
+  PsiElement getFalse();
+
+  @Nullable
+  PsiElement getTrue();
 
 }

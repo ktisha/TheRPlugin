@@ -33,7 +33,7 @@ TheRFile:EmptyExpressionInSubscription.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('drop')
             PsiElement(TheR:=)('=')
-            TheR:THE_R_REFERENCE_EXPRESSION
+            TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
               PsiElement(TheR:FALSE)('FALSE')
           PsiElement(TheR:])(']')
         PsiElement(TheR:))(')')

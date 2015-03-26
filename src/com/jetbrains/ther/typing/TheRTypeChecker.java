@@ -16,12 +16,13 @@ public class TheRTypeChecker {
     ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(parameters);
     ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
+    List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     exactMatching(formalArguments, suppliedArguments, matchedParams);
 
     partialMatching(formalArguments, suppliedArguments, matchedParams);
 
-    positionalMatching(formalArguments, suppliedArguments, matchedParams);
+    positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
 
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
@@ -39,35 +40,43 @@ public class TheRTypeChecker {
     }
   }
 
-  private static void partialMatching(ArrayList<TheRParameter> formalArguments,
-                                      ArrayList<TheRExpression> suppliedArguments,
-                                      Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+  static void partialMatching(ArrayList<TheRParameter> formalArguments,
+                              ArrayList<TheRExpression> suppliedArguments,
+                              Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
     matchParams(formalArguments, suppliedArguments, true, matchedParams);
   }
 
-  private static void exactMatching(ArrayList<TheRParameter> formalArguments,
-                                    ArrayList<TheRExpression> suppliedArguments,
-                                    Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+  static void exactMatching(ArrayList<TheRParameter> formalArguments,
+                            ArrayList<TheRExpression> suppliedArguments,
+                            Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
     matchParams(formalArguments, suppliedArguments, false, matchedParams);
   }
 
-  private static void positionalMatching(List<TheRParameter> formalArguments,
-                                         List<TheRExpression> suppliedArguments,
-                                         Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
+  static void positionalMatching(List<TheRParameter> formalArguments,
+                                 List<TheRExpression> suppliedArguments,
+                                 Map<TheRExpression, TheRParameter> matchedParams,
+                                 List<TheRExpression> matchedByTripleDot) throws MatchingException {
     List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
+    int suppliedSize = suppliedArguments.size();
     for (int i = 0; i < formalArguments.size(); i++) {
-      if (i >= suppliedArguments.size()) {
+      if (i >= suppliedSize) {
         throw new MatchingException(generateMissingArgErrorMessage(formalArguments, i));
+      }
+      if (formalArguments.get(i).getText().equals("...")) {
+        break;
       }
       TheRExpression arg = suppliedArguments.get(i);
       matchedArguments.add(arg);
       matchedParams.put(arg, formalArguments.get(i));
     }
-    if (matchedArguments.size() != suppliedArguments.size() && !TheRPsiUtils.containsTripleDot(formalArguments)) {
-      for (TheRExpression expression : matchedArguments) {
-        suppliedArguments.remove(expression);
-      }
+    for (TheRExpression expression : matchedArguments) {
+      suppliedArguments.remove(expression);
+    }
+    if (matchedArguments.size() != suppliedSize && !TheRPsiUtils.containsTripleDot(formalArguments)) {
       checkUnmatchedArgs(suppliedArguments);
+    }
+    if (TheRPsiUtils.containsTripleDot(formalArguments)) {
+      matchedByTripleDot.addAll(suppliedArguments);
     }
   }
 
