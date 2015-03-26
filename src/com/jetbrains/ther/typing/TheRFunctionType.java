@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TheRFunctionType implements TheRType {
+public class TheRFunctionType extends TheRType {
   private final TheRFunctionExpression myFunctionExpression;
   private TheRType myReturnType;
   private List<TheRFunctionRule> myRules = new ArrayList<TheRFunctionRule>();
@@ -34,21 +34,19 @@ public class TheRFunctionType implements TheRType {
 
   @Override
   public TheRType resolveType(TheRTypeEnvironment env) {
-    return this;
+    throw new UnsupportedOperationException();
   }
 
-  //TODO: move this to more appropriate place
   private void createFunctionType() {
     TheRAssignmentStatement assignmentStatement = TheRPsiUtils.getAssignmentStatement(myFunctionExpression);
     if (assignmentStatement != null) {
       List<Substring> lines = DocStringUtil.getDocStringLines(assignmentStatement);
       for (Substring line: lines) {
-        new TheRAnnotationParser(this).interpretLine(line, this);
+        new TheRAnnotationParser(this).interpretLine(line);
       }
     }
   }
 
-  //TODO: return type should depend from arguments
   public TheRType getReturnType() {
     return myReturnType;
   }

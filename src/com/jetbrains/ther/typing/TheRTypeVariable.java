@@ -1,6 +1,6 @@
 package com.jetbrains.ther.typing;
 
-public class TheRTypeVariable implements TheRType {
+public class TheRTypeVariable extends TheRType {
   private final String myVarName;
 
   @Override

@@ -1,15 +1,10 @@
 package com.jetbrains.ther.typing;
 
-public class TheRLogicalType implements  TheRType {
+public class TheRLogicalType extends TheRType {
   public static TheRType INSTANCE = new TheRLogicalType();
 
   @Override
   public String getName() {
     return "logical";
-  }
-
-  @Override
-  public TheRType resolveType(TheRTypeEnvironment env) {
-    return INSTANCE;
   }
 }

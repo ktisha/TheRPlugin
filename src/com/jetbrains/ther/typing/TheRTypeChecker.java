@@ -13,17 +13,11 @@ import java.util.Map;
 
 public class TheRTypeChecker {
 
-  public static void matchTypes(List<TheRExpression> arguments, TheRFunctionExpression functionExpression) throws MatchingException {
-    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(functionExpression.getParameterList().getParameterList());
-    ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
+  public static void checkTypes(List<TheRExpression> arguments, TheRFunctionExpression functionExpression) throws MatchingException {
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
-    exactMatching(formalArguments, suppliedArguments, matchedParams);
-
-    partialMatching(formalArguments, suppliedArguments, matchedParams);
-
-    positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
+    matchTypes(arguments, functionExpression, matchedParams, matchedByTripleDot);
 
     TheRFunctionType functionType = (TheRFunctionType)TheRTypeProvider.getType(functionExpression);
     assert functionType != null;
@@ -41,6 +35,17 @@ public class TheRTypeChecker {
         }
       }
     }
+  }
+
+  public static void matchTypes(List<TheRExpression> arguments,
+                                TheRFunctionExpression function,
+                                Map<TheRExpression, TheRParameter> matchedParams,
+                                List<TheRExpression> matchedByTripleDot) throws MatchingException {
+    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(function.getParameterList().getParameterList());
+    ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
+    exactMatching(formalArguments, suppliedArguments, matchedParams);
+    partialMatching(formalArguments, suppliedArguments, matchedParams);
+    positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
   }
 
   static void partialMatching(ArrayList<TheRParameter> formalArguments,

@@ -28,7 +28,7 @@ public class TheRAnnotationParser {
     myType = type;
   }
 
-  public void interpretLine(Substring line, TheRFunctionType type) {
+  public void interpretLine(Substring line) {
     if (!line.startsWith(TAG_PREFIX)) {
       return;
     }
@@ -69,7 +69,6 @@ public class TheRAnnotationParser {
     myType.addRule(rule);
   }
 
-  //TODO: find max for types
   private TheRType findType(Substring typeSubstring) {
     String typeName = typeSubstring.trim().getValue();
     Matcher maxMatcher = MAX_PATTERN.matcher(typeName);

@@ -5,7 +5,7 @@ import com.intellij.util.Function;
 
 import java.util.List;
 
-public class TheRTypeSequence implements TheRType {
+public class TheRTypeSequence extends TheRType {
   private List<TheRType> myTypes;
 
   public TheRTypeSequence(List<TheRType> types) {
@@ -24,6 +24,6 @@ public class TheRTypeSequence implements TheRType {
 
   @Override
   public TheRType resolveType(TheRTypeEnvironment env) {
-    return TheRMaxType.getMaxType(myTypes, env);
+    return TheRType.getMaxType(myTypes, env);
   }
 }

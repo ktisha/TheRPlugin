@@ -35,20 +35,9 @@ public class TheRTypeProvider {
     if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
     }
-    //TODO:complete this logic by all the rules
+
     if (element instanceof TheRReferenceExpression) {
-      PsiReference reference = element.getReference();
-      if (reference == null) {
-        return TheRType.UNKNOWN;
-      }
-      PsiElement resolve = reference.resolve();
-      if (resolve != null && resolve instanceof TheRAssignmentStatement) {
-        TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)resolve;
-        TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
-        if (assignedValue != null) {
-          return getType(assignedValue);
-        }
-      }
+      return getReferenceExpressionType((TheRReferenceExpression)element);
     }
     if (element instanceof TheRAssignmentStatement) {
       TheRPsiElement assignedValue = ((TheRAssignmentStatement)element).getAssignedValue();
@@ -61,109 +50,80 @@ public class TheRTypeProvider {
       return getCallExpressionType((TheRCallExpression)element);
     }
 
-    if (element instanceof  TheRFunctionExpression) {
+    if (element instanceof TheRFunctionExpression) {
       return new TheRFunctionType((TheRFunctionExpression)element);
     }
     return TheRType.UNKNOWN;
   }
 
   private static TheRType getCallExpressionType(TheRCallExpression element) {
-    // TODO: Move matching to separate method
     TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
+    if (function == null) {
+      return TheRType.UNKNOWN;
+    }
+    TheRFunctionType functionType = new TheRFunctionType(function);
+    // step 1: check @return
+    if (functionType.getReturnType() != null) {
+      return functionType.getReturnType();
+    }
+
     List<TheRExpression> arguments = element.getArgumentList().getExpressionList();
-    List<TheRParameter> parameters = function.getParameterList().getParameterList();
-    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(parameters);
-    ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     try {
-      TheRTypeChecker.exactMatching(formalArguments, suppliedArguments, matchedParams);
-      TheRTypeChecker.partialMatching(formalArguments, suppliedArguments, matchedParams);
-      TheRTypeChecker.positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
-
-      TheRFunctionType functionType = new TheRFunctionType(function);
-
-      // step 1: check @type
-      Map<String, TheRParameterConfiguration> paramToType =
-        new HashMap<String, TheRParameterConfiguration>();
-      for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
-        TheRExpression expr = entry.getKey();
-        if (expr instanceof TheRAssignmentStatement) {
-          expr = (TheRExpression)((TheRAssignmentStatement)expr).getAssignedValue();
-        }
-        TheRType exprType = getType(expr);
-        String param = entry.getValue().getName();
-        paramToType.put(param, new TheRParameterConfiguration(exprType, expr));
-        TheRType paramType = functionType.getParameterType(param);
-        // TODO : equals
-        if (paramType != null && !paramType.getName().equals(exprType.getName())) {
-          // can't match
-          return TheRType.UNKNOWN;
-        }
-      }
-      if (!matchedByTripleDot.isEmpty()) {
-        List<TheRType> types = new ArrayList<TheRType>();
-        for (TheRExpression expr : matchedByTripleDot) {
-          types.add(getType(expr));
-        }
-        paramToType.put("...", new TheRParameterConfiguration(new TheRTypeSequence(types), null));
-      }
-
-      // step 2: check @return
-      if (functionType.getReturnType() != null) {
-        return functionType.getReturnType();
-      }
-
-      //step 3: check @rule
-      rulefor:
-      for (TheRFunctionRule rule : functionType.getRules()) {
-        TheRTypeEnvironment env = new TheRTypeEnvironment();
-        for (Map.Entry<String, TheRParameterConfiguration> entry : rule.getParameters().entrySet()) {
-          String param = entry.getKey();
-          TheRParameterConfiguration conf = entry.getValue();
-          TheRParameterConfiguration exprConf = paramToType.get(param);
-
-          TheRType ruleType = conf.getType();
-          if (ruleType != null) {
-            if (ruleType instanceof TheRTypeVariable) {
-              TheRTypeVariable typeVariable = (TheRTypeVariable)ruleType;
-              String variableName = typeVariable.getName();
-              if (!env.contains(variableName)) {
-                env.addType(variableName, exprConf.getType());
-              }
-              ruleType = env.getType(variableName);
-            }
-            // equals
-            if (!ruleType.getName().equals(exprConf.getType().getName())) {
-              continue rulefor;
-            }
-          }
-          TheRExpression ruleValue = conf.getValue();
-          if (ruleValue != null) {
-            TheRExpression exprValue = exprConf.getValue();
-            // TODO : equals
-            if (exprValue == null || !exprValue.getText().equals(ruleValue.getText())) {
-              continue rulefor;
-            }
-          }
-        }
-        return rule.getReturnType().resolveType(env);
-      }
+      TheRTypeChecker.matchTypes(arguments, function, matchedParams, matchedByTripleDot);
     }
     catch (MatchingException e) {
       return TheRType.UNKNOWN;
     }
-    return TheRType.UNKNOWN;
+
+    Map<String, TheRParameterConfiguration> paramToSuppliedConfiguration =
+      new HashMap<String, TheRParameterConfiguration>();
+
+    // step 2: check @type annotation
+    if (!isMatchedTypes(functionType, matchedParams, matchedByTripleDot, paramToSuppliedConfiguration)) {
+      return TheRType.UNKNOWN;
+    }
+
+    //step 3: check @rule
+   return tryApplyRule(functionType, paramToSuppliedConfiguration);
   }
 
-  private static boolean isLogicalLiteral(PsiElement element) {
-    String elementText = element.getText();
-    return elementText.equals("TRUE") || elementText.equals("T") || elementText.equals("F") ||
-           elementText.equals("FALSE");
+  private static boolean isMatchedTypes(TheRFunctionType functionType,
+                                        Map<TheRExpression, TheRParameter> matchedParams,
+                                        List<TheRExpression> matchedByTripleDot,
+                                        Map<String, TheRParameterConfiguration> paramToSuppliedConfiguration) {
+    for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
+      TheRExpression expr = entry.getKey();
+      TheRParameter parameter = entry.getValue();
+
+      if (expr instanceof TheRAssignmentStatement) {
+        expr = (TheRExpression)((TheRAssignmentStatement)expr).getAssignedValue();
+      }
+
+      TheRType exprType = getType(expr);
+      String paramName = parameter.getName();
+      paramToSuppliedConfiguration.put(paramName, new TheRParameterConfiguration(exprType, expr));
+      TheRType paramType = functionType.getParameterType(paramName);
+
+      if (paramType != null && !paramType.equals(exprType)) {
+        // can't match
+        return false;
+      }
+    }
+
+    if (!matchedByTripleDot.isEmpty()) {
+      List<TheRType> types = new ArrayList<TheRType>();
+      for (TheRExpression expr : matchedByTripleDot) {
+        types.add(getType(expr));
+      }
+      paramToSuppliedConfiguration.put("...", new TheRParameterConfiguration(new TheRTypeSequence(types), null));
+    }
+
+    return true;
   }
 
-  //TODO: pass parameter list and parse each line only once not for each parameter
   public static TheRType getParamType(TheRParameter parameter, TheRFunctionType functionType) {
     TheRType type = functionType.getParameterType(parameter.getName());
     if (type != null) {
@@ -172,6 +132,45 @@ public class TheRTypeProvider {
     type = guessTypeFromFunctionBody(parameter);
     if (type != null) {
       return type;
+    }
+    return TheRType.UNKNOWN;
+  }
+
+  private static TheRType tryApplyRule(TheRFunctionType functionType,
+                                       Map<String, TheRParameterConfiguration> paramToSuppliedConfiguration) {
+    rulefor:
+    for (TheRFunctionRule rule : functionType.getRules()) {
+      TheRTypeEnvironment env = new TheRTypeEnvironment();
+      for (Map.Entry<String, TheRParameterConfiguration> entry : rule.getParameters().entrySet()) {
+        String paramName = entry.getKey();
+        TheRParameterConfiguration conf = entry.getValue();
+        TheRParameterConfiguration exprConf = paramToSuppliedConfiguration.get(paramName);
+
+        TheRType ruleType = conf.getType();
+        if (ruleType != null) {
+          if (ruleType instanceof TheRTypeVariable) {
+            TheRTypeVariable typeVariable = (TheRTypeVariable)ruleType;
+            String variableName = typeVariable.getName();
+            if (!env.contains(variableName)) {
+              env.addType(variableName, exprConf.getType());
+            }
+            ruleType = env.getType(variableName);
+          }
+          if (!ruleType.equals(exprConf.getType())) {
+            continue rulefor;
+          }
+        }
+        TheRExpression ruleValue = conf.getValue();
+        if (ruleValue != null) {
+          TheRExpression exprValue = exprConf.getValue();
+
+          // TODO : evaluate expressions?
+          if (exprValue == null || !exprValue.getText().equals(ruleValue.getText())) {
+            continue rulefor;
+          }
+        }
+      }
+      return rule.getReturnType().resolveType(env);
     }
     return TheRType.UNKNOWN;
   }
@@ -209,7 +208,6 @@ public class TheRTypeProvider {
     return type[0];
   }
 
-  //TODO:rewrite this normally
   @Nullable
   public static TheRType findTypeByName(String typeName) {
     if (typeName.equals("numeric")) {
@@ -222,5 +220,21 @@ public class TheRTypeProvider {
       return TheRLogicalType.INSTANCE;
     }
     return null;
+  }
+
+  private static TheRType getReferenceExpressionType(TheRReferenceExpression expression) {
+    PsiReference reference = expression.getReference();
+    if (reference == null) {
+      return TheRType.UNKNOWN;
+    }
+    PsiElement resolve = reference.resolve();
+    if (resolve != null && resolve instanceof TheRAssignmentStatement) {
+      TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)resolve;
+      TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
+      if (assignedValue != null) {
+        return getType(assignedValue);
+      }
+    }
+    return TheRType.UNKNOWN;
   }
 }

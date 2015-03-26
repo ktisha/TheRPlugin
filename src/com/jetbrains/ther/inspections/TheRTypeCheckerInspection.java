@@ -46,7 +46,7 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
             TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
             List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
             try {
-              TheRTypeChecker.matchTypes(arguments, function);
+              TheRTypeChecker.checkTypes(arguments, function);
             }
             catch (MatchingException e) {
               registerProblem(myProblemHolder, callExpression, e.getMessage());
