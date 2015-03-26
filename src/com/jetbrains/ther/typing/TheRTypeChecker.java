@@ -3,6 +3,7 @@ package com.jetbrains.ther.typing;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
+import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
 
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.Map;
 
 public class TheRTypeChecker {
 
-  public static void matchTypes(List<TheRParameter> parameters, List<TheRExpression> arguments) throws MatchingException {
-    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(parameters);
+  public static void matchTypes(List<TheRExpression> arguments, TheRFunctionExpression functionExpression) throws MatchingException {
+    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(functionExpression.getParameterList().getParameterList());
     ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
@@ -24,9 +25,11 @@ public class TheRTypeChecker {
 
     positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
 
+    TheRFunctionType functionType = (TheRFunctionType)TheRTypeProvider.getType(functionExpression);
+    assert functionType != null;
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
-      TheRType paramType = TheRTypeProvider.getParamType(parameter);
+      TheRType paramType = TheRTypeProvider.getParamType(parameter, functionType);
       if (paramType == null || paramType.equals(TheRType.UNKNOWN)) {
         continue;
       }

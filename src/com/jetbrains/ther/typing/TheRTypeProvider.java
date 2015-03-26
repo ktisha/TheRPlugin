@@ -1,6 +1,5 @@
 package com.jetbrains.ther.typing;
 
-import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -33,7 +32,7 @@ public class TheRTypeProvider {
     if (element instanceof TheRNumericLiteralExpression) {
       return TheRNumericType.INSTANCE;
     }
-    if (element instanceof  TheRLogicalLiteralExpression) {
+    if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
     }
     //TODO:complete this logic by all the rules
@@ -52,7 +51,7 @@ public class TheRTypeProvider {
       }
     }
     if (element instanceof TheRAssignmentStatement) {
-      TheRPsiElement assignedValue = ((TheRAssignmentStatement) element).getAssignedValue();
+      TheRPsiElement assignedValue = ((TheRAssignmentStatement)element).getAssignedValue();
       if (assignedValue != null) {
         return getType(assignedValue);
       }
@@ -60,6 +59,10 @@ public class TheRTypeProvider {
 
     if (element instanceof TheRCallExpression) {
       return getCallExpressionType((TheRCallExpression)element);
+    }
+
+    if (element instanceof  TheRFunctionExpression) {
+      return new TheRFunctionType((TheRFunctionExpression)element);
     }
     return TheRType.UNKNOWN;
   }
@@ -87,7 +90,7 @@ public class TheRTypeProvider {
       for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
         TheRExpression expr = entry.getKey();
         if (expr instanceof TheRAssignmentStatement) {
-          expr = (TheRExpression) ((TheRAssignmentStatement)expr).getAssignedValue();
+          expr = (TheRExpression)((TheRAssignmentStatement)expr).getAssignedValue();
         }
         TheRType exprType = getType(expr);
         String param = entry.getValue().getName();
@@ -161,8 +164,8 @@ public class TheRTypeProvider {
   }
 
   //TODO: pass parameter list and parse each line only once not for each parameter
-  public static TheRType getParamType(TheRParameter parameter) {
-    TheRType type = getTypeFromDocString(parameter);
+  public static TheRType getParamType(TheRParameter parameter, TheRFunctionType functionType) {
+    TheRType type = functionType.getParameterType(parameter.getName());
     if (type != null) {
       return type;
     }
@@ -217,29 +220,6 @@ public class TheRTypeProvider {
     }
     if (typeName.equals("logical")) {
       return TheRLogicalType.INSTANCE;
-    }
-    return null;
-  }
-
-  /**
-   * @param parameter parameter to get type from docstring
-   * @return null if parameter type isn't specified in docstring or type otherwise
-   */
-  @Nullable
-  private static TheRType getTypeFromDocString(TheRParameter parameter) {
-    TheRAssignmentStatement assignmentStatement = TheRPsiUtils.getAssignmentStatement(parameter);
-    if (assignmentStatement == null) {
-      return null;
-    }
-    PsiElement prevSibling = assignmentStatement.getPrevSibling();
-    while (prevSibling != null && !(prevSibling instanceof TheRPsiElement)) {
-      if (prevSibling instanceof PsiComment) {
-        TheRType type = DocStringUtil.parse(parameter, prevSibling.getText());
-        if (type != null) {
-          return type;
-        }
-      }
-      prevSibling = prevSibling.getPrevSibling();
     }
     return null;
   }
