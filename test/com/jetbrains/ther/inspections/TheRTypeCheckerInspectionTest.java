@@ -20,6 +20,10 @@ public class TheRTypeCheckerInspectionTest extends TheRInspectionTest {
     doTest("test3.R");
   }
 
+  public void testRule() {
+    doTest("test4.R");
+  }
+
   @Override
   protected String getTestDataPath() {
     return super.getTestDataPath() + "/typing/";
