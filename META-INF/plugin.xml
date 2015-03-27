@@ -30,6 +30,10 @@
             text="Run R Console..." description="Starts R interactive console">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
+    <action id="TheRGenerateTypingReport" class="com.jetbrains.ther.typing.TheRGetGenerateTypingReport" text="Generate Typing Report"
+            description="Generate Typing Report">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
