@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -23,13 +22,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class TheRGetGenerateTypingReport extends AnAction {
+public class TheRGenerateTypingReport extends AnAction {
 
-  private static final Logger LOG = Logger.getInstance(TheRGetGenerateTypingReport.class);
+  private static final Logger LOG = Logger.getInstance(TheRGenerateTypingReport.class);
   public static final String HEADER = "text, node type, start, end, type\n";
   public static final String TYPE_REPORTS_DIRNAME = "type-reports";
 
-  public TheRGetGenerateTypingReport() {
+  public TheRGenerateTypingReport() {
     super("Generate Typing Report");
   }
 
