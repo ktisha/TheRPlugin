@@ -17,12 +17,15 @@ import java.util.Map;
 
 public class TheRTypeProvider {
 
-  //TODO: get type from context
+
+  public static TheRType getType(TheRPsiElement element) {
+    return TheRTypeContext.getTypeFromCache(element);
+  }
 
   /**
    * evaluates type of expression
    */
-  public static TheRType getType(PsiElement element) {
+  public static TheRType buildType(PsiElement element) {
     if (element == null) {
       return TheRType.UNKNOWN;
     }
@@ -145,7 +148,9 @@ public class TheRTypeProvider {
         String paramName = entry.getKey();
         TheRParameterConfiguration conf = entry.getValue();
         TheRParameterConfiguration exprConf = paramToSuppliedConfiguration.get(paramName);
-
+        if (exprConf == null) {
+          continue rulefor;
+        }
         TheRType ruleType = conf.getType();
         if (ruleType != null) {
           if (ruleType instanceof TheRTypeVariable) {

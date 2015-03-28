@@ -56,19 +56,20 @@ public class TheRPsiUtils {
         return null;
       }
       PsiElement functionDef = reference.resolve();
+      if (functionDef == null) {
+        return null;
+      }
       if (functionDef instanceof TheRAssignmentStatement) {
         return PsiTreeUtil.getChildOfType(functionDef, TheRFunctionExpression.class);
       }
-      if (functionDef != null) {
-        PsiElement assignmentStatement = functionDef.getParent();
-        return PsiTreeUtil.getChildOfType(assignmentStatement, TheRFunctionExpression.class);
-      }
+      PsiElement assignmentStatement = functionDef.getParent();
+      return PsiTreeUtil.getChildOfType(assignmentStatement, TheRFunctionExpression.class);
     }
     return null;
   }
 
   public static boolean containsTripleDot(List<TheRParameter> formalArguments) {
-    for (TheRParameter parameter: formalArguments) {
+    for (TheRParameter parameter : formalArguments) {
       if (parameter.getText().equals("...")) {
         return true;
       }

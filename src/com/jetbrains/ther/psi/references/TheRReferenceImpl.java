@@ -142,9 +142,10 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     addFromLibrary(result, name, TheRInterpreterConfigurable.The_R_USER_SKELETONS);
     addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_SKELETONS);
     addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
-    if (result.isEmpty()) {
-      addRuntimeDefinition(result, name);
-    }
+    //TODO: seems to give more useless information than useful
+    //if (result.isEmpty()) {
+    //  addRuntimeDefinition(result, name);
+    //}
     return result.toArray(new ResolveResult[result.size()]);
   }
 
@@ -193,10 +194,10 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           if (assignee == null) continue;
           if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name) &&
               TheRInterpreterConfigurable.THE_R_LIBRARY.equals(libraryName)) {
-            result.add(0, new PsiElementResolveResult(assignee));
+            result.add(0, new PsiElementResolveResult(statement));
           }
           else {
-            result.add(new PsiElementResolveResult(assignee));
+            result.add(new PsiElementResolveResult(statement));
           }
         }
       }
@@ -210,7 +211,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     for (TheRAssignmentStatement statement : statements) {
       final PsiElement assignee = statement.getAssignee();
       if (assignee == null) continue;
-      results.add(new PsiElementResolveResult(assignee));
+      results.add(new PsiElementResolveResult(statement));
     }
   }
 
