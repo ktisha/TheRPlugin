@@ -13,6 +13,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -52,14 +53,12 @@ public class TheRGenerateTypingReport extends AnAction {
       @Override
       public void run() {
         try {
-          VirtualFile ideaDir = project.getBaseDir().findChild(".idea");
-          if (ideaDir == null) {
-            LOG.error("No idea folder");
-            return;
-          }
-          VirtualFile typeReports = ideaDir.findChild(TYPE_REPORTS_DIRNAME);
+          PsiDirectory psiDirectory = psiFile.getContainingFile().getParent();
+          assert psiDirectory != null;
+          VirtualFile parentDirectoryForFile = psiDirectory.getVirtualFile();
+          VirtualFile typeReports = parentDirectoryForFile.findChild(TYPE_REPORTS_DIRNAME);
           if (typeReports == null) {
-            typeReports = ideaDir.createChildDirectory(this, TYPE_REPORTS_DIRNAME);
+            typeReports = parentDirectoryForFile.createChildDirectory(this, TYPE_REPORTS_DIRNAME);
           }
           VirtualFile reportFile = typeReports.findOrCreateChildData(project, generateReportName(psiFile.getName()));
           assert reportFile != null;
