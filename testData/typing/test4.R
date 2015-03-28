@@ -1,18 +1,18 @@
-# @type recursive : logical
-# @rule (... : T, recursive = FALSE) -> max(T)
+## @type recursive : logical
+## @rule (... : T, recursive = FALSE) -> max(T)
 c <- function (..., recursive = FALSE)  .Primitive("c")
 
 
 a <- c("1", "2", "3", recursive = FALSE)
 
-# @type x : numeric
+## @type x : numeric
 test_function <- function(x) {
     x
 }
 
 <warning descr="x expected to be of type numeric, found type character">test_function(a)</warning>
 
-# @rule (x : T, y : M) -> max(T, M)
+## @rule (x : T, y : M) -> max(T, M)
 max <- function(x, y) {
     x
 }

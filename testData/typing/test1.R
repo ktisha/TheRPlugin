@@ -1,5 +1,5 @@
-# @type x : numeric
-# @type y : numeric
+## @type x : numeric
+## @type y : numeric
 test_function <- function(x, y, z, d) {
     print("This is test function")
     barplot(x)

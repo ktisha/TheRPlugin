@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DocStringUtil {
-  public static final String COMMENT_SYMBOL = "#";
+  public static final String COMMENT_SYMBOL = "##";
 
   public static List<Substring> getDocStringLines(TheRAssignmentStatement statement) {
     List<Substring> lines = new ArrayList<Substring>();
     PsiElement comment = getNextComment(statement);
-    while (comment != null) {
+    while (comment != null && comment.getText().startsWith(COMMENT_SYMBOL)) {
       lines.add(processComment(comment.getText()));
       comment = getNextComment(comment);
     }
@@ -23,10 +23,7 @@ public class DocStringUtil {
 
   private static Substring processComment(String text) {
     Substring substring = new Substring(text);
-    if (substring.startsWith(COMMENT_SYMBOL)) {
-      return substring.substring(COMMENT_SYMBOL.length()).trim();
-    }
-    return substring;
+    return substring.substring(COMMENT_SYMBOL.length()).trim();
   }
 
   private static PsiElement getNextComment(PsiElement element) {

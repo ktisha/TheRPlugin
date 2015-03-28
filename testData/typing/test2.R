@@ -1,5 +1,5 @@
-# @type fumble : numeric
-# @type fooey : numeric
+## @type fumble : numeric
+## @type fooey : numeric
 fun <- function(fumble, fooey) {
     fumble + fooey
 }

@@ -102,7 +102,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
         for (TheRAssignmentStatement statement : statements) {
           final PsiElement assignee = statement.getAssignee();
           if (assignee != null && assignee.getText().equals(name)) {
-            result.add(new PsiElementResolveResult(assignee));
+            result.add(new PsiElementResolveResult(statement));
           }
         }
       }
