@@ -64,7 +64,7 @@ public class TheRPsiImplUtil {
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
     final ASTNode node = assignment.getNode();
-    if (assignment.isLeft()) {
+    if (!assignment.isRight()) {
       ASTNode childNode = node.findChildByType(TheRElementTypes.THE_R_REFERENCE_EXPRESSION);
       return childNode == null ? null : childNode.getPsi();
     }
