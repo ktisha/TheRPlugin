@@ -54,4 +54,8 @@ public abstract class TheRType {
   public TheRType resolveType(TheRTypeEnvironment env) {
     return this;
   }
+
+  public TheRType getSubscriptionType() {
+    return TheRType.UNKNOWN;
+  }
 }

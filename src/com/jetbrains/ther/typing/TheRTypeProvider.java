@@ -42,6 +42,7 @@ public class TheRTypeProvider {
     if (element instanceof TheRReferenceExpression) {
       return getReferenceExpressionType((TheRReferenceExpression)element);
     }
+
     if (element instanceof TheRAssignmentStatement) {
       TheRPsiElement assignedValue = ((TheRAssignmentStatement)element).getAssignedValue();
       if (assignedValue != null) {
@@ -55,6 +56,15 @@ public class TheRTypeProvider {
 
     if (element instanceof TheRFunctionExpression) {
       return new TheRFunctionType((TheRFunctionExpression)element);
+    }
+    if (element instanceof TheRSubscriptionExpression) {
+      TheRReferenceExpression reference = PsiTreeUtil.getChildOfType(element, TheRReferenceExpression.class);
+      if (reference != null) {
+        TheRType type = getType(reference);
+        if (type != TheRType.UNKNOWN) {
+          return type.getSubscriptionType();
+        }
+      }
     }
     return TheRType.UNKNOWN;
   }
