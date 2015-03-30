@@ -1,15 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package com.jetbrains.ther.parsing;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-
 import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 import static com.jetbrains.ther.parsing.TheRParserUtil.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class TheRParser implements PsiParser {
@@ -2105,14 +2104,15 @@ public class TheRParser implements PsiParser {
     return r;
   }
 
-  // TRUE | FALSE
+  // TRUE | FALSE | T | F
   public static boolean logical_literal_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "logical_literal_expression")) return false;
-    if (!nextTokenIsFast(b, THE_R_FALSE, THE_R_TRUE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<logical literal expression>");
     r = consumeTokenSmart(b, THE_R_TRUE);
     if (!r) r = consumeTokenSmart(b, THE_R_FALSE);
+    if (!r) r = consumeTokenSmart(b, THE_R_T);
+    if (!r) r = consumeTokenSmart(b, THE_R_F);
     exit_section_(b, l, m, THE_R_LOGICAL_LITERAL_EXPRESSION, r, false, null);
     return r;
   }

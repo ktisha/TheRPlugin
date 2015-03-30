@@ -8,7 +8,13 @@ import com.intellij.psi.PsiElement;
 public interface TheRLogicalLiteralExpression extends TheRExpression {
 
   @Nullable
+  PsiElement getF();
+
+  @Nullable
   PsiElement getFalse();
+
+  @Nullable
+  PsiElement getT();
 
   @Nullable
   PsiElement getTrue();

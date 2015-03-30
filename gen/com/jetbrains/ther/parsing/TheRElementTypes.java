@@ -49,6 +49,7 @@ public interface TheRElementTypes {
   IElementType THE_R_EQ = new TheRElementType("=");
   IElementType THE_R_EQEQ = new TheRElementType("==");
   IElementType THE_R_EXP = new TheRElementType("^");
+  IElementType THE_R_F = new TheRElementType("F");
   IElementType THE_R_FALSE = new TheRElementType("FALSE");
   IElementType THE_R_FOR = new TheRElementType("for");
   IElementType THE_R_FUNCTION = new TheRElementType("function");
@@ -102,6 +103,7 @@ public interface TheRElementTypes {
   IElementType THE_R_RPAR = new TheRElementType(")");
   IElementType THE_R_SEMI = new TheRElementType(";");
   IElementType THE_R_STRING = new TheRElementType("string");
+  IElementType THE_R_T = new TheRElementType("T");
   IElementType THE_R_TILDE = new TheRElementType("~");
   IElementType THE_R_TRIPLECOLON = new TheRElementType(":::");
   IElementType THE_R_TRIPLE_DOTS = new TheRElementType("TRIPLE_DOTS");

@@ -76,7 +76,7 @@ private expression_list ::= expression? (semicolon+ expression?)*
 private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
-logical_literal_expression ::= TRUE | FALSE
+logical_literal_expression ::= TRUE | FALSE | T | F
 private special_constant ::= NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
