@@ -2,8 +2,8 @@ package com.jetbrains.ther.console;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.console.LanguageConsoleView;
-import com.intellij.execution.console.LanguageConsoleViewImpl;
 import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler;
 import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
@@ -22,7 +22,7 @@ public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<Language
 
   @Override
   protected LanguageConsoleView createConsoleView() {
-    return new LanguageConsoleViewImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
+    return new LanguageConsoleImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
   }
 
   private String getInterpreterPath() throws ExecutionException {
@@ -41,7 +41,7 @@ public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<Language
     commandLine.setExePath(getInterpreterPath());
     commandLine.addParameter("--slave");
 
-    commandLine.setWorkDirectory(getWorkingDir());
+    commandLine.withWorkDirectory(getWorkingDir());
     return commandLine.createProcess();
   }
 
