@@ -9,9 +9,6 @@ import com.jetbrains.ther.psi.references.TheRReferenceImpl;
 public interface TheRReferenceExpression extends TheRExpression {
 
   @Nullable
-  PsiElement getFalse();
-
-  @Nullable
   PsiElement getInf();
 
   @Nullable
@@ -34,9 +31,6 @@ public interface TheRReferenceExpression extends TheRExpression {
 
   @Nullable
   PsiElement getNull();
-
-  @Nullable
-  PsiElement getTrue();
 
   @Nullable
   PsiElement getIdentifier();

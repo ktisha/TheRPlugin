@@ -81,6 +81,8 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
 // logical constants
 "TRUE"                      { return TheRElementTypes.THE_R_TRUE; }
 "FALSE"                     { return TheRElementTypes.THE_R_FALSE; }
+"T"                         { return TheRElementTypes.THE_R_TRUE; }
+"F"                         { return TheRElementTypes.THE_R_FALSE; }
 
 // numeric constants
 {INTEGER}                   { return TheRElementTypes.THE_R_NUMERIC; }

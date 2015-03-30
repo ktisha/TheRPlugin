@@ -1,6 +1,6 @@
 package com.jetbrains.ther.typing;
 
-public class TheRCharacterType implements TheRType {
+public class TheRCharacterType extends TheRModeType {
   public static TheRCharacterType INSTANCE = new TheRCharacterType();
 
   @Override

@@ -17,15 +17,6 @@
       ]]>
   </change-notes>
 
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
-  <!--<idea-version since-build="133.331"/>-->
-
-  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
-
   <application-components>
     <!-- Add your application components here -->
   </application-components>
@@ -37,6 +28,10 @@
   <actions>
     <action id="com.jetbrains.ther.console.TheRConsoleAction" class="com.jetbrains.ther.console.TheRConsoleAction"
             text="Run R Console..." description="Starts R interactive console">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+    <action id="TheRGenerateTypingReport" class="com.jetbrains.ther.typing.TheRGenerateTypingReport" text="Generate Typing Report"
+            description="Generate Typing Report">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
   </actions>
@@ -64,6 +59,10 @@
     <xdebugger.breakpointType implementation="com.jetbrains.ther.debugger.TheRLineBreakpointType"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
+    <!--localInspection language="TheR" shortName="RUnusedInspection" displayName="R Unused Inspection" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.ther.inspections.TheRUnusedInspection" groupKey=""/-->
+    <!--localInspection language="TheR" shortName="RUnresolvedReferenceInspection" displayName="R Unresolved Reference Inspection" enabledByDefault="true" level="WARNING"
+                     implementationClass="com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspection" groupKey=""/-->
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
   </extensions>
 </idea-plugin>

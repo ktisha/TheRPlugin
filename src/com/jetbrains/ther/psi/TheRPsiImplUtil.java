@@ -39,9 +39,14 @@ public class TheRPsiImplUtil {
     return operator != null;
   }
 
+  public static boolean isRight(TheRAssignmentStatement assignment) {
+    final ASTNode operator = assignment.getNode().findChildByType(RIGHT_ASSIGNMENTS);
+    return operator != null;
+  }
+
   public static TheRPsiElement getAssignedValue(TheRAssignmentStatement assignment) {
     PsiElement child;
-    if (assignment.isLeft()) {
+    if (!assignment.isRight()) {
       child = assignment.getLastChild();
       while (child != null && !(child instanceof TheRExpression)) {
         if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
@@ -59,7 +64,7 @@ public class TheRPsiImplUtil {
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
     final ASTNode node = assignment.getNode();
-    if (assignment.isLeft()) {
+    if (!assignment.isRight()) {
       ASTNode childNode = node.findChildByType(TheRElementTypes.THE_R_REFERENCE_EXPRESSION);
       return childNode == null ? null : childNode.getPsi();
     }

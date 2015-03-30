@@ -40,7 +40,7 @@ TheRFile:StatementAsDefaultValue.r
                 PsiElement(TheR:))(')')
             PsiElement(TheR:))(')')
             PsiWhiteSpace(' ')
-            TheR:THE_R_REFERENCE_EXPRESSION
+            TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
               PsiElement(TheR:TRUE)('TRUE')
             PsiWhiteSpace(' ')
             PsiElement(TheR:else)('else')

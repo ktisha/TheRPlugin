@@ -58,6 +58,9 @@ public class TheRParser implements PsiParser {
     else if (t == THE_R_IF_STATEMENT) {
       r = if_statement(b, 0);
     }
+    else if (t == THE_R_LOGICAL_LITERAL_EXPRESSION) {
+      r = logical_literal_expression(b, 0);
+    }
     else if (t == THE_R_NEXT_STATEMENT) {
       r = next_statement(b, 0);
     }
@@ -107,9 +110,10 @@ public class TheRParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(THE_R_BINARY_EXPRESSION, THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION,
       THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION,
-      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_NEXT_STATEMENT, THE_R_NUMERIC_LITERAL_EXPRESSION,
-      THE_R_PARENTHESIZED_EXPRESSION, THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT,
-      THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_WHILE_STATEMENT),
+      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_NEXT_STATEMENT,
+      THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION, THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION,
+      THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION,
+      THE_R_WHILE_STATEMENT),
   };
 
   /* ********************************************************** */
@@ -608,14 +612,12 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NULL | TRUE | FALSE | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+  // NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
   static boolean special_constant(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "special_constant")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, THE_R_NULL);
-    if (!r) r = consumeToken(b, THE_R_TRUE);
-    if (!r) r = consumeToken(b, THE_R_FALSE);
     if (!r) r = consumeToken(b, THE_R_NA);
     if (!r) r = consumeToken(b, THE_R_INF);
     if (!r) r = consumeToken(b, THE_R_NAN);
@@ -747,7 +749,7 @@ public class TheRParser implements PsiParser {
   // 27: BINARY(at_expression)
   // 28: POSTFIX(namespace_access_expression)
   // 29: ATOM(reference_expression)
-  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression)
+  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
     addVariant(b, "<expression>");
@@ -769,6 +771,7 @@ public class TheRParser implements PsiParser {
     if (!r) r = reference_expression(b, l + 1);
     if (!r) r = numeric_literal_expression(b, l + 1);
     if (!r) r = string_literal_expression(b, l + 1);
+    if (!r) r = logical_literal_expression(b, l + 1);
     p = r;
     r = r && expression_0(b, l + 1, g);
     exit_section_(b, l, m, null, r, p, null);
@@ -2098,6 +2101,19 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, THE_R_STRING);
     exit_section_(b, m, THE_R_STRING_LITERAL_EXPRESSION, r);
+    return r;
+  }
+
+  // TRUE | FALSE | T | F
+  public static boolean logical_literal_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "logical_literal_expression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<logical literal expression>");
+    r = consumeTokenSmart(b, THE_R_TRUE);
+    if (!r) r = consumeTokenSmart(b, THE_R_FALSE);
+    if (!r) r = consumeTokenSmart(b, THE_R_T);
+    if (!r) r = consumeTokenSmart(b, THE_R_F);
+    exit_section_(b, l, m, THE_R_LOGICAL_LITERAL_EXPRESSION, r, false, null);
     return r;
   }
 

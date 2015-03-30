@@ -39,5 +39,6 @@ public class TheRFileImpl extends PsiFileBase implements TheRFile {
 
   @Override
   public void accept(@NotNull final PsiElementVisitor visitor) {
+    visitor.visitFile(this);
   }
 }

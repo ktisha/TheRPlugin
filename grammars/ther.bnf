@@ -73,10 +73,11 @@
 root ::= expression_list
 private expression_list ::= expression? (semicolon+ expression?)*
 
-private constant ::= numeric_literal_expression | string_literal_expression
+private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
-private special_constant ::= NULL | TRUE | FALSE | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+logical_literal_expression ::= TRUE | FALSE | T | F
+private special_constant ::= NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
   function | for | in | next | break
@@ -91,7 +92,7 @@ expression ::=
 
 //operators
 assignment_statement ::= {
-  methods=[isLeft getAssignedValue getAssignee getName setName getNameNode]
+  methods=[isLeft isRight getAssignedValue getAssignee getName setName getNameNode]
   extends="com.jetbrains.ther.psi.stubs.TheRAssignmentBase"
   stubClass="com.jetbrains.ther.psi.stubs.TheRAssignmentStub"
 }
