@@ -39,15 +39,18 @@ public class TheRDebugger {
     myReceiver.receive();
   }
 
-  public boolean executeInstruction() throws IOException, InterruptedException {
+  public int executeInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
+    int result = 0;
 
     while (!accepted) {
       String command = getNextCommand();
 
       if (command == null) {
-        return false;
+        return -1;
       }
+
+      result++;
 
       if (commandShouldBeSkipped(command)) {
         continue;
@@ -61,7 +64,7 @@ public class TheRDebugger {
 
     updateDebugInformation();
 
-    return true;
+    return result;
   }
 
   @NotNull

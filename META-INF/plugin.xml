@@ -61,6 +61,7 @@
     <runConfigurationProducer implementation="com.jetbrains.ther.run.TheRRunConfigurationProducer"/>
     <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
     <programRunner implementation="com.jetbrains.ther.run.TheRDebugRunner"/>
+    <xdebugger.breakpointType implementation="com.jetbrains.ther.debugger.TheRLineBreakpointType"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
