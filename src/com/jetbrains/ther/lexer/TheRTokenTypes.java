@@ -6,6 +6,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.jetbrains.ther.psi.TheRElementType;
 
+//deprecated
+// DO NOT USE
 public class TheRTokenTypes {
   /*
    * There are five types of constants: integer, logical, numeric, complex and string.

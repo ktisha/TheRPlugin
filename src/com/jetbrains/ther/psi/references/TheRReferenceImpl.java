@@ -3,6 +3,7 @@ package com.jetbrains.ther.psi.references;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.impl.scopes.LibraryScope;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
@@ -17,10 +18,12 @@ import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.IncorrectOperationException;
-import com.jetbrains.ther.TheRUtils;
+import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.TheRLanguage;
+import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex;
 import org.jetbrains.annotations.NotNull;
@@ -107,14 +110,14 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
       for (TheRAssignmentStatement statement : statements) {
         final PsiElement assignee = statement.getAssignee();
         if (assignee != null && assignee.getText().equals(name)) {
-          result.add(new PsiElementResolveResult(assignee));
+          result.add(new PsiElementResolveResult(statement));
         }
       }
     }
     if (!result.isEmpty())
       return result.toArray(new ResolveResult[result.size()]);
-    addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
     addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_SKELETONS);
+    addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
     if (result.isEmpty()) {
       addRuntimeDefinition(result, name);
     }
@@ -163,7 +166,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
           final PsiFile containingFile = statement.getContainingFile();
           final PsiElement assignee = statement.getAssignee();
           if(assignee == null) continue;
-          if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name)) {
+          if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name) &&
+              TheRInterpreterConfigurable.THE_R_LIBRARY.equals(libraryName)) {
             result.add(0, new PsiElementResolveResult(assignee));
           }
           else
@@ -200,7 +204,15 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   @Override
   public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-    return null;
+    final ASTNode oldNameIdentifier = getElement().getNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+    if (oldNameIdentifier != null) {
+      final PsiFile dummyFile = TheRElementGenerator.createDummyFile(newElementName, false, getElement().getProject());
+      ASTNode identifier = dummyFile.getNode().getFirstChildNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+      if (identifier != null) {
+        getElement().getNode().replaceChild(oldNameIdentifier, identifier);
+      }
+    }
+    return getElement();
   }
 
   @Override
@@ -210,7 +222,8 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   @Override
   public boolean isReferenceTo(PsiElement element) {
-    return false;
+    //TODO: check some conditions
+    return resolve() == element;
   }
 
   @NotNull
