@@ -44,7 +44,7 @@ public class TheRSkeletonGenerator {
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       if (output.getExitCode() != 0) {
-        LOG.error("Failed to generate skeletons");
+        LOG.error("Failed to generate skeletons. Exit code: " + output.getExitCode());
         LOG.error(output.getStderrLines());
       }
     }

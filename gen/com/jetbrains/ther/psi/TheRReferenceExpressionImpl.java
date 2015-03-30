@@ -24,12 +24,6 @@ public class TheRReferenceExpressionImpl extends TheRExpressionImpl implements T
 
   @Override
   @Nullable
-  public PsiElement getFalse() {
-    return findChildByType(THE_R_FALSE);
-  }
-
-  @Override
-  @Nullable
   public PsiElement getInf() {
     return findChildByType(THE_R_INF);
   }
@@ -74,12 +68,6 @@ public class TheRReferenceExpressionImpl extends TheRExpressionImpl implements T
   @Nullable
   public PsiElement getNull() {
     return findChildByType(THE_R_NULL);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getTrue() {
-    return findChildByType(THE_R_TRUE);
   }
 
   @Override

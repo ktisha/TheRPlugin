@@ -1,6 +1,5 @@
 package com.jetbrains.ther.inspections;
 
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class TheRTypeCheckerInspection extends LocalInspectionTool {
+public class TheRTypeCheckerInspection extends TheRLocalInspection {
   @Nls
   @NotNull
   @Override
@@ -28,7 +27,7 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
     return new Visitor(holder);
   }
 
-  class Visitor extends TheRVisitor {
+  private class Visitor extends TheRVisitor {
     private final ProblemsHolder myProblemHolder;
 
     public Visitor(ProblemsHolder holder) {
@@ -39,22 +38,18 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
       PsiReference referenceToFunction = callExpression.getExpression().getReference();
       if (referenceToFunction != null) {
-        PsiElement resolve = referenceToFunction.resolve();
-        if (resolve instanceof TheRReferenceExpression) {
-          PsiElement assignmentStatement = resolve.getParent();
-          if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
-            TheRAssignmentStatement assignment = (TheRAssignmentStatement) assignmentStatement;
-            TheRPsiElement assignedValue = assignment.getAssignedValue();
-            if (assignedValue != null && assignedValue instanceof  TheRFunctionExpression) {
-              TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
-              List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
-              List<TheRParameter> parameters = function.getParameterList().getParameterList();
-              try {
-                TheRTypeChecker.matchTypes(parameters, arguments);
-              }
-              catch (MatchingException e) {
-                registerProblem(myProblemHolder, callExpression, e.getMessage());
-              }
+        PsiElement assignmentStatement = referenceToFunction.resolve();
+        if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
+          TheRAssignmentStatement assignment = (TheRAssignmentStatement)assignmentStatement;
+          TheRPsiElement assignedValue = assignment.getAssignedValue();
+          if (assignedValue != null && assignedValue instanceof TheRFunctionExpression) {
+            TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
+            List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
+            try {
+              TheRTypeChecker.checkTypes(arguments, function);
+            }
+            catch (MatchingException e) {
+              registerProblem(myProblemHolder, callExpression, e.getMessage());
             }
           }
         }
@@ -65,11 +60,5 @@ public class TheRTypeCheckerInspection extends LocalInspectionTool {
   @Override
   public boolean isEnabledByDefault() {
     return true;
-  }
-
-  private void registerProblem(ProblemsHolder holder, PsiElement element, String message) {
-    if (holder!= null) {
-      holder.registerProblem(element, message);
-    }
   }
 }

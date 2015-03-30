@@ -11,8 +11,7 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitAssignmentStatement(@NotNull TheRAssignmentStatement o) {
-    visitExpression(o);
-    // visitNamedElement(o);
+    visitNamedElement(o);
   }
 
   public void visitBinaryExpression(@NotNull TheRBinaryExpression o) {
@@ -52,6 +51,10 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitIfStatement(@NotNull TheRIfStatement o) {
+    visitExpression(o);
+  }
+
+  public void visitLogicalLiteralExpression(@NotNull TheRLogicalLiteralExpression o) {
     visitExpression(o);
   }
 

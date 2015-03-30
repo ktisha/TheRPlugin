@@ -39,4 +39,8 @@ public class TheRFunctionExpressionImpl extends TheRExpressionImpl implements Th
     return findNotNullChildByType(THE_R_FUNCTION);
   }
 
+  public String getDocStringValue() {
+    return TheRPsiImplUtil.getDocStringValue(this);
+  }
+
 }

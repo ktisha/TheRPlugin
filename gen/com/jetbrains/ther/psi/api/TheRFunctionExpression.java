@@ -16,4 +16,6 @@ public interface TheRFunctionExpression extends TheRExpression {
   @NotNull
   PsiElement getFunction();
 
+  String getDocStringValue();
+
 }

@@ -6,17 +6,13 @@ import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.jetbrains.ther.psi.TheRAssignmentStatementImpl;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
-import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
+import com.jetbrains.ther.psi.api.TheRPsiElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmentStub, TheRAssignmentStatement> {
-  public TheRAssignmentElementType() {
-    this("ASSIGNMENT_STATEMENT");
-  }
-
   public TheRAssignmentElementType(@NotNull final String debugName) {
     super(debugName);
   }
@@ -28,19 +24,19 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
 
   @Override
   public TheRAssignmentStatement createPsi(@NotNull final TheRAssignmentStub stub) {
-    return null; //todo: implement me
+    return new TheRAssignmentStatementImpl(stub, this);
   }
 
   @Override
   public TheRAssignmentStub createStub(@NotNull TheRAssignmentStatement psi, StubElement parentStub) {
     final String name = psi.getName();
     final TheRPsiElement value = psi.getAssignedValue();
-    return new TheRAssignmentStubImpl(name, parentStub, getStubElementType(), value instanceof TheRFunctionExpression);
+    return new TheRAssignmentStubImpl(name, parentStub, this, value instanceof TheRFunctionExpression);
   }
 
   @Override
   public void serialize(@NotNull final TheRAssignmentStub stub, @NotNull final StubOutputStream dataStream)
-      throws IOException {
+    throws IOException {
     dataStream.writeName(stub.getName());
     dataStream.writeBoolean(stub.isFunctionDeclaration());
   }
@@ -50,7 +46,7 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
   public TheRAssignmentStub deserialize(@NotNull final StubInputStream dataStream, final StubElement parentStub) throws IOException {
     String name = StringRef.toString(dataStream.readName());
     final boolean isFunctionDefinition = dataStream.readBoolean();
-    return new TheRAssignmentStubImpl(name, parentStub, getStubElementType(), isFunctionDefinition);
+    return new TheRAssignmentStubImpl(name, parentStub, this, isFunctionDefinition);
   }
 
   @Override
@@ -59,9 +55,5 @@ public class TheRAssignmentElementType extends TheRStubElementType<TheRAssignmen
     if (name != null && stub.getParentStub() instanceof PsiFileStub && stub.isFunctionDeclaration()) {
       sink.occurrence(TheRAssignmentNameIndex.KEY, name);
     }
-  }
-
-  protected IStubElementType getStubElementType() {
-    return null;
   }
 }

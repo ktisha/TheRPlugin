@@ -1,7 +1,7 @@
 {
   parserClass="com.jetbrains.ther.parsing.TheRParser"
   parserUtilClass="com.jetbrains.ther.parsing.TheRParserUtil"
-
+  elementTypeFactory("assignment_statement")="com.jetbrains.ther.psi.stubs.TheRElementTypeFactory.getElementTypeByName"
   implements="com.jetbrains.ther.psi.api.TheRPsiElement"
   extends="com.jetbrains.ther.psi.TheRElementImpl"
 
@@ -73,10 +73,11 @@
 root ::= expression_list
 private expression_list ::= expression? (semicolon+ expression?)*
 
-private constant ::= numeric_literal_expression | string_literal_expression
+private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
-private special_constant ::= NULL | TRUE | FALSE | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+logical_literal_expression ::= TRUE | FALSE
+private special_constant ::= NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
   function | for | in | next | break
@@ -90,8 +91,10 @@ expression ::=
   call_expression | member_expression | at_expression | namespace_access_expression | primitive_expression
 
 //operators
-assignment_statement ::= expression {  //todo: fake node to generate psi, how to remove it?
-  methods=[isLeft getAssignedValue getAssignee getName setName getNameNode]   //todo: stub
+assignment_statement ::= {
+  methods=[isLeft isRight getAssignedValue getAssignee getName setName getNameNode]
+  extends="com.jetbrains.ther.psi.stubs.TheRAssignmentBase"
+  stubClass="com.jetbrains.ther.psi.stubs.TheRAssignmentStub"
 }
 binary_expression ::= expression //todo: fake not to generate psi, how to remove it?
 prefix_expression ::= expression //todo: fake not to generate psi, how to remove it?
@@ -151,7 +154,9 @@ parameter ::= (identifier '=' expression) | identifier | '...' {
   methods = [ getNameNode getName setName]
 }
 parameter_list ::= ('(' ')') | ('(' parameter nl* (',' nl* parameter nl*)* ')')
-function_expression ::= function parameter_list nl* expression
+function_expression ::= function parameter_list nl* expression {
+methods = [ getDocStringValue]
+}
 
 private semicolon ::= ';' | nl
 

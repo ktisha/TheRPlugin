@@ -5,12 +5,13 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 import com.jetbrains.ther.psi.TheRElementType;
+import com.jetbrains.ther.psi.stubs.TheRElementTypeFactory;
 import com.jetbrains.ther.psi.*;
 
 public interface TheRElementTypes {
 
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
-  IElementType THE_R_ASSIGNMENT_STATEMENT = new TheRElementType("THE_R_ASSIGNMENT_STATEMENT");
+  IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
   IElementType THE_R_BINARY_EXPRESSION = new TheRElementType("THE_R_BINARY_EXPRESSION");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");
@@ -21,6 +22,7 @@ public interface TheRElementTypes {
   IElementType THE_R_FUNCTION_EXPRESSION = new TheRElementType("THE_R_FUNCTION_EXPRESSION");
   IElementType THE_R_HELP_EXPRESSION = new TheRElementType("THE_R_HELP_EXPRESSION");
   IElementType THE_R_IF_STATEMENT = new TheRElementType("THE_R_IF_STATEMENT");
+  IElementType THE_R_LOGICAL_LITERAL_EXPRESSION = new TheRElementType("THE_R_LOGICAL_LITERAL_EXPRESSION");
   IElementType THE_R_NEXT_STATEMENT = new TheRElementType("THE_R_NEXT_STATEMENT");
   IElementType THE_R_NUMERIC_LITERAL_EXPRESSION = new TheRElementType("THE_R_NUMERIC_LITERAL_EXPRESSION");
   IElementType THE_R_PARAMETER = new TheRElementType("THE_R_PARAMETER");
@@ -144,6 +146,9 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_IF_STATEMENT) {
         return new TheRIfStatementImpl(node);
+      }
+      else if (type == THE_R_LOGICAL_LITERAL_EXPRESSION) {
+        return new TheRLogicalLiteralExpressionImpl(node);
       }
       else if (type == THE_R_NEXT_STATEMENT) {
         return new TheRNextStatementImpl(node);

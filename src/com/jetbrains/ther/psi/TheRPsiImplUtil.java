@@ -1,14 +1,15 @@
 package com.jetbrains.ther.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -38,9 +39,14 @@ public class TheRPsiImplUtil {
     return operator != null;
   }
 
+  public static boolean isRight(TheRAssignmentStatement assignment) {
+    final ASTNode operator = assignment.getNode().findChildByType(RIGHT_ASSIGNMENTS);
+    return operator != null;
+  }
+
   public static TheRPsiElement getAssignedValue(TheRAssignmentStatement assignment) {
     PsiElement child;
-    if (assignment.isLeft()) {
+    if (!assignment.isRight()) {
       child = assignment.getLastChild();
       while (child != null && !(child instanceof TheRExpression)) {
         if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
@@ -58,7 +64,7 @@ public class TheRPsiImplUtil {
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
     final ASTNode node = assignment.getNode();
-    if (assignment.isLeft()) {
+    if (!assignment.isRight()) {
       ASTNode childNode = node.findChildByType(TheRElementTypes.THE_R_REFERENCE_EXPRESSION);
       return childNode == null ? null : childNode.getPsi();
     }
@@ -71,7 +77,19 @@ public class TheRPsiImplUtil {
   }
 
   public static PsiElement setName(TheRAssignmentStatement assignment, String name) {
-    throw new UnsupportedOperationException(); //todo: implement me
+    ASTNode nameNode = assignment.getNameNode();
+    if (nameNode == null) {
+      return assignment;
+    }
+    final ASTNode oldNameIdentifier = nameNode.findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+    if (oldNameIdentifier != null) {
+      final PsiFile dummyFile = TheRElementGenerator.createDummyFile(name, false, assignment.getProject());
+      ASTNode identifier = dummyFile.getNode().getFirstChildNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+      if (identifier != null) {
+        nameNode.replaceChild(oldNameIdentifier, identifier);
+      }
+    }
+    return assignment;
   }
 
   public static String getName(TheRAssignmentStatement assignment) {
@@ -95,7 +113,15 @@ public class TheRPsiImplUtil {
   }
 
   public static PsiElement setName(TheRParameter parameter, String name) {
-    throw new UnsupportedOperationException(); //todo: implement me
+    final ASTNode oldNameIdentifier = parameter.getNameNode();
+    if (oldNameIdentifier != null) {
+      final PsiFile dummyFile = TheRElementGenerator.createDummyFile(name, false, parameter.getProject());
+      ASTNode identifier = dummyFile.getNode().getFirstChildNode().findChildByType(TheRElementTypes.THE_R_IDENTIFIER);
+      if (identifier != null) {
+        parameter.getNode().replaceChild(oldNameIdentifier, identifier);
+      }
+    }
+    return parameter;
   }
 
   public static TheRReferenceImpl getReference(TheRReferenceExpression referenceExpression) {
@@ -104,6 +130,31 @@ public class TheRPsiImplUtil {
     final PsiElement prevElement = PsiTreeUtil.skipSiblingsBackward(referenceExpression, PsiWhiteSpace.class);
     if (prevElement != null && RIGHT_ASSIGNMENTS.contains(prevElement.getNode().getElementType())) return null;
     return new TheRReferenceImpl(referenceExpression);
+  }
+
+  public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
+    final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
+    if (statement == null) return null;
+
+    PsiComment comment = null;
+    for (PsiElement sibling = statement.getPrevSibling(); sibling != null && !(sibling instanceof TheRExpression);
+         sibling = sibling.getPrevSibling()) {
+      if (sibling instanceof PsiComment) {
+        comment = (PsiComment)sibling;
+      }
+    }
+
+    if (comment == null) return null;
+    return getCommentText(comment);
+  }
+
+  private static String getCommentText(@NotNull final PsiComment comment) {
+    final StringBuilder stringBuilder = new StringBuilder();
+    final String[] strings = StringUtil.splitByLines(comment.getText());
+    for (String string : strings) {
+      stringBuilder.append(StringUtil.trimStart(string, "# "));
+    }
+    return stringBuilder.toString();
   }
 
   @Nullable
