@@ -2,6 +2,7 @@ package com.jetbrains.ther.console;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.console.LanguageConsoleView;
 import com.intellij.execution.console.LanguageConsoleViewImpl;
 import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler;
 import com.intellij.execution.process.ColoredProcessHandler;
@@ -13,14 +14,14 @@ import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<LanguageConsoleViewImpl> {
+public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<LanguageConsoleView> {
 
   public TheRConsoleRunner(@NotNull final Project project, @Nullable final String workingDir) {
     super(project, "The R Console", workingDir);
   }
 
   @Override
-  protected LanguageConsoleViewImpl createConsoleView() {
+  protected LanguageConsoleView createConsoleView() {
     return new LanguageConsoleViewImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
   }
 
