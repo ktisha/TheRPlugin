@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.psi.api.TheRExpression;
+import com.jetbrains.ther.typing.types.*;
 
 import java.util.ArrayList;
 import java.util.List;

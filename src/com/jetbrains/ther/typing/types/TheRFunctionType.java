@@ -1,9 +1,10 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
 
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.typing.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

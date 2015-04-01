@@ -1,7 +1,8 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Function;
+import com.jetbrains.ther.typing.TheRTypeEnvironment;
 
 import java.util.List;
 

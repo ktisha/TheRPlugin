@@ -1,6 +1,7 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
 
 import com.jetbrains.ther.psi.api.TheRExpression;
+import com.jetbrains.ther.typing.types.TheRType;
 
 public class TheRParameterConfiguration {
 
@@ -12,11 +13,11 @@ public class TheRParameterConfiguration {
     myValue = value;
   }
 
-  TheRType getType() {
+  public TheRType getType() {
     return myType;
   }
 
-  TheRExpression getValue() {
+  public TheRExpression getValue() {
     return myValue;
   }
 }

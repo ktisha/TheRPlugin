@@ -3,6 +3,7 @@ package com.jetbrains.ther.typing;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
+import com.jetbrains.ther.typing.types.TheRType;
 
 import java.util.HashMap;
 import java.util.Map;

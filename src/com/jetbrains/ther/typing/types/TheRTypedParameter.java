@@ -1,6 +1,7 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
 
 import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.typing.types.TheRType;
 
 public class TheRTypedParameter {
   String myName;

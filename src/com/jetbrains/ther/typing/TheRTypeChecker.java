@@ -4,6 +4,8 @@ import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.typing.types.TheRFunctionType;
+import com.jetbrains.ther.typing.types.TheRType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

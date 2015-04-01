@@ -19,6 +19,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.psi.api.TheRVisitor;
+import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -61,7 +62,6 @@ public class TheRGenerateTypingReport extends AnAction {
             typeReports = parentDirectoryForFile.createChildDirectory(this, TYPE_REPORTS_DIRNAME);
           }
           VirtualFile reportFile = typeReports.findOrCreateChildData(project, generateReportName(psiFile.getName()));
-          assert reportFile != null;
           final Document reportDocument = FileDocumentManager.getInstance().getDocument(reportFile);
           assert reportDocument != null;
           CommandProcessor.getInstance().runUndoTransparentAction(new Runnable() {

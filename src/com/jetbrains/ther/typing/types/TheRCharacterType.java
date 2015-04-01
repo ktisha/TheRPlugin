@@ -1,4 +1,4 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
 
 public class TheRCharacterType extends TheRModeType {
   public static TheRCharacterType INSTANCE = new TheRCharacterType();

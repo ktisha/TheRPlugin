@@ -1,4 +1,6 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.typing.types;
+
+import com.jetbrains.ther.typing.TheRTypeEnvironment;
 
 import java.util.List;
 

@@ -8,6 +8,7 @@ import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
