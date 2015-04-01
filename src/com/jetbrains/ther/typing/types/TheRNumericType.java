@@ -1,6 +1,6 @@
 package com.jetbrains.ther.typing.types;
 
-public class TheRNumericType extends TheRModeType {
+public class TheRNumericType extends TheRComplexType {
   public static TheRNumericType INSTANCE = new TheRNumericType();
 
   @Override

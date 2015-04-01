@@ -5,5 +5,5 @@ test_function <- function(x, y, z, d) {
     z
 }
 
-z <- 10
+z <- 10i
 test_function(z, 2, 1, 1)

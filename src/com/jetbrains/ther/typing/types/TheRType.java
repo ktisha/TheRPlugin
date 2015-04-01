@@ -29,14 +29,20 @@ public abstract class TheRType {
   }
 
   public static int getOrder(TheRType type) {
-    if (type == TheRLogicalType.INSTANCE) {
+    if (type == TheRRawType.INSTANCE) {
       return 0;
-    } else if (type == TheRNumericType.INSTANCE) {
+    } else if (type == TheRLogicalType.INSTANCE){
       return 1;
-    } else if (type == TheRCharacterType.INSTANCE) {
+    } else if (type == TheRIntegerType.INSTANCE) {
       return 2;
-    } else if (type == TheRType.UNKNOWN) {
+    } else if (type == TheRNumericType.INSTANCE) {
       return 3;
+    } else if (type == TheRComplexType.INSTANCE) {
+      return 4;
+    } else if (type == TheRCharacterType.INSTANCE) {
+      return 5;
+    } else if (type == TheRType.UNKNOWN) {
+      return 6;
     } else {
       throw new IllegalArgumentException("Incorrect type: " + type.getName());
     }

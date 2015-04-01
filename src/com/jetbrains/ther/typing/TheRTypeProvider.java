@@ -34,7 +34,7 @@ public class TheRTypeProvider {
       return TheRCharacterType.INSTANCE;
     }
     if (element instanceof TheRNumericLiteralExpression) {
-      return TheRNumericType.INSTANCE;
+      return getNumericType((TheRNumericLiteralExpression)element);
     }
     if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
@@ -70,6 +70,16 @@ public class TheRTypeProvider {
     return TheRType.UNKNOWN;
   }
 
+  private static TheRType getNumericType(TheRNumericLiteralExpression expression) {
+    if (expression.getInteger() != null) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (expression.getComplex() != null) {
+      return TheRComplexType.INSTANCE;
+    }
+    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
+  }
+
   private static TheRType getCallExpressionType(TheRCallExpression element) {
     TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
     if (function == null) {
@@ -86,7 +96,7 @@ public class TheRTypeProvider {
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     try {
-      TheRTypeChecker.matchTypes(arguments, function, matchedParams, matchedByTripleDot);
+      TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot);
     }
     catch (MatchingException e) {
       return TheRType.UNKNOWN;
