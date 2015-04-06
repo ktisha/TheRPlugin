@@ -12,6 +12,9 @@ public class TheRDebugger {
   private final String myFilePath;
 
   @NotNull
+  private final Process myProcess;
+
+  @NotNull
   private final Sender mySender;
 
   @NotNull
@@ -22,6 +25,7 @@ public class TheRDebugger {
 
   @NotNull
   private final Map<String, String> myVarToRepresentation;
+
   @NotNull
   private final Map<String, String> myVarToType;
 
@@ -29,12 +33,12 @@ public class TheRDebugger {
     myFilePath = filePath;
 
     ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
-    Process process = builder.start();
+    myProcess = builder.start();
 
-    mySender = new Sender(process.getOutputStream()); // TODO close
-    myReceiver = new Receiver(process.getInputStream(), mySender); // TODO close
+    mySender = new Sender(myProcess.getOutputStream());
+    myReceiver = new Receiver(myProcess.getInputStream(), mySender);
 
-    mySourceReader = new BufferedReader(new FileReader(filePath)); // TODO close
+    mySourceReader = new BufferedReader(new FileReader(filePath));
 
     myVarToRepresentation = new HashMap<>();
     myVarToType = new HashMap<>();
@@ -84,6 +88,17 @@ public class TheRDebugger {
   @NotNull
   public String getFilePath() {
     return myFilePath;
+  }
+
+  public void stop() {
+    try {
+      mySourceReader.close();
+    }
+    catch (IOException e) {
+      // TODO
+    }
+
+    myProcess.destroy();
   }
 
   @Nullable

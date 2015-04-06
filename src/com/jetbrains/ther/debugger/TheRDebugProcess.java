@@ -62,13 +62,26 @@ public class TheRDebugProcess extends XDebugProcess {
 
   @Override
   public void sessionInitialized() {
-    resume();
+    if (!myBreakpoints.containsKey(0)) {
+      resume();
+    }
+    else {
+      updateDebugInformation();
+    }
   }
 
   @Override
   public void startStepOver() {
     try {
-      myNextLineNumber += myDebugger.executeInstruction(); // TODO -1 case
+      int executed = myDebugger.executeInstruction();
+
+      if (executed == -1) {
+        getSession().stop();
+
+        return;
+      }
+
+      myNextLineNumber += executed;
 
       updateDebugInformation();
     }
@@ -90,9 +103,18 @@ public class TheRDebugProcess extends XDebugProcess {
   @Override
   public void resume() {
     try {
-      while (!myBreakpoints.containsKey(myNextLineNumber)) {
-        myNextLineNumber += myDebugger.executeInstruction(); // TODO -1 case
+      do {
+        int executed = myDebugger.executeInstruction();
+
+        if (executed == -1) {
+          getSession().stop();
+
+          return;
+        }
+
+        myNextLineNumber += executed;
       }
+      while ((!myBreakpoints.containsKey(myNextLineNumber)));
 
       updateDebugInformation();
     }
@@ -108,7 +130,7 @@ public class TheRDebugProcess extends XDebugProcess {
 
   @Override
   public void stop() {
-    // TODO
+    myDebugger.stop();
   }
 
   public void registerBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
@@ -120,14 +142,14 @@ public class TheRDebugProcess extends XDebugProcess {
   }
 
   private void updateDebugInformation() {
-    XDebugSession session = getSession();
-    XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(myNextLineNumber);
-
     Map<String, String> varRepresentations = new HashMap<>(myDebugger.getVarToRepresentation());
     Map<String, String> varTypes = new HashMap<>(myDebugger.getVarToType());
 
+    myStackFramesData.clear();
     myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varRepresentations, varTypes));
 
+    XDebugSession session = getSession();
+    XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(myNextLineNumber);
     TheRSuspendContext suspendContext = new TheRSuspendContext(myStackFramesData);
 
     if (breakpoint != null) {
