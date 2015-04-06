@@ -9,6 +9,9 @@ import java.util.*;
 public class TheRDebugger {
 
   @NotNull
+  private final String myFilePath;
+
+  @NotNull
   private final Sender mySender;
 
   @NotNull
@@ -19,11 +22,12 @@ public class TheRDebugger {
 
   @NotNull
   private final Map<String, String> myVarToRepresentation;
-
   @NotNull
   private final Map<String, String> myVarToType;
 
   public TheRDebugger(@NotNull String interpreterPath, @NotNull String filePath) throws IOException, InterruptedException {
+    myFilePath = filePath;
+
     ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
     Process process = builder.start();
 
@@ -53,7 +57,7 @@ public class TheRDebugger {
       result++;
 
       if (commandShouldBeSkipped(command)) {
-        continue;
+        return 1;
       }
 
       mySender.send(command);
@@ -75,6 +79,11 @@ public class TheRDebugger {
   @NotNull
   public Map<String, String> getVarToType() {
     return Collections.unmodifiableMap(myVarToType);
+  }
+
+  @NotNull
+  public String getFilePath() {
+    return myFilePath;
   }
 
   @Nullable

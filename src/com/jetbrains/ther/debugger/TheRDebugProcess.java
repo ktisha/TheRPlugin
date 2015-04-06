@@ -1,6 +1,8 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -8,11 +10,14 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.impl.XDebuggerUtilImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TheRDebugProcess extends XDebugProcess {
 
@@ -20,9 +25,12 @@ public class TheRDebugProcess extends XDebugProcess {
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final Set<Integer> myBreakpointLines;
+  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
 
-  private int myExecutedLines;
+  @NotNull
+  private final List<TheRStackFrameData> myStackFramesData;
+
+  private int myNextLineNumber;
 
   public TheRDebugProcess(@NotNull XDebugSession session, @NotNull String interpreterPath, @NotNull String filePath)
     throws ExecutionException {
@@ -35,8 +43,9 @@ public class TheRDebugProcess extends XDebugProcess {
       throw new ExecutionException(e); // TODO
     }
 
-    myBreakpointLines = new HashSet<>();
-    myExecutedLines = 0;
+    myBreakpoints = new HashMap<>();
+    myStackFramesData = new ArrayList<>();
+    myNextLineNumber = 0;
   }
 
   @NotNull
@@ -59,7 +68,9 @@ public class TheRDebugProcess extends XDebugProcess {
   @Override
   public void startStepOver() {
     try {
-      myExecutedLines += myDebugger.executeInstruction(); // TODO -1 case
+      myNextLineNumber += myDebugger.executeInstruction(); // TODO -1 case
+
+      updateDebugInformation();
     }
     catch (IOException | InterruptedException e) {
       // TODO
@@ -79,9 +90,11 @@ public class TheRDebugProcess extends XDebugProcess {
   @Override
   public void resume() {
     try {
-      while (!myBreakpointLines.contains(myExecutedLines)) { // TODO before line
-        myExecutedLines += myDebugger.executeInstruction(); // TODO -1 case
+      while (!myBreakpoints.containsKey(myNextLineNumber)) {
+        myNextLineNumber += myDebugger.executeInstruction(); // TODO -1 case
       }
+
+      updateDebugInformation();
     }
     catch (IOException | InterruptedException e) {
       // TODO
@@ -99,10 +112,38 @@ public class TheRDebugProcess extends XDebugProcess {
   }
 
   public void registerBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpointLines.add(breakpoint.getLine());
+    myBreakpoints.put(breakpoint.getLine(), breakpoint);
   }
 
   public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpointLines.remove(breakpoint.getLine());
+    myBreakpoints.remove(breakpoint.getLine());
+  }
+
+  private void updateDebugInformation() {
+    XDebugSession session = getSession();
+    XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(myNextLineNumber);
+
+    Map<String, String> varRepresentations = new HashMap<>(myDebugger.getVarToRepresentation());
+    Map<String, String> varTypes = new HashMap<>(myDebugger.getVarToType());
+
+    myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varRepresentations, varTypes));
+
+    TheRSuspendContext suspendContext = new TheRSuspendContext(myStackFramesData);
+
+    if (breakpoint != null) {
+      if (!session.breakpointReached(breakpoint, "ABCDEF", suspendContext)) { // TODO
+        resume();
+      }
+    }
+    else {
+      session.positionReached(suspendContext);
+    }
+  }
+
+  @NotNull
+  private XSourcePosition calculatePosition(int line) {
+    VirtualFile virtualFile = VirtualFileManager.getInstance().findFileByUrl("file:///" + myDebugger.getFilePath());
+
+    return new XDebuggerUtilImpl().createPosition(virtualFile, line);
   }
 }
