@@ -30,7 +30,7 @@ public class TheRSkeletonGenerator {
     return basePath + File.separator + SKELETON_DIR_NAME;
   }
 
-  public void runSkeletonGeneration() {
+  public static void runSkeletonGeneration() {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (StringUtil.isEmptyOrSpaces(path)) return;
     final String helperPath = TheRHelpersLocator.getHelperPath(R_GENERATOR);

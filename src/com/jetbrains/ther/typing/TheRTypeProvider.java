@@ -153,7 +153,8 @@ public class TheRTypeProvider {
     if (type != null) {
       return type;
     }
-    type = guessTypeFromFunctionBody(parameter);
+    //TODO: uncomment this
+    //type = guessTypeFromFunctionBody(parameter);
     if (type != null) {
       return type;
     }

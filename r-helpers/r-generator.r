@@ -15,22 +15,23 @@ for (name in packageNames) {
         library(package=name, character.only=TRUE)
     }
 
-    symbolList <- ls(pName)
+    functions <- as.character(lsf.str(paste("package", name, sep=":")))
 
     dirName = paste(args[1], name, sep="/")
     dir.create(dirName)
 
-    for(symbol in symbolList) {
-        obj <- get(symbol)
-        fileName <- paste(paste(dirName, symbol, sep="/"), "r", sep=".")
+    for (symbol in functions) {
+    	obj <- get(symbol)
+    	name_without_extension <- ifelse(grepl("/", symbol), gsub("/", "slash", symbol), symbol)
+        fileName <- paste(paste(dirName, name_without_extension, sep="/"), "r", sep=".")
         tmpFileName <- tempfile(pattern = "tmp", tmpdir = tempdir(), fileext = "")
         sink(tmpFileName)
         if (is.identifier(symbol))
-            cat(symbol)
+          cat(symbol)
         else {
-            cat("\"")
-            cat(symbol)
-            cat("\"")
+          cat("\"")
+          cat(symbol)
+          cat("\"")
         }
         cat(" <- ")
         print(obj)
@@ -51,6 +52,7 @@ for (name in packageNames) {
             sink()
         }
     }
+
     if (shouldLoadLibrary) {
         detach(pName, character.only=TRUE)
         diff <- setdiff(search(), searchPath)
@@ -59,4 +61,3 @@ for (name in packageNames) {
         }
     }
 }
-
