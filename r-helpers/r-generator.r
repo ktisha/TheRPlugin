@@ -22,6 +22,9 @@ for (name in packageNames) {
 
     for (symbol in functions) {
     	obj <- get(symbol)
+    	if (class(obj) != "function") {
+    	    next
+    	}
     	name_without_extension <- ifelse(grepl("/", symbol), gsub("/", "slash", symbol), symbol)
         fileName <- paste(paste(dirName, name_without_extension, sep="/"), "r", sep=".")
         tmpFileName <- tempfile(pattern = "tmp", tmpdir = tempdir(), fileext = "")
