@@ -160,9 +160,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
         ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Updating skeletons", false) {
           @Override
           public void run(@NotNull ProgressIndicator indicator) {
-
-            final TheRSkeletonGenerator generator = new TheRSkeletonGenerator();
-            generator.runSkeletonGeneration();
+            TheRSkeletonGenerator.runSkeletonGeneration();
           }});
 
         application.runWriteAction(new Runnable() {

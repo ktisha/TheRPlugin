@@ -1,4 +1,4 @@
-package com.jetbrains.ther.typing;
+package com.jetbrains.ther.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -19,6 +19,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.psi.api.TheRVisitor;
+import com.jetbrains.ther.typing.TheRTypeProvider;
 import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;
 
