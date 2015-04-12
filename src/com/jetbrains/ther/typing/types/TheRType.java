@@ -66,4 +66,14 @@ public abstract class TheRType {
   public TheRType getSubscriptionType() {
     return TheRType.UNKNOWN;
   }
+
+  @Override
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return "type: " + getName();
+  }
 }
