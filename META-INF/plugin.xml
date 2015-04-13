@@ -66,5 +66,6 @@
     <!--localInspection language="TheR" shortName="RUnresolvedReferenceInspection" displayName="R Unresolved Reference Inspection" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspection" groupKey=""/-->
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
+    <documentationProvider implementation="com.jetbrains.ther.documentation.TheRDocumentationProvider"/>
   </extensions>
 </idea-plugin>
