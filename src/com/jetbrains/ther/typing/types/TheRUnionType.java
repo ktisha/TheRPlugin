@@ -40,4 +40,8 @@ public class TheRUnionType extends TheRType{
     }
     return true;
   }
+
+  public boolean contains(TheRType type) {
+    return myTypes.contains(type);
+  }
 }

@@ -183,7 +183,7 @@ public class TheRTypeProvider {
             }
             ruleType = env.getType(variableName);
           }
-          if (!ruleType.equals(exprConf.getType())) {
+          if (!TheRTypeChecker.matchTypes(ruleType,exprConf.getType())) {
             continue rulefor;
           }
         }
@@ -245,6 +245,9 @@ public class TheRTypeProvider {
     }
     if (typeName.equals("logical")) {
       return TheRLogicalType.INSTANCE;
+    }
+    if (typeName.equals("complex")) {
+      return TheRComplexType.INSTANCE;
     }
     return null;
   }

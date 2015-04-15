@@ -19,3 +19,10 @@ max <- function(x, y) {
 
 b <- max("a", 1)
 <warning descr="x expected to be of type numeric, found type character">test_function(b)</warning>
+
+## @rule (x : logical | character = TRUE) -> numeric
+f <- function(x) {
+    return(bar(x))
+}
+
+<warning descr="recursive = FALSE expected to be of type logical, found type numeric">c(recursive=f(TRUE))</warning>

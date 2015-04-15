@@ -7,7 +7,9 @@ import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.typing.types.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,7 +83,7 @@ public class TheRAnnotationParser {
       }
       return new TheRMaxType(typesList);
     }
-    TheRType type = TheRTypeProvider.findTypeByName(typeName);
+    TheRType type = createType(typeName);
     return type != null ? type : new TheRTypeVariable(typeName);
   }
 
@@ -129,7 +131,7 @@ public class TheRAnnotationParser {
 
   private void parseReturn(Substring line) {
     String typeName = line.trim().getValue();
-    TheRType type = TheRTypeProvider.findTypeByName(typeName);
+    TheRType type = createType(typeName);
     if (type != null && type != TheRType.UNKNOWN) {
       myType.setReturnType(type);
     }
@@ -142,10 +144,22 @@ public class TheRAnnotationParser {
     }
     Substring parameterName = split.get(0).trim();
     Substring typeName = split.get(1).trim();
-    TheRType type = TheRTypeProvider.findTypeByName(typeName.getValue());
+    TheRType type = createType(typeName.getValue());
     if (type != TheRType.UNKNOWN) {
       myType.addParameterType(parameterName.getValue(), type);
     }
+  }
+
+  private TheRType createType(String typeName) {
+    String[] typeNames = typeName.split("\\|");
+    Set<TheRType> types = new HashSet<TheRType>();
+    for (String name : typeNames) {
+      TheRType type = TheRTypeProvider.findTypeByName(name.trim());
+      if (type != TheRType.UNKNOWN) {
+        types.add(type);
+      }
+    }
+    return TheRUnionType.create(types);
   }
 
 }

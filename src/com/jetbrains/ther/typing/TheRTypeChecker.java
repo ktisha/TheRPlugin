@@ -6,6 +6,7 @@ import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
 import com.jetbrains.ther.typing.types.TheRFunctionType;
 import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,10 @@ public class TheRTypeChecker {
     }
   }
 
-  private static boolean matchTypes(TheRType type, TheRType replacementType) {
+  public static boolean matchTypes(TheRType type, TheRType replacementType) {
+    if (type instanceof TheRUnionType) {
+      return ((TheRUnionType) type).contains(replacementType);
+    }
     return type.equals(replacementType) || replacementType.getClass().isAssignableFrom(type.getClass());
   }
 
