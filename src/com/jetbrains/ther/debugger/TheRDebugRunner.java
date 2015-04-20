@@ -17,6 +17,8 @@ import com.jetbrains.ther.run.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+
 public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
@@ -41,22 +43,35 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
     final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,
-      createDebugProcessStarter(environment)
+      createDebugProcessStarter(createDebugger(environment))
     );
 
     return session.getRunContentDescriptor();
   }
 
   @NotNull
-  private XDebugProcessStarter createDebugProcessStarter(@NotNull final ExecutionEnvironment environment) {
+  private TheRDebugger createDebugger(@NotNull final ExecutionEnvironment environment) throws ExecutionException {
+    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
+    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
+
+    try {
+      return new TheRDebugger(interpreterPath, runConfiguration.getScriptName());
+    }
+    catch (final IOException e) {
+      throw new ExecutionException(e);
+    }
+    catch (final InterruptedException e) {
+      throw new ExecutionException(e);
+    }
+  }
+
+  @NotNull
+  private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-        final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
-
-        return new TheRDebugProcess(session, interpreterPath, runConfiguration.getScriptName());
+        return new TheRDebugProcess(session, debugger);
       }
     };
   }
