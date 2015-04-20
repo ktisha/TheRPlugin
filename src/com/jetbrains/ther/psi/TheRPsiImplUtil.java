@@ -136,11 +136,12 @@ public class TheRPsiImplUtil {
     return new TheRReferenceImpl(referenceExpression);
   }
 
+  @Nullable
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
     final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
     if (statement == null) return null;
 
-    List<PsiComment> comments = new ArrayList<PsiComment>();
+    final List<PsiComment> comments = new ArrayList<PsiComment>();
     for (PsiElement sibling = statement.getPrevSibling(); sibling != null && !(sibling instanceof TheRExpression);
          sibling = sibling.getPrevSibling()) {
       if (sibling instanceof PsiComment) {
@@ -152,7 +153,7 @@ public class TheRPsiImplUtil {
     Collections.reverse(comments);
     return getCommentText(comments);
   }
-
+  @NotNull
   private static String getCommentText(@NotNull final List<PsiComment> comments) {
     final StringBuilder stringBuilder = new StringBuilder();
     for (PsiComment comment : comments) {

@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 public class TheRDocumentationProvider extends AbstractDocumentationProvider {
 
+  private static final Pattern myPattern = Pattern.compile("^.+:");
+
   @Nullable
   @Override
   public String generateDoc(PsiElement element, @Nullable PsiElement element1) {
@@ -23,22 +25,26 @@ public class TheRDocumentationProvider extends AbstractDocumentationProvider {
     return null;
   }
 
-  private String getFormattedString(String docString) {
-    StringBuilder builder = new StringBuilder();
-    String[] strings = StringUtil.splitByLines(docString);
-    Pattern pattern = Pattern.compile("^.+:");
-    boolean argsStarted = false;
+  @Nullable
+  private String getFormattedString(@Nullable String docString) {
+    if (docString == null) {
+      return null;
+    }
+    final StringBuilder builder = new StringBuilder();
+    final String[] strings = StringUtil.splitByLines(docString);
     for (String string : strings) {
-      if (string.trim().startsWith("Args:")) {
+      final String trimmedString = string.trim();
+      if (trimmedString.startsWith("Args:")) {
         builder.append("<br>");
         builder.append("<b>").append(string).append("</b>");
       }
       else {
-        Matcher matcher = pattern.matcher(string.trim());
-        if(matcher.find()){
+        final Matcher matcher = myPattern.matcher(trimmedString);
+        if (matcher.find()) {
           builder.append("<br>");
           builder.append(matcher.replaceFirst("<b>$0</b>"));
-        }else {
+        }
+        else {
           builder.append(string);
         }
         builder.append(" ");
