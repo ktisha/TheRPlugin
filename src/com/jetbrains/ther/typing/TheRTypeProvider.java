@@ -183,7 +183,7 @@ public class TheRTypeProvider {
             }
             ruleType = env.getType(variableName);
           }
-          if (!TheRTypeChecker.matchTypes(ruleType,exprConf.getType())) {
+          if (!TheRTypeChecker.matchTypes(ruleType, exprConf.getType())) {
             continue rulefor;
           }
         }
@@ -266,5 +266,9 @@ public class TheRTypeProvider {
       }
     }
     return TheRType.UNKNOWN;
+  }
+
+  public static boolean isSubtype(TheRType subType, TheRType type) {
+    return type.getClass().isAssignableFrom(subType.getClass());
   }
 }

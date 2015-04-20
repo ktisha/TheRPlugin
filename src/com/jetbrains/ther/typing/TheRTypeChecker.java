@@ -43,7 +43,7 @@ public class TheRTypeChecker {
     if (type instanceof TheRUnionType) {
       return ((TheRUnionType) type).contains(replacementType);
     }
-    return type.equals(replacementType) || replacementType.getClass().isAssignableFrom(type.getClass());
+    return type.equals(replacementType) || TheRTypeProvider.isSubtype(type, replacementType);
   }
 
   public static void matchArgs(List<TheRExpression> arguments,
