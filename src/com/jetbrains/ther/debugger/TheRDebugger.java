@@ -1,5 +1,7 @@
 package com.jetbrains.ther.debugger;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +11,29 @@ import java.util.*;
 public class TheRDebugger {
 
   @NotNull
-  private final String myFilePath;
+  private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
+
+  @NotNull
+  private static final String NO_SAVE_PARAMETER = "--no-save";
+
+  @NotNull
+  private static final String QUIET_PARAMETER = "--quiet";
+
+  @NotNull
+  private static final String BROWSER_COMMAND = "browser()";
+
+  @NotNull
+  private static final String LS_COMMAND = "ls()";
+
+  @NotNull
+  private static final String TYPEOF_COMMAND = "typeof";
+
+  private static final char COMMENT_SYMBOL = '#';
+
+  private static final int INITIAL_RECEIVER_TIMEOUT = 50;
+
+  @NotNull
+  private final String myScriptPath;
 
   @NotNull
   private final Process myProcess;
@@ -29,30 +53,43 @@ public class TheRDebugger {
   @NotNull
   private final Map<String, String> myVarToType;
 
-  public TheRDebugger(@NotNull String interpreterPath, @NotNull String filePath) throws IOException, InterruptedException {
-    myFilePath = filePath;
+  /**
+   * Constructs new instance of debugger with specified interpreter and script.
+   *
+   * @param interpreterPath path to interpreter
+   * @param scriptPath      path to script
+   * @throws IOException          if script couldn't be opened or interpreter couldn't be started
+   * @throws InterruptedException if thread was interrupted while waiting interpreter's response
+   */
+  public TheRDebugger(@NotNull final String interpreterPath, @NotNull final String scriptPath) throws IOException, InterruptedException {
+    myScriptPath = scriptPath;
 
-    ProcessBuilder builder = new ProcessBuilder(interpreterPath, "--no-save", "--quiet");
+    final ProcessBuilder builder = new ProcessBuilder(interpreterPath, NO_SAVE_PARAMETER, QUIET_PARAMETER);
     myProcess = builder.start();
 
     mySender = new Sender(myProcess.getOutputStream());
     myReceiver = new Receiver(myProcess.getInputStream(), mySender);
 
-    mySourceReader = new BufferedReader(new FileReader(filePath));
+    mySourceReader = new BufferedReader(new FileReader(scriptPath));
 
-    myVarToRepresentation = new HashMap<>();
-    myVarToType = new HashMap<>();
+    myVarToRepresentation = new HashMap<String, String>();
+    myVarToType = new HashMap<String, String>();
 
-    mySender.send("browser()");
+    mySender.send(BROWSER_COMMAND);
     myReceiver.receive();
   }
 
+  /**
+   * @return nonzero number of executed lines, or -1 if the end of the source has been reached
+   * @throws IOException          if script couldn't be read or communication with interpreter was broken
+   * @throws InterruptedException if thread was interrupted while waiting interpreter's response
+   */
   public int executeInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
     int result = 0;
 
     while (!accepted) {
-      String command = getNextCommand();
+      final String command = mySourceReader.readLine();
 
       if (command == null) {
         return -1;
@@ -60,12 +97,12 @@ public class TheRDebugger {
 
       result++;
 
-      if (commandShouldBeSkipped(command)) {
+      if (isComment(command) || StringUtil.isEmptyOrSpaces(command)) {
         return 1;
       }
 
       mySender.send(command);
-      String response = myReceiver.receive();
+      final String response = myReceiver.receive();
 
       accepted = !nextCommandIsNeeded(response);
     }
@@ -86,63 +123,63 @@ public class TheRDebugger {
   }
 
   @NotNull
-  public String getFilePath() {
-    return myFilePath;
+  public String getScriptPath() {
+    return myScriptPath;
   }
 
   public void stop() {
     try {
       mySourceReader.close();
     }
-    catch (IOException e) {
-      // TODO
+    catch (final IOException e) {
+      LOGGER.warn(e);
     }
 
     myProcess.destroy();
   }
 
-  @Nullable
-  private String getNextCommand() throws IOException {
-    String command = mySourceReader.readLine();
+  private boolean isComment(@NotNull final String command) {
+    for (int i = 0; i < command.length(); i++) {
+      if (!StringUtil.isWhiteSpace(command.charAt(i))) {
+        return command.charAt(i) == COMMENT_SYMBOL;
+      }
+    }
 
-    return command != null ? command.trim() : null;
+    return false;
   }
 
-  private boolean commandShouldBeSkipped(@NotNull String command) {
-    return command.startsWith("#") || command.isEmpty();
-  }
-
-  private boolean nextCommandIsNeeded(@NotNull String response) {
-    return response.length() < 2 || response.charAt(response.length() - 2) != '>';
+  private boolean nextCommandIsNeeded(@NotNull final String response) {
+    return response.length() < 2 || response.charAt(response.length() - 2) != '>'; // TODO match only Browser[#]>
   }
 
   private void updateDebugInformation() throws IOException, InterruptedException {
-    mySender.send("ls()");
-    String response = removeLastLine(myReceiver.receive());
+    mySender.send(LS_COMMAND);
+    final String response = removeLastLine(myReceiver.receive());
 
     myVarToRepresentation.clear();
     myVarToType.clear();
 
-    for (String var : calculateVariables(response)) {
+    for (final String var : calculateVariables(response)) {
       updateRepresentation(var);
       updateType(var);
     }
   }
 
   @NotNull
-  private List<String> calculateVariables(@NotNull String response) {
-    List<String> result = new ArrayList<>();
+  private String removeLastLine(@NotNull final String response) {
+    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
+  }
 
-    StringTokenizer lineTokenizer = new StringTokenizer(response, System.lineSeparator());
+  @NotNull
+  private List<String> calculateVariables(@NotNull final String response) {
+    final List<String> result = new ArrayList<String>();
 
-    while (lineTokenizer.hasMoreTokens()) {
-      StringTokenizer variableTokenizer = new StringTokenizer(lineTokenizer.nextToken(), " ");
+    for (final String line : StringUtil.splitByLines(response)) {
+      for (final String token : StringUtil.tokenize(new StringTokenizer(line))) {
+        final String var = getVariable(token);
 
-      while (variableTokenizer.hasMoreTokens()) {
-        String token = variableTokenizer.nextToken();
-
-        if (isVariable(token)) {
-          result.add(getVariable(token));
+        if (var != null) {
+          result.add(var);
         }
       }
     }
@@ -150,28 +187,26 @@ public class TheRDebugger {
     return result;
   }
 
-  private void updateRepresentation(@NotNull String var) throws IOException, InterruptedException {
+  private void updateRepresentation(@NotNull final String var) throws IOException, InterruptedException {
     mySender.send(var);
     myVarToRepresentation.put(var, removeLastLine(myReceiver.receive()));
   }
 
-  private void updateType(@NotNull String var) throws IOException, InterruptedException {
-    mySender.send("typeof(" + var + ")");
+  private void updateType(@NotNull final String var) throws IOException, InterruptedException {
+    mySender.send(TYPEOF_COMMAND + "(" + var + ")");
     myVarToType.put(var, removeLastLine(myReceiver.receive()));
   }
 
-  private boolean isVariable(@NotNull String token) {
-    return token.startsWith("\"") && token.endsWith("\"");
-  }
+  @Nullable
+  private String getVariable(@NotNull final String token) {
+    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
 
-  @NotNull
-  private String getVariable(@NotNull String token) {
-    return token.substring(1, token.length() - 1);
-  }
-
-  @NotNull
-  private String removeLastLine(@NotNull String response) {
-    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
+    if (isNotEmptyQuotedString) {
+      return token.substring(1, token.length() - 1);
+    }
+    else {
+      return null;
+    }
   }
 
   private static class Sender {
@@ -179,12 +214,18 @@ public class TheRDebugger {
     @NotNull
     private final OutputStreamWriter myWriter;
 
-    private Sender(@NotNull OutputStream stream) {
+    private Sender(@NotNull final OutputStream stream) {
       myWriter = new OutputStreamWriter(stream);
     }
 
-    public void send(@NotNull String command) throws IOException {
+    public void send(@NotNull final String command) throws IOException {
       myWriter.write(command);
+      myWriter.write(System.lineSeparator());
+      myWriter.flush();
+    }
+
+    public void send(final char symbol) throws IOException {
+      myWriter.write(symbol);
       myWriter.write(System.lineSeparator());
       myWriter.flush();
     }
@@ -204,7 +245,7 @@ public class TheRDebugger {
     @NotNull
     private final Sender mySender;
 
-    private Receiver(@NotNull InputStream stream, @NotNull Sender sender) {
+    private Receiver(@NotNull final InputStream stream, @NotNull final Sender sender) {
       myStream = stream;
       myReader = new InputStreamReader(stream);
       myBuffer = new char[1024];
@@ -214,14 +255,14 @@ public class TheRDebugger {
 
     @NotNull
     public String receive() throws IOException, InterruptedException {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       int pings = 0;
 
       while (true) {
         waitForResponse();
 
         while (myStream.available() != 0) {
-          int read = myReader.read(myBuffer);
+          final int read = myReader.read(myBuffer);
           sb.append(myBuffer, 0, read);
         }
 
@@ -229,7 +270,7 @@ public class TheRDebugger {
           break;
         }
 
-        ping(); // pings R interpreter to get tail of response
+        ping(); // pings interpreter to get tail of response
         pings++;
       }
 
@@ -239,7 +280,7 @@ public class TheRDebugger {
     }
 
     private void waitForResponse() throws IOException, InterruptedException {
-      long timeout = 50;
+      long timeout = INITIAL_RECEIVER_TIMEOUT;
 
       while (myStream.available() == 0) {
         Thread.sleep(timeout);
@@ -247,22 +288,22 @@ public class TheRDebugger {
       }
     }
 
-    private boolean responseIsComplete(@NotNull StringBuilder sb) {
-      return sb.length() > 2 && (sb.charAt(sb.length() - 2) == '>' || sb.charAt(sb.length() - 2) == '+');
+    private boolean responseIsComplete(@NotNull final StringBuilder sb) {
+      return sb.length() > 2 && (sb.charAt(sb.length() - 2) == '>' || sb.charAt(sb.length() - 2) == '+'); // TODO match only Browser[#]>
     }
 
     private void ping() throws IOException {
-      mySender.send("#");
+      mySender.send(COMMENT_SYMBOL);
     }
 
-    private void removePings(@NotNull StringBuilder sb, int pings) {
+    private void removePings(@NotNull final StringBuilder sb, final int pings) {
       for (int i = 0; i < pings; i++) {
         sb.setLength(sb.lastIndexOf(System.lineSeparator()) - 1);
       }
     }
 
     @NotNull
-    private String removeFirstLine(@NotNull StringBuilder sb) {
+    private String removeFirstLine(@NotNull final StringBuilder sb) {
       return sb.substring(sb.indexOf(System.lineSeparator()) + 1);
     }
   }
