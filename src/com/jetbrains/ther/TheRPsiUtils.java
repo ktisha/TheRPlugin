@@ -1,16 +1,25 @@
 package com.jetbrains.ther;
 
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.psi.api.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TheRPsiUtils {
+  private static final Logger LOG = Logger.getInstance(TheRPsiUtils.class);
+  private static final int MINUTE = 60 * 1000;
+
   public static List<TheRExpression> getParametersExpressions(List<TheRParameter> parameters) {
     List<TheRExpression> parametersExpressions = new ArrayList<TheRExpression>();
     for (TheRParameter parameter : parameters) {
@@ -81,6 +90,29 @@ public class TheRPsiUtils {
     PsiElement assignmentStatement = expression.getParent();
     if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
       return (TheRAssignmentStatement)assignmentStatement;
+    }
+    return null;
+  }
+
+  public static String getHelpForFunction(PsiElement assignee) {
+    File file = TheRHelpersLocator.getHelperFile("r-help.r");
+    final String path = TheRInterpreterService.getInstance().getInterpreterPath();
+    String helperPath = file.getAbsolutePath();
+    final Process process;
+    try {
+      String assigneeText =
+        assignee.getText().replaceAll("\"", "");
+      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
+      final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
+      final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
+      String stdout = output.getStdout();
+      if (stdout.startsWith("No documentation")) {
+        return null;
+      }
+      return stdout;
+    }
+    catch (IOException e) {
+      LOG.error(e);
     }
     return null;
   }
