@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 public class TheRDebuggerEditorsProvider extends XDebuggerEditorsProvider {
 
   @NotNull
+  private static final String FRAGMENT_NAME = "fragment.r";
+
+  @NotNull
   @Override
   public FileType getFileType() {
     return TheRFileType.INSTANCE;
@@ -22,11 +25,11 @@ public class TheRDebuggerEditorsProvider extends XDebuggerEditorsProvider {
 
   @NotNull
   @Override
-  public Document createDocument(@NotNull Project project,
-                                 @NotNull String text,
-                                 @Nullable XSourcePosition sourcePosition,
-                                 @NotNull EvaluationMode mode) {
-    PsiFile psiFile = new TheRExpressionCodeFragmentImpl(project, "fragment.r", text);
+  public Document createDocument(@NotNull final Project project,
+                                 @NotNull final String text,
+                                 @Nullable final XSourcePosition sourcePosition,
+                                 @NotNull final EvaluationMode mode) {
+    final PsiFile psiFile = new TheRExpressionCodeFragmentImpl(project, FRAGMENT_NAME, text);
 
     return PsiDocumentManager.getInstance(project).getDocument(psiFile);
   }

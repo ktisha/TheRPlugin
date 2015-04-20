@@ -15,7 +15,7 @@ public class TheRStackFrame extends XStackFrame {
   @NotNull
   private final TheRStackFrameData myFrame;
 
-  public TheRStackFrame(@NotNull TheRStackFrameData frame) {
+  public TheRStackFrame(@NotNull final TheRStackFrameData frame) {
     myFrame = frame;
   }
 
@@ -26,20 +26,20 @@ public class TheRStackFrame extends XStackFrame {
   }
 
   @Override
-  public void computeChildren(@NotNull XCompositeNode node) {
+  public void computeChildren(@NotNull final XCompositeNode node) {
     node.addChildren(calculateVars(), true);
   }
 
   @NotNull
   private XValueChildrenList calculateVars() {
-    List<String> names = new ArrayList<>(myFrame.getVarRepresentations().keySet());
+    final List<String> names = new ArrayList<String>(myFrame.getVarRepresentations().keySet());
     Collections.sort(names);
 
-    XValueChildrenList result = new XValueChildrenList();
+    final XValueChildrenList result = new XValueChildrenList();
 
-    for (String name : names) {
-      String value = myFrame.getVarRepresentations().get(name);
-      String type = myFrame.getVarTypes().get(name);
+    for (final String name : names) {
+      final String value = myFrame.getVarRepresentations().get(name);
+      final String type = myFrame.getVarTypes().get(name);
 
       result.add(
         new TheRVar(name, type, value)

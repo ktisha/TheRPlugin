@@ -11,7 +11,7 @@ public class TheRSuspendContext extends XSuspendContext {
   @NotNull
   private final TheRExecutionStack myExecutionStack;
 
-  public TheRSuspendContext(@NotNull List<TheRStackFrameData> stackFramesData) {
+  public TheRSuspendContext(@NotNull final List<TheRStackFrameData> stackFramesData) {
     myExecutionStack = new TheRExecutionStack(stackFramesData);
   }
 

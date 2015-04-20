@@ -16,9 +16,9 @@ public class TheRStackFrameData {
   @NotNull
   private final Map<String, String> myVarTypes;
 
-  public TheRStackFrameData(@NotNull XSourcePosition position,
-                            @NotNull Map<String, String> varRepresentations,
-                            @NotNull Map<String, String> varTypes) {
+  public TheRStackFrameData(@NotNull final XSourcePosition position,
+                            @NotNull final Map<String, String> varRepresentations,
+                            @NotNull final Map<String, String> varTypes) {
     myPosition = position;
     myVarRepresentations = varRepresentations;
     myVarTypes = varTypes;

@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TheRExecutionStack extends XExecutionStack {
@@ -14,18 +13,16 @@ public class TheRExecutionStack extends XExecutionStack {
   @NotNull
   private final List<TheRStackFrame> myStackFrames;
 
-  public TheRExecutionStack(@NotNull List<TheRStackFrameData> data) {
-    super(""); // TODO
+  public TheRExecutionStack(@NotNull final List<TheRStackFrameData> data) {
+    super("GHIJKL"); // TODO find usage of this string in ui and replace with better one
 
-    myStackFrames = new ArrayList<>(data.size());
+    myStackFrames = new ArrayList<TheRStackFrame>(data.size());
 
-    for (TheRStackFrameData stackFrameData : data) {
+    for (final TheRStackFrameData stackFrameData : data) {
       myStackFrames.add(
         new TheRStackFrame(stackFrameData)
       );
     }
-
-    Collections.reverse(myStackFrames);
   }
 
   @Nullable
@@ -35,9 +32,9 @@ public class TheRExecutionStack extends XExecutionStack {
   }
 
   @Override
-  public void computeStackFrames(int firstFrameIndex, XStackFrameContainer container) {
+  public void computeStackFrames(final int firstFrameIndex, final XStackFrameContainer container) {
     if (firstFrameIndex <= myStackFrames.size()) {
-      List<TheRStackFrame> stackFrames = myStackFrames.subList(firstFrameIndex, myStackFrames.size());
+      final List<TheRStackFrame> stackFrames = myStackFrames.subList(firstFrameIndex, myStackFrames.size());
 
       container.addStackFrames(stackFrames, true);
     }

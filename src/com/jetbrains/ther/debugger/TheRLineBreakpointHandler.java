@@ -10,18 +10,19 @@ public class TheRLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoin
   @NotNull
   private final TheRDebugProcess myDebugProcess;
 
-  public TheRLineBreakpointHandler(@NotNull TheRDebugProcess process) {
+  public TheRLineBreakpointHandler(@NotNull final TheRDebugProcess process) {
     super(TheRLineBreakpointType.class);
+
     myDebugProcess = process;
   }
 
   @Override
-  public void registerBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
+  public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
     myDebugProcess.registerBreakpoint(breakpoint);
   }
 
   @Override
-  public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint, boolean temporary) {
+  public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint, final boolean temporary) {
     myDebugProcess.unregisterBreakpoint(breakpoint);
   }
 }

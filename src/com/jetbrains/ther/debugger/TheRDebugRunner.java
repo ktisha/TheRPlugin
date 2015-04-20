@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.debugger;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RunProfile;
@@ -12,15 +12,15 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.jetbrains.ther.debugger.TheRDebugProcess;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.run.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
-  public static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
+  private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
 
   @NotNull
   @Override
@@ -29,30 +29,35 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @Override
-  public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
+  public boolean canRun(@NotNull final String executorId, @NotNull final RunProfile profile) {
     return executorId.equals(DefaultDebugExecutor.EXECUTOR_ID) && profile instanceof TheRRunConfiguration;
   }
 
   @Nullable
   @Override
-  protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull final ExecutionEnvironment environment)
+  protected RunContentDescriptor doExecute(@NotNull final RunProfileState state, @NotNull final ExecutionEnvironment environment)
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
-    XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
+    final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,
-      new XDebugProcessStarter() {
-        @NotNull
-        @Override
-        public XDebugProcess start(@NotNull XDebugSession session) throws ExecutionException {
-          String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-          TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
-
-          return new TheRDebugProcess(session, interpreterPath, runConfiguration.getScriptName());
-        }
-      }
+      createDebugProcessStarter(environment)
     );
 
     return session.getRunContentDescriptor();
+  }
+
+  @NotNull
+  private XDebugProcessStarter createDebugProcessStarter(@NotNull final ExecutionEnvironment environment) {
+    return new XDebugProcessStarter() {
+      @NotNull
+      @Override
+      public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
+        final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
+        final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
+
+        return new TheRDebugProcess(session, interpreterPath, runConfiguration.getScriptName());
+      }
+    };
   }
 }

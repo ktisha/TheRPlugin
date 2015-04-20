@@ -14,7 +14,7 @@ public class TheRVar extends XNamedValue {
   @NotNull
   private final String myType;
 
-  public TheRVar(@NotNull String name, @NotNull String type, @NotNull String value) {
+  public TheRVar(@NotNull final String name, @NotNull final String type, @NotNull final String value) {
     super(name);
 
     myValue = value;
@@ -22,7 +22,7 @@ public class TheRVar extends XNamedValue {
   }
 
   @Override
-  public void computePresentation(@NotNull XValueNode node, @NotNull XValuePlace place) {
+  public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
     node.setPresentation(AllIcons.Debugger.Value, myType, myValue, false);
   }
 }
