@@ -89,4 +89,14 @@ public class TheRUnionType extends TheRType {
   public boolean contains(TheRType type) {
     return myTypes.contains(type);
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (TheRType type : myTypes) {
+      builder.append(type.toString()).append("|");
+    }
+    builder.deleteCharAt(builder.length() - 1);
+    return builder.toString();
+  }
 }

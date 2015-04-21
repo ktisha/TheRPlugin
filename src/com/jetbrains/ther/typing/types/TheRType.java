@@ -74,6 +74,6 @@ public abstract class TheRType {
 
   @Override
   public String toString() {
-    return "type: " + getName();
+    return getName();
   }
 }
