@@ -4,6 +4,8 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.parsing.TheRParserDefinition;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
+import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.typing.types.TheRType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,5 +39,9 @@ public class DocStringUtil {
 
   private static boolean isComment(PsiElement comment) {
     return comment != null && comment.getNode().getElementType() == TheRParserDefinition.END_OF_LINE_COMMENT;
+  }
+
+  public static String generateTypeAnnotation(TheRParameter parameter, TheRType type) {
+    return "## @type " + parameter.getName() + " : " + type.toString() + "\n";
   }
 }

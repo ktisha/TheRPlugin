@@ -4,8 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.DocumentUtil;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.packages.TheRPackage;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +24,8 @@ import java.util.Set;
 public class TheRUtils {
   private static final Logger LOG = Logger.getInstance(TheRUtils.class.getName());
 
-  private TheRUtils(){}
+  private TheRUtils() {
+  }
 
   public static Set<String> getLibraryPathes(@NotNull final String intepreterPath) {
     final Set<String> libPaths = Sets.newHashSet();
@@ -105,5 +110,23 @@ public class TheRUtils {
                "Exception occurred: " + e.getMessage());
     }
     return null;
+  }
+
+  public static void appendToDocument(@NotNull final Document document, final String text) {
+    DocumentUtil.writeInRunUndoTransparentAction(new Runnable() {
+      @Override
+      public void run() {
+        document.insertString(document.getTextLength(), text);
+      }
+    });
+  }
+
+  public static void saveDocument(@NotNull final Document document) {
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        FileDocumentManager.getInstance().saveDocument(document);
+      }
+    });
   }
 }
