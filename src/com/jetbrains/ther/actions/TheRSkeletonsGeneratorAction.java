@@ -1,5 +1,9 @@
 package com.jetbrains.ther.actions;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.Application;
@@ -184,9 +188,35 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
                     TheRUtils.appendToDocument(myPackageDocument, typeAnnotation);
                   }
                 }
+
+
                 //TODO: fill temp doc and check types
 
                 tempFile.delete(this);
+
+                // TODO: REFACTOR IT!!
+                TheRType valueType = guessReturnValueTypeFromHelp(help);
+
+                if (valueType != TheRType.UNKNOWN) {
+                  String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
+                  VirtualFile valueTempFile = myFile.getParent().findOrCreateChildData(this, valueTempFileName);
+                  final Document valueTempDocument = FileDocumentManager.getInstance().getDocument(valueTempFile);
+                  if (valueTempDocument != null && help.myExamples != null) {
+                    TheRUtils.appendToDocument(valueTempDocument, help.myExamples);
+                    TheRUtils.saveDocument(valueTempDocument);
+                    FileContentUtil.reparseFiles(valueTempFile);
+                    ValueVisitor valueVisitor = new ValueVisitor(valueType, valueTempFile, assignee.getText());
+                    PsiFile valuePsiFile = PsiManager.getInstance(myProject).findFile(valueTempFile);
+                    if (valuePsiFile != null) {
+                      valuePsiFile.acceptChildren(valueVisitor);
+                      if (valueVisitor.isOk()) {
+                        TheRUtils.appendToDocument(myPackageDocument, "## @return " + valueType.toString() + "\n");
+                      }
+                    }
+                  }
+
+                }
+
               }
             }
             catch (IOException e) {
@@ -201,7 +231,6 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       }
     }
 
-    //TODO: return map
     private Map<TheRParameter, TheRType> guessArgsTypeFromHelp(TheRHelp help, TheRFunctionExpression function) {
       List<TheRParameter> parameters = function.getParameterList().getParameterList();
       Map<TheRParameter, TheRType> parsedTypes = new HashMap<TheRParameter, TheRType>();
@@ -210,6 +239,13 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         parseArgumentsDescription(argumentsDescription, parameters, parsedTypes);
       }
       return parsedTypes;
+    }
+
+    private TheRType guessReturnValueTypeFromHelp(TheRHelp help) {
+      if (help.myValue == null) {
+        return TheRType.UNKNOWN;
+      }
+      return findType(help.myValue);
     }
 
     private void parseArgumentsDescription(String description, List<TheRParameter> parameters, Map<TheRParameter, TheRType> parsedTypes) {
@@ -263,9 +299,59 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       }
       return null;
     }
+
+    class ValueVisitor extends TheRVisitor {
+      private Boolean myOk = null;
+      private final TheRType myCandidate;
+      private final VirtualFile myExamplesFile;
+      private final String myFunctionName;
+
+      ValueVisitor(TheRType candidate, VirtualFile examplesFile, String functionName) {
+        myCandidate = candidate;
+        myExamplesFile = examplesFile;
+        myFunctionName = functionName;
+      }
+
+      @Override
+      public void visitCallExpression(@NotNull TheRCallExpression o) {
+        if (!myFunctionName.equals(o.getExpression().getName())) {
+          return;
+        }
+        if (myOk != null && !myOk) {
+          return;
+        }
+        String programString = "source(\"" + myExamplesFile + "\");"
+                               + "myValueType<-class(" + o.getText() + ");"
+                               + "print(myValueType)";
+        String rPath = TheRInterpreterService.getInstance().getInterpreterPath();
+        try {
+          GeneralCommandLine gcl = new GeneralCommandLine();
+          gcl.withWorkDirectory(myExamplesFile.getParent().getPath());
+          gcl.setExePath(rPath);
+          gcl.addParameter("--slave");
+          gcl.addParameter("-e");
+          gcl.addParameter(programString);
+          Process rProcess = gcl.createProcess();
+          final CapturingProcessHandler processHandler = new CapturingProcessHandler(rProcess);
+          final ProcessOutput output = processHandler.runProcess(20000);
+          String stdout = output.getStdout();
+          TheRType evaledType = findType(stdout);
+          myOk = TheRTypeChecker.matchTypes(myCandidate, evaledType);
+        }
+        catch (ExecutionException e) {
+          e.printStackTrace();
+        }
+      }
+
+      public boolean isOk() {
+        return myOk != null && myOk;
+      }
+    }
+
+
   }
 
-  class Visitor extends  TheRVisitor {
+    class Visitor extends  TheRVisitor {
     private boolean hasErrors = false;
     @Override
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {

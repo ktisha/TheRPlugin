@@ -20,11 +20,11 @@ public class TheRUnionType extends TheRType {
     if (types.isEmpty()) {
       return TheRType.UNKNOWN;
     }
+    unpackUnions(types);
+    types = mergeSimilar(types);
     if (types.size() == 1) {
       return types.iterator().next();
     }
-    unpackUnions(types);
-    types = mergeSimilar(types);
 
     return new TheRUnionType(types);
   }
