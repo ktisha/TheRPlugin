@@ -72,6 +72,21 @@ public class TheRTypeProvider {
         return TheRTypeProvider.getType(lastExpression);
       }
     }
+
+    if (element instanceof  TheRIfStatement) {
+      TheRIfStatement ifStatement = (TheRIfStatement)element;
+      List<TheRExpression> expressions = ifStatement.getExpressionList();
+      if (expressions.size() > 1) {
+        Set<TheRType> types = new HashSet<TheRType>();
+        for (int i = 1; i < expressions.size(); i++) {
+          TheRType type = getType(expressions.get(i));
+          if (type != TheRType.UNKNOWN) {
+            types.add(type);
+          }
+        }
+        return TheRUnionType.create(types);
+      }
+    }
     return TheRType.UNKNOWN;
   }
 

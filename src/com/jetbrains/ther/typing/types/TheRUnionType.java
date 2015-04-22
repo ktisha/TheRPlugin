@@ -63,9 +63,13 @@ public class TheRUnionType extends TheRType {
   }
 
   private static void unpackUnions(Set<TheRType> types) {
-    for (TheRType type : types) {
+    Set<TheRType> savedTypes =  new HashSet<TheRType>(types);
+    types.clear();
+    for (TheRType type : savedTypes) {
       if (type instanceof TheRUnionType) {
         types.addAll(((TheRUnionType)type).myTypes);
+      } else {
+        types.add(type);
       }
     }
   }

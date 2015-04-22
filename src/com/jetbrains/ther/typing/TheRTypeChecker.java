@@ -32,8 +32,8 @@ public class TheRTypeChecker {
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
       if (argType != null && !argType.equals(TheRType.UNKNOWN)) {
         if (!matchTypes(paramType, argType)) {
-          throw new MatchingException(parameter.getText() + " expected to be of type " + paramType.getName() +
-                                      ", found type " + argType.getName());
+          throw new MatchingException(parameter.getText() + " expected to be of type " + paramType +
+                                      ", found type " + argType);
         }
       }
     }
