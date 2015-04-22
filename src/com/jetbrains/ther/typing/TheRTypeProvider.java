@@ -11,10 +11,7 @@ import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TheRTypeProvider {
 
@@ -266,6 +263,43 @@ public class TheRTypeProvider {
       }
     }
     return TheRType.UNKNOWN;
+  }
+
+  public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {
+    TheRExpression expression = functionExpression.getExpression();
+    if (expression == null) {
+      return TheRType.UNKNOWN;
+    }
+    Set<TheRType> types = new HashSet<TheRType>();
+    TheRType type;
+    if (expression instanceof TheRBlockExpression) {
+      TheRBlockExpression blockExpression = (TheRBlockExpression)expression;
+      List<TheRExpression> expressionList = blockExpression.getExpressionList();
+      TheRExpression lastExpression = expressionList.get(expressionList.size() - 1);
+      type = TheRTypeProvider.getType(lastExpression);
+      collectReturnTypes(functionExpression, types);
+    } else {
+      type = TheRTypeProvider.getType(expression);
+    }
+    if (type != TheRType.UNKNOWN) {
+      types.add(type);
+    }
+    return TheRUnionType.create(types);
+  }
+
+  private static void collectReturnTypes(TheRFunctionExpression functionExpression, Set<TheRType> types) {
+    TheRCallExpression[] calls = TheRPsiUtils.getAllChildrenOfType(functionExpression, TheRCallExpression.class);
+    for (TheRCallExpression callExpression : calls) {
+      if (TheRPsiUtils.isReturn(callExpression)) {
+        List<TheRExpression> args = callExpression.getArgumentList().getExpressionList();
+        if (args.size() == 1) {
+          TheRType rType = TheRTypeProvider.getType(args.iterator().next());
+          if (rType != null && rType != TheRType.UNKNOWN) {
+            types.add(rType);
+          }
+        }
+      }
+    }
   }
 
   public static boolean isSubtype(TheRType subType, TheRType type) {

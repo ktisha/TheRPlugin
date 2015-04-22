@@ -7,12 +7,13 @@ import java.util.*;
 public class TheRUnionType extends TheRType {
   private Set<TheRType> myTypes;
 
+
   @Override
   public String getName() {
     return "union";
   }
 
-  public TheRUnionType(Set<TheRType> types) {
+  private TheRUnionType(Set<TheRType> types) {
     myTypes = types;
   }
 

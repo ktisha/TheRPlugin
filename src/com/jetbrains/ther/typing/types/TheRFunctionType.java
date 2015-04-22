@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing.types;
 
+import com.intellij.psi.PsiManager;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
@@ -25,7 +26,6 @@ public class TheRFunctionType extends TheRType {
       myParameters.put(parameterName, new TheRTypedParameter(parameterName, null, parameter));
     }
     createFunctionType();
-    getReturnType();
   }
 
   @Override
@@ -44,6 +44,14 @@ public class TheRFunctionType extends TheRType {
       List<Substring> lines = DocStringUtil.getDocStringLines(assignmentStatement);
       for (Substring line: lines) {
         new TheRAnnotationParser(this).interpretLine(line);
+      }
+    }
+    if (myReturnType == null || myReturnType == TheRType.UNKNOWN) {
+      if (PsiManager.getInstance(myFunctionExpression.getProject()).isInProject(myFunctionExpression)) {
+        TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody(myFunctionExpression);
+        if (type != TheRType.UNKNOWN) {
+          myReturnType = type;
+        }
       }
     }
   }

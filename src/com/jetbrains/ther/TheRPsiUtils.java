@@ -6,6 +6,9 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.ArrayUtil;
+import com.intellij.util.SmartList;
+import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.psi.api.*;
 import org.jetbrains.annotations.NotNull;
@@ -115,5 +118,24 @@ public class TheRPsiUtils {
       LOG.error(e);
     }
     return null;
+  }
+
+  @NotNull
+  public static <T extends TheRPsiElement> T[] getAllChildrenOfType(@NotNull PsiElement element, @NotNull Class<T> aClass) {
+    List<T> result = new SmartList<T>();
+    for (PsiElement child : element.getChildren()) {
+      if (aClass.isInstance(child)) {
+        //noinspection unchecked
+        result.add((T)child);
+      }
+      else {
+        ContainerUtil.addAll(result, getAllChildrenOfType(child, aClass));
+      }
+    }
+    return ArrayUtil.toObjectArray(result, aClass);
+  }
+
+  public static boolean isReturn(TheRCallExpression expression) {
+    return expression.getText().startsWith("return");
   }
 }

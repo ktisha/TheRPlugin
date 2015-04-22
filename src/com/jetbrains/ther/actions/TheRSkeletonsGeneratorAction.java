@@ -29,10 +29,7 @@ import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
 import com.jetbrains.ther.psi.api.*;
-import com.jetbrains.ther.typing.DocStringUtil;
-import com.jetbrains.ther.typing.MatchingException;
-import com.jetbrains.ther.typing.TheRSkeletonGeneratorHelper;
-import com.jetbrains.ther.typing.TheRTypeChecker;
+import com.jetbrains.ther.typing.*;
 import com.jetbrains.ther.typing.types.TheRType;
 import com.jetbrains.ther.typing.types.TheRUnionType;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +82,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
   private void generateSkeletonsForPackage(@NotNull final VirtualFile packageDir, @NotNull final Project project) {
     String packageName = packageDir.getName();
-    //TODO: DELETE THIS CHECK!!!
+    //TODO: DELETE THIS CHECK!!! it is here only for speeding checks while developing
     if (!packageName.equals("base")) {
       return;
     }
@@ -189,34 +186,18 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
                   }
                 }
 
-
-                //TODO: fill temp doc and check types
-
                 tempFile.delete(this);
 
-                // TODO: REFACTOR IT!!
-                TheRType valueType = guessReturnValueTypeFromHelp(help);
+                //getting value type
 
-                if (valueType != TheRType.UNKNOWN) {
-                  String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
-                  VirtualFile valueTempFile = myFile.getParent().findOrCreateChildData(this, valueTempFileName);
-                  final Document valueTempDocument = FileDocumentManager.getInstance().getDocument(valueTempFile);
-                  if (valueTempDocument != null && help.myExamples != null) {
-                    TheRUtils.appendToDocument(valueTempDocument, help.myExamples);
-                    TheRUtils.saveDocument(valueTempDocument);
-                    FileContentUtil.reparseFiles(valueTempFile);
-                    ValueVisitor valueVisitor = new ValueVisitor(valueType, valueTempFile, assignee.getText());
-                    PsiFile valuePsiFile = PsiManager.getInstance(myProject).findFile(valueTempFile);
-                    if (valuePsiFile != null) {
-                      valuePsiFile.acceptChildren(valueVisitor);
-                      if (valueVisitor.isOk()) {
-                        TheRUtils.appendToDocument(myPackageDocument, "## @return " + valueType.toString() + "\n");
-                      }
-                    }
-                  }
+                TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
+                //getType from function body
 
+                if (type != TheRType.UNKNOWN) {
+                  TheRUtils.appendToDocument(myPackageDocument, "## @return " + type.toString() + "\n");
+                } else {
+                  insertTypeFromHelp(assignee, help);
                 }
-
               }
             }
             catch (IOException e) {
@@ -228,6 +209,30 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
         TheRUtils.appendToDocument(myPackageDocument, o.getText() + "\n\n");
         TheRUtils.saveDocument(myPackageDocument);
+      }
+    }
+
+    private void insertTypeFromHelp(PsiElement assignee, TheRHelp help) throws IOException {
+      // TODO: REFACTOR IT!! MOVE TO SEPARATE FUNCTION FOR READABILITY
+      TheRType valueType = guessReturnValueTypeFromHelp(help);
+
+      if (valueType != TheRType.UNKNOWN) {
+        String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
+        VirtualFile valueTempFile = myFile.getParent().findOrCreateChildData(this, valueTempFileName);
+        final Document valueTempDocument = FileDocumentManager.getInstance().getDocument(valueTempFile);
+        if (valueTempDocument != null && help.myExamples != null) {
+          TheRUtils.appendToDocument(valueTempDocument, help.myExamples);
+          TheRUtils.saveDocument(valueTempDocument);
+          FileContentUtil.reparseFiles(valueTempFile);
+          ValueVisitor valueVisitor = new ValueVisitor(valueType, valueTempFile, assignee.getText());
+          PsiFile valuePsiFile = PsiManager.getInstance(myProject).findFile(valueTempFile);
+          if (valuePsiFile != null) {
+            valuePsiFile.acceptChildren(valueVisitor);
+            if (valueVisitor.isOk()) {
+              TheRUtils.appendToDocument(myPackageDocument, "## @return " + valueType.toString() + "\n");
+            }
+          }
+        }
       }
     }
 
@@ -351,7 +356,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
   }
 
-    class Visitor extends  TheRVisitor {
+  class Visitor extends  TheRVisitor {
     private boolean hasErrors = false;
     @Override
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
