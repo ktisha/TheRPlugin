@@ -64,6 +64,14 @@ public class TheRTypeProvider {
         }
       }
     }
+    if (element instanceof TheRBlockExpression) {
+      TheRBlockExpression blockExpression = (TheRBlockExpression)element;
+      List<TheRExpression> expressionList = blockExpression.getExpressionList();
+      if (!expressionList.isEmpty()) {
+        TheRExpression lastExpression = expressionList.get(expressionList.size() - 1);
+        return TheRTypeProvider.getType(lastExpression);
+      }
+    }
     return TheRType.UNKNOWN;
   }
 
@@ -271,16 +279,7 @@ public class TheRTypeProvider {
       return TheRType.UNKNOWN;
     }
     Set<TheRType> types = new HashSet<TheRType>();
-    TheRType type;
-    if (expression instanceof TheRBlockExpression) {
-      TheRBlockExpression blockExpression = (TheRBlockExpression)expression;
-      List<TheRExpression> expressionList = blockExpression.getExpressionList();
-      TheRExpression lastExpression = expressionList.get(expressionList.size() - 1);
-      type = TheRTypeProvider.getType(lastExpression);
-      collectReturnTypes(functionExpression, types);
-    } else {
-      type = TheRTypeProvider.getType(expression);
-    }
+    TheRType type = getType(expression);
     if (type != TheRType.UNKNOWN) {
       types.add(type);
     }

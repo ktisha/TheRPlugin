@@ -1,4 +1,6 @@
-f <- function(x) "text"
+f <- function(x) {
+    y <- "text"
+}
 
 ## @type x : numeric
 bar <- function(x) {
