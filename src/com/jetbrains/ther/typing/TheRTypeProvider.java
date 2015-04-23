@@ -298,6 +298,7 @@ public class TheRTypeProvider {
     if (type != TheRType.UNKNOWN) {
       types.add(type);
     }
+    collectReturnTypes(functionExpression, types);
     return TheRUnionType.create(types);
   }
 

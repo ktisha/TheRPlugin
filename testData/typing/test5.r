@@ -1,4 +1,7 @@
 f <- function(x) {
+    if (x == 0) {
+        return(FALSE)
+    }
     y <- "text"
 }
 
@@ -7,4 +10,4 @@ bar <- function(x) {
     x
 }
 
-<warning descr="x expected to be of type numeric, found type character">bar(f(1))</warning>
+<warning descr="x expected to be of type numeric, found type logical|character">bar(f(1))</warning>
