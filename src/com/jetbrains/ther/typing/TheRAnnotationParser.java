@@ -25,6 +25,7 @@ public class TheRAnnotationParser {
   public static final Pattern COMMA_PATTERN = Pattern.compile(",");
   public static final Pattern EQUALS_PATTERN = Pattern.compile("=");
   public static final Pattern MAX_PATTERN = Pattern.compile("max\\((.*)\\)");
+  private static final String OPTIONAL_TAG = "optional";
   private TheRFunctionType myType;
 
   public TheRAnnotationParser(TheRFunctionType type) {
@@ -55,6 +56,17 @@ public class TheRAnnotationParser {
     }
     if (tagName.equals(RULE_TAG)) {
       parseRule(line);
+    }
+
+    if (tagName.equals(OPTIONAL_TAG)) {
+      parseOptional(line);
+    }
+  }
+
+  private void parseOptional(Substring line) {
+    List<Substring> optionalParams = line.split(COMMA_PATTERN);
+    for (Substring param : optionalParams) {
+      myType.setOptional(param.getValue().trim());
     }
   }
 

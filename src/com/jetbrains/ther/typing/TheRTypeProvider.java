@@ -116,7 +116,7 @@ public class TheRTypeProvider {
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     try {
-      TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot);
+      TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot, functionType);
     }
     catch (MatchingException e) {
       return TheRType.UNKNOWN;

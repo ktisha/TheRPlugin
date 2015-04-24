@@ -32,6 +32,10 @@ public class TheRTypeCheckerInspectionTest extends TheRInspectionTest {
     doTest("test6.r");
   }
 
+  public void testOptional() {
+    doTest("test-optional.r");
+  }
+
   @Override
   protected String getTestDataPath() {
     return super.getTestDataPath() + "/typing/";

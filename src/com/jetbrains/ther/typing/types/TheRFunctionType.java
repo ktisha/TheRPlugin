@@ -56,6 +56,10 @@ public class TheRFunctionType extends TheRType {
     }
   }
 
+  public void setOptional(String paramName) {
+    myParameters.get(paramName).setOptional(true);
+  }
+
   public TheRType getReturnType() {
     return myReturnType;
   }
@@ -82,5 +86,15 @@ public class TheRFunctionType extends TheRType {
 
   public void addRule(TheRFunctionRule rule) {
     myRules.add(rule);
+  }
+
+  public List<TheRParameter> getOptionalParams() {
+    List<TheRParameter> optionalParams = new ArrayList<TheRParameter>();
+    for (TheRTypedParameter typedParameter : myParameters.values()) {
+      if (typedParameter.isOptional()) {
+        optionalParams.add(typedParameter.getParameter());
+      }
+    }
+    return optionalParams;
   }
 }
