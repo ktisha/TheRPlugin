@@ -15,6 +15,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -29,6 +30,7 @@ import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.psi.references.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.typing.*;
 import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class TheRSkeletonsGeneratorAction extends AnAction {
@@ -132,6 +135,8 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     public void visitAssignmentStatement(@NotNull final TheRAssignmentStatement o) {
       TheRPsiElement assignedValue = o.getAssignedValue();
       PsiElement assignee = o.getAssignee();
+
+      //TODO: remember why I wrote this
       if (assignee == null) {
         PsiElement[] children = o.getChildren();
         if (children.length == 0) {
@@ -192,9 +197,11 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
                 //getting value type
 
-                TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
+                //TODO: fix this
+                //TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
                 //getType from function body
 
+                TheRType type = TheRType.UNKNOWN;
                 if (type != TheRType.UNKNOWN) {
                   TheRUtils.appendToDocument(myPackageDocument, "## @return " + type.toString() + "\n");
                 } else {
@@ -208,7 +215,11 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
           }
         }
 
+        Set<String> unusedParameters = TheRStaticAnalyzerHelper.optionalParameters((TheRFunctionExpression)assignedValue);
 
+        if (!unusedParameters.isEmpty()) {
+          TheRUtils.appendToDocument(myPackageDocument, "## @optional " + StringUtil.join(unusedParameters, ", ") + "\n");
+        }
         TheRUtils.appendToDocument(myPackageDocument, o.getText() + "\n\n");
         TheRUtils.saveDocument(myPackageDocument);
       }

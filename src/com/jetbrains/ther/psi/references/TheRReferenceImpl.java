@@ -2,7 +2,6 @@ package com.jetbrains.ther.psi.references;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.execution.process.ProcessOutput;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.impl.scopes.LibraryScope;
@@ -15,17 +14,12 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.PsiFileFactoryImpl;
 import com.intellij.psi.search.ProjectScopeImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.ther.TheRElementGenerator;
-import com.jetbrains.ther.TheRLanguage;
 import com.jetbrains.ther.TheRPsiUtils;
-import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
-import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex;
@@ -36,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference {
+public class TheRReferenceImpl implements PsiPolyVariantReference {
   private static final Logger LOG = Logger.getInstance(TheRReferenceImpl.class.getName());
   protected final TheRReferenceExpression myElement;
 
@@ -142,41 +136,7 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
     addFromLibrary(result, name, TheRInterpreterConfigurable.The_R_USER_SKELETONS);
     addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_SKELETONS);
     addFromLibrary(result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
-    //TODO: seems to give more useless information than useful
-    //if (result.isEmpty()) {
-    //  addRuntimeDefinition(result, name);
-    //}
     return result.toArray(new ResolveResult[result.size()]);
-  }
-
-  private void addRuntimeDefinition(@NotNull final List<ResolveResult> result, @NotNull final String name) {
-    final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    if (path == null) return;
-    final ProcessOutput output = TheRUtils.getProcessOutput(name);
-    if (output == null) {
-      LOG.info("Failed to obtain function definition from runtime: ");
-      return;
-    }
-    if (output.getExitCode() != 0) {
-      LOG.info("Failed to obtain function definition from runtime: " + output.getStderr());
-      return;
-    }
-    if (output.isTimeout()) {
-      LOG.info("Failed to obtain function definition from runtime because of timeout.");
-      return;
-    }
-
-    String stdout = output.getStdout();
-    final int byteCodeIndex = stdout.indexOf("<bytecode");
-    if (byteCodeIndex > 0) stdout = stdout.substring(0, byteCodeIndex);
-
-    final PsiFileFactory factory = PsiFileFactory.getInstance(myElement.getProject());
-    final String fileName = name + ".r";
-    final LightVirtualFile virtualFile = new LightVirtualFile(fileName, TheRLanguage.getInstance(), stdout);
-    final PsiFile psiFile = ((PsiFileFactoryImpl)factory).trySetupPsiForFile(virtualFile, TheRLanguage.getInstance(), true, true);
-    if (psiFile != null) {
-      result.add(new PsiElementResolveResult(psiFile));
-    }
   }
 
   private void addFromLibrary(@NotNull final List<ResolveResult> result, @NotNull final String name, @NotNull final String libraryName) {
@@ -332,6 +292,6 @@ public class TheRReferenceImpl implements PsiReference, PsiPolyVariantReference 
 
   @Override
   public boolean isSoft() {
-    return true;
+    return false;
   }
 }
