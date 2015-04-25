@@ -1,2 +1,5 @@
 args <- commandArgs(TRUE)
-help(args[1])
+packageName <- args[1]
+library(package=packageName, character.only=TRUE)
+loadNamespace(package=packageName)
+help(args[2])

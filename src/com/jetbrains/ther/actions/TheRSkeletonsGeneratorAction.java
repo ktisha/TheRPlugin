@@ -6,7 +6,6 @@ import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -18,10 +17,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.util.DocumentUtil;
 import com.intellij.util.FileContentUtil;
 import com.jetbrains.ther.TheRHelp;
@@ -29,6 +25,7 @@ import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
+import com.jetbrains.ther.psi.TheRRecursiveElementVisitor;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.typing.*;
@@ -47,18 +44,17 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
   private static final Logger LOG = Logger.getInstance(TheRSkeletonsGeneratorAction.class);
 
-  public void actionPerformed(AnActionEvent e) {
-    final Project project = e.getProject();
+  public void actionPerformed(AnActionEvent event) {
+    final Project project = event.getProject();
     assert project != null;
-    final Application application = ApplicationManager.getApplication();
-
-    application.invokeLater(new Runnable() {
+    ProgressManager.getInstance().run(new Task.Backgroundable(project, "Updating skeletons", false) {
       @Override
-      public void run() {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Updating skeletons", false) {
+      public void run(@NotNull ProgressIndicator indicator) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
           @Override
-          public void run(@NotNull ProgressIndicator indicator) {
+          public void run() {
             TheRSkeletonGenerator.runSkeletonGeneration();
+            PsiDocumentManager.getInstance(project).commitAllDocuments();
             final String path = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
             VirtualFile skeletonDir = VfsUtil.findFileByIoFile(new File(path), true);
             if (skeletonDir == null) {
@@ -66,6 +62,9 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
               return;
             }
             for (final VirtualFile packageDir : skeletonDir.getChildren()) {
+              if (!packageDir.isDirectory()) {
+                continue;
+              }
               ApplicationManager.getApplication().invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -73,6 +72,12 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
                     @Override
                     public void run() {
                       generateSkeletonsForPackage(packageDir, project);
+                      try {
+                        packageDir.delete(this);
+                      }
+                      catch (IOException e) {
+                        LOG.error("Failed to delete " + packageDir.getPath());
+                      }
                     }
                   });
                 }
@@ -103,7 +108,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         }
       });
       for (final VirtualFile file : packageDir.getChildren()) {
-        generateSkeletonsForFile(file, packageDocument, project);
+        generateSkeletonsForFile(file, packageDocument, project, packageName);
       }
     }
     catch (IOException e) {
@@ -113,22 +118,26 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
   private void generateSkeletonsForFile(@NotNull final VirtualFile file,
                                         @NotNull final Document packageDocument,
-                                        @NotNull final Project project) {
+                                        @NotNull final Project project,
+                                        String packageName) {
+    LOG.info("start processing " + file.getPath());
     PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
     assert psiFile != null;
-    psiFile.acceptChildren(new FunctionVisitor(packageDocument, file, project));
+    psiFile.acceptChildren(new FunctionVisitor(packageDocument, file, project, packageName));
   }
 
   class FunctionVisitor extends TheRVisitor {
     private final Document myPackageDocument;
     private final VirtualFile myFile;
+    private final String myPackageName;
     private Project myProject;
 
 
-    public FunctionVisitor(Document packageDocument, VirtualFile file, Project project) {
+    public FunctionVisitor(Document packageDocument, VirtualFile file, Project project, String packageName) {
       myPackageDocument = packageDocument;
       myFile = file;
       myProject = project;
+      myPackageName = packageName;
     }
 
     @Override
@@ -136,7 +145,8 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       TheRPsiElement assignedValue = o.getAssignedValue();
       PsiElement assignee = o.getAssignee();
 
-      //TODO: remember why I wrote this
+      //we need this check because of functions like "!" <- ...
+      //TODO: delete this check
       if (assignee == null) {
         PsiElement[] children = o.getChildren();
         if (children.length == 0) {
@@ -146,22 +156,22 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       }
       //TODO: check if we have user skeleton for this function
       if (assignedValue instanceof TheRFunctionExpression) {
-        if (assignee.getText().equals("apply")) {
+        if (assignee.getText().equals("all")) {
           System.out.println();
         }
-        String helpText = TheRPsiUtils.getHelpForFunction(assignee);
+        String helpText = TheRPsiUtils.getHelpForFunction(assignee, myPackageName);
         if (helpText != null) {
-          TheRHelp help;
+          final TheRHelp help;
           help = new TheRHelp(helpText);
-          Map<TheRParameter, TheRType> parsedTypes = TheRSkeletonGeneratorHelper.guessArgsTypeFromHelp(help,
-                                                                                                       (TheRFunctionExpression)assignedValue);
+          final Map<TheRParameter, TheRType> parsedTypes = TheRSkeletonGeneratorHelper.guessArgsTypeFromHelp(help,
+                                                                                                             (TheRFunctionExpression)assignedValue);
           if (parsedTypes != null && !parsedTypes.isEmpty()) {
             String tempFileName = myFile.getNameWithoutExtension() + "temp.r";
             try {
               VirtualFile tempFile = myFile.getParent().findOrCreateChildData(this, tempFileName);
               final Document tempDocument = FileDocumentManager.getInstance().getDocument(tempFile);
               if (tempDocument != null) {
-                List<String> annotations = new ArrayList<String>();
+                final List<String> annotations = new ArrayList<String>();
                 for (Map.Entry<TheRParameter, TheRType> entry : parsedTypes.entrySet()) {
                   String typeAnnotation = DocStringUtil.generateTypeAnnotation(entry.getKey(), entry.getValue());
                   TheRUtils.appendToDocument(tempDocument, typeAnnotation);
@@ -176,17 +186,12 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
                 if (help.myUsage != null && !help.myUsage.isEmpty()) {
                   TheRUtils.appendToDocument(tempDocument, "\n" + help.myUsage + "\n");
                 }
-
-                ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                  @Override
-                  public void run() {
-                    FileDocumentManager.getInstance().saveDocument(tempDocument);
-                  }
-                });
+                TheRUtils.saveDocument(tempDocument);
+                PsiDocumentManager.getInstance(myProject).commitDocument(tempDocument);
                 Visitor visitor = new Visitor();
                 FileContentUtil.reparseFiles(tempFile);
                 PsiFile psiFile = PsiManager.getInstance(myProject).findFile(tempFile);
-                if (psiFile != null) {
+                if (psiFile != null && psiFile.isValid()) {
                   psiFile.acceptChildren(visitor);
                 }
                 if (!visitor.hasErrors()) {
@@ -202,7 +207,8 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
                 TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
                 if (type != TheRType.UNKNOWN) {
                   TheRUtils.appendToDocument(myPackageDocument, "## @return " + type.toString() + "\n");
-                } else {
+                }
+                else {
                   insertTypeFromHelp(assignee, help);
                 }
               }
@@ -220,10 +226,11 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         }
         TheRUtils.appendToDocument(myPackageDocument, o.getText() + "\n\n");
         TheRUtils.saveDocument(myPackageDocument);
+        LOG.info("end processing " + myFile.getPath());
       }
     }
 
-    private void insertTypeFromHelp(PsiElement assignee, TheRHelp help) throws IOException {
+    private void insertTypeFromHelp(PsiElement assignee, final TheRHelp help) throws IOException {
       TheRType valueType = TheRSkeletonGeneratorHelper.guessReturnValueTypeFromHelp(help);
       if (valueType != TheRType.UNKNOWN) {
         String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
@@ -232,10 +239,10 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         if (valueTempDocument != null && help.myExamples != null) {
           TheRUtils.appendToDocument(valueTempDocument, help.myExamples);
           TheRUtils.saveDocument(valueTempDocument);
-          FileContentUtil.reparseFiles(valueTempFile);
+          PsiDocumentManager.getInstance(myProject).commitDocument(valueTempDocument);
           ValueVisitor valueVisitor = new ValueVisitor(valueType, valueTempFile, assignee.getText());
           PsiFile valuePsiFile = PsiManager.getInstance(myProject).findFile(valueTempFile);
-          if (valuePsiFile != null) {
+          if (valuePsiFile != null && valuePsiFile.isValid()) {
             valuePsiFile.acceptChildren(valueVisitor);
             if (valueVisitor.isOk()) {
               TheRUtils.appendToDocument(myPackageDocument, "## @return " + valueType.toString() + "\n");
@@ -246,7 +253,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       }
     }
 
-    class ValueVisitor extends TheRVisitor {
+    class ValueVisitor extends TheRRecursiveElementVisitor {
       private Boolean myOk = null;
       private final TheRType myCandidate;
       private final VirtualFile myExamplesFile;
@@ -266,7 +273,10 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         if (myOk != null && !myOk) {
           return;
         }
-        String programString = "source(\"" + myExamplesFile + "\");"
+        String packageQuoted = "\"" + myPackageName + "\"";
+        String programString = "library(package=" + packageQuoted + ", character.only=TRUE);"
+                               + "loadNamespace(package=" + packageQuoted + ");"
+                               + "source(\"" + myExamplesFile + "\");"
                                + "myValueType<-class(" + o.getText() + ");"
                                + "print(myValueType)";
         String rPath = TheRInterpreterService.getInstance().getInterpreterPath();
@@ -293,12 +303,11 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
         return myOk != null && myOk;
       }
     }
-
-
   }
 
-  class Visitor extends  TheRVisitor {
+  class Visitor extends TheRVisitor {
     private boolean hasErrors = false;
+
     @Override
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
       PsiReference referenceToFunction = callExpression.getExpression().getReference();

@@ -97,7 +97,7 @@ public class TheRPsiUtils {
     return null;
   }
 
-  public static String getHelpForFunction(PsiElement assignee) {
+  public static String getHelpForFunction(PsiElement assignee, String packageName) {
     File file = TheRHelpersLocator.getHelperFile("r-help.r");
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     String helperPath = file.getAbsolutePath();
@@ -105,7 +105,7 @@ public class TheRPsiUtils {
     try {
       String assigneeText =
         assignee.getText().replaceAll("\"", "");
-      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
+      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + packageName + " " + assigneeText);
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       String stdout = output.getStdout();
