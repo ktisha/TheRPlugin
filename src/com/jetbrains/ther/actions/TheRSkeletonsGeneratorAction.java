@@ -87,7 +87,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
   private void generateSkeletonsForPackage(@NotNull final VirtualFile packageDir, @NotNull final Project project) {
     String packageName = packageDir.getName();
     //TODO: DELETE THIS CHECK!!! it is here only for speeding checks while developing
-    if (!packageName.equals("base")) {
+    if (!packageName.equals("base") && !packageName.equals("codetools")) {
       return;
     }
     VirtualFile skeletonsDir = packageDir.getParent();
@@ -146,6 +146,9 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
       }
       //TODO: check if we have user skeleton for this function
       if (assignedValue instanceof TheRFunctionExpression) {
+        if (assignee.getText().equals("apply")) {
+          System.out.println();
+        }
         String helpText = TheRPsiUtils.getHelpForFunction(assignee);
         if (helpText != null) {
           TheRHelp help;
@@ -195,13 +198,8 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
                 tempFile.delete(this);
 
-                //getting value type
 
-                //TODO: fix this
-                //TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
-                //getType from function body
-
-                TheRType type = TheRType.UNKNOWN;
+                TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
                 if (type != TheRType.UNKNOWN) {
                   TheRUtils.appendToDocument(myPackageDocument, "## @return " + type.toString() + "\n");
                 } else {
@@ -226,9 +224,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     }
 
     private void insertTypeFromHelp(PsiElement assignee, TheRHelp help) throws IOException {
-      // TODO: REFACTOR IT!! MOVE TO SEPARATE FUNCTION FOR READABILITY
       TheRType valueType = TheRSkeletonGeneratorHelper.guessReturnValueTypeFromHelp(help);
-
       if (valueType != TheRType.UNKNOWN) {
         String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
         VirtualFile valueTempFile = myFile.getParent().findOrCreateChildData(this, valueTempFileName);
@@ -246,6 +242,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
             }
           }
         }
+        valueTempFile.delete(this);
       }
     }
 

@@ -269,7 +269,7 @@ public class TheRTypeProvider {
     if (typeName.equals("complex")) {
       return TheRComplexType.INSTANCE;
     }
-    return null;
+    return TheRType.UNKNOWN;
   }
 
   private static TheRType getReferenceExpressionType(TheRReferenceExpression expression) {
