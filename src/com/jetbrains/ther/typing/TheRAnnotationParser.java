@@ -157,7 +157,7 @@ public class TheRAnnotationParser {
     Substring parameterName = split.get(0).trim();
     Substring typeName = split.get(1).trim();
     TheRType type = createType(typeName.getValue());
-    if (type != TheRType.UNKNOWN) {
+    if (type != null && type != TheRType.UNKNOWN) {
       myType.addParameterType(parameterName.getValue(), type);
     }
   }
@@ -167,6 +167,9 @@ public class TheRAnnotationParser {
     Set<TheRType> types = new HashSet<TheRType>();
     for (String name : typeNames) {
       TheRType type = TheRTypeProvider.findTypeByName(name.trim());
+      if (type == null) {
+        return null;
+      }
       if (type != TheRType.UNKNOWN) {
         types.add(type);
       }

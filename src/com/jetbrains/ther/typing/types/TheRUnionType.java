@@ -69,7 +69,7 @@ public class TheRUnionType extends TheRType {
       if (type instanceof TheRUnionType) {
         types.addAll(((TheRUnionType)type).myTypes);
       } else {
-        types.add(type);
+          types.add(type);
       }
     }
   }

@@ -2,6 +2,7 @@ package com.jetbrains.ther.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
@@ -40,6 +41,18 @@ public class TheRGenerateTypingReport extends AnAction {
     final Project project = event.getProject();
     assert project != null;
     generateReportForOpenedFile(project);
+  }
+
+  @Override
+  public void update(AnActionEvent e) {
+    Presentation presentation = e.getPresentation();
+    if (!ApplicationManager.getApplication().isInternal()) {
+      presentation.setEnabled(false);
+      presentation.setVisible(false);
+      return;
+    }
+    presentation.setVisible(true);
+    presentation.setEnabled(true);
   }
 
   public static void generateReportForOpenedFile(final Project project) {

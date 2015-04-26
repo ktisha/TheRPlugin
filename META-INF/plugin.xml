@@ -34,7 +34,7 @@
             description="Generate Typing Report">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
-    <action id="TheRSkeletonsGenerator" class="com.jetbrains.ther.actions.TheRSkeletonsGeneratorAction" text="TheRSkeletonsGenerator"
+    <action id="TheRSkeletonsGenerator" class="com.jetbrains.ther.actions.TheRSkeletonsGeneratorAction" text="Generate Skeletons"
             description="Generate skeletons">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>

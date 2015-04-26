@@ -6,6 +6,7 @@ import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -44,9 +45,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
   private static final Logger LOG = Logger.getInstance(TheRSkeletonsGeneratorAction.class);
 
-  public void actionPerformed(AnActionEvent event) {
-    final Project project = event.getProject();
-    assert project != null;
+  public static void generateSmartSkeletons(@NotNull final Project project) {
     ProgressManager.getInstance().run(new Task.Backgroundable(project, "Updating skeletons", false) {
       @Override
       public void run(@NotNull ProgressIndicator indicator) {
@@ -89,7 +88,25 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     });
   }
 
-  private void generateSkeletonsForPackage(@NotNull final VirtualFile packageDir, @NotNull final Project project) {
+  public void actionPerformed(AnActionEvent event) {
+    final Project project = event.getProject();
+    assert project != null;
+    TheRSkeletonsGeneratorAction.generateSmartSkeletons(project);
+  }
+
+  @Override
+  public void update(AnActionEvent e) {
+    Presentation presentation = e.getPresentation();
+    if (!ApplicationManager.getApplication().isInternal()) {
+      presentation.setEnabled(false);
+      presentation.setVisible(false);
+      return;
+    }
+    presentation.setVisible(true);
+    presentation.setEnabled(true);
+  }
+
+  private static void generateSkeletonsForPackage(@NotNull final VirtualFile packageDir, @NotNull final Project project) {
     String packageName = packageDir.getName();
     //TODO: DELETE THIS CHECK!!! it is here only for speeding checks while developing
     if (!packageName.equals("base") && !packageName.equals("codetools")) {
@@ -97,8 +114,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     }
     VirtualFile skeletonsDir = packageDir.getParent();
     try {
-      //TODO: move files from userSkeletons
-      VirtualFile packageFile = skeletonsDir.findOrCreateChildData(this, packageName + ".r");
+      VirtualFile packageFile = skeletonsDir.findOrCreateChildData(project, packageName + ".r");
       final Document packageDocument = FileDocumentManager.getInstance().getDocument(packageFile);
       assert packageDocument != null;
       DocumentUtil.writeInRunUndoTransparentAction(new Runnable() {
@@ -116,17 +132,17 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     }
   }
 
-  private void generateSkeletonsForFile(@NotNull final VirtualFile file,
-                                        @NotNull final Document packageDocument,
-                                        @NotNull final Project project,
-                                        String packageName) {
+  private static void generateSkeletonsForFile(@NotNull final VirtualFile file,
+                                               @NotNull final Document packageDocument,
+                                               @NotNull final Project project,
+                                               String packageName) {
     LOG.info("start processing " + file.getPath());
     PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
     assert psiFile != null;
     psiFile.acceptChildren(new FunctionVisitor(packageDocument, file, project, packageName));
   }
 
-  class FunctionVisitor extends TheRVisitor {
+  static class FunctionVisitor extends TheRVisitor {
     private final Document myPackageDocument;
     private final VirtualFile myFile;
     private final String myPackageName;
@@ -305,7 +321,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
     }
   }
 
-  class Visitor extends TheRVisitor {
+  static class Visitor extends TheRVisitor {
     private boolean hasErrors = false;
 
     @Override

@@ -6,7 +6,11 @@ is.identifier <- function(str) {
  return(grepl("^([[:alpha:]]|_|\\.)([[:alpha:]]|[[:digit:]]|_|\\.)*$", str) == TRUE)
 }
 
+
 for (name in packageNames) {
+    if (paste(name, "r", sep=".") %in% list.files(path=args[1])) {
+        next
+    }
     shouldLoadLibrary = FALSE
     pName = paste("package", name, sep=":")
     if (!pName %in% searchPath)
