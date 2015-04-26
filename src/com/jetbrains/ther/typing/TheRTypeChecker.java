@@ -127,7 +127,7 @@ public class TheRTypeChecker {
   private static String generateMissingArgErrorMessage(List<TheRParameter> parameters, int i) {
     String noDefaultMessage = " missing, with no default";
     if (i == parameters.size() - 1) {
-      return "argument \'" + parameters.get(i).getText() + "\" is" + noDefaultMessage;
+      return "argument \'" + parameters.get(i).getText() + "\' is" + noDefaultMessage;
     }
     StringBuilder stringBuilder = new StringBuilder("arguments ");
     while (i < parameters.size()) {

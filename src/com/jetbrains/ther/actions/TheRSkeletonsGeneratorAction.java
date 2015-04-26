@@ -28,7 +28,7 @@ import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
 import com.jetbrains.ther.psi.TheRRecursiveElementVisitor;
 import com.jetbrains.ther.psi.api.*;
-import com.jetbrains.ther.psi.references.TheRStaticAnalyzerHelper;
+import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.typing.*;
 import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;

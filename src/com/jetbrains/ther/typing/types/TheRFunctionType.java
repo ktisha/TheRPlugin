@@ -2,15 +2,13 @@ package com.jetbrains.ther.typing.types;
 
 import com.intellij.psi.PsiManager;
 import com.jetbrains.ther.TheRPsiUtils;
+import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
 import com.jetbrains.ther.typing.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TheRFunctionType extends TheRType {
   private final TheRFunctionExpression myFunctionExpression;
@@ -44,6 +42,13 @@ public class TheRFunctionType extends TheRType {
       List<Substring> lines = DocStringUtil.getDocStringLines(assignmentStatement);
       for (Substring line: lines) {
         new TheRAnnotationParser(this).interpretLine(line);
+      }
+    }
+    Set<String> strings = TheRStaticAnalyzerHelper.optionalParameters(myFunctionExpression);
+    for (String name : strings) {
+      TheRTypedParameter typedParameter = myParameters.get(name);
+      if (typedParameter != null) {
+        typedParameter.setOptional(true);
       }
     }
     if (myReturnType == null || myReturnType == TheRType.UNKNOWN) {

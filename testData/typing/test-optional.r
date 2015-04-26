@@ -1,6 +1,6 @@
 ## @optional x, y
 f <- function(x, y, z, w) {
-  z <- 1
+  z <- w
 }
 
-f(z=1, w=2)
+<warning descr="argument 'w' is missing, with no default">f()</warning>
