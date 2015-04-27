@@ -1,9 +1,13 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ui.ConsoleView;
+import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.LineSeparator;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -34,6 +38,9 @@ public class TheRDebugProcess extends XDebugProcess {
   @NotNull
   private final List<TheRStackFrameData> myStackFramesData;
 
+  @NotNull
+  private final ConsoleView myConsole;
+
   private int myNextLineNumber;
 
   public TheRDebugProcess(@NotNull final XDebugSession session, @NotNull final TheRDebugger debugger)
@@ -44,7 +51,15 @@ public class TheRDebugProcess extends XDebugProcess {
 
     myBreakpoints = new HashMap<Integer, XLineBreakpoint<XBreakpointProperties>>();
     myStackFramesData = new ArrayList<TheRStackFrameData>();
+    myConsole = (ConsoleView)super.createConsole();
+
     myNextLineNumber = 0;
+  }
+
+  @NotNull
+  @Override
+  public ExecutionConsole createConsole() {
+    return myConsole;
   }
 
   @NotNull
@@ -82,6 +97,8 @@ public class TheRDebugProcess extends XDebugProcess {
 
       myNextLineNumber += executed;
 
+      printROut();
+
       updateDebugInformation();
     }
     catch (final IOException e) {
@@ -115,6 +132,8 @@ public class TheRDebugProcess extends XDebugProcess {
         }
 
         myNextLineNumber += executed;
+
+        printROut();
       }
       while ((!myBreakpoints.containsKey(myNextLineNumber)));
 
@@ -144,6 +163,15 @@ public class TheRDebugProcess extends XDebugProcess {
 
   public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
     myBreakpoints.remove(breakpoint.getLine());
+  }
+
+  private void printROut() {
+    final String latestROut = myDebugger.getLatestROut();
+
+    if (latestROut != null) {
+      myConsole.print(latestROut, ConsoleViewContentType.NORMAL_OUTPUT);
+      myConsole.print(LineSeparator.getSystemLineSeparator().getSeparatorString(), ConsoleViewContentType.NORMAL_OUTPUT);
+    }
   }
 
   private void updateDebugInformation() {

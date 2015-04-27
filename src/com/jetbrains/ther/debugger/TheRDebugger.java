@@ -82,6 +82,9 @@ public class TheRDebugger {
   @NotNull
   private final Map<String, String> myVarToType;
 
+  @Nullable
+  private String myLatestROut;
+
   /**
    * Constructs new instance of debugger with specified interpreter and script.
    *
@@ -106,6 +109,8 @@ public class TheRDebugger {
 
     myVarToRepresentation = new HashMap<String, String>();
     myVarToType = new HashMap<String, String>();
+
+    myLatestROut = null;
   }
 
   /**
@@ -116,6 +121,7 @@ public class TheRDebugger {
   public int executeInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
     int result = 0;
+    myLatestROut = null;
 
     while (!accepted) {
       final String command = mySourceReader.readLine();
@@ -156,6 +162,11 @@ public class TheRDebugger {
     return myScriptPath;
   }
 
+  @Nullable
+  public String getLatestROut() {
+    return myLatestROut;
+  }
+
   public void stop() {
     try {
       mySourceReader.close();
@@ -188,6 +199,7 @@ public class TheRDebugger {
     return false;
   }
 
+  // TODO rename
   private boolean nextCommandIsNeeded(@NotNull final String response) {
     if (endsWithPlusAndSpace(response)) {
       return true;
@@ -203,7 +215,8 @@ public class TheRDebugger {
     }
 
     if (ENDS_BROWSE_PATTERN.matcher(response).matches()) {
-      // TODO print to console
+      myLatestROut = removeLastLine(response);
+
       return false;
     }
 
