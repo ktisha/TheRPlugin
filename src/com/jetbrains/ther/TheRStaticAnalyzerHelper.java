@@ -11,8 +11,13 @@ public class TheRStaticAnalyzerHelper {
 
   private interface StaticAnalysisResult {
     StaticAnalysisResult applyRead(TheRReferenceExpression ref);
+
     StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement);
+
     StaticAnalysisResult merge(StaticAnalysisResult other);
+
+    void applyReturn();
+
     boolean isEnd();
   }
 
@@ -55,6 +60,9 @@ public class TheRStaticAnalyzerHelper {
     }
 
     @Override
+    public void applyReturn() { }
+
+    @Override
     public boolean isEnd() {
       return myEnd;
     }
@@ -70,36 +78,42 @@ public class TheRStaticAnalyzerHelper {
 
   private static class OptionalParameters implements StaticAnalysisResult {
 
-    private Set<String> myOptionalParameters = new HashSet<String>();
-    private Map<String, Set<PsiElement>> myDefinitions = new HashMap<String, Set<PsiElement>>();
+    private Set<String> myPossibleOptionals = new HashSet<String>();
+    private Set<String> myOptionals = new HashSet<String>();
+    private Set<String> myReaded = new HashSet<String>();
 
     private OptionalParameters(List<TheRParameter> parameters) {
       for (TheRParameter parameter : parameters) {
         if (parameter.getName() != null && parameter.getExpression() == null) {
-          myOptionalParameters.add(parameter.getName());
-          Set<PsiElement> definitions = new HashSet<PsiElement>();
-          definitions.add(parameter);
-          myDefinitions.put(parameter.getName(), definitions);
+          myPossibleOptionals.add(parameter.getName());
         }
       }
+    }
+
+    public OptionalParameters(OptionalParameters parameters) {
+      myPossibleOptionals = parameters.myPossibleOptionals;
+      myOptionals.addAll(parameters.myOptionals);
+      myReaded.addAll(parameters.myReaded);
     }
 
     @Override
     public StaticAnalysisResult applyRead(TheRReferenceExpression ref) {
       PsiElement parent = ref.getParent();
-      if (parent instanceof TheRCallExpression) {
-        TheRCallExpression callExpression = (TheRCallExpression)parent;
-        String functionName = callExpression.getExpression().getText();
-        if ("missing".equals(functionName) || "is.null".equals(functionName)) {
-          return this;
+      if (parent instanceof TheRArgumentList) {
+        parent = parent.getParent();
+        if (parent instanceof TheRCallExpression) {
+          TheRCallExpression callExpression = (TheRCallExpression)parent;
+          String functionName = callExpression.getExpression().getText();
+          if ("missing".equals(functionName) || "is.null".equals(functionName)) {
+            return this;
+          }
         }
       }
       String name = ref.getName();
-      if (myOptionalParameters.contains(name)) {
-        Set<PsiElement> definitions = myDefinitions.get(name);
-        if (definitions.size() == 1 && definitions.iterator().next() instanceof TheRParameter) {
-          myOptionalParameters.remove(name);
-        }
+      if (myPossibleOptionals.contains(name) && !myOptionals.contains(name)) {
+        OptionalParameters newParams = new OptionalParameters(this);
+        newParams.myReaded.add(name);
+        return newParams;
       }
       return this;
     }
@@ -111,9 +125,11 @@ public class TheRStaticAnalyzerHelper {
         return this;
       }
       String name = assignee.getText();
-      Set<PsiElement> definitions = new HashSet<PsiElement>();
-      definitions.add(assignmentStatement);
-      myDefinitions.put(name, definitions);
+      if (myPossibleOptionals.contains(name) && !myReaded.contains(name)) {
+        OptionalParameters newParams = new OptionalParameters(this);
+        newParams.myOptionals.add(name);
+        return newParams;
+      }
       return this;
     }
 
@@ -123,16 +139,24 @@ public class TheRStaticAnalyzerHelper {
         throw new IllegalArgumentException();
       }
       OptionalParameters otherParams = (OptionalParameters)other;
-      for (Map.Entry<String, Set<PsiElement>> entry: otherParams.myDefinitions.entrySet()) {
-        String name = entry.getKey();
-        Set<PsiElement> definitions = entry.getValue();
-        if (myDefinitions.containsKey(name)) {
-          myDefinitions.get(name).addAll(definitions);
-        } else {
-          myDefinitions.put(name, definitions);
+      myOptionals.addAll(otherParams.myOptionals);
+      Set<String> mergeReaded = new HashSet<String>();
+      for (String name : myReaded) {
+        if (otherParams.myReaded.contains(name)) {
+          mergeReaded.add(name);
         }
       }
+      myReaded = mergeReaded;
       return this;
+    }
+
+    @Override
+    public void applyReturn() {
+      for (String name : myPossibleOptionals) {
+        if (!myReaded.contains(name)) {
+          myOptionals.add(name);
+        }
+      }
     }
 
     @Override
@@ -141,7 +165,7 @@ public class TheRStaticAnalyzerHelper {
     }
 
     public Set<String> getOptionalParameters() {
-      return myOptionalParameters;
+      return myOptionals;
     }
   }
 
@@ -176,6 +200,7 @@ public class TheRStaticAnalyzerHelper {
     }
     OptionalParameters parameters = new OptionalParameters(function.getParameterList().getParameterList());
     parameters = (OptionalParameters)analyze(functionExpression, parameters);
+    parameters.applyReturn();
     return parameters.getOptionalParameters();
   }
 
@@ -191,7 +216,7 @@ public class TheRStaticAnalyzerHelper {
       if (resolveResult.isEnd()) {
         return resolveResult;
       }
-      resolveResult.applyAssign(assignment);
+      resolveResult = resolveResult.applyAssign(assignment);
       return resolveResult;
     }
 
@@ -260,19 +285,33 @@ public class TheRStaticAnalyzerHelper {
 
     if (where instanceof TheRCallExpression) {
       TheRCallExpression callExpression = (TheRCallExpression)where;
-      StaticAnalysisResult result = parentResult;
-      for (TheRExpression expression : callExpression.getArgumentList().getExpressionList()) {
-        TheRPsiElement child = expression;
-        if (expression instanceof TheRAssignmentStatement) {
-          child = ((TheRAssignmentStatement)expression).getAssignedValue();
+      List<TheRExpression> expressions = new ArrayList<TheRExpression>();
+      expressions.add(callExpression.getExpression());
+      for (TheRExpression argument : callExpression.getArgumentList().getExpressionList()) {
+        TheRExpression child = argument;
+        if (argument instanceof TheRAssignmentStatement) {
+          child = (TheRExpression)((TheRAssignmentStatement)argument).getAssignedValue();
         }
-        StaticAnalysisResult argumentResult = analyze(child, parentResult);
-        if (argumentResult.isEnd()) {
-          return argumentResult;
-        }
-        result = result.merge(argumentResult);
+        expressions.add(child);
+      }
+      StaticAnalysisResult result = analyzeSequence(expressions, parentResult);
+      if (result.isEnd()) {
+        return result;
+      }
+      if ("return".equals(callExpression.getExpression().getText())) {
+        result.applyReturn();
       }
       return result;
+    }
+
+    if (where instanceof TheRSubscriptionExpression) {
+      TheRSubscriptionExpression subscriptionExpression = (TheRSubscriptionExpression)where;
+      return analyzeSequence(subscriptionExpression.getExpressionList(), parentResult);
+    }
+
+    if (where instanceof TheRSliceExpression) {
+      TheRSliceExpression sliceExpression = (TheRSliceExpression)where;
+      return analyzeSequence(sliceExpression.getExpressionList(), parentResult);
     }
 
     //TODO: look at other expressions (for, call expression)
@@ -290,5 +329,4 @@ public class TheRStaticAnalyzerHelper {
     }
     return resolveResult;
   }
-
 }

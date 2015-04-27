@@ -169,7 +169,8 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
           @Override
           public void run() {
             // add all paths to library
-            final String skeletonLibraryPath = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
+            final String skeletonLibraryPath =
+              TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
             File skeletonLibDir = new File(skeletonLibraryPath);
             if (!skeletonLibDir.exists()) {
               if (!skeletonLibDir.mkdir()) {
@@ -181,7 +182,8 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
             File pregeneratedSkeletonsDir = new File(skeletons);
             if (!pregeneratedSkeletonsDir.exists()) {
               LOG.info("Pre-generated skeletons not found");
-            } else {
+            }
+            else {
               try {
                 FileUtil.copyDirContent(pregeneratedSkeletonsDir, skeletonLibDir);
               }
@@ -201,6 +203,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
             VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
             //TODO: run my brand new action
             TheRSkeletonGenerator.runSkeletonGeneration();
+            VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
           }
         });
       }

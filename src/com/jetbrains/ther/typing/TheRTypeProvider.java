@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.jetbrains.ther.TheRPsiUtils;
+import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.Nullable;
@@ -278,15 +279,17 @@ public class TheRTypeProvider {
     if (reference == null) {
       return TheRType.UNKNOWN;
     }
-    PsiElement resolve = reference.resolve();
-    if (resolve != null && resolve instanceof TheRAssignmentStatement) {
-      TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)resolve;
-      TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
-      if (assignedValue != null) {
-        return getType(assignedValue);
+    Set<TheRType> definitionTypes = new HashSet<TheRType>();
+    for (PsiElement reachDefinition : TheRStaticAnalyzerHelper.reachDefinitions(expression)) {
+      if (reachDefinition instanceof TheRAssignmentStatement) {
+        TheRAssignmentStatement assignment = (TheRAssignmentStatement)reachDefinition;
+        TheRPsiElement assignedValue = assignment.getAssignedValue();
+        if (assignedValue != null) {
+          definitionTypes.add(getType(assignedValue));
+        }
       }
     }
-    return TheRType.UNKNOWN;
+    return TheRUnionType.create(definitionTypes);
   }
 
   public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {
