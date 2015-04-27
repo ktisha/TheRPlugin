@@ -116,7 +116,7 @@ public class TheRDebugger {
       result++;
 
       if (isComment(command) || StringUtil.isEmptyOrSpaces(command)) {
-        return 1;
+        return 1; // TODO forward to next command and cache it
       }
 
       mySender.send(command);
@@ -131,12 +131,12 @@ public class TheRDebugger {
   }
 
   @NotNull
-  public Map<String, String> getVarToRepresentation() {
+  public Map<String, String> getVarRepresentations() {
     return Collections.unmodifiableMap(myVarToRepresentation);
   }
 
   @NotNull
-  public Map<String, String> getVarToType() {
+  public Map<String, String> getVarTypes() {
     return Collections.unmodifiableMap(myVarToType);
   }
 
@@ -175,13 +175,16 @@ public class TheRDebugger {
     final String response = removeLastLine(myReceiver.receive());
 
     myVarToType.clear();
+    myVarToRepresentation.clear();
 
     for (final String var : calculateVariables(response)) {
-      updateType(var);
-      updateRepresentation(var);
-    }
+      final VarDebugInformation debugInformation = getDebugInformation(var);
 
-    removeObsoleteVarRepresentations();
+      if (debugInformation != null) {
+        myVarToType.put(var, debugInformation.getType());
+        myVarToRepresentation.put(var, debugInformation.getRepresentation());
+      }
+    }
   }
 
   @NotNull
@@ -206,49 +209,27 @@ public class TheRDebugger {
     return result;
   }
 
-  private void updateType(@NotNull final String var) throws IOException, InterruptedException {
-    mySender.send(TYPEOF_COMMAND + "(" + var + ")");
-    myVarToType.put(var, removeLastLine(myReceiver.receive()));
-  }
+  @Nullable
+  private VarDebugInformation getDebugInformation(@NotNull final String var) throws IOException, InterruptedException {
+    final String type = getType(var);
 
-  private void updateRepresentation(@NotNull final String var) throws IOException, InterruptedException {
-    mySender.send(var);
-
-    final String representation = removeLastLine(myReceiver.receive());
-
-    if (isNewOrUpdatedFunction(var, representation)) {
-      traceAndDebug(var);
-    }
-
-    myVarToRepresentation.put(var, representation);
-  }
-
-  private void removeObsoleteVarRepresentations() {
-    final Iterator<Map.Entry<String, String>> iterator = myVarToRepresentation.entrySet().iterator();
-
-    while (iterator.hasNext()) {
-      final String var = iterator.next().getKey();
-
-      if (!myVarToType.containsKey(var)) {
-        iterator.remove();
+    if (type.equals(FUNCTION_TYPE)) {
+      if (var.startsWith(SERVICE_FUNCTION_PREFIX)) {
+        return null;
+      }
+      else {
+        traceAndDebug(var);
       }
     }
+
+    return new VarDebugInformation(type, getRepresentation(var, type));
   }
 
-  @Nullable
-  private String getVariable(@NotNull final String token) {
-    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
+  @NotNull
+  private String getType(@NotNull final String var) throws IOException, InterruptedException {
+    mySender.send(TYPEOF_COMMAND + "(" + var + ")");
 
-    if (isNotEmptyQuotedString) {
-      return token.substring(1, token.length() - 1);
-    }
-    else {
-      return null;
-    }
-  }
-
-  private boolean isNewOrUpdatedFunction(@NotNull final String var, @NotNull final String representation) {
-    return myVarToType.get(var).equals(FUNCTION_TYPE) && !representation.equals(myVarToRepresentation.get(var));
+    return removeLastLine(myReceiver.receive());
   }
 
   private void traceAndDebug(@NotNull final String var) throws IOException, InterruptedException {
@@ -263,6 +244,39 @@ public class TheRDebugger {
 
     mySender.send(createDebugCommand(var));
     myReceiver.receive();
+  }
+
+  @NotNull
+  private String getRepresentation(@NotNull final String var, @NotNull final String type) throws IOException, InterruptedException {
+    mySender.send(var);
+
+    final String representation = removeLastLine(myReceiver.receive());
+
+    if (type.equals(FUNCTION_TYPE)) {
+      final String[] lines = StringUtil.splitByLinesKeepSeparators(representation);
+      final StringBuilder sb = new StringBuilder();
+
+      for (int i = 2; i < lines.length - 1; i++) {
+        sb.append(lines[i]);
+      }
+
+      return sb.toString();
+    }
+    else {
+      return representation;
+    }
+  }
+
+  @Nullable
+  private String getVariable(@NotNull final String token) {
+    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
+
+    if (isNotEmptyQuotedString) {
+      return token.substring(1, token.length() - 1);
+    }
+    else {
+      return null;
+    }
   }
 
   @NotNull
@@ -391,6 +405,30 @@ public class TheRDebugger {
     @NotNull
     private String removeFirstLine(@NotNull final StringBuilder sb) {
       return sb.substring(sb.indexOf(System.lineSeparator()) + 1);
+    }
+  }
+
+  private static class VarDebugInformation {
+
+    @NotNull
+    public final String myType;
+
+    @NotNull
+    public final String myRepresentation;
+
+    public VarDebugInformation(@NotNull final String type, @NotNull final String representation) {
+      myType = type;
+      myRepresentation = representation;
+    }
+
+    @NotNull
+    public String getType() {
+      return myType;
+    }
+
+    @NotNull
+    public String getRepresentation() {
+      return myRepresentation;
     }
   }
 }

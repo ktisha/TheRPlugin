@@ -22,8 +22,8 @@ public abstract class TheRDebuggerTestCase extends TestCase {
   public TheRDebuggerTestCase(@NotNull String name) throws IOException, InterruptedException {
     myDebugger = new TheRDebugger("R", "./testData/debugger/" + name + ".r");
 
-    myVarToRepresentation = myDebugger.getVarToRepresentation();
-    myVarToType = myDebugger.getVarToType();
+    myVarToRepresentation = myDebugger.getVarRepresentations();
+    myVarToType = myDebugger.getVarTypes();
   }
 
   protected void checkSize(int size) {

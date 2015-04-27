@@ -147,8 +147,8 @@ public class TheRDebugProcess extends XDebugProcess {
   }
 
   private void updateDebugInformation() {
-    final Map<String, String> varRepresentations = new HashMap<String, String>(myDebugger.getVarToRepresentation());
-    final Map<String, String> varTypes = new HashMap<String, String>(myDebugger.getVarToType());
+    final Map<String, String> varRepresentations = new HashMap<String, String>(myDebugger.getVarRepresentations());
+    final Map<String, String> varTypes = new HashMap<String, String>(myDebugger.getVarTypes());
 
     myStackFramesData.clear();
     myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varRepresentations, varTypes)); // TODO reverse
