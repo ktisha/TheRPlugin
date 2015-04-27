@@ -158,7 +158,8 @@ public class TheRDebugProcess extends XDebugProcess {
     final TheRSuspendContext suspendContext = new TheRSuspendContext(myStackFramesData);
 
     if (breakpoint != null) {
-      if (!session.breakpointReached(breakpoint, "ABCDEF", suspendContext)) { // TODO find usage of this string and replace with better one
+      if (!session
+        .breakpointReached(breakpoint, null, suspendContext)) { // second argument is printed to console when breakpoint is reached
         resume();
       }
     }

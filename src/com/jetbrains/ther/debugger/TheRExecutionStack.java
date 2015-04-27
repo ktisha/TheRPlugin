@@ -14,7 +14,7 @@ public class TheRExecutionStack extends XExecutionStack {
   private final List<TheRStackFrame> myStackFrames;
 
   public TheRExecutionStack(@NotNull final List<TheRStackFrameData> data) {
-    super("GHIJKL"); // TODO find usage of this string in ui and replace with better one
+    super(""); // argument used as a description for current thread
 
     myStackFrames = new ArrayList<TheRStackFrame>(data.size());
 

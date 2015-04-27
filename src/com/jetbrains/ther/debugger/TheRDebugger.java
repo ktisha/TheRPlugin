@@ -28,9 +28,27 @@ public class TheRDebugger {
   @NotNull
   private static final String TYPEOF_COMMAND = "typeof";
 
+  @NotNull
+  private static final String TRACE_COMMAND = "trace";
+
+  @NotNull
+  private static final String DEBUG_COMMAND = "debug";
+
   private static final char COMMENT_SYMBOL = '#';
 
   private static final int INITIAL_RECEIVER_TIMEOUT = 50;
+
+  @NotNull
+  private static final String FUNCTION_TYPE = "[1] \"closure\"";
+
+  @NotNull
+  private static final String SERVICE_FUNCTION_PREFIX = "intellij_ther_";
+
+  @NotNull
+  private static final String SERVICE_ENTER_FUNCTION_SUFFIX = "_enter";
+
+  @NotNull
+  private static final String SERVICE_EXIT_FUNCTION_SUFFIX = "_exit";
 
   @NotNull
   private final String myScriptPath;
@@ -72,11 +90,11 @@ public class TheRDebugger {
 
     mySourceReader = new BufferedReader(new FileReader(scriptPath));
 
-    myVarToRepresentation = new HashMap<String, String>();
-    myVarToType = new HashMap<String, String>();
-
     mySender.send(BROWSER_COMMAND);
     myReceiver.receive();
+
+    myVarToRepresentation = new HashMap<String, String>();
+    myVarToType = new HashMap<String, String>();
   }
 
   /**
@@ -156,13 +174,14 @@ public class TheRDebugger {
     mySender.send(LS_COMMAND);
     final String response = removeLastLine(myReceiver.receive());
 
-    myVarToRepresentation.clear();
     myVarToType.clear();
 
     for (final String var : calculateVariables(response)) {
-      updateRepresentation(var);
       updateType(var);
+      updateRepresentation(var);
     }
+
+    removeObsoleteVarRepresentations();
   }
 
   @NotNull
@@ -187,14 +206,33 @@ public class TheRDebugger {
     return result;
   }
 
-  private void updateRepresentation(@NotNull final String var) throws IOException, InterruptedException {
-    mySender.send(var);
-    myVarToRepresentation.put(var, removeLastLine(myReceiver.receive()));
-  }
-
   private void updateType(@NotNull final String var) throws IOException, InterruptedException {
     mySender.send(TYPEOF_COMMAND + "(" + var + ")");
     myVarToType.put(var, removeLastLine(myReceiver.receive()));
+  }
+
+  private void updateRepresentation(@NotNull final String var) throws IOException, InterruptedException {
+    mySender.send(var);
+
+    final String representation = removeLastLine(myReceiver.receive());
+
+    if (isNewOrUpdatedFunction(var, representation)) {
+      traceAndDebug(var);
+    }
+
+    myVarToRepresentation.put(var, representation);
+  }
+
+  private void removeObsoleteVarRepresentations() {
+    final Iterator<Map.Entry<String, String>> iterator = myVarToRepresentation.entrySet().iterator();
+
+    while (iterator.hasNext()) {
+      final String var = iterator.next().getKey();
+
+      if (!myVarToType.containsKey(var)) {
+        iterator.remove();
+      }
+    }
   }
 
   @Nullable
@@ -207,6 +245,54 @@ public class TheRDebugger {
     else {
       return null;
     }
+  }
+
+  private boolean isNewOrUpdatedFunction(@NotNull final String var, @NotNull final String representation) {
+    return myVarToType.get(var).equals(FUNCTION_TYPE) && !representation.equals(myVarToRepresentation.get(var));
+  }
+
+  private void traceAndDebug(@NotNull final String var) throws IOException, InterruptedException {
+    mySender.send(createEnterFunction(var));
+    myReceiver.receive();
+
+    mySender.send(createExitFunction(var));
+    myReceiver.receive();
+
+    mySender.send(createTraceCommand(var));
+    myReceiver.receive();
+
+    mySender.send(createDebugCommand(var));
+    myReceiver.receive();
+  }
+
+  @NotNull
+  private String createEnterFunction(@NotNull final String var) {
+    return createEnterFunctionName(var) + " <- function() { print(\"enter " + var + "\") }";
+  }
+
+  @NotNull
+  private String createEnterFunctionName(@NotNull final String var) {
+    return SERVICE_FUNCTION_PREFIX + var + SERVICE_ENTER_FUNCTION_SUFFIX;
+  }
+
+  @NotNull
+  private String createExitFunction(@NotNull final String var) {
+    return createExitFunctionName(var) + " <- function() { print(\"exit " + var + "\") }";
+  }
+
+  @NotNull
+  private String createExitFunctionName(@NotNull final String var) {
+    return SERVICE_FUNCTION_PREFIX + var + SERVICE_EXIT_FUNCTION_SUFFIX;
+  }
+
+  @NotNull
+  private String createTraceCommand(@NotNull final String var) {
+    return TRACE_COMMAND + "(" + var + ", " + createEnterFunctionName(var) + ", exit = " + createExitFunctionName(var) + ")";
+  }
+
+  @NotNull
+  private String createDebugCommand(@NotNull final String var) {
+    return DEBUG_COMMAND + "(" + var + ")";
   }
 
   private static class Sender {
