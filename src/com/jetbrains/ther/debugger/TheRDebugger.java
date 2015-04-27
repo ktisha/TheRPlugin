@@ -2,16 +2,27 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.LineSeparator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class TheRDebugger {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
+
+  @NotNull
+  private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^Browse\\[\\d+\\]> $");
+
+  @NotNull
+  private static final Pattern ENDS_BROWSE_PATTERN = Pattern.compile("^.*Browse\\[\\d+\\]> $", Pattern.DOTALL);
+
+  @NotNull
+  private static final Pattern DEBUGGING_PATTERN = Pattern.compile("^debugging in.*$", Pattern.DOTALL);
 
   @NotNull
   private static final String NO_SAVE_PARAMETER = "--no-save";
@@ -156,6 +167,17 @@ public class TheRDebugger {
     myProcess.destroy();
   }
 
+  @NotNull
+  private static String lineSeparator() {
+    return LineSeparator.getSystemLineSeparator().getSeparatorString();
+  }
+
+  private static boolean endsWithPlusAndSpace(@NotNull final CharSequence sequence) {
+    final int length = sequence.length();
+
+    return length >= 2 && sequence.charAt(length - 1) == ' ' && sequence.charAt(length - 2) == '+';
+  }
+
   private boolean isComment(@NotNull final String command) {
     for (int i = 0; i < command.length(); i++) {
       if (!StringUtil.isWhiteSpace(command.charAt(i))) {
@@ -167,7 +189,26 @@ public class TheRDebugger {
   }
 
   private boolean nextCommandIsNeeded(@NotNull final String response) {
-    return response.length() < 2 || response.charAt(response.length() - 2) != '>'; // TODO match only Browser[#]>
+    if (endsWithPlusAndSpace(response)) {
+      return true;
+    }
+
+    if (JUST_BROWSE_PATTERN.matcher(response).matches()) {
+      return false;
+    }
+
+    if (DEBUGGING_PATTERN.matcher(response).matches()) {
+      // TODO debug mode
+      return false;
+    }
+
+    if (ENDS_BROWSE_PATTERN.matcher(response).matches()) {
+      // TODO print to console
+      return false;
+    }
+
+    // TODO default return
+    return true;
   }
 
   private void updateDebugInformation() throws IOException, InterruptedException {
@@ -189,7 +230,7 @@ public class TheRDebugger {
 
   @NotNull
   private String removeLastLine(@NotNull final String response) {
-    return response.substring(0, response.lastIndexOf(System.lineSeparator()));
+    return response.substring(0, response.lastIndexOf(lineSeparator()));
   }
 
   @NotNull
@@ -260,6 +301,10 @@ public class TheRDebugger {
         sb.append(lines[i]);
       }
 
+      while (StringUtil.endsWithLineBreak(sb)) {
+        sb.setLength(sb.length() - 1);
+      }
+
       return sb.toString();
     }
     else {
@@ -320,13 +365,13 @@ public class TheRDebugger {
 
     public void send(@NotNull final String command) throws IOException {
       myWriter.write(command);
-      myWriter.write(System.lineSeparator());
+      myWriter.write(lineSeparator());
       myWriter.flush();
     }
 
     public void send(final char symbol) throws IOException {
       myWriter.write(symbol);
-      myWriter.write(System.lineSeparator());
+      myWriter.write(lineSeparator());
       myWriter.flush();
     }
   }
@@ -353,6 +398,7 @@ public class TheRDebugger {
       mySender = sender;
     }
 
+    // TODO don't forget to handle result of this function everywhere
     @NotNull
     public String receive() throws IOException, InterruptedException {
       final StringBuilder sb = new StringBuilder();
@@ -389,7 +435,7 @@ public class TheRDebugger {
     }
 
     private boolean responseIsComplete(@NotNull final StringBuilder sb) {
-      return sb.length() > 2 && (sb.charAt(sb.length() - 2) == '>' || sb.charAt(sb.length() - 2) == '+'); // TODO match only Browser[#]>
+      return endsWithPlusAndSpace(sb) || ENDS_BROWSE_PATTERN.matcher(sb).matches();
     }
 
     private void ping() throws IOException {
@@ -398,13 +444,13 @@ public class TheRDebugger {
 
     private void removePings(@NotNull final StringBuilder sb, final int pings) {
       for (int i = 0; i < pings; i++) {
-        sb.setLength(sb.lastIndexOf(System.lineSeparator()) - 1);
+        sb.setLength(sb.lastIndexOf(lineSeparator()) - 1);
       }
     }
 
     @NotNull
     private String removeFirstLine(@NotNull final StringBuilder sb) {
-      return sb.substring(sb.indexOf(System.lineSeparator()) + 1);
+      return sb.substring(sb.indexOf(lineSeparator()) + 1);
     }
   }
 
