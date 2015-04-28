@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.intellij;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ui.ConsoleView;
@@ -16,6 +16,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.impl.XDebuggerUtilImpl;
+import com.jetbrains.ther.debugger.TheRDebugger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -76,12 +77,7 @@ public class TheRDebugProcess extends XDebugProcess {
 
   @Override
   public void sessionInitialized() {
-    if (!myBreakpoints.containsKey(0)) {
-      resume();
-    }
-    else {
-      updateDebugInformation();
-    }
+    resume();
   }
 
   @Override
@@ -122,7 +118,7 @@ public class TheRDebugProcess extends XDebugProcess {
   @Override
   public void resume() {
     try {
-      do {
+      while ((!myBreakpoints.containsKey(myNextLineNumber))) {
         final int executed = myDebugger.executeInstruction();
 
         if (executed == -1) {
@@ -135,7 +131,6 @@ public class TheRDebugProcess extends XDebugProcess {
 
         printROut();
       }
-      while ((!myBreakpoints.containsKey(myNextLineNumber)));
 
       updateDebugInformation();
     }
@@ -174,12 +169,12 @@ public class TheRDebugProcess extends XDebugProcess {
     }
   }
 
-  private void updateDebugInformation() {
+  private void updateDebugInformation() { // TODO update
     final Map<String, String> varRepresentations = new HashMap<String, String>(myDebugger.getVarRepresentations());
     final Map<String, String> varTypes = new HashMap<String, String>(myDebugger.getVarTypes());
 
     myStackFramesData.clear();
-    myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varRepresentations, varTypes)); // TODO reverse
+    myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varTypes, varRepresentations)); // TODO reverse
 
     final XDebugSession session = getSession();
     final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(myNextLineNumber);

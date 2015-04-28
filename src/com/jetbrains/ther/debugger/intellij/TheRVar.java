@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.intellij;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.XNamedValue;
@@ -9,16 +9,16 @@ import org.jetbrains.annotations.NotNull;
 public class TheRVar extends XNamedValue {
 
   @NotNull
-  private final String myValue;
+  private final String myType;
 
   @NotNull
-  private final String myType;
+  private final String myValue;
 
   public TheRVar(@NotNull final String name, @NotNull final String type, @NotNull final String value) {
     super(name);
 
-    myValue = value;
     myType = type;
+    myValue = value;
   }
 
   @Override

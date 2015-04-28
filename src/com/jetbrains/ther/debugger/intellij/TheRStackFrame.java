@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.intellij;
 
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XCompositeNode;
@@ -38,8 +38,8 @@ public class TheRStackFrame extends XStackFrame {
     final XValueChildrenList result = new XValueChildrenList();
 
     for (final String name : names) {
-      final String value = myFrame.getVarRepresentations().get(name);
       final String type = myFrame.getVarTypes().get(name);
+      final String value = myFrame.getVarRepresentations().get(name);
 
       result.add(
         new TheRVar(name, type, value)
