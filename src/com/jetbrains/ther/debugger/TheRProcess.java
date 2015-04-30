@@ -30,13 +30,13 @@ public class TheRProcess {
   }
 
   @NotNull
-  public String execute(@NotNull final String command) throws IOException, InterruptedException {
+  public TheRProcessResponseAndType execute(@NotNull final String command) throws IOException, InterruptedException {
     mySender.send(command);
     return myReceiver.receive();
   }
 
   @NotNull
-  public String execute(final char command) throws IOException, InterruptedException {
+  public TheRProcessResponseAndType execute(final char command) throws IOException, InterruptedException {
     mySender.send(command);
     return myReceiver.receive();
   }

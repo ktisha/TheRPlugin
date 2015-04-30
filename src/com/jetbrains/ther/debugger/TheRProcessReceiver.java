@@ -29,24 +29,23 @@ public class TheRProcessReceiver {
   }
 
   @NotNull
-  public String receive() throws IOException, InterruptedException {
+  public TheRProcessResponseAndType receive() throws IOException, InterruptedException {
     final StringBuilder sb = new StringBuilder();
     int pings = 0;
 
     while (true) {
       waitForResponse();
+      appendResponse(sb);
 
-      readResponse(sb);
+      final TheRProcessResponseType responseType = TheRProcessResponseType.calculateResponseType(sb);
 
-      if (responseIsComplete(sb)) {
-        break;
+      if (responseType != null) {
+        return new TheRProcessResponseAndType(removePingsAndCommand(sb, pings), responseType);
       }
 
       ping(); // pings interpreter to get tail of response
       pings++;
     }
-
-    return removePingsAndCommand(sb, pings);
   }
 
   private void waitForResponse() throws IOException, InterruptedException {
@@ -58,18 +57,10 @@ public class TheRProcessReceiver {
     }
   }
 
-  private void readResponse(@NotNull final StringBuilder sb) throws IOException {
+  private void appendResponse(@NotNull final StringBuilder sb) throws IOException {
     while (myStream.available() != 0) {
       sb.append(myBuffer, 0, myReader.read(myBuffer));
     }
-  }
-
-  private boolean responseIsComplete(@NotNull final StringBuilder sb) {
-    return TheRProcessResponseType.calculateResponseType(sb) != null;
-  }
-
-  private void ping() throws IOException {
-    mySender.send(TheRDebugConstants.PING_COMMAND);
   }
 
   @NotNull
@@ -79,5 +70,9 @@ public class TheRProcessReceiver {
     }
 
     return sb.substring(sb.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
+  }
+
+  private void ping() throws IOException {
+    mySender.send(TheRDebugConstants.PING_COMMAND);
   }
 }

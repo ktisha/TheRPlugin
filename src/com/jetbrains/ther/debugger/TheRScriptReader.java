@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ScriptReader {
+public class TheRScriptReader {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRScriptReader.class);
 
   @NotNull
   private final BufferedReader myReader;
@@ -21,7 +25,7 @@ public class ScriptReader {
   @Nullable
   private String myCachedCommand;
 
-  public ScriptReader(@NotNull final String scriptPath) throws FileNotFoundException {
+  public TheRScriptReader(@NotNull final String scriptPath) throws FileNotFoundException {
     myReader = new BufferedReader(new FileReader(scriptPath));
 
     myCurrentPosition = 0;
@@ -30,9 +34,9 @@ public class ScriptReader {
 
   @Nullable
   public String getNextCommand() throws IOException {
-    final String result = calculateNextCommand(myCachedCommand);
+    final String result = calculateCurrentCommand(myCachedCommand);
 
-    myCachedCommand = calculateCachedCommand();
+    myCachedCommand = calculateNextCommand();
 
     return result;
   }
@@ -45,8 +49,17 @@ public class ScriptReader {
     return myNextPosition;
   }
 
+  public void close() {
+    try {
+      myReader.close();
+    }
+    catch (final IOException e) {
+      LOGGER.warn(e);
+    }
+  }
+
   @Nullable
-  private String calculateNextCommand(@Nullable final String cachedCommand) throws IOException {
+  private String calculateCurrentCommand(@Nullable final String cachedCommand) throws IOException {
     String result = cachedCommand;
 
     if (result == null) {
@@ -65,7 +78,7 @@ public class ScriptReader {
   }
 
   @Nullable
-  private String calculateCachedCommand() throws IOException {
+  private String calculateNextCommand() throws IOException {
     String result;
 
     do {
@@ -78,7 +91,7 @@ public class ScriptReader {
     }
     while (isCommentOrSpaces(result));
 
-    return calculateNextCommand(null);
+    return result;
   }
 
   private boolean isCommentOrSpaces(@NotNull final String line) {
