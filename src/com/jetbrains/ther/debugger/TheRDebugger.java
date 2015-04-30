@@ -1,89 +1,28 @@
 package com.jetbrains.ther.debugger;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.LineSeparator;
+import com.jetbrains.ther.debugger.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class TheRDebugger {
 
   @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
+  private final TheRProcess myProcess;
 
   @NotNull
-  private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^Browse\\[\\d+\\]> $");
+  private final TheRScriptReader myScriptReader;
 
   @NotNull
-  private static final Pattern ENDS_BROWSE_PATTERN = Pattern.compile("^.*Browse\\[\\d+\\]> $", Pattern.DOTALL);
+  private final TheRStack myStack;
 
   @NotNull
-  private static final Pattern DEBUGGING_PATTERN = Pattern.compile("^debugging in.*$", Pattern.DOTALL);
-
-  @NotNull
-  private static final String NO_SAVE_PARAMETER = "--no-save";
-
-  @NotNull
-  private static final String QUIET_PARAMETER = "--quiet";
-
-  @NotNull
-  private static final String BROWSER_COMMAND = "browser()";
-
-  @NotNull
-  private static final String LS_COMMAND = "ls()";
-
-  @NotNull
-  private static final String TYPEOF_COMMAND = "typeof";
-
-  @NotNull
-  private static final String TRACE_COMMAND = "trace";
-
-  @NotNull
-  private static final String DEBUG_COMMAND = "debug";
-
-  private static final char COMMENT_SYMBOL = '#';
-
-  private static final int INITIAL_RECEIVER_TIMEOUT = 50;
-
-  @NotNull
-  private static final String FUNCTION_TYPE = "[1] \"closure\"";
-
-  @NotNull
-  private static final String SERVICE_FUNCTION_PREFIX = "intellij_ther_";
-
-  @NotNull
-  private static final String SERVICE_ENTER_FUNCTION_SUFFIX = "_enter";
-
-  @NotNull
-  private static final String SERVICE_EXIT_FUNCTION_SUFFIX = "_exit";
-
-  @NotNull
-  private final String myScriptPath;
-
-  @NotNull
-  private final Process myProcess;
-
-  @NotNull
-  private final Sender mySender;
-
-  @NotNull
-  private final Receiver myReceiver;
-
-  @NotNull
-  private final BufferedReader mySourceReader;
-
-  @NotNull
-  private final Map<String, String> myVarToRepresentation;
-
-  @NotNull
-  private final Map<String, String> myVarToType;
-
-  @Nullable
-  private String myLatestROut;
+  private final TheROutput myOutput;
 
   /**
    * Constructs new instance of debugger with specified interpreter and script.
@@ -94,23 +33,13 @@ public class TheRDebugger {
    * @throws InterruptedException if thread was interrupted while waiting interpreter's response
    */
   public TheRDebugger(@NotNull final String interpreterPath, @NotNull final String scriptPath) throws IOException, InterruptedException {
-    myScriptPath = scriptPath;
+    myProcess = new TheRProcess(interpreterPath);
+    myScriptReader = new TheRScriptReader(scriptPath);
 
-    final ProcessBuilder builder = new ProcessBuilder(interpreterPath, NO_SAVE_PARAMETER, QUIET_PARAMETER);
-    myProcess = builder.start();
+    myStack = new TheRStack();
+    myStack.addEntry();
 
-    mySender = new Sender(myProcess.getOutputStream());
-    myReceiver = new Receiver(myProcess.getInputStream(), mySender);
-
-    mySourceReader = new BufferedReader(new FileReader(scriptPath));
-
-    mySender.send(BROWSER_COMMAND);
-    myReceiver.receive();
-
-    myVarToRepresentation = new HashMap<String, String>();
-    myVarToType = new HashMap<String, String>();
-
-    myLatestROut = null;
+    myOutput = new TheROutput();
   }
 
   /**
@@ -118,141 +47,75 @@ public class TheRDebugger {
    * @throws IOException          if script couldn't be read or communication with interpreter was broken
    * @throws InterruptedException if thread was interrupted while waiting interpreter's response
    */
-  public int executeInstruction() throws IOException, InterruptedException {
+  public int executeInstruction() throws IOException, InterruptedException { // TODO update method and usages
     boolean accepted = false;
-    int result = 0;
-    myLatestROut = null;
 
     while (!accepted) {
-      final String command = mySourceReader.readLine();
+      final String command = myScriptReader.getNextCommand();
 
       if (command == null) {
         return -1;
       }
 
-      result++;
+      final TheRProcessResponseAndType responseAndType = myProcess.execute(command);
 
-      if (isComment(command) || StringUtil.isEmptyOrSpaces(command)) {
-        return 1; // TODO forward to next command and cache it
-      }
+      handleResponse(responseAndType);
 
-      mySender.send(command);
-      final String response = myReceiver.receive();
-
-      accepted = !nextCommandIsNeeded(response);
+      accepted = responseAndType.getType() != TheRProcessResponseType.PLUS;
     }
 
-    updateDebugInformation();
+    updateCurrentStackFrame();
 
-    return result;
-  }
-
-  @NotNull
-  public Map<String, String> getVarRepresentations() {
-    return Collections.unmodifiableMap(myVarToRepresentation);
-  }
-
-  @NotNull
-  public Map<String, String> getVarTypes() {
-    return Collections.unmodifiableMap(myVarToType);
-  }
-
-  @NotNull
-  public String getScriptPath() {
-    return myScriptPath;
-  }
-
-  @Nullable
-  public String getLatestROut() {
-    return myLatestROut;
+    return 0;
   }
 
   public void stop() {
-    try {
-      mySourceReader.close();
+    myScriptReader.close();
+    myProcess.stop();
+  }
+
+  private void handleResponse(@NotNull final TheRProcessResponseAndType responseAndType) {
+    myOutput.reset();
+
+    if (responseAndType.getType() == TheRProcessResponseType.DEBUG) {
+      // TODO handle debug response
     }
-    catch (final IOException e) {
-      LOGGER.warn(e);
+
+    if (responseAndType.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
+      myOutput.setNormalOutput(removeLastLine(responseAndType.getResponse()));
     }
-
-    myProcess.destroy();
   }
 
-  @NotNull
-  private static String lineSeparator() {
-    return LineSeparator.getSystemLineSeparator().getSeparatorString();
-  }
+  private void updateCurrentStackFrame() throws IOException, InterruptedException {
+    // TODO check type
+    final TheRProcessResponseAndType responseAndType = myProcess.execute(TheRDebugConstants.LS_COMMAND);
+    final String response = removeLastLine(responseAndType.getResponse());
 
-  private static boolean endsWithPlusAndSpace(@NotNull final CharSequence sequence) {
-    final int length = sequence.length();
+    final List<TheRVar> vars = new ArrayList<TheRVar>();
 
-    return length >= 2 && sequence.charAt(length - 1) == ' ' && sequence.charAt(length - 2) == '+';
-  }
+    for (final String variableName : calculateVariableNames(response)) {
+      final TheRVar var = loadVar(variableName);
 
-  private boolean isComment(@NotNull final String command) {
-    for (int i = 0; i < command.length(); i++) {
-      if (!StringUtil.isWhiteSpace(command.charAt(i))) {
-        return command.charAt(i) == COMMENT_SYMBOL;
+      if (var != null) {
+        vars.add(var);
       }
     }
 
-    return false;
-  }
-
-  // TODO rename
-  private boolean nextCommandIsNeeded(@NotNull final String response) {
-    if (endsWithPlusAndSpace(response)) {
-      return true;
-    }
-
-    if (JUST_BROWSE_PATTERN.matcher(response).matches()) {
-      return false;
-    }
-
-    if (DEBUGGING_PATTERN.matcher(response).matches()) {
-      // TODO debug mode
-      return false;
-    }
-
-    if (ENDS_BROWSE_PATTERN.matcher(response).matches()) {
-      myLatestROut = removeLastLine(response);
-
-      return false;
-    }
-
-    // TODO default return
-    return true;
-  }
-
-  private void updateDebugInformation() throws IOException, InterruptedException {
-    mySender.send(LS_COMMAND);
-    final String response = removeLastLine(myReceiver.receive());
-
-    myVarToType.clear();
-    myVarToRepresentation.clear();
-
-    for (final String var : calculateVariables(response)) {
-      final VarDebugInformation debugInformation = getDebugInformation(var);
-
-      if (debugInformation != null) {
-        myVarToType.put(var, debugInformation.getType());
-        myVarToRepresentation.put(var, debugInformation.getRepresentation());
-      }
-    }
+    myStack.updateCurrent(new TheRStackFrame("abc", 0, vars));
   }
 
   @NotNull
   private String removeLastLine(@NotNull final String response) {
-    return response.substring(0, response.lastIndexOf(lineSeparator()));
+    return response.substring(0, response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR));
   }
 
   @NotNull
-  private List<String> calculateVariables(@NotNull final String response) {
+  private List<String> calculateVariableNames(@NotNull final String response) {
     final List<String> result = new ArrayList<String>();
 
     for (final String line : StringUtil.splitByLines(response)) {
       for (final String token : StringUtil.tokenize(new StringTokenizer(line))) {
-        final String var = getVariable(token);
+        final String var = getVariableName(token);
 
         if (var != null) {
           result.add(var);
@@ -264,11 +127,11 @@ public class TheRDebugger {
   }
 
   @Nullable
-  private VarDebugInformation getDebugInformation(@NotNull final String var) throws IOException, InterruptedException {
-    final String type = getType(var);
+  private TheRVar loadVar(@NotNull final String var) throws IOException, InterruptedException {
+    final String type = loadType(var);
 
-    if (type.equals(FUNCTION_TYPE)) {
-      if (var.startsWith(SERVICE_FUNCTION_PREFIX)) {
+    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
+      if (var.startsWith(TheRDebugConstants.SERVICE_FUNCTION_PREFIX)) {
         return null;
       }
       else {
@@ -276,38 +139,48 @@ public class TheRDebugger {
       }
     }
 
-    return new VarDebugInformation(type, getRepresentation(var, type));
+    return new TheRVar(var, type, loadValue(var, type));
+  }
+
+  @Nullable
+  private String getVariableName(@NotNull final String token) {
+    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
+
+    if (isNotEmptyQuotedString) {
+      return token.substring(1, token.length() - 1);
+    }
+    else {
+      return null;
+    }
   }
 
   @NotNull
-  private String getType(@NotNull final String var) throws IOException, InterruptedException {
-    mySender.send(TYPEOF_COMMAND + "(" + var + ")");
+  private String loadType(@NotNull final String var) throws IOException, InterruptedException {
+    // TODO check type
+    final TheRProcessResponseAndType responseAndType = myProcess.execute(TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")");
 
-    return removeLastLine(myReceiver.receive());
+    return removeLastLine(responseAndType.getResponse());
   }
 
   private void traceAndDebug(@NotNull final String var) throws IOException, InterruptedException {
-    mySender.send(createEnterFunction(var));
-    myReceiver.receive();
-
-    mySender.send(createExitFunction(var));
-    myReceiver.receive();
-
-    mySender.send(createTraceCommand(var));
-    myReceiver.receive();
-
-    mySender.send(createDebugCommand(var));
-    myReceiver.receive();
+    // TODO check type
+    myProcess.execute(createEnterFunction(var));
+    // TODO check type
+    myProcess.execute(createExitFunction(var));
+    // TODO check type
+    myProcess.execute(createTraceCommand(var));
+    // TODO check type
+    myProcess.execute(createDebugCommand(var));
   }
 
   @NotNull
-  private String getRepresentation(@NotNull final String var, @NotNull final String type) throws IOException, InterruptedException {
-    mySender.send(var);
+  private String loadValue(@NotNull final String var, @NotNull final String type) throws IOException, InterruptedException {
+    // TODO check type
+    final TheRProcessResponseAndType responseAndType = myProcess.execute(var);
+    final String value = removeLastLine(responseAndType.getResponse());
 
-    final String representation = removeLastLine(myReceiver.receive());
-
-    if (type.equals(FUNCTION_TYPE)) {
-      final String[] lines = StringUtil.splitByLinesKeepSeparators(representation);
+    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
+      final String[] lines = StringUtil.splitByLinesKeepSeparators(value);
       final StringBuilder sb = new StringBuilder();
 
       for (int i = 2; i < lines.length - 1; i++) {
@@ -321,19 +194,7 @@ public class TheRDebugger {
       return sb.toString();
     }
     else {
-      return representation;
-    }
-  }
-
-  @Nullable
-  private String getVariable(@NotNull final String token) {
-    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
-
-    if (isNotEmptyQuotedString) {
-      return token.substring(1, token.length() - 1);
-    }
-    else {
-      return null;
+      return value;
     }
   }
 
@@ -344,7 +205,7 @@ public class TheRDebugger {
 
   @NotNull
   private String createEnterFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_ENTER_FUNCTION_SUFFIX;
+    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
   }
 
   @NotNull
@@ -354,140 +215,23 @@ public class TheRDebugger {
 
   @NotNull
   private String createExitFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_EXIT_FUNCTION_SUFFIX;
+    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 
   @NotNull
   private String createTraceCommand(@NotNull final String var) {
-    return TRACE_COMMAND + "(" + var + ", " + createEnterFunctionName(var) + ", exit = " + createExitFunctionName(var) + ")";
+    return TheRDebugConstants.TRACE_COMMAND +
+           "(" +
+           var +
+           ", " +
+           createEnterFunctionName(var) +
+           ", exit = " +
+           createExitFunctionName(var) +
+           ")";
   }
 
   @NotNull
   private String createDebugCommand(@NotNull final String var) {
-    return DEBUG_COMMAND + "(" + var + ")";
-  }
-
-  private static class Sender {
-
-    @NotNull
-    private final OutputStreamWriter myWriter;
-
-    private Sender(@NotNull final OutputStream stream) {
-      myWriter = new OutputStreamWriter(stream);
-    }
-
-    public void send(@NotNull final String command) throws IOException {
-      myWriter.write(command);
-      myWriter.write(lineSeparator());
-      myWriter.flush();
-    }
-
-    public void send(final char symbol) throws IOException {
-      myWriter.write(symbol);
-      myWriter.write(lineSeparator());
-      myWriter.flush();
-    }
-  }
-
-  private static class Receiver {
-
-    @NotNull
-    private final InputStream myStream;
-
-    @NotNull
-    private final InputStreamReader myReader;
-
-    @NotNull
-    private final char[] myBuffer;
-
-    @NotNull
-    private final Sender mySender;
-
-    private Receiver(@NotNull final InputStream stream, @NotNull final Sender sender) {
-      myStream = stream;
-      myReader = new InputStreamReader(stream);
-      myBuffer = new char[1024];
-
-      mySender = sender;
-    }
-
-    // TODO don't forget to handle result of this function everywhere
-    @NotNull
-    public String receive() throws IOException, InterruptedException {
-      final StringBuilder sb = new StringBuilder();
-      int pings = 0;
-
-      while (true) {
-        waitForResponse();
-
-        while (myStream.available() != 0) {
-          final int read = myReader.read(myBuffer);
-          sb.append(myBuffer, 0, read);
-        }
-
-        if (responseIsComplete(sb)) {
-          break;
-        }
-
-        ping(); // pings interpreter to get tail of response
-        pings++;
-      }
-
-      removePings(sb, pings);
-
-      return removeFirstLine(sb);
-    }
-
-    private void waitForResponse() throws IOException, InterruptedException {
-      long timeout = INITIAL_RECEIVER_TIMEOUT;
-
-      while (myStream.available() == 0) {
-        Thread.sleep(timeout);
-        timeout *= 2;
-      }
-    }
-
-    private boolean responseIsComplete(@NotNull final StringBuilder sb) {
-      return endsWithPlusAndSpace(sb) || ENDS_BROWSE_PATTERN.matcher(sb).matches();
-    }
-
-    private void ping() throws IOException {
-      mySender.send(COMMENT_SYMBOL);
-    }
-
-    private void removePings(@NotNull final StringBuilder sb, final int pings) {
-      for (int i = 0; i < pings; i++) {
-        sb.setLength(sb.lastIndexOf(lineSeparator()) - 1);
-      }
-    }
-
-    @NotNull
-    private String removeFirstLine(@NotNull final StringBuilder sb) {
-      return sb.substring(sb.indexOf(lineSeparator()) + 1);
-    }
-  }
-
-  private static class VarDebugInformation {
-
-    @NotNull
-    public final String myType;
-
-    @NotNull
-    public final String myRepresentation;
-
-    public VarDebugInformation(@NotNull final String type, @NotNull final String representation) {
-      myType = type;
-      myRepresentation = representation;
-    }
-
-    @NotNull
-    public String getType() {
-      return myType;
-    }
-
-    @NotNull
-    public String getRepresentation() {
-      return myRepresentation;
-    }
+    return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
   }
 }

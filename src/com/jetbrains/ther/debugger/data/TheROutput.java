@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.Nullable;
 

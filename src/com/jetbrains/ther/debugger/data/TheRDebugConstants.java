@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.data;
 
 import com.intellij.util.LineSeparator;
 import org.jetbrains.annotations.NotNull;

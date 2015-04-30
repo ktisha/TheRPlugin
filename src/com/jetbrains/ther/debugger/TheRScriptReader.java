@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,5 +1,7 @@
 package com.jetbrains.ther.debugger;
 
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRProcessResponseAndType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -31,12 +33,6 @@ public class TheRProcess {
 
   @NotNull
   public TheRProcessResponseAndType execute(@NotNull final String command) throws IOException, InterruptedException {
-    mySender.send(command);
-    return myReceiver.receive();
-  }
-
-  @NotNull
-  public TheRProcessResponseAndType execute(final char command) throws IOException, InterruptedException {
     mySender.send(command);
     return myReceiver.receive();
   }
