@@ -20,6 +20,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String SERVICE_EXIT_FUNCTION_SUFFIX = "_exit";
 
+  @NotNull
+  public static final String MAIN_FUNCTION_NAME = "intellij_ther_main";
+
   // interpreter parameters
 
   @NotNull
@@ -46,6 +49,8 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String DEBUG_COMMAND = "debug";
+
+  public static final char EXECUTE_AND_STEP_COMMAND = 'n';
 
   // language
 

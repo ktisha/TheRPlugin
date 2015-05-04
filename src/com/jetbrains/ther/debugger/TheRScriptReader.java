@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
@@ -12,9 +11,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class TheRScriptReader {
-
-  @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRScriptReader.class);
 
   @NotNull
   private final BufferedReader myReader;
@@ -50,13 +46,8 @@ public class TheRScriptReader {
     return myNextPosition;
   }
 
-  public void close() {
-    try {
-      myReader.close();
-    }
-    catch (final IOException e) {
-      LOGGER.warn(e);
-    }
+  public void close() throws IOException {
+    myReader.close();
   }
 
   @Nullable

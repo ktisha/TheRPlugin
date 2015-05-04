@@ -25,4 +25,8 @@ public class TheRStack {
   public void updateCurrent(@NotNull final TheRStackFrame current) {
     myStack.set(myStack.size() - 1, current);
   }
+
+  public int size() {
+    return myStack.size();
+  }
 }

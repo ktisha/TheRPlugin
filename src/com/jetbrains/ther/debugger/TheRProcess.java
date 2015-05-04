@@ -37,6 +37,12 @@ public class TheRProcess {
     return myReceiver.receive();
   }
 
+  @NotNull
+  public TheRProcessResponseAndType execute(final char command) throws IOException, InterruptedException {
+    mySender.send(command);
+    return myReceiver.receive();
+  }
+
   public void stop() {
     myProcess.destroy();
   }

@@ -7,26 +7,19 @@ import java.util.List;
 public class TheRStackFrame {
 
   @NotNull
-  private final String myFunction;
-
-  private final int myLine;
+  private final TheRLocation myLocation;
 
   @NotNull
   private final List<TheRVar> myVars;
 
-  public TheRStackFrame(@NotNull final String function, final int line, @NotNull final List<TheRVar> vars) {
-    myFunction = function;
-    myLine = line;
+  public TheRStackFrame(@NotNull final TheRLocation location, @NotNull final List<TheRVar> vars) {
+    myLocation = location;
     myVars = vars;
   }
 
   @NotNull
-  public String getFunction() {
-    return myFunction;
-  }
-
-  public int getLine() {
-    return myLine;
+  public TheRLocation getLocation() {
+    return myLocation;
   }
 
   @NotNull
