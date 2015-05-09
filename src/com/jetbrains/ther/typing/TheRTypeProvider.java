@@ -104,6 +104,9 @@ public class TheRTypeProvider {
         return ((TheRListType)elementType).getFieldType(memberExpression.getTag());
       }
     }
+    if (element instanceof TheRSliceExpression) {
+      return TheRNumericType.INSTANCE; // TODO: think!
+    }
     return TheRType.UNKNOWN;
   }
 

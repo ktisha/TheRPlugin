@@ -20,4 +20,9 @@ public abstract class TheRAtomicType extends TheRType {
     }
     return super.afterSubscriptionType(arguments, valueType);
   }
+
+  @Override
+  public TheRType getElementTypes() {
+    return this;
+  }
 }

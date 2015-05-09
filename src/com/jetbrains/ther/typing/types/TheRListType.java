@@ -229,4 +229,16 @@ public class TheRListType extends TheRType {
     }
     return resultType;
   }
+
+  @Override
+  public TheRType getElementTypes() {
+    if (!myPrecise) {
+      return TheRType.UNKNOWN;
+    }
+    Set<TheRType> elementTypes = new HashSet<TheRType>();
+    for (TypeDescriptor descriptor : myPositionalTypes) {
+      elementTypes.add(descriptor.myType);
+    }
+    return TheRUnionType.create(elementTypes);
+  }
 }

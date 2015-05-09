@@ -6,9 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.TheRTypeContext;
 import com.jetbrains.ther.typing.TheRTypeProvider;
-import com.jetbrains.ther.typing.types.TheRListType;
-import com.jetbrains.ther.typing.types.TheRType;
-import com.jetbrains.ther.typing.types.TheRUnionType;
+import com.jetbrains.ther.typing.types.*;
 
 import java.util.*;
 
@@ -18,6 +16,8 @@ public class TheRStaticAnalyzerHelper {
     StaticAnalysisResult applyRead(TheRReferenceExpression ref);
 
     StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement);
+
+    StaticAnalysisResult applyAssignInFor(TheRExpression assignee, TheRExpression expression);
 
     StaticAnalysisResult merge(StaticAnalysisResult other);
 
@@ -68,19 +68,27 @@ public class TheRStaticAnalyzerHelper {
       return this;
     }
 
-    @Override
-    public StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement) {
-      PsiElement assignee = assignmentStatement.getAssignee();
-      if (assignee == null) {
-        return this;
-      }
-      String name = assignee.getText();
+    private StaticAnalysisResult applyWrite(String name) {
       if (myPossibleOptionals.contains(name) && !myRead.contains(name)) {
         OptionalParameters newParams = new OptionalParameters(this);
         newParams.myOptionals.add(name);
         return newParams;
       }
       return this;
+    }
+
+    @Override
+    public StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement) {
+      PsiElement assignee = assignmentStatement.getAssignee();
+      if (assignee == null) {
+        return this;
+      }
+      return applyWrite(assignee.getText());
+    }
+
+    @Override
+    public StaticAnalysisResult applyAssignInFor(TheRExpression assignee, TheRExpression expression) {
+      return applyWrite(assignee.getText());
     }
 
     @Override
@@ -221,6 +229,17 @@ public class TheRStaticAnalyzerHelper {
       }
 
       //TODO: check for class(x) <- "clazz" here
+      return result;
+    }
+
+    @Override
+    public StaticAnalysisResult applyAssignInFor(TheRExpression assignee, TheRExpression expression) {
+      if (!TheRReferenceExpression.class.isInstance(assignee)) {
+        return this;
+      }
+      String name = assignee.getName();
+      ReachTypes result = new ReachTypes(this);
+      result.myReachTypes.put(name, TheRTypeProvider.getType(expression).getElementTypes());
       return result;
     }
 
@@ -399,7 +418,22 @@ public class TheRStaticAnalyzerHelper {
       TheRMemberExpression memberExpression = (TheRMemberExpression) where;
       return analyze(memberExpression.getExpression(), parentResult);
     }
-
+    if (where instanceof TheRForStatement) {
+      TheRForStatement forStatement = (TheRForStatement)where;
+      StaticAnalysisResult afterRange = analyze(forStatement.getRange(), parentResult);
+      if (afterRange.isEnd()) {
+        return afterRange;
+      }
+      StaticAnalysisResult withoutBody = afterRange.applyAssignInFor(forStatement.getTarget(), forStatement.getRange());
+      if (withoutBody.isEnd()) {
+        return withoutBody;
+      }
+      StaticAnalysisResult withBody = analyze(forStatement.getBody(), withoutBody);
+      if (withBody.isEnd()) {
+        return withBody;
+      }
+      return withoutBody.merge(withBody);
+    }
     //TODO: look at other expressions (for, call expression)
     return parentResult;
   }

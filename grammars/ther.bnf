@@ -126,7 +126,7 @@ namespace_access_expression ::= expression ('::' | ':::') identifier { elementTy
 if_statement ::= if nl* '(' nl* expression nl* ')' nl* expression (nl* else nl* expression)?
 while_statement ::= while nl* '(' nl* expression nl* ')' nl* expression
 for_statement ::= for nl* '(' nl* expression 'in' nl* expression ')' nl* expression {
-  methods=[ target = "expression[0]" ]
+  methods=[ target = "expression[0]" range = "expression[1]" body = "expression[2]"]
 }
 repeat_statement ::= repeat nl* expression
 break_statement ::= break break_next_expression?

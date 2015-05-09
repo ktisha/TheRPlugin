@@ -30,7 +30,9 @@ public abstract class TheRType {
   }
 
   public static int getOrder(TheRType type) {
-    if (type == TheRRawType.INSTANCE) {
+    if (type == TheRNullType.INSTANCE) {
+      return -1;
+    } else if (type == TheRRawType.INSTANCE) {
       return 0;
     } else if (type == TheRLogicalType.INSTANCE){
       return 1;
@@ -83,6 +85,10 @@ public abstract class TheRType {
     if (arguments.isEmpty()) {
       return this;
     }
+    return TheRType.UNKNOWN;
+  }
+
+  public TheRType getElementTypes() {
     return TheRType.UNKNOWN;
   }
 }

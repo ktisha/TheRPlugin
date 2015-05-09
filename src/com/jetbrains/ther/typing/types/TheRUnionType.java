@@ -117,4 +117,22 @@ public class TheRUnionType extends TheRType {
     }
     return TheRUnionType.create(subscriptTypes);
   }
+
+  @Override
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+    HashSet<TheRType> afterTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      afterTypes.add(type.afterSubscriptionType(arguments, valueType));
+    }
+    return TheRUnionType.create(afterTypes);
+  }
+
+  @Override
+  public TheRType getElementTypes() {
+    HashSet<TheRType> elementTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      elementTypes.add(type.getElementTypes());
+    }
+    return TheRUnionType.create(elementTypes);
+  }
 }

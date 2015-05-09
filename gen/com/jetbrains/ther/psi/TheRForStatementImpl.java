@@ -52,4 +52,18 @@ public class TheRForStatementImpl extends TheRExpressionImpl implements TheRForS
     return p1.get(0);
   }
 
+  @Override
+  @Nullable
+  public TheRExpression getRange() {
+    List<TheRExpression> p1 = getExpressionList();
+    return p1.size() < 2 ? null : p1.get(1);
+  }
+
+  @Override
+  @Nullable
+  public TheRExpression getBody() {
+    List<TheRExpression> p1 = getExpressionList();
+    return p1.size() < 3 ? null : p1.get(2);
+  }
+
 }
