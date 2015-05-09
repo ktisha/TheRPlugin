@@ -64,16 +64,21 @@ public class TheRPsiImplUtil {
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
     final ASTNode node = assignment.getNode();
+    PsiElement child;
     if (!assignment.isRight()) {
-      ASTNode childNode = node.findChildByType(TheRElementTypes.THE_R_REFERENCE_EXPRESSION);
-      return childNode == null ? null : childNode.getPsi();
-    }
-    for (ASTNode element = node.getLastChildNode(); element != null; element = element.getTreePrev()) {
-      if (element.getElementType() == TheRElementTypes.THE_R_REFERENCE_EXPRESSION) {
-        return element.getPsi();
+      child = assignment.getFirstChild();
+      while (child != null && !(child instanceof TheRExpression)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getPrevSibling();
+      }
+    } else {
+      child = assignment.getLastChild();
+      while (child != null && !(child instanceof TheRExpression)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getNextSibling();
       }
     }
-    return null;
+    return child;
   }
 
   public static PsiElement setName(TheRAssignmentStatement assignment, String name) {
@@ -130,6 +135,18 @@ public class TheRPsiImplUtil {
     final PsiElement prevElement = PsiTreeUtil.skipSiblingsBackward(referenceExpression, PsiWhiteSpace.class);
     if (prevElement != null && RIGHT_ASSIGNMENTS.contains(prevElement.getNode().getElementType())) return null;
     return new TheRReferenceImpl(referenceExpression);
+  }
+
+  public static String getTag(TheRMemberExpression memberExpression) {
+    PsiElement identifier = memberExpression.getIdentifier();
+    if (identifier != null) {
+      return identifier.getText();
+    }
+    PsiElement name = memberExpression.getString();
+    if (name != null) {
+      return name.getText().substring(1, name.getText().length() - 1);
+    }
+    return "...";
   }
 
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware

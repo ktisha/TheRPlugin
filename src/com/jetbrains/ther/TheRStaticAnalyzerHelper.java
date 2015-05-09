@@ -4,6 +4,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.typing.TheRTypeContext;
+import com.jetbrains.ther.typing.TheRTypeProvider;
+import com.jetbrains.ther.typing.types.TheRListType;
+import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnionType;
 
 import java.util.*;
 
@@ -21,66 +26,11 @@ public class TheRStaticAnalyzerHelper {
     boolean isEnd();
   }
 
-  private static class ReachDefinitions implements StaticAnalysisResult {
-
-    private TheRReferenceExpression myWhat;
-    private Set<PsiElement> myDefinitions = new HashSet<PsiElement>();
-    private boolean myEnd;
-
-    private ReachDefinitions(TheRReferenceExpression what) {
-      myWhat = what;
-    }
-
-    @Override
-    public StaticAnalysisResult applyRead(TheRReferenceExpression ref) {
-      if (ref == myWhat) {
-        myEnd = true;
-      }
-      return this;
-    }
-
-    @Override
-    public StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement) {
-      PsiElement assignee = assignmentStatement.getAssignee();
-      if (assignee != null && assignee.getText().equals(myWhat.getName())) {
-        ReachDefinitions result = new ReachDefinitions(myWhat);
-        result.myDefinitions.add(assignmentStatement);
-        return result;
-      }
-      return this;
-    }
-
-    @Override
-    public StaticAnalysisResult merge(StaticAnalysisResult other) {
-      if (!(other instanceof ReachDefinitions)) {
-        throw new IllegalArgumentException();
-      }
-      myDefinitions.addAll(((ReachDefinitions)other).myDefinitions);
-      return this;
-    }
-
-    @Override
-    public void applyReturn() { }
-
-    @Override
-    public boolean isEnd() {
-      return myEnd;
-    }
-
-    public void addDefinition(PsiElement definition) {
-      myDefinitions.add(definition);
-    }
-
-    public Set<PsiElement> getDefinitions() {
-      return myDefinitions;
-    }
-  }
-
   private static class OptionalParameters implements StaticAnalysisResult {
 
     private Set<String> myPossibleOptionals = new HashSet<String>();
     private Set<String> myOptionals = new HashSet<String>();
-    private Set<String> myReaded = new HashSet<String>();
+    private Set<String> myRead = new HashSet<String>();
 
     private OptionalParameters(List<TheRParameter> parameters) {
       for (TheRParameter parameter : parameters) {
@@ -93,7 +43,7 @@ public class TheRStaticAnalyzerHelper {
     public OptionalParameters(OptionalParameters parameters) {
       myPossibleOptionals = parameters.myPossibleOptionals;
       myOptionals.addAll(parameters.myOptionals);
-      myReaded.addAll(parameters.myReaded);
+      myRead.addAll(parameters.myRead);
     }
 
     @Override
@@ -112,7 +62,7 @@ public class TheRStaticAnalyzerHelper {
       String name = ref.getName();
       if (myPossibleOptionals.contains(name) && !myOptionals.contains(name)) {
         OptionalParameters newParams = new OptionalParameters(this);
-        newParams.myReaded.add(name);
+        newParams.myRead.add(name);
         return newParams;
       }
       return this;
@@ -125,7 +75,7 @@ public class TheRStaticAnalyzerHelper {
         return this;
       }
       String name = assignee.getText();
-      if (myPossibleOptionals.contains(name) && !myReaded.contains(name)) {
+      if (myPossibleOptionals.contains(name) && !myRead.contains(name)) {
         OptionalParameters newParams = new OptionalParameters(this);
         newParams.myOptionals.add(name);
         return newParams;
@@ -140,20 +90,20 @@ public class TheRStaticAnalyzerHelper {
       }
       OptionalParameters otherParams = (OptionalParameters)other;
       myOptionals.addAll(otherParams.myOptionals);
-      Set<String> mergeReaded = new HashSet<String>();
-      for (String name : myReaded) {
-        if (otherParams.myReaded.contains(name)) {
-          mergeReaded.add(name);
+      Set<String> mergeRead = new HashSet<String>();
+      for (String name : myRead) {
+        if (otherParams.myRead.contains(name)) {
+          mergeRead.add(name);
         }
       }
-      myReaded = mergeReaded;
+      myRead = mergeRead;
       return this;
     }
 
     @Override
     public void applyReturn() {
       for (String name : myPossibleOptionals) {
-        if (!myReaded.contains(name)) {
+        if (!myRead.contains(name)) {
           myOptionals.add(name);
         }
       }
@@ -169,29 +119,160 @@ public class TheRStaticAnalyzerHelper {
     }
   }
 
+  private static class ReachTypes implements StaticAnalysisResult {
+    final Map<String, TheRType> myReachTypes = new HashMap<String, TheRType>();
+    final TheRReferenceExpression myWhat;
+    TheRType myResult = null;
 
-  public static Set<PsiElement> reachDefinitions(TheRReferenceExpression what) {
-    ReachDefinitions resolveResult = new ReachDefinitions(what);
-    TheRFunctionExpression functionExpression = PsiTreeUtil.getParentOfType(what, TheRFunctionExpression.class);
-    if (functionExpression != null) {
-      List<TheRParameter> parameterList = functionExpression.getParameterList().getParameterList();
-      for (TheRParameter parameter : parameterList) {
-        String name = parameter.getName();
-        if (name != null && name.equals(what.getText())) {
-          resolveResult.addDefinition(parameter);
-          break;
+    public ReachTypes(TheRReferenceExpression what) {
+      myWhat = what;
+    }
+
+    private ReachTypes(ReachTypes other) {
+      myReachTypes.putAll(other.myReachTypes);
+      myWhat = other.myWhat;
+      myResult = other.myResult;
+    }
+
+    public TheRType getResultType() {
+      return myResult;
+    }
+
+    @Override
+    public StaticAnalysisResult applyRead(TheRReferenceExpression ref) {
+      String name = ref.getName();
+      TheRType refType = TheRType.UNKNOWN;
+      if (myReachTypes.containsKey(name)) {
+        refType = myReachTypes.get(name);
+      }
+      TheRTypeContext.putTypeInCache(ref, refType);
+      if (ref.equals(myWhat)) {
+        myResult = refType;
+      }
+      return this;
+    }
+
+    @Override
+    public StaticAnalysisResult applyAssign(TheRAssignmentStatement assignmentStatement) {
+      PsiElement assignee = assignmentStatement.getAssignee();
+      TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
+      if (assignedValue == null) {
+        return this;
+      }
+      TheRType assignedValueType = TheRTypeProvider.getType(assignedValue);
+      ReachTypes result = this;
+      if (assignee instanceof TheRReferenceExpression) {
+        TheRReferenceExpression ref = (TheRReferenceExpression)assignee;
+        String name = ref.getName();
+        result = new ReachTypes(this);
+        result.myReachTypes.put(name, assignedValueType);
+      }
+      if (assignee instanceof TheRMemberExpression) {
+        TheRMemberExpression member = (TheRMemberExpression)assignee;
+        TheRExpression base = member.getExpression();
+        String tag = member.getTag();
+        if (base instanceof TheRReferenceExpression) { // check only x$y not f()$y
+          TheRReferenceExpression ref = (TheRReferenceExpression)base;
+          String name = ref.getName();
+          TheRType baseType = myReachTypes.get(name);
+          if (baseType == null) {
+            baseType = TheRType.UNKNOWN;
+          }
+          final Set<TheRType> beforeTypes;
+          if (baseType instanceof TheRUnionType) {
+            beforeTypes = ((TheRUnionType)baseType).getTypes();
+          } else {
+            beforeTypes = new HashSet<TheRType>();
+            beforeTypes.add(baseType);
+          }
+          Set<TheRType> afterTypes = new HashSet<TheRType>();
+          for (TheRType type : beforeTypes) {
+            if (!TheRListType.class.isInstance(type)) {
+              type = new TheRListType(false);
+            }
+            TheRListType list = (TheRListType) type;
+            if ("NULL".equals(assignedValue.getText())) {
+              list.removeField(tag);
+            } else {
+              list.addField(tag, assignedValueType);
+            }
+            afterTypes.add(list);
+          }
+          TheRType resultType = TheRUnionType.create(afterTypes);
+          result = new ReachTypes(this);
+          result.myReachTypes.put(name, resultType);
         }
       }
-      resolveResult = (ReachDefinitions)analyze(functionExpression.getExpression(), resolveResult);
+      if (assignee instanceof TheRSubscriptionExpression) {
+        TheRSubscriptionExpression subscriptionExpression = (TheRSubscriptionExpression)assignee;
+        List<TheRExpression> expressionList = subscriptionExpression.getExpressionList();
+        TheRExpression base = expressionList.get(0);
+        List<TheRExpression> arguments = expressionList.subList(1, expressionList.size());
+        if (base instanceof TheRReferenceExpression) {
+          String name = base.getName();
+          TheRType baseType = myReachTypes.get(name);
+          if (baseType == null) {
+            baseType = TheRType.UNKNOWN;
+          }
+          TheRType resultType = baseType.afterSubscriptionType(arguments, assignedValueType);
+          result = new ReachTypes(this);
+          result.myReachTypes.put(name, resultType);
+        }
+      }
+
+      //TODO: check for class(x) <- "clazz" here
+      return result;
+    }
+
+    @Override
+    public StaticAnalysisResult merge(StaticAnalysisResult other) {
+      if (!ReachTypes.class.isInstance(other)) {
+        throw new IllegalArgumentException();
+      }
+      ReachTypes result = new ReachTypes((ReachTypes)other);
+      for (Map.Entry<String, TheRType> entry : myReachTypes.entrySet()) {
+        String name = entry.getKey();
+        TheRType type = entry.getValue();
+        if (result.myReachTypes.containsKey(name)) {
+          Set<TheRType> typeSet = new HashSet<TheRType>();
+          typeSet.add(type);
+          typeSet.add(result.myReachTypes.get(name));
+          type = TheRUnionType.create(typeSet);
+        }
+        result.myReachTypes.put(name, type);
+      }
+      if (result.myResult == null && myResult != null) {
+        result.myResult = myResult;
+      }
+      return result;
+    }
+
+    @Override
+    public void applyReturn() {
+
+    }
+
+    @Override
+    public boolean isEnd() {
+      return false;
+    }
+  }
+
+  public static TheRType getReferenceType(TheRReferenceExpression what) {
+    ReachTypes resolveResult = new ReachTypes(what);
+    TheRFunctionExpression functionExpression = PsiTreeUtil.getParentOfType(what, TheRFunctionExpression.class);
+    if (functionExpression != null) {
+      resolveResult = (ReachTypes)analyze(functionExpression.getExpression(), resolveResult);
     }
     else {
       PsiFile file = what.getContainingFile();
       TheRExpression[] expressions = PsiTreeUtil.getChildrenOfType(file, TheRExpression.class);
       assert expressions != null;
-      resolveResult = (ReachDefinitions)analyzeSequence(Arrays.asList(expressions), resolveResult);
+      resolveResult = (ReachTypes)analyzeSequence(Arrays.asList(expressions), resolveResult);
     }
-    return resolveResult.getDefinitions();
+    return resolveResult.getResultType();
   }
+
 
   public static Set<String> optionalParameters(TheRFunctionExpression function) {
     TheRExpression functionExpression = function.getExpression();
@@ -312,6 +393,11 @@ public class TheRStaticAnalyzerHelper {
     if (where instanceof TheRSliceExpression) {
       TheRSliceExpression sliceExpression = (TheRSliceExpression)where;
       return analyzeSequence(sliceExpression.getExpressionList(), parentResult);
+    }
+
+    if (where instanceof TheRMemberExpression) {
+      TheRMemberExpression memberExpression = (TheRMemberExpression) where;
+      return analyze(memberExpression.getExpression(), parentResult);
     }
 
     //TODO: look at other expressions (for, call expression)

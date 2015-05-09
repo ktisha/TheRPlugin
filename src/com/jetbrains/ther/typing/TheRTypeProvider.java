@@ -17,6 +17,8 @@ import java.util.*;
 public class TheRTypeProvider {
 
 
+  public static final String LIST = "list";
+
   public static TheRType getType(TheRPsiElement element) {
     return TheRTypeContext.getTypeFromCache(element);
   }
@@ -36,6 +38,9 @@ public class TheRTypeProvider {
     }
     if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
+    }
+    if (element instanceof TheRNullLiteralExpression) {
+      return TheRNullType.INSTANCE;
     }
 
     if (element instanceof TheRReferenceExpression) {
@@ -57,11 +62,14 @@ public class TheRTypeProvider {
       return new TheRFunctionType((TheRFunctionExpression)element);
     }
     if (element instanceof TheRSubscriptionExpression) {
-      TheRReferenceExpression reference = PsiTreeUtil.getChildOfType(element, TheRReferenceExpression.class);
-      if (reference != null) {
-        TheRType type = getType(reference);
+      TheRSubscriptionExpression subscriptionExpression = (TheRSubscriptionExpression)element;
+      boolean isSingleBracket = subscriptionExpression.getLbracket() != null;
+      List<TheRExpression> expressionList = subscriptionExpression.getExpressionList();
+      TheRExpression base = expressionList.get(0);
+      if (base != null) {
+        TheRType type = getType(base);
         if (type != TheRType.UNKNOWN) {
-          return type.getSubscriptionType();
+          return type.getSubscriptionType(expressionList.subList(1, expressionList.size()), isSingleBracket);
         }
       }
     }
@@ -88,6 +96,14 @@ public class TheRTypeProvider {
         return TheRUnionType.create(types);
       }
     }
+
+    if (element instanceof TheRMemberExpression) {
+      TheRMemberExpression memberExpression = (TheRMemberExpression)element;
+      TheRType elementType = getType(memberExpression.getExpression());
+      if (elementType instanceof TheRListType) {
+        return ((TheRListType)elementType).getFieldType(memberExpression.getTag());
+      }
+    }
     return TheRType.UNKNOWN;
   }
 
@@ -102,6 +118,9 @@ public class TheRTypeProvider {
   }
 
   private static TheRType getCallExpressionType(TheRCallExpression element) {
+    if (LIST.equals(element.getExpression().getName())) {
+      return getNewListType(element.getArgumentList().getExpressionList());
+    }
     TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
     if (function == null) {
       return TheRType.UNKNOWN;
@@ -133,6 +152,19 @@ public class TheRTypeProvider {
 
     //step 3: check @rule
    return tryApplyRule(functionType, paramToSuppliedConfiguration);
+  }
+
+  private static TheRType getNewListType(List<TheRExpression> arguments) {
+    TheRListType list = new TheRListType();
+    for (TheRExpression arg : arguments) {
+      if (arg instanceof TheRAssignmentStatement) {
+        TheRAssignmentStatement assignment = (TheRAssignmentStatement)arg;
+        list.addField(assignment.getAssignee().getText(), getType(assignment.getAssignedValue()));
+      } else {
+        list.addField(getType(arg));
+      }
+    }
+    return list;
   }
 
   private static boolean isMatchedTypes(TheRFunctionType functionType,
@@ -279,17 +311,7 @@ public class TheRTypeProvider {
     if (reference == null) {
       return TheRType.UNKNOWN;
     }
-    Set<TheRType> definitionTypes = new HashSet<TheRType>();
-    for (PsiElement reachDefinition : TheRStaticAnalyzerHelper.reachDefinitions(expression)) {
-      if (reachDefinition instanceof TheRAssignmentStatement) {
-        TheRAssignmentStatement assignment = (TheRAssignmentStatement)reachDefinition;
-        TheRPsiElement assignedValue = assignment.getAssignedValue();
-        if (assignedValue != null) {
-          definitionTypes.add(getType(assignedValue));
-        }
-      }
-    }
-    return TheRUnionType.create(definitionTypes);
+    return TheRStaticAnalyzerHelper.getReferenceType(expression);
   }
 
   public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {

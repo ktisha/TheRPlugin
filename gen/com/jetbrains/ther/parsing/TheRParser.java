@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package com.jetbrains.ther.parsing;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
+import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
 import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 import static com.jetbrains.ther.parsing.TheRParserUtil.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
-import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class TheRParser implements PsiParser {
@@ -61,8 +62,14 @@ public class TheRParser implements PsiParser {
     else if (t == THE_R_LOGICAL_LITERAL_EXPRESSION) {
       r = logical_literal_expression(b, 0);
     }
+    else if (t == THE_R_MEMBER_EXPRESSION) {
+      r = expression(b, 0, 25);
+    }
     else if (t == THE_R_NEXT_STATEMENT) {
       r = next_statement(b, 0);
+    }
+    else if (t == THE_R_NULL_LITERAL_EXPRESSION) {
+      r = null_literal_expression(b, 0);
     }
     else if (t == THE_R_NUMERIC_LITERAL_EXPRESSION) {
       r = numeric_literal_expression(b, 0);
@@ -110,10 +117,10 @@ public class TheRParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(THE_R_BINARY_EXPRESSION, THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION,
       THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION,
-      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_NEXT_STATEMENT,
-      THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION, THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION,
-      THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION,
-      THE_R_WHILE_STATEMENT),
+      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION,
+      THE_R_NEXT_STATEMENT, THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION,
+      THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION,
+      THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_WHILE_STATEMENT),
   };
 
   /* ********************************************************** */
@@ -612,13 +619,12 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+  // NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
   static boolean special_constant(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "special_constant")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, THE_R_NULL);
-    if (!r) r = consumeToken(b, THE_R_NA);
+    r = consumeToken(b, THE_R_NA);
     if (!r) r = consumeToken(b, THE_R_INF);
     if (!r) r = consumeToken(b, THE_R_NAN);
     if (!r) r = consumeToken(b, THE_R_NA_INTEGER);
@@ -749,7 +755,7 @@ public class TheRParser implements PsiParser {
   // 27: BINARY(at_expression)
   // 28: POSTFIX(namespace_access_expression)
   // 29: ATOM(reference_expression)
-  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression)
+  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression) ATOM(null_literal_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
     addVariant(b, "<expression>");
@@ -772,6 +778,7 @@ public class TheRParser implements PsiParser {
     if (!r) r = numeric_literal_expression(b, l + 1);
     if (!r) r = string_literal_expression(b, l + 1);
     if (!r) r = logical_literal_expression(b, l + 1);
+    if (!r) r = null_literal_expression(b, l + 1);
     p = r;
     r = r && expression_0(b, l + 1, g);
     exit_section_(b, l, m, null, r, p, null);
@@ -841,7 +848,7 @@ public class TheRParser implements PsiParser {
       }
       else if (g < 26 && member_expression_0(b, l + 1)) {
         r = true;
-        exit_section_(b, l, m, THE_R_REFERENCE_EXPRESSION, r, true, null);
+        exit_section_(b, l, m, THE_R_MEMBER_EXPRESSION, r, true, null);
       }
       else if (g < 27 && at_expression_0(b, l + 1)) {
         r = expression(b, l, 27);
@@ -2114,6 +2121,17 @@ public class TheRParser implements PsiParser {
     if (!r) r = consumeTokenSmart(b, THE_R_T);
     if (!r) r = consumeTokenSmart(b, THE_R_F);
     exit_section_(b, l, m, THE_R_LOGICAL_LITERAL_EXPRESSION, r, false, null);
+    return r;
+  }
+
+  // NULL
+  public static boolean null_literal_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "null_literal_expression")) return false;
+    if (!nextTokenIsFast(b, THE_R_NULL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, THE_R_NULL);
+    exit_section_(b, m, THE_R_NULL_LITERAL_EXPRESSION, r);
     return r;
   }
 

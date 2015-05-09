@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.typing.types.TheRType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,15 @@ public class TheRTypeContext {
   }
 
   public static TheRType getTypeFromCache(TheRPsiElement element) {
+    return getContext(element).getType(element);
+  }
+
+  public static void putTypeInCache(TheRPsiElement element, TheRType type) {
+    getContext(element).putType(element, type);
+  }
+
+  @NotNull
+  private static TheRTypeContext getContext(TheRPsiElement element) {
     final Project project = element.getProject();
     final PsiModificationTracker tracker = PsiModificationTracker.SERVICE.getInstance(project);
     TheRTypeContext context;
@@ -32,11 +42,21 @@ public class TheRTypeContext {
         CONTEXT.put(project, context);
       }
     }
-    return context.getType(element);
+    return context;
   }
 
+  private void putType(TheRPsiElement element, TheRType type) {
+    cacheLock.lock();
+    TheRType typeInCache = cache.get(element);
+    if (typeInCache == null) {
+      cache.put(element, type);
+    } else if (!TheREvaluatingNowType.class.isInstance(typeInCache) && !typeInCache.equals(type)) {
+      throw new RuntimeException("Wrong types for element");
+    }
+    cacheLock.unlock();
+  }
 
-  public TheRType getType(TheRPsiElement element) {
+  private TheRType getType(TheRPsiElement element) {
     TheREvaluatingNowType evaluatingType = new TheREvaluatingNowType();
     cacheLock.lock();
     TheRType type = cache.get(element);

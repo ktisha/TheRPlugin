@@ -1,15 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package com.jetbrains.ther.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static com.jetbrains.ther.parsing.TheRElementTypes.*;
-import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.psi.api.TheRReferenceExpression;
+import com.jetbrains.ther.psi.api.TheRVisitor;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 
 public class TheRReferenceExpressionImpl extends TheRExpressionImpl implements TheRReferenceExpression {
 
@@ -62,12 +63,6 @@ public class TheRReferenceExpressionImpl extends TheRExpressionImpl implements T
   @Nullable
   public PsiElement getNaReal() {
     return findChildByType(THE_R_NA_REAL);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNull() {
-    return findChildByType(THE_R_NULL);
   }
 
   @Override

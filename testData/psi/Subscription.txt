@@ -52,7 +52,7 @@ TheRFile:Subscription.r
     PsiElement(TheR:]])(']]')
   PsiElement(TheR:nl)('\n')
   TheR:THE_R_SUBSCRIPTION_EXPRESSION
-    TheR:THE_R_REFERENCE_EXPRESSION
+    TheR:THE_R_MEMBER_EXPRESSION
       TheR:THE_R_REFERENCE_EXPRESSION
         PsiElement(TheR:identifier)('D')
       PsiElement(TheR:$)('$')
@@ -63,7 +63,7 @@ TheRFile:Subscription.r
         PsiElement(TheR:identifier)('length')
       TheR:THE_R_ARGUMENT_LIST
         PsiElement(TheR:()('(')
-        TheR:THE_R_REFERENCE_EXPRESSION
+        TheR:THE_R_MEMBER_EXPRESSION
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('D')
           PsiElement(TheR:$)('$')

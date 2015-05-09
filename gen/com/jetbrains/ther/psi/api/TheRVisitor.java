@@ -58,7 +58,15 @@ public class TheRVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitMemberExpression(@NotNull TheRMemberExpression o) {
+    visitExpression(o);
+  }
+
   public void visitNextStatement(@NotNull TheRNextStatement o) {
+    visitExpression(o);
+  }
+
+  public void visitNullLiteralExpression(@NotNull TheRNullLiteralExpression o) {
     visitExpression(o);
   }
 

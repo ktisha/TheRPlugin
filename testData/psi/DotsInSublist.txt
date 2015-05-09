@@ -1,6 +1,6 @@
 TheRFile:DotsInSublist.r
   TheR:THE_R_ASSIGNMENT_STATEMENT
-    TheR:THE_R_REFERENCE_EXPRESSION
+    TheR:THE_R_MEMBER_EXPRESSION
       TheR:THE_R_REFERENCE_EXPRESSION
         PsiElement(TheR:identifier)('m')
       PsiElement(TheR:$)('$')
@@ -9,7 +9,7 @@ TheRFile:DotsInSublist.r
     PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_ASSIGNMENT_STATEMENT
-      TheR:THE_R_REFERENCE_EXPRESSION
+      TheR:THE_R_MEMBER_EXPRESSION
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('m')
         PsiElement(TheR:$)('$')
@@ -17,5 +17,5 @@ TheRFile:DotsInSublist.r
       PsiWhiteSpace(' ')
       PsiElement(TheR:<-)('<-')
       PsiWhiteSpace(' ')
-      TheR:THE_R_REFERENCE_EXPRESSION
+      TheR:THE_R_NULL_LITERAL_EXPRESSION
         PsiElement(TheR:NULL)('NULL')

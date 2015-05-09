@@ -73,11 +73,12 @@
 root ::= expression_list
 private expression_list ::= expression? (semicolon+ expression?)*
 
-private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression
+private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression | null_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
 logical_literal_expression ::= TRUE | FALSE | T | F
-private special_constant ::= NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+null_literal_expression ::= NULL
+private special_constant ::= NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
   function | for | in | next | break
@@ -115,7 +116,9 @@ slice_expression ::= expression ':' nl* expression
 unary_plusminus_expression ::= ('+' | '-') nl* expression { elementType=prefix_expression }
 exp_expression ::= expression '^' nl* expression { elementType=binary_expression }
 private member_tag ::= identifier | string | '...'
-member_expression ::= expression '$' nl* member_tag { elementType=reference_expression }
+member_expression ::= expression '$' nl* member_tag {
+  methods = [ getTag ]
+}
 at_expression ::= expression '@' nl* expression { elementType=reference_expression }
 namespace_access_expression ::= expression ('::' | ':::') identifier { elementType=reference_expression }
 

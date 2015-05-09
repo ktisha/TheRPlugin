@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing.types;
 
+import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.typing.TheRTypeProvider;
 
 import java.util.*;
@@ -7,6 +8,9 @@ import java.util.*;
 public class TheRUnionType extends TheRType {
   private Set<TheRType> myTypes;
 
+  public Set<TheRType> getTypes() {
+    return myTypes;
+  }
 
   @Override
   public String getName() {
@@ -103,5 +107,14 @@ public class TheRUnionType extends TheRType {
     }
     builder.deleteCharAt(builder.length() - 1);
     return builder.toString();
+  }
+
+  @Override
+  public TheRType getSubscriptionType(List<TheRExpression> expressions, boolean isSingleBracket) {
+    HashSet<TheRType> subscriptTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      subscriptTypes.add(type.getSubscriptionType(expressions, isSingleBracket));
+    }
+    return TheRUnionType.create(subscriptTypes);
   }
 }

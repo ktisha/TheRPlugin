@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing.types;
 
+import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.typing.TheRTypeEnvironment;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public abstract class TheRType {
     return this;
   }
 
-  public TheRType getSubscriptionType() {
+  public TheRType getSubscriptionType(List<TheRExpression> expressions, boolean isSingleBracket) {
     return TheRType.UNKNOWN;
   }
 
@@ -75,5 +76,13 @@ public abstract class TheRType {
   @Override
   public String toString() {
     return getName();
+  }
+
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+    // TODO : valueType is union
+    if (arguments.isEmpty()) {
+      return this;
+    }
+    return TheRType.UNKNOWN;
   }
 }
