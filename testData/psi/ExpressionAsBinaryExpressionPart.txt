@@ -1,9 +1,9 @@
 TheRFile:ExpressionAsBinaryExpressionPart.r
-  TheR:THE_R_BINARY_EXPRESSION
+  TheR:THE_R_OPERATOR_EXPRESSION
     TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(TheR:numeric)('1')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:+)('+')
     PsiWhiteSpace(' ')
     TheR:THE_R_FOR_STATEMENT
@@ -15,10 +15,10 @@ TheRFile:ExpressionAsBinaryExpressionPart.r
       PsiWhiteSpace(' ')
       PsiElement(TheR:in)('in')
       PsiWhiteSpace(' ')
-      TheR:THE_R_BINARY_EXPRESSION
+      TheR:THE_R_SLICE_EXPRESSION
         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(TheR:numeric)('1')
-        TheR:THE_R_BINARY_OPERATOR
+        TheR:THE_R_OPERATOR
           PsiElement(TheR::)(':')
         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(TheR:numeric)('4')

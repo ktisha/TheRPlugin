@@ -107,8 +107,8 @@ public class TheRTypeProvider {
     if (element instanceof TheRSliceExpression) {
       return TheRNumericType.INSTANCE; // TODO: think!
     }
-    if (element instanceof TheRBinaryExpression) {
-      return getBinaryExpressionType((TheRBinaryExpression)element);
+    if (element instanceof TheROperatorExpression) {
+      return getBinaryExpressionType((TheROperatorExpression)element);
     }
     return TheRType.UNKNOWN;
   }
@@ -123,7 +123,7 @@ public class TheRTypeProvider {
     return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
   }
 
-  private static TheRType getBinaryExpressionType(TheRBinaryExpression expression) {
+  private static TheRType getBinaryExpressionType(TheROperatorExpression expression) {
     TheRFunctionExpression function = TheRPsiUtils.getFunction(expression);
     if (function == null) {
       return TheRType.UNKNOWN;
@@ -294,7 +294,7 @@ public class TheRTypeProvider {
         PsiElement parent = element.getParent();
         //TODO: check operations more strict
         //TODO: check control flow analysis
-        if (parent instanceof TheRBinaryExpression) {
+        if (parent instanceof TheROperatorExpression) {
           if (PsiTreeUtil.isAncestor(blockExpression, element, false)) {
             type[0] = TheRNumericType.INSTANCE;
             return false;

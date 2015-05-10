@@ -5,18 +5,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.IncorrectOperationException;
-import com.jetbrains.ther.psi.api.TheRBinaryOperator;
+import com.jetbrains.ther.psi.api.TheROperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheRBinaryOperatorReference implements PsiPolyVariantReference {
+public class TheROperatorReference implements PsiPolyVariantReference {
 
-  private final TheRBinaryOperator myElement;
+  private final TheROperator myElement;
 
-  public TheRBinaryOperatorReference(TheRBinaryOperator element) {
+  public TheROperatorReference(TheROperator element) {
     myElement = element;
   }
 

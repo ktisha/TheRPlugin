@@ -3,7 +3,7 @@ TheRFile:FunctionAsCallArgument.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('wtd.means')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:=)('=')
     PsiWhiteSpace(' ')
     TheR:THE_R_CALL_EXPRESSION
@@ -30,19 +30,19 @@ TheRFile:FunctionAsCallArgument.r
           PsiWhiteSpace(' ')
           TheR:THE_R_PARENTHESIZED_EXPRESSION
             PsiElement(TheR:()('(')
-            TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('sum')
                 TheR:THE_R_ARGUMENT_LIST
                   PsiElement(TheR:()('(')
-                  TheR:THE_R_BINARY_EXPRESSION
+                  TheR:THE_R_OPERATOR_EXPRESSION
                     TheR:THE_R_MEMBER_EXPRESSION
                       TheR:THE_R_REFERENCE_EXPRESSION
                         PsiElement(TheR:identifier)('piece')
                       PsiElement(TheR:$)('$')
                       PsiElement(TheR:identifier)('mktcap')
-                    TheR:THE_R_BINARY_OPERATOR
+                    TheR:THE_R_OPERATOR
                       PsiElement(TheR:*)('*')
                     TheR:THE_R_MEMBER_EXPRESSION
                       TheR:THE_R_REFERENCE_EXPRESSION
@@ -50,7 +50,7 @@ TheRFile:FunctionAsCallArgument.r
                       PsiElement(TheR:$)('$')
                       PsiElement(TheR:identifier)('spread')
                   PsiElement(TheR:))(')')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION

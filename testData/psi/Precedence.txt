@@ -13,7 +13,7 @@ TheRFile:Precedence.r
             PsiElement(TheR:numeric)('1000')
           PsiElement(TheR:,)(',')
           PsiWhiteSpace(' ')
-          TheR:THE_R_BINARY_EXPRESSION
+          TheR:THE_R_OPERATOR_EXPRESSION
             TheR:THE_R_MEMBER_EXPRESSION
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION
@@ -42,7 +42,7 @@ TheRFile:Precedence.r
               PsiElement(TheR:$)('$')
               PsiElement(TheR:identifier)('p.value')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:<)('<')
             PsiWhiteSpace(' ')
             TheR:THE_R_NUMERIC_LITERAL_EXPRESSION

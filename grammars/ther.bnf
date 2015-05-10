@@ -92,40 +92,40 @@ assignment_statement ::= {
   stubClass="com.jetbrains.ther.psi.stubs.TheRAssignmentStub"
 }
 
-binary_operator ::= {
+operator ::= {
   methods=[getName getReference]
 }
-left_assign_operator ::= '<-' | '<<-'  { elementType=binary_operator }
-right_assign_operator ::= '->' | '->>' { elementType=binary_operator }
-eq_assign_operator ::= '=' { elementType=binary_operator }
-or_operator ::= '|' | '||' { elementType=binary_operator }
-tilde_operator ::= '~' { elementType=binary_operator }
-and_operator ::= '&' | '&&' { elementType=binary_operator }
-compare_operator ::= '>' | '>=' | '<' | '<=' | '==' | '!=' { elementType=binary_operator }
-plusminus_operator ::= '+' | '-' { elementType=binary_operator }
-muldiv_operator ::= '*' | '/' { elementType=binary_operator }
-slice_operator ::= ':' { elementType=binary_operator }
-exp_operator ::= '^' { elementType=binary_operator }
-infix_operator ::= INFIX_OP { elementType=binary_operator }
+left_assign_operator ::= '<-' | '<<-'  { elementType=operator }
+right_assign_operator ::= '->' | '->>' { elementType=operator }
+eq_assign_operator ::= '=' { elementType=operator }
+or_operator ::= '|' | '||' { elementType=operator }
+tilde_operator ::= '~' { elementType=operator }
+and_operator ::= '&' | '&&' { elementType=operator }
+compare_operator ::= '>' | '>=' | '<' | '<=' | '==' | '!=' { elementType=operator }
+plusminus_operator ::= '+' | '-' { elementType=operator }
+muldiv_operator ::= '*' | '/' { elementType=operator }
+slice_operator ::= ':' { elementType=operator }
+exp_operator ::= '^' { elementType=operator }
+infix_operator ::= INFIX_OP { elementType=operator }
+not_operator ::= '!' { elementType=operator }
 
-binary_expression ::= expression
-prefix_expression ::= expression //todo: fake not to generate psi, how to remove it?
+operator_expression ::= expression
 left_assign_expression ::= expression left_assign_operator nl* expression { rightAssociative=true; elementType=assignment_statement }
 eq_assign_expression ::= expression eq_assign_operator nl* (expression | external_empty_expression) { rightAssociative=true; elementType=assignment_statement }
 right_assign_expression ::= expression right_assign_operator nl* expression { elementType=assignment_statement }
 private tilde_group ::= unary_tilde_expression | tilde_expression
-unary_tilde_expression ::= '~' nl* expression { elementType=prefix_expression }
-tilde_expression ::= expression tilde_operator nl* expression { elementType=binary_expression }
-or_expression ::= expression or_operator nl* expression { elementType=binary_expression }
-and_expression ::= expression and_operator nl* expression { elementType=binary_expression }
-unary_not_expression ::= '!' nl* expression  { elementType=prefix_expression }
-compare_expression ::= expression compare_operator nl* expression { elementType=binary_expression }
-plusminus_expression ::= expression plusminus_operator nl* expression { elementType=binary_expression }
-muldiv_expression ::= expression muldiv_operator nl* expression { elementType=binary_expression }
-user_defined_expression ::= expression infix_operator nl* expression { elementType=binary_expression }
-slice_expression ::= expression slice_operator nl* expression { elementType=binary_expression }
-unary_plusminus_expression ::= ('+' | '-') nl* expression { elementType=prefix_expression }
-exp_expression ::= expression exp_operator nl* expression { elementType=binary_expression }
+unary_tilde_expression ::= tilde_operator nl* expression
+tilde_expression ::= expression tilde_operator nl* expression
+or_expression ::= expression or_operator nl* expression { elementType=operator_expression }
+and_expression ::= expression and_operator nl* expression { elementType=operator_expression }
+unary_not_expression ::= not_operator nl* expression  { elementType=operator_expression }
+compare_expression ::= expression compare_operator nl* expression { elementType=operator_expression }
+plusminus_expression ::= expression plusminus_operator nl* expression { elementType=operator_expression }
+muldiv_expression ::= expression muldiv_operator nl* expression { elementType=operator_expression }
+user_defined_expression ::= expression infix_operator nl* expression { elementType=operator_expression }
+slice_expression ::= expression slice_operator nl* expression
+unary_plusminus_expression ::= plusminus_operator nl* expression { elementType=operator_expression }
+exp_expression ::= expression exp_operator nl* expression { elementType=operator_expression }
 private member_tag ::= identifier | string | '...'
 member_expression ::= expression '$' nl* member_tag {
   methods = [ getTag ]

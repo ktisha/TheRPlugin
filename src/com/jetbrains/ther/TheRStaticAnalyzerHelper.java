@@ -342,7 +342,7 @@ public class TheRStaticAnalyzerHelper {
       return thenResult.merge(elseResult);
     }
 
-    if (where instanceof TheRBinaryExpression || where instanceof TheRPrefixExpression) {
+    if (where instanceof TheROperatorExpression || where instanceof TheRPrefixExpression) {
       TheRExpression[] expressions = PsiTreeUtil.getChildrenOfType(where, TheRExpression.class);
       if (expressions == null) {
         return parentResult;

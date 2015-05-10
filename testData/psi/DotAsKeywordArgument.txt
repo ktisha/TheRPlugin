@@ -3,7 +3,7 @@ TheRFile:DotAsKeywordArgument.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('missE')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_CALL_EXPRESSION
@@ -51,7 +51,7 @@ TheRFile:DotAsKeywordArgument.r
                     TheR:THE_R_REFERENCE_EXPRESSION
                       PsiElement(TheR:identifier)('.')
                     PsiWhiteSpace(' ')
-                    TheR:THE_R_BINARY_OPERATOR
+                    TheR:THE_R_OPERATOR
                       PsiElement(TheR:=)('=')
                     PsiWhiteSpace(' ')
                     TheR:THE_R_CALL_EXPRESSION

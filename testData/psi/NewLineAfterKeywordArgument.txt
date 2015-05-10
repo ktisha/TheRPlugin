@@ -18,20 +18,20 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('gaussian')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('1')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_PARENTHESIZED_EXPRESSION
                 PsiElement(TheR:()('(')
-                TheR:THE_R_BINARY_EXPRESSION
+                TheR:THE_R_OPERATOR_EXPRESSION
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('2')
-                  TheR:THE_R_BINARY_OPERATOR
+                  TheR:THE_R_OPERATOR
                     PsiElement(TheR:*)('*')
                   TheR:THE_R_CALL_EXPRESSION
                     TheR:THE_R_REFERENCE_EXPRESSION
@@ -49,10 +49,10 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('rectangular')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('sqrt')
@@ -61,7 +61,7 @@ TheRFile:NewLineAfterKeywordArgument.r
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('3')
                   PsiElement(TheR:))(')')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('6')
@@ -72,10 +72,10 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('triangular')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('sqrt')
@@ -84,7 +84,7 @@ TheRFile:NewLineAfterKeywordArgument.r
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('6')
                   PsiElement(TheR:))(')')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('9')
@@ -95,20 +95,20 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('epanechnikov')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('3')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_PARENTHESIZED_EXPRESSION
                 PsiElement(TheR:()('(')
-                TheR:THE_R_BINARY_EXPRESSION
+                TheR:THE_R_OPERATOR_EXPRESSION
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('5')
-                  TheR:THE_R_BINARY_OPERATOR
+                  TheR:THE_R_OPERATOR
                     PsiElement(TheR:*)('*')
                   TheR:THE_R_CALL_EXPRESSION
                     TheR:THE_R_REFERENCE_EXPRESSION
@@ -126,14 +126,14 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('biweight')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
-              TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
+              TheR:THE_R_OPERATOR_EXPRESSION
                 TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(TheR:numeric)('5')
-                TheR:THE_R_BINARY_OPERATOR
+                TheR:THE_R_OPERATOR
                   PsiElement(TheR:*)('*')
                 TheR:THE_R_CALL_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
@@ -143,7 +143,7 @@ TheRFile:NewLineAfterKeywordArgument.r
                     TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                       PsiElement(TheR:numeric)('7')
                     PsiElement(TheR:))(')')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('49')
@@ -154,45 +154,45 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('cosine')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
-              TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
+              TheR:THE_R_OPERATOR_EXPRESSION
                 TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(TheR:numeric)('3')
-                TheR:THE_R_BINARY_OPERATOR
+                TheR:THE_R_OPERATOR
                   PsiElement(TheR:/)('/')
                 TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(TheR:numeric)('4')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:*)('*')
               TheR:THE_R_CALL_EXPRESSION
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('sqrt')
                 TheR:THE_R_ARGUMENT_LIST
                   PsiElement(TheR:()('(')
-                  TheR:THE_R_BINARY_EXPRESSION
-                    TheR:THE_R_BINARY_EXPRESSION
+                  TheR:THE_R_OPERATOR_EXPRESSION
+                    TheR:THE_R_OPERATOR_EXPRESSION
                       TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(TheR:numeric)('1')
-                      TheR:THE_R_BINARY_OPERATOR
+                      TheR:THE_R_OPERATOR
                         PsiElement(TheR:/)('/')
                       TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(TheR:numeric)('3')
                     PsiWhiteSpace(' ')
-                    TheR:THE_R_BINARY_OPERATOR
+                    TheR:THE_R_OPERATOR
                       PsiElement(TheR:-)('-')
                     PsiWhiteSpace(' ')
-                    TheR:THE_R_BINARY_EXPRESSION
+                    TheR:THE_R_OPERATOR_EXPRESSION
                       TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(TheR:numeric)('2')
-                      TheR:THE_R_BINARY_OPERATOR
+                      TheR:THE_R_OPERATOR
                         PsiElement(TheR:/)('/')
-                      TheR:THE_R_BINARY_EXPRESSION
+                      TheR:THE_R_OPERATOR_EXPRESSION
                         TheR:THE_R_REFERENCE_EXPRESSION
                           PsiElement(TheR:identifier)('pi')
-                        TheR:THE_R_BINARY_OPERATOR
+                        TheR:THE_R_OPERATOR
                           PsiElement(TheR:^)('^')
                         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                           PsiElement(TheR:numeric)('2')
@@ -204,44 +204,44 @@ TheRFile:NewLineAfterKeywordArgument.r
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('optcosine')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
-            TheR:THE_R_BINARY_EXPRESSION
-              TheR:THE_R_BINARY_EXPRESSION
+            TheR:THE_R_OPERATOR_EXPRESSION
+              TheR:THE_R_OPERATOR_EXPRESSION
                 TheR:THE_R_CALL_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('sqrt')
                   TheR:THE_R_ARGUMENT_LIST
                     PsiElement(TheR:()('(')
-                    TheR:THE_R_BINARY_EXPRESSION
+                    TheR:THE_R_OPERATOR_EXPRESSION
                       TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(TheR:numeric)('1')
-                      TheR:THE_R_BINARY_OPERATOR
+                      TheR:THE_R_OPERATOR
                         PsiElement(TheR:-)('-')
-                      TheR:THE_R_BINARY_EXPRESSION
+                      TheR:THE_R_OPERATOR_EXPRESSION
                         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                           PsiElement(TheR:numeric)('8')
-                        TheR:THE_R_BINARY_OPERATOR
+                        TheR:THE_R_OPERATOR
                           PsiElement(TheR:/)('/')
-                        TheR:THE_R_BINARY_EXPRESSION
+                        TheR:THE_R_OPERATOR_EXPRESSION
                           TheR:THE_R_REFERENCE_EXPRESSION
                             PsiElement(TheR:identifier)('pi')
-                          TheR:THE_R_BINARY_OPERATOR
+                          TheR:THE_R_OPERATOR
                             PsiElement(TheR:^)('^')
                           TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                             PsiElement(TheR:numeric)('2')
                     PsiElement(TheR:))(')')
-                TheR:THE_R_BINARY_OPERATOR
+                TheR:THE_R_OPERATOR
                   PsiElement(TheR:*)('*')
-                TheR:THE_R_BINARY_EXPRESSION
+                TheR:THE_R_OPERATOR_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('pi')
-                  TheR:THE_R_BINARY_OPERATOR
+                  TheR:THE_R_OPERATOR
                     PsiElement(TheR:^)('^')
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('2')
-              TheR:THE_R_BINARY_OPERATOR
+              TheR:THE_R_OPERATOR
                 PsiElement(TheR:/)('/')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('16')

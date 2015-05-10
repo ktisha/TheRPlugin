@@ -1,6 +1,7 @@
 TheRFile:ReprInSublist.r
-  TheR:THE_R_PREFIX_EXPRESSION
-    PsiElement(TheR:!)('!')
+  TheR:THE_R_OPERATOR_EXPRESSION
+    TheR:THE_R_OPERATOR
+      PsiElement(TheR:!)('!')
     TheR:THE_R_MEMBER_EXPRESSION
       TheR:THE_R_CALL_EXPRESSION
         TheR:THE_R_REFERENCE_EXPRESSION

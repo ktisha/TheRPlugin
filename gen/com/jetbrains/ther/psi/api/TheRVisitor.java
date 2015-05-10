@@ -14,14 +14,6 @@ public class TheRVisitor extends PsiElementVisitor {
     visitNamedElement(o);
   }
 
-  public void visitBinaryExpression(@NotNull TheRBinaryExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitBinaryOperator(@NotNull TheRBinaryOperator o) {
-    visitPsiElement(o);
-  }
-
   public void visitBlockExpression(@NotNull TheRBlockExpression o) {
     visitExpression(o);
   }
@@ -78,6 +70,14 @@ public class TheRVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitOperator(@NotNull TheROperator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitOperatorExpression(@NotNull TheROperatorExpression o) {
+    visitExpression(o);
+  }
+
   public void visitParameter(@NotNull TheRParameter o) {
     visitNamedElement(o);
   }
@@ -90,10 +90,6 @@ public class TheRVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
-  public void visitPrefixExpression(@NotNull TheRPrefixExpression o) {
-    visitExpression(o);
-  }
-
   public void visitReferenceExpression(@NotNull TheRReferenceExpression o) {
     visitExpression(o);
   }
@@ -102,11 +98,23 @@ public class TheRVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitSliceExpression(@NotNull TheRSliceExpression o) {
+    visitExpression(o);
+  }
+
   public void visitStringLiteralExpression(@NotNull TheRStringLiteralExpression o) {
     visitExpression(o);
   }
 
   public void visitSubscriptionExpression(@NotNull TheRSubscriptionExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitTildeExpression(@NotNull TheRTildeExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitUnaryTildeExpression(@NotNull TheRUnaryTildeExpression o) {
     visitExpression(o);
   }
 

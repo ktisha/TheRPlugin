@@ -7,11 +7,11 @@ TheRFile:IfStatementAsArgument.r
       TheR:THE_R_IF_STATEMENT
         PsiElement(TheR:if)('if')
         PsiElement(TheR:()('(')
-        TheR:THE_R_BINARY_EXPRESSION
+        TheR:THE_R_OPERATOR_EXPRESSION
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('inCode')
           PsiWhiteSpace(' ')
-          TheR:THE_R_BINARY_OPERATOR
+          TheR:THE_R_OPERATOR
             PsiElement(TheR:||)('||')
           PsiWhiteSpace(' ')
           TheR:THE_R_REFERENCE_EXPRESSION

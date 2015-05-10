@@ -13,7 +13,7 @@ TheRFile:AssignmentInSubscription.r
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('i2')
         PsiWhiteSpace(' ')
-        TheR:THE_R_BINARY_OPERATOR
+        TheR:THE_R_OPERATOR
           PsiElement(TheR:<-)('<-')
         PsiWhiteSpace(' ')
         TheR:THE_R_CALL_EXPRESSION
@@ -35,7 +35,7 @@ TheRFile:AssignmentInSubscription.r
             PsiElement(TheR:))(')')
       PsiElement(TheR:])(']')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_STRING_LITERAL_EXPRESSION
@@ -50,7 +50,7 @@ TheRFile:AssignmentInSubscription.r
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('i1')
         PsiWhiteSpace(' ')
-        TheR:THE_R_BINARY_OPERATOR
+        TheR:THE_R_OPERATOR
           PsiElement(TheR:<-)('<-')
         PsiWhiteSpace(' ')
         TheR:THE_R_CALL_EXPRESSION
@@ -77,7 +77,7 @@ TheRFile:AssignmentInSubscription.r
         <empty list>
       PsiElement(TheR:])(']')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_STRING_LITERAL_EXPRESSION

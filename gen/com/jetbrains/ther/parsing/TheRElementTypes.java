@@ -12,8 +12,6 @@ public interface TheRElementTypes {
 
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
   IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
-  IElementType THE_R_BINARY_EXPRESSION = new TheRElementType("THE_R_BINARY_EXPRESSION");
-  IElementType THE_R_BINARY_OPERATOR = new TheRElementType("THE_R_BINARY_OPERATOR");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");
   IElementType THE_R_CALL_EXPRESSION = new TheRElementType("THE_R_CALL_EXPRESSION");
@@ -28,14 +26,18 @@ public interface TheRElementTypes {
   IElementType THE_R_NEXT_STATEMENT = new TheRElementType("THE_R_NEXT_STATEMENT");
   IElementType THE_R_NULL_LITERAL_EXPRESSION = new TheRElementType("THE_R_NULL_LITERAL_EXPRESSION");
   IElementType THE_R_NUMERIC_LITERAL_EXPRESSION = new TheRElementType("THE_R_NUMERIC_LITERAL_EXPRESSION");
+  IElementType THE_R_OPERATOR = new TheRElementType("THE_R_OPERATOR");
+  IElementType THE_R_OPERATOR_EXPRESSION = new TheRElementType("THE_R_OPERATOR_EXPRESSION");
   IElementType THE_R_PARAMETER = new TheRElementType("THE_R_PARAMETER");
   IElementType THE_R_PARAMETER_LIST = new TheRElementType("THE_R_PARAMETER_LIST");
   IElementType THE_R_PARENTHESIZED_EXPRESSION = new TheRElementType("THE_R_PARENTHESIZED_EXPRESSION");
-  IElementType THE_R_PREFIX_EXPRESSION = new TheRElementType("THE_R_PREFIX_EXPRESSION");
   IElementType THE_R_REFERENCE_EXPRESSION = new TheRElementType("THE_R_REFERENCE_EXPRESSION");
   IElementType THE_R_REPEAT_STATEMENT = new TheRElementType("THE_R_REPEAT_STATEMENT");
+  IElementType THE_R_SLICE_EXPRESSION = new TheRElementType("THE_R_SLICE_EXPRESSION");
   IElementType THE_R_STRING_LITERAL_EXPRESSION = new TheRElementType("THE_R_STRING_LITERAL_EXPRESSION");
   IElementType THE_R_SUBSCRIPTION_EXPRESSION = new TheRElementType("THE_R_SUBSCRIPTION_EXPRESSION");
+  IElementType THE_R_TILDE_EXPRESSION = new TheRElementType("THE_R_TILDE_EXPRESSION");
+  IElementType THE_R_UNARY_TILDE_EXPRESSION = new TheRElementType("THE_R_UNARY_TILDE_EXPRESSION");
   IElementType THE_R_WHILE_STATEMENT = new TheRElementType("THE_R_WHILE_STATEMENT");
 
   IElementType THE_R_AND = new TheRElementType("&");
@@ -115,12 +117,6 @@ public interface TheRElementTypes {
       else if (type == THE_R_ASSIGNMENT_STATEMENT) {
         return new TheRAssignmentStatementImpl(node);
       }
-      else if (type == THE_R_BINARY_EXPRESSION) {
-        return new TheRBinaryExpressionImpl(node);
-      }
-      else if (type == THE_R_BINARY_OPERATOR) {
-        return new TheRBinaryOperatorImpl(node);
-      }
       else if (type == THE_R_BLOCK_EXPRESSION) {
         return new TheRBlockExpressionImpl(node);
       }
@@ -163,6 +159,12 @@ public interface TheRElementTypes {
       else if (type == THE_R_NUMERIC_LITERAL_EXPRESSION) {
         return new TheRNumericLiteralExpressionImpl(node);
       }
+      else if (type == THE_R_OPERATOR) {
+        return new TheROperatorImpl(node);
+      }
+      else if (type == THE_R_OPERATOR_EXPRESSION) {
+        return new TheROperatorExpressionImpl(node);
+      }
       else if (type == THE_R_PARAMETER) {
         return new TheRParameterImpl(node);
       }
@@ -172,20 +174,26 @@ public interface TheRElementTypes {
       else if (type == THE_R_PARENTHESIZED_EXPRESSION) {
         return new TheRParenthesizedExpressionImpl(node);
       }
-      else if (type == THE_R_PREFIX_EXPRESSION) {
-        return new TheRPrefixExpressionImpl(node);
-      }
       else if (type == THE_R_REFERENCE_EXPRESSION) {
         return new TheRReferenceExpressionImpl(node);
       }
       else if (type == THE_R_REPEAT_STATEMENT) {
         return new TheRRepeatStatementImpl(node);
       }
+      else if (type == THE_R_SLICE_EXPRESSION) {
+        return new TheRSliceExpressionImpl(node);
+      }
       else if (type == THE_R_STRING_LITERAL_EXPRESSION) {
         return new TheRStringLiteralExpressionImpl(node);
       }
       else if (type == THE_R_SUBSCRIPTION_EXPRESSION) {
         return new TheRSubscriptionExpressionImpl(node);
+      }
+      else if (type == THE_R_TILDE_EXPRESSION) {
+        return new TheRTildeExpressionImpl(node);
+      }
+      else if (type == THE_R_UNARY_TILDE_EXPRESSION) {
+        return new TheRUnaryTildeExpressionImpl(node);
       }
       else if (type == THE_R_WHILE_STATEMENT) {
         return new TheRWhileStatementImpl(node);

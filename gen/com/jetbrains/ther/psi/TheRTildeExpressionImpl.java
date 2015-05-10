@@ -10,15 +10,27 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 import com.jetbrains.ther.psi.api.*;
 
-public class TheRPrefixExpressionImpl extends TheRExpressionImpl implements TheRPrefixExpression {
+public class TheRTildeExpressionImpl extends TheRExpressionImpl implements TheRTildeExpression {
 
-  public TheRPrefixExpressionImpl(ASTNode node) {
+  public TheRTildeExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof TheRVisitor) ((TheRVisitor)visitor).visitPrefixExpression(this);
+    if (visitor instanceof TheRVisitor) ((TheRVisitor)visitor).visitTildeExpression(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<TheRExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, TheRExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public TheROperator getOperator() {
+    return findChildByClass(TheROperator.class);
   }
 
 }

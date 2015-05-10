@@ -8,7 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
-import com.jetbrains.ther.psi.references.TheRBinaryOperatorReference;
+import com.jetbrains.ther.psi.references.TheROperatorReference;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,12 +34,12 @@ public class TheRPsiImplUtil {
     TheRElementTypes.THE_R_LEFT_ASSIGN, TheRElementTypes.THE_R_RIGHT_ASSIGN, TheRElementTypes.THE_R_LIST_SUBSET, TheRElementTypes.THE_R_AT);
 
 
-  public static String getName(TheRBinaryOperator binaryOperator) {
+  public static String getName(TheROperator binaryOperator) {
     return binaryOperator.getText();
   }
 
-  public static TheRBinaryOperatorReference getReference(TheRBinaryOperator binaryOperator) {
-    return new TheRBinaryOperatorReference(binaryOperator);
+  public static TheROperatorReference getReference(TheROperator binaryOperator) {
+    return new TheROperatorReference(binaryOperator);
   }
 
   public static boolean isLeft(TheRAssignmentStatement assignment) {

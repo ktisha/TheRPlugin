@@ -4,13 +4,12 @@ package com.jetbrains.ther.psi.api;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.jetbrains.ther.psi.references.TheROperatorReference;
 
-public interface TheRSliceExpression extends TheRExpression {
+public interface TheROperator extends TheRPsiElement {
 
-  @NotNull
-  List<TheRExpression> getExpressionList();
+  String getName();
 
-  @Nullable
-  TheROperator getOperator();
+  TheROperatorReference getReference();
 
 }

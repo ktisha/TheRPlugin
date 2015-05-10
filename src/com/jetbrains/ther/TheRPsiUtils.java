@@ -85,8 +85,8 @@ public class TheRPsiUtils {
   }
 
   @Nullable
-  public static TheRFunctionExpression getFunction(@NotNull final TheRBinaryExpression binaryExpression) {
-    TheRBinaryOperator operator = PsiTreeUtil.getChildOfType(binaryExpression, TheRBinaryOperator.class);
+  public static TheRFunctionExpression getFunction(@NotNull final TheROperatorExpression binaryExpression) {
+    TheROperator operator = PsiTreeUtil.getChildOfType(binaryExpression, TheROperator.class);
     if (operator != null) {
       return getFunctionFromReference(operator.getReference());
     }

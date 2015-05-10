@@ -5,10 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface TheRSliceExpression extends TheRExpression {
+public interface TheRUnaryTildeExpression extends TheRExpression {
 
-  @NotNull
-  List<TheRExpression> getExpressionList();
+  @Nullable
+  TheRExpression getExpression();
 
   @Nullable
   TheROperator getOperator();

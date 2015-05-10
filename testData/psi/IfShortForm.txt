@@ -3,7 +3,7 @@ TheRFile:IfShortForm.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('r')
     PsiWhiteSpace(' ')
-    TheR:THE_R_BINARY_OPERATOR
+    TheR:THE_R_OPERATOR
       PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_IF_STATEMENT
@@ -42,7 +42,7 @@ TheRFile:IfShortForm.r
               TheR:THE_R_ASSIGNMENT_STATEMENT
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('length')
-                TheR:THE_R_BINARY_OPERATOR
+                TheR:THE_R_OPERATOR
                   PsiElement(TheR:=)('=')
                 PsiWhiteSpace(' ')
                 TheR:THE_R_CALL_EXPRESSION
@@ -59,7 +59,7 @@ TheRFile:IfShortForm.r
           TheR:THE_R_ASSIGNMENT_STATEMENT
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('names')
-            TheR:THE_R_BINARY_OPERATOR
+            TheR:THE_R_OPERATOR
               PsiElement(TheR:=)('=')
             PsiWhiteSpace(' ')
             TheR:THE_R_REFERENCE_EXPRESSION
