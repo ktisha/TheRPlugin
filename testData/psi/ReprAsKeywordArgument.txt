@@ -3,7 +3,8 @@ TheRFile:ReprAsKeywordArgument.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('DF')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_CALL_EXPRESSION
       TheR:THE_R_REFERENCE_EXPRESSION
@@ -13,7 +14,8 @@ TheRFile:ReprAsKeywordArgument.r
         TheR:THE_R_ASSIGNMENT_STATEMENT
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('y')
-          PsiElement(TheR:=)('=')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:=)('=')
           TheR:THE_R_CALL_EXPRESSION
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('rnorm')
@@ -27,13 +29,15 @@ TheRFile:ReprAsKeywordArgument.r
         TheR:THE_R_ASSIGNMENT_STATEMENT
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('`x 1`')
-          PsiElement(TheR:=)('=')
-          TheR:THE_R_SLICE_EXPRESSION
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:=)('=')
+          TheR:THE_R_BINARY_EXPRESSION
             TheR:THE_R_PREFIX_EXPRESSION
               PsiElement(TheR:-)('-')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('10')
-            PsiElement(TheR::)(':')
+            TheR:THE_R_BINARY_OPERATOR
+              PsiElement(TheR::)(':')
             TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(TheR:numeric)('10.')
         PsiElement(TheR:,)(',')
@@ -42,7 +46,8 @@ TheRFile:ReprAsKeywordArgument.r
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('check.names')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:=)('=')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:=)('=')
           PsiWhiteSpace(' ')
           TheR:THE_R_LOGICAL_LITERAL_EXPRESSION
             PsiElement(TheR:FALSE)('FALSE')

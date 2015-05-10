@@ -13,7 +13,8 @@ TheRFile:AssignmentInSubscription.r
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('i2')
         PsiWhiteSpace(' ')
-        PsiElement(TheR:<-)('<-')
+        TheR:THE_R_BINARY_OPERATOR
+          PsiElement(TheR:<-)('<-')
         PsiWhiteSpace(' ')
         TheR:THE_R_CALL_EXPRESSION
           TheR:THE_R_REFERENCE_EXPRESSION
@@ -34,7 +35,8 @@ TheRFile:AssignmentInSubscription.r
             PsiElement(TheR:))(')')
       PsiElement(TheR:])(']')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_STRING_LITERAL_EXPRESSION
       PsiElement(TheR:string)('"gray"')
@@ -48,7 +50,8 @@ TheRFile:AssignmentInSubscription.r
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('i1')
         PsiWhiteSpace(' ')
-        PsiElement(TheR:<-)('<-')
+        TheR:THE_R_BINARY_OPERATOR
+          PsiElement(TheR:<-)('<-')
         PsiWhiteSpace(' ')
         TheR:THE_R_CALL_EXPRESSION
           TheR:THE_R_REFERENCE_EXPRESSION
@@ -74,7 +77,8 @@ TheRFile:AssignmentInSubscription.r
         <empty list>
       PsiElement(TheR:])(']')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_STRING_LITERAL_EXPRESSION
       PsiElement(TheR:string)('"gray"')

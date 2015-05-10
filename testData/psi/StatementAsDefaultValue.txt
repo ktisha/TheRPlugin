@@ -3,7 +3,8 @@ TheRFile:StatementAsDefaultValue.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('`[.data.frame`')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiElement(TheR:nl)('\n')
     PsiWhiteSpace('    ')
     TheR:THE_R_FUNCTION_EXPRESSION
@@ -55,7 +56,8 @@ TheRFile:StatementAsDefaultValue.r
                     PsiElement(TheR:identifier)('cols')
                   PsiElement(TheR:))(')')
               PsiWhiteSpace(' ')
-              PsiElement(TheR:==)('==')
+              TheR:THE_R_BINARY_OPERATOR
+                PsiElement(TheR:==)('==')
               PsiWhiteSpace(' ')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('1')

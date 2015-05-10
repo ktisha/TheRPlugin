@@ -8,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.psi.references.TheRBinaryOperatorReference;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +28,19 @@ public class TheRPsiImplUtil {
     TheRElementTypes.THE_R_IN, TheRElementTypes.THE_R_NEXT, TheRElementTypes.THE_R_BREAK);
   public static final TokenSet OPERATORS = TokenSet.create(
     TheRElementTypes.THE_R_MINUS, TheRElementTypes.THE_R_PLUS, TheRElementTypes.THE_R_NOT, TheRElementTypes.THE_R_TILDE, TheRElementTypes.THE_R_HELP,
-    TheRElementTypes.THE_R_COLON, TheRElementTypes.THE_R_MULT, TheRElementTypes.THE_R_DIV, TheRElementTypes.THE_R_EXP, TheRElementTypes.THE_R_MODULUS,
-    TheRElementTypes.THE_R_INT_DIV, TheRElementTypes.THE_R_MATRIX_PROD, TheRElementTypes.THE_R_OUTER_PROD, TheRElementTypes.THE_R_MATCHING, TheRElementTypes.THE_R_KRONECKER_PROD,
+    TheRElementTypes.THE_R_COLON, TheRElementTypes.THE_R_MULT, TheRElementTypes.THE_R_DIV, TheRElementTypes.THE_R_EXP,
     TheRElementTypes.THE_R_INFIX_OP, TheRElementTypes.THE_R_LT, TheRElementTypes.THE_R_GT, TheRElementTypes.THE_R_EQEQ, TheRElementTypes.THE_R_GE,
     TheRElementTypes.THE_R_LE, TheRElementTypes.THE_R_AND, TheRElementTypes.THE_R_ANDAND, TheRElementTypes.THE_R_OR, TheRElementTypes.THE_R_OROR,
     TheRElementTypes.THE_R_LEFT_ASSIGN, TheRElementTypes.THE_R_RIGHT_ASSIGN, TheRElementTypes.THE_R_LIST_SUBSET, TheRElementTypes.THE_R_AT);
 
+
+  public static String getName(TheRBinaryOperator binaryOperator) {
+    return binaryOperator.getText();
+  }
+
+  public static TheRBinaryOperatorReference getReference(TheRBinaryOperator binaryOperator) {
+    return new TheRBinaryOperatorReference(binaryOperator);
+  }
 
   public static boolean isLeft(TheRAssignmentStatement assignment) {
     final ASTNode operator = assignment.getNode().findChildByType(LEFT_ASSIGNMENTS);

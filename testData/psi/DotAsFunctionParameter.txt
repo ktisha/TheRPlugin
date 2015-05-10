@@ -3,7 +3,8 @@ TheRFile:DotAsFunctionParameter.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('not.Ident')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_FUNCTION_EXPRESSION
       PsiElement(TheR:function)('function')

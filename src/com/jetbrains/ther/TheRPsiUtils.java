@@ -63,22 +63,36 @@ public class TheRPsiUtils {
   public static TheRFunctionExpression getFunction(@NotNull final TheRCallExpression callExpression) {
     TheRExpression expression = callExpression.getExpression();
     if (expression instanceof TheRReferenceExpression) {
-      PsiReference reference = expression.getReference();
-      if (reference == null) {
-        return null;
-      }
-      PsiElement functionDef = reference.resolve();
-      if (functionDef == null) {
-        return null;
-      }
-      if (functionDef instanceof TheRAssignmentStatement) {
-        return PsiTreeUtil.getChildOfType(functionDef, TheRFunctionExpression.class);
-      }
-      PsiElement assignmentStatement = functionDef.getParent();
-      return PsiTreeUtil.getChildOfType(assignmentStatement, TheRFunctionExpression.class);
+      return getFunctionFromReference(expression.getReference());
     }
     return null;
   }
+
+  @Nullable
+  private static TheRFunctionExpression getFunctionFromReference(PsiReference reference) {
+    if (reference == null) {
+      return null;
+    }
+    PsiElement functionDef = reference.resolve();
+    if (functionDef == null) {
+      return null;
+    }
+    if (functionDef instanceof TheRAssignmentStatement) {
+      return PsiTreeUtil.getChildOfType(functionDef, TheRFunctionExpression.class);
+    }
+    PsiElement assignmentStatement = functionDef.getParent();
+    return PsiTreeUtil.getChildOfType(assignmentStatement, TheRFunctionExpression.class);
+  }
+
+  @Nullable
+  public static TheRFunctionExpression getFunction(@NotNull final TheRBinaryExpression binaryExpression) {
+    TheRBinaryOperator operator = PsiTreeUtil.getChildOfType(binaryExpression, TheRBinaryOperator.class);
+    if (operator != null) {
+      return getFunctionFromReference(operator.getReference());
+    }
+    return null;
+  }
+
 
   public static boolean containsTripleDot(List<TheRParameter> formalArguments) {
     for (TheRParameter parameter : formalArguments) {

@@ -3,7 +3,8 @@ TheRFile:StatementBreak.r
     TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(TheR:numeric)('13')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:+)('+')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:+)('+')
     PsiWhiteSpace(' ')
     TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(TheR:numeric)('4')

@@ -3,14 +3,16 @@ TheRFile:Subscription.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('mtcars')
     PsiElement(TheR:[)('[')
-    TheR:THE_R_SLICE_EXPRESSION
-      TheR:THE_R_SLICE_EXPRESSION
+    TheR:THE_R_BINARY_EXPRESSION
+      TheR:THE_R_BINARY_EXPRESSION
         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(TheR:numeric)('2')
-        PsiElement(TheR::)(':')
+        TheR:THE_R_BINARY_OPERATOR
+          PsiElement(TheR::)(':')
         TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(TheR:numeric)('3')
-      PsiElement(TheR::)(':')
+      TheR:THE_R_BINARY_OPERATOR
+        PsiElement(TheR::)(':')
       TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
         PsiElement(TheR:numeric)('5')
     PsiElement(TheR:,)(',')

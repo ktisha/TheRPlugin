@@ -6,7 +6,8 @@ TheRFile:DotsInSublist.r
       PsiElement(TheR:$)('$')
       PsiElement(TheR:TRIPLE_DOTS)('...')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_ASSIGNMENT_STATEMENT
       TheR:THE_R_MEMBER_EXPRESSION
@@ -15,7 +16,8 @@ TheRFile:DotsInSublist.r
         PsiElement(TheR:$)('$')
         PsiElement(TheR:identifier)('FUN')
       PsiWhiteSpace(' ')
-      PsiElement(TheR:<-)('<-')
+      TheR:THE_R_BINARY_OPERATOR
+        PsiElement(TheR:<-)('<-')
       PsiWhiteSpace(' ')
       TheR:THE_R_NULL_LITERAL_EXPRESSION
         PsiElement(TheR:NULL)('NULL')

@@ -11,7 +11,8 @@ TheRFile:IfStatementAsArgument.r
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('inCode')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:||)('||')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:||)('||')
           PsiWhiteSpace(' ')
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('inCodeBlock')

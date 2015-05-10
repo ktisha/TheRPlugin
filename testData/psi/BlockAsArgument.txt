@@ -12,7 +12,8 @@ TheRFile:BlockAsArgument.r
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('B')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:=)('=')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:=)('=')
           PsiWhiteSpace(' ')
           TheR:THE_R_CALL_EXPRESSION
             TheR:THE_R_REFERENCE_EXPRESSION
@@ -22,7 +23,8 @@ TheRFile:BlockAsArgument.r
               TheR:THE_R_ASSIGNMENT_STATEMENT
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('x1')
-                PsiElement(TheR:=)('=')
+                TheR:THE_R_BINARY_OPERATOR
+                  PsiElement(TheR:=)('=')
                 TheR:THE_R_CALL_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('runif')
@@ -36,7 +38,8 @@ TheRFile:BlockAsArgument.r
               TheR:THE_R_ASSIGNMENT_STATEMENT
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('x2')
-                PsiElement(TheR:=)('=')
+                TheR:THE_R_BINARY_OPERATOR
+                  PsiElement(TheR:=)('=')
                 TheR:THE_R_CALL_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('runif')
@@ -50,7 +53,8 @@ TheRFile:BlockAsArgument.r
               TheR:THE_R_ASSIGNMENT_STATEMENT
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('x3')
-                PsiElement(TheR:=)('=')
+                TheR:THE_R_BINARY_OPERATOR
+                  PsiElement(TheR:=)('=')
                 TheR:THE_R_CALL_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('runif')

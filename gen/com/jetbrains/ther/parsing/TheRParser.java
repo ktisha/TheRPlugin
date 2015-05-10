@@ -31,6 +31,9 @@ public class TheRParser implements PsiParser {
     else if (t == THE_R_BINARY_EXPRESSION) {
       r = binary_expression(b, 0);
     }
+    else if (t == THE_R_BINARY_OPERATOR) {
+      r = binary_operator(b, 0);
+    }
     else if (t == THE_R_BLOCK_EXPRESSION) {
       r = block_expression(b, 0);
     }
@@ -91,9 +94,6 @@ public class TheRParser implements PsiParser {
     else if (t == THE_R_REPEAT_STATEMENT) {
       r = repeat_statement(b, 0);
     }
-    else if (t == THE_R_SLICE_EXPRESSION) {
-      r = expression(b, 0, 20);
-    }
     else if (t == THE_R_STRING_LITERAL_EXPRESSION) {
       r = string_literal_expression(b, 0);
     }
@@ -118,9 +118,22 @@ public class TheRParser implements PsiParser {
       THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION,
       THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION,
       THE_R_NEXT_STATEMENT, THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION,
-      THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION,
-      THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_WHILE_STATEMENT),
+      THE_R_PREFIX_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_STRING_LITERAL_EXPRESSION,
+      THE_R_SUBSCRIPTION_EXPRESSION, THE_R_WHILE_STATEMENT),
   };
+
+  /* ********************************************************** */
+  // '&' | '&&'
+  public static boolean and_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "and_operator")) return false;
+    if (!nextTokenIs(b, "<and operator>", THE_R_ANDAND, THE_R_AND)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<and operator>");
+    r = consumeToken(b, THE_R_AND);
+    if (!r) r = consumeToken(b, THE_R_ANDAND);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
+    return r;
+  }
 
   /* ********************************************************** */
   // '...' | expression | external_empty_expression
@@ -279,6 +292,13 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  public static boolean binary_operator(PsiBuilder b, int l) {
+    Marker m = enter_section_(b);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, true);
+    return true;
+  }
+
+  /* ********************************************************** */
   // nl* '(' nl* (expression nl*)? ')'
   static boolean break_next_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "break_next_expression")) return false;
@@ -349,6 +369,22 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // '>' | '>=' | '<' | '<=' | '==' | '!='
+  public static boolean compare_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compare_operator")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<compare operator>");
+    r = consumeToken(b, THE_R_GT);
+    if (!r) r = consumeToken(b, THE_R_GE);
+    if (!r) r = consumeToken(b, THE_R_LT);
+    if (!r) r = consumeToken(b, THE_R_LE);
+    if (!r) r = consumeToken(b, THE_R_EQEQ);
+    if (!r) r = consumeToken(b, THE_R_NOTEQ);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // expression
   public static boolean empty_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "empty_expression")) return false;
@@ -356,6 +392,30 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _COLLAPSE_, "<empty expression>");
     r = expression(b, l + 1, -1);
     exit_section_(b, l, m, THE_R_EMPTY_EXPRESSION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '='
+  public static boolean eq_assign_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "eq_assign_operator")) return false;
+    if (!nextTokenIs(b, THE_R_EQ)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_EQ);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '^'
+  public static boolean exp_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exp_operator")) return false;
+    if (!nextTokenIs(b, THE_R_EXP)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_EXP);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, r);
     return r;
   }
 
@@ -425,6 +485,18 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // INFIX_OP
+  public static boolean infix_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "infix_operator")) return false;
+    if (!nextTokenIs(b, THE_R_INFIX_OP)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_INFIX_OP);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   //   TRIPLE_DOTS | if | else | repeat | while |
   //   function | for | in | next | break
@@ -451,6 +523,19 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // '<-' | '<<-'
+  public static boolean left_assign_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "left_assign_operator")) return false;
+    if (!nextTokenIs(b, "<left assign operator>", THE_R_LEFT_ASSIGN, THE_R_LEFT_COMPLEX_ASSIGN)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<left assign operator>");
+    r = consumeToken(b, THE_R_LEFT_ASSIGN);
+    if (!r) r = consumeToken(b, THE_R_LEFT_COMPLEX_ASSIGN);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // identifier | string | '...'
   static boolean member_tag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member_tag")) return false;
@@ -460,6 +545,32 @@ public class TheRParser implements PsiParser {
     if (!r) r = consumeToken(b, THE_R_STRING);
     if (!r) r = consumeToken(b, "...");
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '*' | '/'
+  public static boolean muldiv_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "muldiv_operator")) return false;
+    if (!nextTokenIs(b, "<muldiv operator>", THE_R_MULT, THE_R_DIV)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<muldiv operator>");
+    r = consumeToken(b, THE_R_MULT);
+    if (!r) r = consumeToken(b, THE_R_DIV);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '|' | '||'
+  public static boolean or_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "or_operator")) return false;
+    if (!nextTokenIs(b, "<or operator>", THE_R_OR, THE_R_OROR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<or operator>");
+    r = consumeToken(b, THE_R_OR);
+    if (!r) r = consumeToken(b, THE_R_OROR);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
     return r;
   }
 
@@ -588,6 +699,19 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // '+' | '-'
+  public static boolean plusminus_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "plusminus_operator")) return false;
+    if (!nextTokenIs(b, "<plusminus operator>", THE_R_PLUS, THE_R_MINUS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<plusminus operator>");
+    r = consumeToken(b, THE_R_PLUS);
+    if (!r) r = consumeToken(b, THE_R_MINUS);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // expression
   public static boolean prefix_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefix_expression")) return false;
@@ -595,6 +719,19 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b, l, _COLLAPSE_, "<prefix expression>");
     r = expression(b, l + 1, -1);
     exit_section_(b, l, m, THE_R_PREFIX_EXPRESSION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '->' | '->>'
+  public static boolean right_assign_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "right_assign_operator")) return false;
+    if (!nextTokenIs(b, "<right assign operator>", THE_R_RIGHT_ASSIGN, THE_R_RIGHT_COMPLEX_ASSIGN)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<right assign operator>");
+    r = consumeToken(b, THE_R_RIGHT_ASSIGN);
+    if (!r) r = consumeToken(b, THE_R_RIGHT_COMPLEX_ASSIGN);
+    exit_section_(b, l, m, THE_R_BINARY_OPERATOR, r, false, null);
     return r;
   }
 
@@ -614,6 +751,18 @@ public class TheRParser implements PsiParser {
     r = consumeToken(b, THE_R_SEMI);
     if (!r) r = consumeToken(b, THE_R_NL);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ':'
+  public static boolean slice_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "slice_operator")) return false;
+    if (!nextTokenIs(b, THE_R_COLON)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_COLON);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, r);
     return r;
   }
 
@@ -719,6 +868,18 @@ public class TheRParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // '~'
+  public static boolean tilde_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tilde_operator")) return false;
+    if (!nextTokenIs(b, THE_R_TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, THE_R_TILDE);
+    exit_section_(b, m, THE_R_BINARY_OPERATOR, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -831,7 +992,7 @@ public class TheRParser implements PsiParser {
       }
       else if (g < 21 && slice_expression_0(b, l + 1)) {
         r = expression(b, l, 21);
-        exit_section_(b, l, m, THE_R_SLICE_EXPRESSION, r, true, null);
+        exit_section_(b, l, m, THE_R_BINARY_EXPRESSION, r, true, null);
       }
       else if (g < 23 && exp_expression_0(b, l + 1)) {
         r = expression(b, l, 23);
@@ -1394,24 +1555,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('<-' | '<<-') nl*
+  // left_assign_operator nl*
   private static boolean left_assign_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "left_assign_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = left_assign_expression_0_0(b, l + 1);
+    r = left_assign_operator(b, l + 1);
     r = r && left_assign_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '<-' | '<<-'
-  private static boolean left_assign_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "left_assign_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_LEFT_ASSIGN);
-    if (!r) r = consumeTokenSmart(b, THE_R_LEFT_COMPLEX_ASSIGN);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1428,12 +1578,12 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // '=' nl* (expression | external_empty_expression)
+  // eq_assign_operator nl* (expression | external_empty_expression)
   private static boolean eq_assign_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "eq_assign_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_EQ);
+    r = eq_assign_operator(b, l + 1);
     r = r && eq_assign_expression_0_1(b, l + 1);
     r = r && eq_assign_expression_0_2(b, l + 1);
     exit_section_(b, m, null, r);
@@ -1463,24 +1613,13 @@ public class TheRParser implements PsiParser {
     return r;
   }
 
-  // ('->' | '->>') nl*
+  // right_assign_operator nl*
   private static boolean right_assign_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "right_assign_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = right_assign_expression_0_0(b, l + 1);
+    r = right_assign_operator(b, l + 1);
     r = r && right_assign_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '->' | '->>'
-  private static boolean right_assign_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "right_assign_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_RIGHT_ASSIGN);
-    if (!r) r = consumeTokenSmart(b, THE_R_RIGHT_COMPLEX_ASSIGN);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1532,12 +1671,12 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // '~' nl*
+  // tilde_operator nl*
   private static boolean tilde_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tilde_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_TILDE);
+    r = tilde_operator(b, l + 1);
     r = r && tilde_expression_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1555,24 +1694,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('|' | '||') nl*
+  // or_operator nl*
   private static boolean or_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "or_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = or_expression_0_0(b, l + 1);
+    r = or_operator(b, l + 1);
     r = r && or_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '|' | '||'
-  private static boolean or_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "or_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_OR);
-    if (!r) r = consumeTokenSmart(b, THE_R_OROR);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1589,24 +1717,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('&' | '&&') nl*
+  // and_operator nl*
   private static boolean and_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "and_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = and_expression_0_0(b, l + 1);
+    r = and_operator(b, l + 1);
     r = r && and_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '&' | '&&'
-  private static boolean and_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "and_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_AND);
-    if (!r) r = consumeTokenSmart(b, THE_R_ANDAND);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1658,28 +1775,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('>' | '>=' | '<' | '<=' | '==' | '!=') nl*
+  // compare_operator nl*
   private static boolean compare_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "compare_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = compare_expression_0_0(b, l + 1);
+    r = compare_operator(b, l + 1);
     r = r && compare_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '>' | '>=' | '<' | '<=' | '==' | '!='
-  private static boolean compare_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "compare_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_GT);
-    if (!r) r = consumeTokenSmart(b, THE_R_GE);
-    if (!r) r = consumeTokenSmart(b, THE_R_LT);
-    if (!r) r = consumeTokenSmart(b, THE_R_LE);
-    if (!r) r = consumeTokenSmart(b, THE_R_EQEQ);
-    if (!r) r = consumeTokenSmart(b, THE_R_NOTEQ);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1696,24 +1798,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('+' | '-') nl*
+  // plusminus_operator nl*
   private static boolean plusminus_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "plusminus_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = plusminus_expression_0_0(b, l + 1);
+    r = plusminus_operator(b, l + 1);
     r = r && plusminus_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '+' | '-'
-  private static boolean plusminus_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "plusminus_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_PLUS);
-    if (!r) r = consumeTokenSmart(b, THE_R_MINUS);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1730,24 +1821,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ('*' | '/') nl*
+  // muldiv_operator nl*
   private static boolean muldiv_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "muldiv_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = muldiv_expression_0_0(b, l + 1);
+    r = muldiv_operator(b, l + 1);
     r = r && muldiv_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '*' | '/'
-  private static boolean muldiv_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "muldiv_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_MULT);
-    if (!r) r = consumeTokenSmart(b, THE_R_DIV);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1764,29 +1844,13 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // (INFIX_OP | MODULUS | INT_DIV | MATRIX_PROD | OUTER_PROD | MATCHING | KRONECKER_PROD) nl*
+  // infix_operator nl*
   private static boolean user_defined_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "user_defined_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = user_defined_expression_0_0(b, l + 1);
+    r = infix_operator(b, l + 1);
     r = r && user_defined_expression_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // INFIX_OP | MODULUS | INT_DIV | MATRIX_PROD | OUTER_PROD | MATCHING | KRONECKER_PROD
-  private static boolean user_defined_expression_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "user_defined_expression_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_INFIX_OP);
-    if (!r) r = consumeTokenSmart(b, THE_R_MODULUS);
-    if (!r) r = consumeTokenSmart(b, THE_R_INT_DIV);
-    if (!r) r = consumeTokenSmart(b, THE_R_MATRIX_PROD);
-    if (!r) r = consumeTokenSmart(b, THE_R_OUTER_PROD);
-    if (!r) r = consumeTokenSmart(b, THE_R_MATCHING);
-    if (!r) r = consumeTokenSmart(b, THE_R_KRONECKER_PROD);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1803,12 +1867,12 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // ':' nl*
+  // slice_operator nl*
   private static boolean slice_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "slice_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_COLON);
+    r = slice_operator(b, l + 1);
     r = r && slice_expression_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1872,12 +1936,12 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // '^' nl*
+  // exp_operator nl*
   private static boolean exp_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "exp_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, THE_R_EXP);
+    r = exp_operator(b, l + 1);
     r = r && exp_expression_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

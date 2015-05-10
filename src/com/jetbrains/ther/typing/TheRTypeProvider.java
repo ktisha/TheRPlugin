@@ -107,6 +107,9 @@ public class TheRTypeProvider {
     if (element instanceof TheRSliceExpression) {
       return TheRNumericType.INSTANCE; // TODO: think!
     }
+    if (element instanceof TheRBinaryExpression) {
+      return getBinaryExpressionType((TheRBinaryExpression)element);
+    }
     return TheRType.UNKNOWN;
   }
 
@@ -120,6 +123,15 @@ public class TheRTypeProvider {
     return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
   }
 
+  private static TheRType getBinaryExpressionType(TheRBinaryExpression expression) {
+    TheRFunctionExpression function = TheRPsiUtils.getFunction(expression);
+    if (function == null) {
+      return TheRType.UNKNOWN;
+    }
+    List<TheRExpression> arguments = PsiTreeUtil.getChildrenOfTypeAsList(expression, TheRExpression.class);
+    return getFunctionCallReturnType(function, arguments);
+  }
+
   private static TheRType getCallExpressionType(TheRCallExpression element) {
     if (LIST.equals(element.getExpression().getName())) {
       return getNewListType(element.getArgumentList().getExpressionList());
@@ -128,13 +140,16 @@ public class TheRTypeProvider {
     if (function == null) {
       return TheRType.UNKNOWN;
     }
+    return getFunctionCallReturnType(function, element.getArgumentList().getExpressionList());
+  }
+
+  private static TheRType getFunctionCallReturnType(TheRFunctionExpression function, List<TheRExpression> arguments) {
     TheRFunctionType functionType = new TheRFunctionType(function);
     // step 1: check @return
     if (functionType.getReturnType() != null) {
       return functionType.getReturnType();
     }
 
-    List<TheRExpression> arguments = element.getArgumentList().getExpressionList();
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
@@ -154,7 +169,7 @@ public class TheRTypeProvider {
     }
 
     //step 3: check @rule
-   return tryApplyRule(functionType, paramToSuppliedConfiguration);
+    return tryApplyRule(functionType, paramToSuppliedConfiguration);
   }
 
   private static TheRType getNewListType(List<TheRExpression> arguments) {

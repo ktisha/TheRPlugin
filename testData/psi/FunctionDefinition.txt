@@ -3,7 +3,8 @@ TheRFile:FunctionDefinition.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('readinteger')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_FUNCTION_EXPRESSION
       PsiElement(TheR:function)('function')
@@ -19,7 +20,8 @@ TheRFile:FunctionDefinition.r
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('n')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:<-)('<-')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:<-)('<-')
           PsiWhiteSpace(' ')
           TheR:THE_R_CALL_EXPRESSION
             TheR:THE_R_REFERENCE_EXPRESSION
@@ -29,7 +31,8 @@ TheRFile:FunctionDefinition.r
               TheR:THE_R_ASSIGNMENT_STATEMENT
                 TheR:THE_R_REFERENCE_EXPRESSION
                   PsiElement(TheR:identifier)('prompt')
-                PsiElement(TheR:=)('=')
+                TheR:THE_R_BINARY_OPERATOR
+                  PsiElement(TheR:=)('=')
                 TheR:THE_R_STRING_LITERAL_EXPRESSION
                   PsiElement(TheR:string)('"Enter an integer: "')
               PsiElement(TheR:))(')')

@@ -18,17 +18,20 @@ TheRFile:DotAsReference.r
                 TheR:THE_R_BINARY_EXPRESSION
                   TheR:THE_R_REFERENCE_EXPRESSION
                     PsiElement(TheR:identifier)('Days')
-                  PsiElement(TheR:+)('+')
+                  TheR:THE_R_BINARY_OPERATOR
+                    PsiElement(TheR:+)('+')
                   TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(TheR:numeric)('2.5')
                 PsiElement(TheR:))(')')
             PsiWhiteSpace(' ')
-            PsiElement(TheR:~)('~')
+            TheR:THE_R_BINARY_OPERATOR
+              PsiElement(TheR:~)('~')
             PsiWhiteSpace(' ')
             TheR:THE_R_BINARY_EXPRESSION
               TheR:THE_R_REFERENCE_EXPRESSION
                 PsiElement(TheR:identifier)('.')
-              PsiElement(TheR:^)('^')
+              TheR:THE_R_BINARY_OPERATOR
+                PsiElement(TheR:^)('^')
               TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(TheR:numeric)('4')
           PsiElement(TheR:,)(',')
@@ -36,7 +39,8 @@ TheRFile:DotAsReference.r
           TheR:THE_R_ASSIGNMENT_STATEMENT
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('data')
-            PsiElement(TheR:=)('=')
+            TheR:THE_R_BINARY_OPERATOR
+              PsiElement(TheR:=)('=')
             TheR:THE_R_REFERENCE_EXPRESSION
               PsiElement(TheR:identifier)('Quine')
           PsiElement(TheR:))(')')

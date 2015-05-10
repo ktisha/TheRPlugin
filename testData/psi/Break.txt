@@ -3,7 +3,8 @@ TheRFile:Break.r
     TheR:THE_R_REFERENCE_EXPRESSION
       PsiElement(TheR:identifier)('z')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:<-)('<-')
+    TheR:THE_R_BINARY_OPERATOR
+      PsiElement(TheR:<-)('<-')
     PsiWhiteSpace(' ')
     TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(TheR:numeric)('0')
@@ -19,13 +20,15 @@ TheRFile:Break.r
         TheR:THE_R_REFERENCE_EXPRESSION
           PsiElement(TheR:identifier)('z')
         PsiWhiteSpace(' ')
-        PsiElement(TheR:<-)('<-')
+        TheR:THE_R_BINARY_OPERATOR
+          PsiElement(TheR:<-)('<-')
         PsiWhiteSpace(' ')
         TheR:THE_R_BINARY_EXPRESSION
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('z')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:+)('+')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:+)('+')
           PsiWhiteSpace(' ')
           TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
             PsiElement(TheR:numeric)('1')
@@ -48,7 +51,8 @@ TheRFile:Break.r
           TheR:THE_R_REFERENCE_EXPRESSION
             PsiElement(TheR:identifier)('z')
           PsiWhiteSpace(' ')
-          PsiElement(TheR:>)('>')
+          TheR:THE_R_BINARY_OPERATOR
+            PsiElement(TheR:>)('>')
           PsiWhiteSpace(' ')
           TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
             PsiElement(TheR:numeric)('100')

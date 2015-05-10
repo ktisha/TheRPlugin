@@ -18,6 +18,10 @@ public class TheRVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitBinaryOperator(@NotNull TheRBinaryOperator o) {
+    visitPsiElement(o);
+  }
+
   public void visitBlockExpression(@NotNull TheRBlockExpression o) {
     visitExpression(o);
   }
@@ -95,10 +99,6 @@ public class TheRVisitor extends PsiElementVisitor {
   }
 
   public void visitRepeatStatement(@NotNull TheRRepeatStatement o) {
-    visitExpression(o);
-  }
-
-  public void visitSliceExpression(@NotNull TheRSliceExpression o) {
     visitExpression(o);
   }
 

@@ -42,7 +42,8 @@ TheRFile:Precedence.r
               PsiElement(TheR:$)('$')
               PsiElement(TheR:identifier)('p.value')
             PsiWhiteSpace(' ')
-            PsiElement(TheR:<)('<')
+            TheR:THE_R_BINARY_OPERATOR
+              PsiElement(TheR:<)('<')
             PsiWhiteSpace(' ')
             TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(TheR:numeric)('0.05')

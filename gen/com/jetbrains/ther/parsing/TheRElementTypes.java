@@ -13,6 +13,7 @@ public interface TheRElementTypes {
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
   IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
   IElementType THE_R_BINARY_EXPRESSION = new TheRElementType("THE_R_BINARY_EXPRESSION");
+  IElementType THE_R_BINARY_OPERATOR = new TheRElementType("THE_R_BINARY_OPERATOR");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");
   IElementType THE_R_CALL_EXPRESSION = new TheRElementType("THE_R_CALL_EXPRESSION");
@@ -33,7 +34,6 @@ public interface TheRElementTypes {
   IElementType THE_R_PREFIX_EXPRESSION = new TheRElementType("THE_R_PREFIX_EXPRESSION");
   IElementType THE_R_REFERENCE_EXPRESSION = new TheRElementType("THE_R_REFERENCE_EXPRESSION");
   IElementType THE_R_REPEAT_STATEMENT = new TheRElementType("THE_R_REPEAT_STATEMENT");
-  IElementType THE_R_SLICE_EXPRESSION = new TheRElementType("THE_R_SLICE_EXPRESSION");
   IElementType THE_R_STRING_LITERAL_EXPRESSION = new TheRElementType("THE_R_STRING_LITERAL_EXPRESSION");
   IElementType THE_R_SUBSCRIPTION_EXPRESSION = new TheRElementType("THE_R_SUBSCRIPTION_EXPRESSION");
   IElementType THE_R_WHILE_STATEMENT = new TheRElementType("THE_R_WHILE_STATEMENT");
@@ -64,8 +64,6 @@ public interface TheRElementTypes {
   IElementType THE_R_INF = new TheRElementType("INF");
   IElementType THE_R_INFIX_OP = new TheRElementType("INFIX_OP");
   IElementType THE_R_INTEGER = new TheRElementType("integer");
-  IElementType THE_R_INT_DIV = new TheRElementType("INT_DIV");
-  IElementType THE_R_KRONECKER_PROD = new TheRElementType("KRONECKER_PROD");
   IElementType THE_R_LBRACE = new TheRElementType("{");
   IElementType THE_R_LBRACKET = new TheRElementType("[");
   IElementType THE_R_LDBRACKET = new TheRElementType("[[");
@@ -75,10 +73,7 @@ public interface TheRElementTypes {
   IElementType THE_R_LIST_SUBSET = new TheRElementType("$");
   IElementType THE_R_LPAR = new TheRElementType("(");
   IElementType THE_R_LT = new TheRElementType("<");
-  IElementType THE_R_MATCHING = new TheRElementType("MATCHING");
-  IElementType THE_R_MATRIX_PROD = new TheRElementType("MATRIX_PROD");
   IElementType THE_R_MINUS = new TheRElementType("-");
-  IElementType THE_R_MODULUS = new TheRElementType("MODULUS");
   IElementType THE_R_MULT = new TheRElementType("*");
   IElementType THE_R_NA = new TheRElementType("NA");
   IElementType THE_R_NAN = new TheRElementType("NAN");
@@ -94,7 +89,6 @@ public interface TheRElementTypes {
   IElementType THE_R_NUMERIC = new TheRElementType("numeric");
   IElementType THE_R_OR = new TheRElementType("|");
   IElementType THE_R_OROR = new TheRElementType("||");
-  IElementType THE_R_OUTER_PROD = new TheRElementType("OUTER_PROD");
   IElementType THE_R_PLUS = new TheRElementType("+");
   IElementType THE_R_RBRACE = new TheRElementType("}");
   IElementType THE_R_RBRACKET = new TheRElementType("]");
@@ -123,6 +117,9 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_BINARY_EXPRESSION) {
         return new TheRBinaryExpressionImpl(node);
+      }
+      else if (type == THE_R_BINARY_OPERATOR) {
+        return new TheRBinaryOperatorImpl(node);
       }
       else if (type == THE_R_BLOCK_EXPRESSION) {
         return new TheRBlockExpressionImpl(node);
@@ -183,9 +180,6 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_REPEAT_STATEMENT) {
         return new TheRRepeatStatementImpl(node);
-      }
-      else if (type == THE_R_SLICE_EXPRESSION) {
-        return new TheRSliceExpressionImpl(node);
       }
       else if (type == THE_R_STRING_LITERAL_EXPRESSION) {
         return new TheRStringLiteralExpressionImpl(node);
