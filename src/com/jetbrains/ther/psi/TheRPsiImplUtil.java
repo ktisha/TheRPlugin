@@ -10,6 +10,7 @@ import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.references.TheROperatorReference;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
+import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -199,5 +200,24 @@ public class TheRPsiImplUtil {
       return text.substring(namespaceIndex + 2);
     }
     return text;
+  }
+
+  public static TheRType getType(TheRNaLiteralExpression na) {
+    if (na.getNa() != null) {
+      return TheRLogicalType.INSTANCE;
+    }
+    if (na.getNaCharacter() != null) {
+      return TheRCharacterType.INSTANCE;
+    }
+    if (na.getNaComplex() != null) {
+      return TheRComplexType.INSTANCE;
+    }
+    if (na.getNaInteger() != null) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (na.getNaReal() != null) {
+      return TheRNumericType.INSTANCE;
+    }
+    return TheRType.UNKNOWN;
   }
 }

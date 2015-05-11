@@ -42,6 +42,9 @@ public class TheRTypeProvider {
     if (element instanceof TheRNullLiteralExpression) {
       return TheRNullType.INSTANCE;
     }
+    if (element instanceof TheRNaLiteralExpression) {
+      return ((TheRNaLiteralExpression)element).getType();
+    }
 
     if (element instanceof TheRReferenceExpression) {
       return getReferenceExpressionType((TheRReferenceExpression)element);

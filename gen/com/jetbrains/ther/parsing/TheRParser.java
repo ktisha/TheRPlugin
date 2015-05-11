@@ -61,6 +61,9 @@ public class TheRParser implements PsiParser {
     else if (t == THE_R_MEMBER_EXPRESSION) {
       r = expression(b, 0, 25);
     }
+    else if (t == THE_R_NA_LITERAL_EXPRESSION) {
+      r = na_literal_expression(b, 0);
+    }
     else if (t == THE_R_NEXT_STATEMENT) {
       r = next_statement(b, 0);
     }
@@ -122,10 +125,11 @@ public class TheRParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION, THE_R_EMPTY_EXPRESSION,
       THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION, THE_R_HELP_EXPRESSION,
-      THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION, THE_R_NEXT_STATEMENT,
-      THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_OPERATOR_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION,
-      THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION,
-      THE_R_SUBSCRIPTION_EXPRESSION, THE_R_TILDE_EXPRESSION, THE_R_UNARY_TILDE_EXPRESSION, THE_R_WHILE_STATEMENT),
+      THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION, THE_R_NA_LITERAL_EXPRESSION,
+      THE_R_NEXT_STATEMENT, THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_OPERATOR_EXPRESSION,
+      THE_R_PARENTHESIZED_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION,
+      THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_TILDE_EXPRESSION, THE_R_UNARY_TILDE_EXPRESSION,
+      THE_R_WHILE_STATEMENT),
   };
 
   /* ********************************************************** */
@@ -774,18 +778,14 @@ public class TheRParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+  // INF | NAN
   static boolean special_constant(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "special_constant")) return false;
+    if (!nextTokenIs(b, "", THE_R_INF, THE_R_NAN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, THE_R_NA);
-    if (!r) r = consumeToken(b, THE_R_INF);
+    r = consumeToken(b, THE_R_INF);
     if (!r) r = consumeToken(b, THE_R_NAN);
-    if (!r) r = consumeToken(b, THE_R_NA_INTEGER);
-    if (!r) r = consumeToken(b, THE_R_NA_REAL);
-    if (!r) r = consumeToken(b, THE_R_NA_COMPLEX);
-    if (!r) r = consumeToken(b, THE_R_NA_CHARACTER);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -922,7 +922,7 @@ public class TheRParser implements PsiParser {
   // 27: BINARY(at_expression)
   // 28: POSTFIX(namespace_access_expression)
   // 29: ATOM(reference_expression)
-  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression) ATOM(null_literal_expression)
+  // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression) ATOM(null_literal_expression) ATOM(na_literal_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
     addVariant(b, "<expression>");
@@ -946,6 +946,7 @@ public class TheRParser implements PsiParser {
     if (!r) r = string_literal_expression(b, l + 1);
     if (!r) r = logical_literal_expression(b, l + 1);
     if (!r) r = null_literal_expression(b, l + 1);
+    if (!r) r = na_literal_expression(b, l + 1);
     p = r;
     r = r && expression_0(b, l + 1, g);
     exit_section_(b, l, m, null, r, p, null);
@@ -2191,6 +2192,20 @@ public class TheRParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, THE_R_NULL);
     exit_section_(b, m, THE_R_NULL_LITERAL_EXPRESSION, r);
+    return r;
+  }
+
+  // NA | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+  public static boolean na_literal_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "na_literal_expression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<na literal expression>");
+    r = consumeTokenSmart(b, THE_R_NA);
+    if (!r) r = consumeTokenSmart(b, THE_R_NA_INTEGER);
+    if (!r) r = consumeTokenSmart(b, THE_R_NA_REAL);
+    if (!r) r = consumeTokenSmart(b, THE_R_NA_COMPLEX);
+    if (!r) r = consumeTokenSmart(b, THE_R_NA_CHARACTER);
+    exit_section_(b, l, m, THE_R_NA_LITERAL_EXPRESSION, r, false, null);
     return r;
   }
 

@@ -100,6 +100,6 @@ TheRFile:DotAsFunctionParameter.r
           PsiElement(TheR:,)(',')
           PsiElement(TheR:nl)('\n')
           PsiWhiteSpace('                           ')
-          TheR:THE_R_REFERENCE_EXPRESSION
+          TheR:THE_R_NA_LITERAL_EXPRESSION
             PsiElement(TheR:NA)('NA')
           PsiElement(TheR:))(')')

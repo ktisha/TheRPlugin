@@ -12,22 +12,7 @@ public interface TheRReferenceExpression extends TheRExpression {
   PsiElement getInf();
 
   @Nullable
-  PsiElement getNa();
-
-  @Nullable
   PsiElement getNan();
-
-  @Nullable
-  PsiElement getNaCharacter();
-
-  @Nullable
-  PsiElement getNaComplex();
-
-  @Nullable
-  PsiElement getNaInteger();
-
-  @Nullable
-  PsiElement getNaReal();
 
   @Nullable
   PsiElement getIdentifier();

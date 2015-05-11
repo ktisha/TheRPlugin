@@ -23,6 +23,7 @@ public interface TheRElementTypes {
   IElementType THE_R_IF_STATEMENT = new TheRElementType("THE_R_IF_STATEMENT");
   IElementType THE_R_LOGICAL_LITERAL_EXPRESSION = new TheRElementType("THE_R_LOGICAL_LITERAL_EXPRESSION");
   IElementType THE_R_MEMBER_EXPRESSION = new TheRElementType("THE_R_MEMBER_EXPRESSION");
+  IElementType THE_R_NA_LITERAL_EXPRESSION = new TheRElementType("THE_R_NA_LITERAL_EXPRESSION");
   IElementType THE_R_NEXT_STATEMENT = new TheRElementType("THE_R_NEXT_STATEMENT");
   IElementType THE_R_NULL_LITERAL_EXPRESSION = new TheRElementType("THE_R_NULL_LITERAL_EXPRESSION");
   IElementType THE_R_NUMERIC_LITERAL_EXPRESSION = new TheRElementType("THE_R_NUMERIC_LITERAL_EXPRESSION");
@@ -149,6 +150,9 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_MEMBER_EXPRESSION) {
         return new TheRMemberExpressionImpl(node);
+      }
+      else if (type == THE_R_NA_LITERAL_EXPRESSION) {
+        return new TheRNaLiteralExpressionImpl(node);
       }
       else if (type == THE_R_NEXT_STATEMENT) {
         return new TheRNextStatementImpl(node);

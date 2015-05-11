@@ -67,12 +67,15 @@
 root ::= expression_list
 private expression_list ::= expression? (semicolon+ expression?)*
 
-private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression | null_literal_expression
+private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression | null_literal_expression | na_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
 logical_literal_expression ::= TRUE | FALSE | T | F
 null_literal_expression ::= NULL
-private special_constant ::= NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+na_literal_expression ::= NA | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER {
+  methods = [getType]
+}
+private special_constant ::= INF | NAN
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
   function | for | in | next | break
