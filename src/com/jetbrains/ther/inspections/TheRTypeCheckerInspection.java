@@ -5,6 +5,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.MatchingException;
 import com.jetbrains.ther.typing.TheRTypeChecker;
@@ -37,6 +38,22 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
     @Override
     public void visitCallExpression(@NotNull TheRCallExpression callExpression) {
       PsiReference referenceToFunction = callExpression.getExpression().getReference();
+      List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
+      checkFunctionCall(callExpression, referenceToFunction, arguments);
+    }
+
+    @Override
+    public void visitOperatorExpression(@NotNull TheROperatorExpression operatorExpression) {
+      TheROperator operator = PsiTreeUtil.getChildOfType(operatorExpression, TheROperator.class);
+      if (operator == null) {
+        return;
+      }
+      PsiReference referenceToFunction = operator.getReference();
+      List<TheRExpression> arguments = PsiTreeUtil.getChildrenOfTypeAsList(operatorExpression, TheRExpression.class);
+      checkFunctionCall(operatorExpression, referenceToFunction, arguments);
+    }
+
+    private void checkFunctionCall(PsiElement callSite, PsiReference referenceToFunction, List<TheRExpression> arguments) {
       if (referenceToFunction != null) {
         PsiElement assignmentStatement = referenceToFunction.resolve();
         if (assignmentStatement != null && assignmentStatement instanceof TheRAssignmentStatement) {
@@ -44,12 +61,11 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
           TheRPsiElement assignedValue = assignment.getAssignedValue();
           if (assignedValue != null && assignedValue instanceof TheRFunctionExpression) {
             TheRFunctionExpression function = (TheRFunctionExpression)assignedValue;
-            List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
             try {
               TheRTypeChecker.checkTypes(arguments, function);
             }
             catch (MatchingException e) {
-              registerProblem(myProblemHolder, callExpression, e.getMessage());
+              registerProblem(myProblemHolder, callSite, e.getMessage());
             }
           }
         }
