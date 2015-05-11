@@ -8,7 +8,6 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.ProjectScopeImpl;
@@ -50,13 +49,7 @@ public class TheRResolver {
         final PsiFile containingFile = statement.getContainingFile();
         final PsiElement assignee = statement.getAssignee();
         if (assignee == null || containingFile.getName() == null) continue;
-        if (FileUtil.getNameWithoutExtension(containingFile.getName()).equalsIgnoreCase(name) &&
-            TheRInterpreterConfigurable.THE_R_LIBRARY.equals(libraryName)) {
-          result.add(0, new PsiElementResolveResult(statement));
-        }
-        else {
-          result.add(new PsiElementResolveResult(statement));
-        }
+        result.add(new PsiElementResolveResult(statement));
       }
     }
   }

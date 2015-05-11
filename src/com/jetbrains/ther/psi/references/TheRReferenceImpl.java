@@ -51,10 +51,7 @@ public class TheRReferenceImpl implements PsiPolyVariantReference {
     if (!result.isEmpty()) {
       return result.toArray(new ResolveResult[result.size()]);
     }
-    TheRResolver.addFromProject(myElement.getName(), myElement.getProject(), result);
-    TheRResolver.addFromLibrary(myElement, result, name, TheRInterpreterConfigurable.The_R_USER_SKELETONS);
-    TheRResolver.addFromLibrary(myElement, result, name, TheRInterpreterConfigurable.THE_R_SKELETONS);
-    TheRResolver.addFromLibrary(myElement, result, name, TheRInterpreterConfigurable.THE_R_LIBRARY);
+    TheRResolver.addFromSkeletonsAndRLibrary(myElement, result, name);
     return result.toArray(new ResolveResult[result.size()]);
   }
 

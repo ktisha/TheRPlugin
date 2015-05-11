@@ -536,3 +536,61 @@ library <- function (package, help, pos = 2, lib.loc = NULL, character.only = FA
         TRUE
     else invisible(.packages())
 }
+
+
+## @type length : integer
+## @type mode : character
+## @rule (mode="logical")->logical
+## @rule (mode="numeric")->numeric
+## @rule (mode="integer")->integer
+## @rule (mode="double")->numeric
+## @rule (mode="complex")->complex
+## @rule (mode="character")->character
+## @rule (mode="raw")->raw
+vector <- function (mode = "logical", length = 0L)
+.Internal(vector(mode, length))
+
+## @return character
+## @type length : integer
+character <- function (length = 0L)
+.Internal(vector("character", length))
+
+
+## @return raw
+## @type length : integer
+raw <- function (length = 0L)
+.Internal(vector("raw", length))
+
+## @return numeric
+## @type length : integer
+double <- function (length = 0L)
+.Internal(vector("double", length))
+
+## @type imaginary : numeric
+## @type length.out : numeric
+## @type modulus : numeric
+## @type argument : numeric
+## @type real : numeric
+## @return complex
+complex <- function (length.out = 0L, real = numeric(), imaginary = numeric(),
+    modulus = 1, argument = 0)
+{
+    if (missing(modulus) && missing(argument)) {
+        .Internal(complex(length.out, real, imaginary))
+    }
+    else {
+        n <- max(length.out, length(argument), length(modulus))
+        rep_len(modulus, n) * exp((0+1i) * rep_len(argument,
+            n))
+    }
+}
+
+## @return logical
+## @type length : integer
+logical <- function (length = 0L)
+.Internal(vector("logical", length))
+
+## @return integer
+## @type length : integer
+integer <- function (length = 0L)
+.Internal(vector("integer", length))
