@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
 import org.jetbrains.annotations.NotNull;
@@ -7,10 +8,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class TheRDebugger {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
 
   @NotNull
   private final TheRProcess myProcess;
@@ -19,10 +24,13 @@ public class TheRDebugger {
   private final TheRScriptReader myScriptReader;
 
   @NotNull
-  private final TheRStack myStack;
+  private final TheRStackHandler myStackHandler;
 
   @NotNull
   private final TheROutput myOutput;
+
+  @NotNull
+  private TheRLocation myCurrentLocation;
 
   /**
    * Constructs new instance of debugger with specified interpreter and script.
@@ -36,60 +44,126 @@ public class TheRDebugger {
     myProcess = new TheRProcess(interpreterPath);
     myScriptReader = new TheRScriptReader(scriptPath);
 
-    myStack = new TheRStack();
-    myStack.addEntry();
+    myStackHandler = new TheRStackHandler();
+    myStackHandler.addEntry();
 
     myOutput = new TheROutput();
+
+    myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 0);
+    myStackHandler.updateCurrent(new TheRStackFrame(myCurrentLocation, Collections.<TheRVar>emptyList()));
   }
 
   /**
-   * @return nonzero number of executed lines, or -1 if the end of the source has been reached
+   * @return true, or false if the end of the source has been reached
    * @throws IOException          if script couldn't be read or communication with interpreter was broken
    * @throws InterruptedException if thread was interrupted while waiting interpreter's response
    */
-  public int executeInstruction() throws IOException, InterruptedException { // TODO update method and usages
+  public boolean executeInstruction() throws IOException, InterruptedException {
+    myOutput.reset();
+
+    if (myStackHandler.getStack().size() == 1) {
+      if (!executeScriptInstruction()) {
+        return false;
+      }
+    }
+    else {
+      executeFunctionInstruction();
+    }
+
+    updateCurrentStackFrame();
+
+    return true;
+  }
+
+  @NotNull
+  public List<TheRStackFrame> getStack() {
+    return myStackHandler.getStack();
+  }
+
+  public void stop() {
+    try {
+      myScriptReader.close();
+    }
+    catch (final IOException e) {
+      LOGGER.warn(e);
+    }
+
+    myProcess.stop();
+  }
+
+  private boolean executeScriptInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
 
     while (!accepted) {
       final String command = myScriptReader.getNextCommand();
 
       if (command == null) {
-        return -1;
+        return false;
       }
 
       final TheRProcessResponseAndType responseAndType = myProcess.execute(command);
+
+      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextPosition());
 
       handleResponse(responseAndType);
 
       accepted = responseAndType.getType() != TheRProcessResponseType.PLUS;
     }
 
-    updateCurrentStackFrame();
-
-    return 0;
+    return true;
   }
 
-  public void stop() {
-    myScriptReader.close();
-    myProcess.stop();
+  private void executeFunctionInstruction() throws IOException, InterruptedException {
+    // TODO check type
+    handleResponse(myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND));
   }
 
-  private void handleResponse(@NotNull final TheRProcessResponseAndType responseAndType) {
-    myOutput.reset();
+  private void handleResponse(@NotNull final TheRProcessResponseAndType responseAndType) throws IOException, InterruptedException {
+    if (responseAndType.getType() == TheRProcessResponseType.START_DEBUG) {
+      // TODO check type
+      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+      // TODO check type
+      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+      // TODO check type
+      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+      // TODO check type
+      final TheRProcessResponseAndType enterResponseAndType = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
 
-    if (responseAndType.getType() == TheRProcessResponseType.DEBUG) {
-      // TODO handle debug response
+      final String enterResponse = enterResponseAndType.getResponse();
+
+      final int firstLineSeparator = enterResponse.indexOf(TheRDebugConstants.LINE_SEPARATOR);
+      final int secondLineSeparator = enterResponse.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
+
+      final String function = enterResponse.substring(
+        firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
+        secondLineSeparator - "\"".length()
+      );
+
+      // TODO check type
+      final TheRProcessResponseAndType firstInstructionResponseAndType = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+
+      // int line = Integer.parseInt(firstInstructionResponseAndType.getResponse().substring("debug at #".length()));
+
+      myStackHandler.addEntry();
+      myCurrentLocation = new TheRLocation(function, 0);
+    }
+
+    if (responseAndType.getType() == TheRProcessResponseType.END_DEBUG) {
+      myStackHandler.removeEntry();
+
+      final List<TheRStackFrame> stack = myStackHandler.getStack();
+      myCurrentLocation = stack.get(stack.size() - 1).getLocation();
     }
 
     if (responseAndType.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
-      myOutput.setNormalOutput(removeLastLine(responseAndType.getResponse()));
+      myOutput.setNormalOutput(responseAndType.getResponse());
     }
   }
 
   private void updateCurrentStackFrame() throws IOException, InterruptedException {
     // TODO check type
     final TheRProcessResponseAndType responseAndType = myProcess.execute(TheRDebugConstants.LS_COMMAND);
-    final String response = removeLastLine(responseAndType.getResponse());
+    final String response = responseAndType.getResponse();
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
 
@@ -101,12 +175,7 @@ public class TheRDebugger {
       }
     }
 
-    myStack.updateCurrent(new TheRStackFrame("abc", 0, vars));
-  }
-
-  @NotNull
-  private String removeLastLine(@NotNull final String response) {
-    return response.substring(0, response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR));
+    myStackHandler.updateCurrent(new TheRStackFrame(myCurrentLocation, Collections.unmodifiableList(vars)));
   }
 
   @NotNull
@@ -159,7 +228,7 @@ public class TheRDebugger {
     // TODO check type
     final TheRProcessResponseAndType responseAndType = myProcess.execute(TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")");
 
-    return removeLastLine(responseAndType.getResponse());
+    return responseAndType.getResponse();
   }
 
   private void traceAndDebug(@NotNull final String var) throws IOException, InterruptedException {
@@ -177,7 +246,7 @@ public class TheRDebugger {
   private String loadValue(@NotNull final String var, @NotNull final String type) throws IOException, InterruptedException {
     // TODO check type
     final TheRProcessResponseAndType responseAndType = myProcess.execute(var);
-    final String value = removeLastLine(responseAndType.getResponse());
+    final String value = responseAndType.getResponse();
 
     if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
       final String[] lines = StringUtil.splitByLinesKeepSeparators(value);

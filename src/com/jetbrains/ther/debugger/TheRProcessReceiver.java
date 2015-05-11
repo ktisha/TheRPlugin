@@ -13,13 +13,19 @@ import java.util.regex.Pattern;
 public class TheRProcessReceiver {
 
   @NotNull
-  private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^Browse\\[\\d+\\]> $");
+  private static final String BROWSE_REGEX = "Browse\\[\\d+\\]>";
 
   @NotNull
-  private static final Pattern DEBUGGING_PATTERN = Pattern.compile("^debugging in.*$", Pattern.DOTALL);
+  private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^" + BROWSE_REGEX + " $");
 
   @NotNull
-  private static final Pattern ENDS_WITH_BROWSE_PATTERN = Pattern.compile("^.*Browse\\[\\d+\\]> $", Pattern.DOTALL);
+  private static final Pattern START_DEBUG_PATTERN = Pattern.compile("^debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+
+  @NotNull
+  private static final Pattern END_DEBUG_PATTERN = Pattern.compile("^Tracing .* on exit.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+
+  @NotNull
+  private static final Pattern ENDS_WITH_BROWSE_PATTERN = Pattern.compile("^.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
   private final InputStream myStream;
@@ -113,8 +119,12 @@ public class TheRProcessReceiver {
       return TheRProcessResponseType.JUST_BROWSE;
     }
 
-    if (DEBUGGING_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.DEBUG;
+    if (START_DEBUG_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.START_DEBUG;
+    }
+
+    if (END_DEBUG_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.END_DEBUG;
     }
 
     if (ENDS_WITH_BROWSE_PATTERN.matcher(response).matches()) {

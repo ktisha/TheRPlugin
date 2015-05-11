@@ -3,15 +3,20 @@ package com.jetbrains.ther.debugger.data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class TheRStack {
+public class TheRStackHandler {
 
   @NotNull
   private final List<TheRStackFrame> myStack;
 
-  public TheRStack() {
+  @NotNull
+  private final List<TheRStackFrame> myUnmodifiableStack;
+
+  public TheRStackHandler() {
     myStack = new ArrayList<TheRStackFrame>();
+    myUnmodifiableStack = Collections.unmodifiableList(myStack);
   }
 
   public void addEntry() {
@@ -26,7 +31,8 @@ public class TheRStack {
     myStack.set(myStack.size() - 1, current);
   }
 
-  public int size() {
-    return myStack.size();
+  @NotNull
+  public List<TheRStackFrame> getStack() {
+    return myUnmodifiableStack;
   }
 }
