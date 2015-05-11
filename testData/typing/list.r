@@ -14,3 +14,7 @@ x$gender <- "female"
 x$gender <- NULL
 
 <warning descr="x expected to be of type complex, found type null">sin(x$gender)</warning>
+
+<warning descr="x expected to be of type complex, found type list(name: character)">sin(x[1])</warning>
+
+<warning descr="x expected to be of type complex, found type character">sin(x[[1]])</warning>

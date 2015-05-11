@@ -40,6 +40,18 @@ public class TheRTypeCheckerInspectionTest extends TheRInspectionTest {
     doTest("list.r");
   }
 
+  public void testBinary() {
+    doTest("binary.r");
+  }
+
+  public void testSlice() {
+    doTest("slice.r");
+  }
+
+  public void testVector() {
+    doTest("vector.r");
+  }
+
   @Override
   protected String getTestDataPath() {
     return super.getTestDataPath() + "/typing/";
