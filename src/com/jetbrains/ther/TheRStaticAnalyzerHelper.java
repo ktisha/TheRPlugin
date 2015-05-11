@@ -154,7 +154,7 @@ public class TheRStaticAnalyzerHelper {
         refType = myReachTypes.get(name);
       }
       TheRTypeContext.putTypeInCache(ref, refType);
-      if (ref.equals(myWhat)) {
+      if (myResult == null && ref.equals(myWhat)) {
         myResult = refType;
       }
       return this;
@@ -198,7 +198,7 @@ public class TheRStaticAnalyzerHelper {
             if (!TheRListType.class.isInstance(type)) {
               type = new TheRListType(false);
             }
-            TheRListType list = (TheRListType) type;
+            TheRListType list = new TheRListType((TheRListType) type);
             if ("NULL".equals(assignedValue.getText())) {
               list.removeField(tag);
             } else {
