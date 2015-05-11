@@ -1,12 +1,10 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.LineSeparator;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -15,46 +13,44 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import com.intellij.xdebugger.impl.XDebuggerUtilImpl;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.data.TheROutput;
+import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TheRDebugProcess extends XDebugProcess {
+public class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRDebugProcess.class);
+  private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
 
   @NotNull
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
+  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints; // TODO use XSourcePosition as a key
 
   @NotNull
-  private final List<TheRStackFrameData> myStackFramesData;
+  private final TheRLocationResolver myLocationResolver;
 
   @NotNull
   private final ConsoleView myConsole;
 
-  private int myNextLineNumber;
-
-  public TheRDebugProcess(@NotNull final XDebugSession session, @NotNull final TheRDebugger debugger)
+  public TheRXDebugProcess(@NotNull final XDebugSession session, @NotNull final TheRDebugger debugger)
     throws ExecutionException {
     super(session);
 
     myDebugger = debugger;
 
     myBreakpoints = new HashMap<Integer, XLineBreakpoint<XBreakpointProperties>>();
-    myStackFramesData = new ArrayList<TheRStackFrameData>();
-    myConsole = (ConsoleView)super.createConsole();
+    myLocationResolver = new TheRLocationResolver();
 
-    myNextLineNumber = 0;
+    myConsole = (ConsoleView)super.createConsole();
   }
 
   @NotNull
@@ -66,13 +62,13 @@ public class TheRDebugProcess extends XDebugProcess {
   @NotNull
   @Override
   public XDebuggerEditorsProvider getEditorsProvider() {
-    return new TheRDebuggerEditorsProvider();
+    return new TheRXDebuggerEditorsProvider();
   }
 
   @NotNull
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    return new XBreakpointHandler[]{new TheRLineBreakpointHandler(this)};
+    return new XBreakpointHandler[]{new TheRXLineBreakpointHandler(this)};
   }
 
   @Override
@@ -83,17 +79,15 @@ public class TheRDebugProcess extends XDebugProcess {
   @Override
   public void startStepOver() {
     try {
-      final int executed = myDebugger.executeInstruction();
+      final boolean executed = myDebugger.executeInstruction();
 
-      if (executed == -1) {
+      if (!executed) {
         getSession().stop();
 
         return;
       }
 
-      myNextLineNumber += executed;
-
-      printROut();
+      handleInterpreterOutput();
 
       updateDebugInformation();
     }
@@ -107,29 +101,27 @@ public class TheRDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepInto() {
-    // TODO
+    // TODO impl
   }
 
   @Override
   public void startStepOut() {
-    // TODO
+    // TODO impl
   }
 
   @Override
   public void resume() {
     try {
-      while ((!myBreakpoints.containsKey(myNextLineNumber))) {
-        final int executed = myDebugger.executeInstruction();
+      while ((!myBreakpoints.containsKey(getCurrentDebuggerLocation()))) {
+        final boolean executed = myDebugger.executeInstruction();
 
-        if (executed == -1) {
+        if (!executed) {
           getSession().stop();
 
           return;
         }
 
-        myNextLineNumber += executed;
-
-        printROut();
+        handleInterpreterOutput();
       }
 
       updateDebugInformation();
@@ -144,7 +136,7 @@ public class TheRDebugProcess extends XDebugProcess {
 
   @Override
   public void runToPosition(@NotNull final XSourcePosition position) {
-    // TODO
+    // TODO impl
   }
 
   @Override
@@ -160,25 +152,17 @@ public class TheRDebugProcess extends XDebugProcess {
     myBreakpoints.remove(breakpoint.getLine());
   }
 
-  private void printROut() {
-    final String latestROut = myDebugger.getLatestROut();
+  private void handleInterpreterOutput() {
+    final TheROutput output = myDebugger.getOutput();
 
-    if (latestROut != null) {
-      myConsole.print(latestROut, ConsoleViewContentType.NORMAL_OUTPUT);
-      myConsole.print(LineSeparator.getSystemLineSeparator().getSeparatorString(), ConsoleViewContentType.NORMAL_OUTPUT);
-    }
+    printToConsole(output.getNormalOutput(), ConsoleViewContentType.NORMAL_OUTPUT);
+    printToConsole(output.getErrorOutput(), ConsoleViewContentType.ERROR_OUTPUT);
   }
 
-  private void updateDebugInformation() { // TODO update
-    final Map<String, String> varRepresentations = new HashMap<String, String>(myDebugger.getVarRepresentations());
-    final Map<String, String> varTypes = new HashMap<String, String>(myDebugger.getVarTypes());
-
-    myStackFramesData.clear();
-    myStackFramesData.add(new TheRStackFrameData(calculatePosition(myNextLineNumber), varTypes, varRepresentations)); // TODO reverse
-
+  private void updateDebugInformation() {
     final XDebugSession session = getSession();
-    final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(myNextLineNumber);
-    final TheRSuspendContext suspendContext = new TheRSuspendContext(myStackFramesData);
+    final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(getCurrentDebuggerLocation());
+    final TheRXSuspendContext suspendContext = new TheRXSuspendContext(myDebugger.getStack(), myLocationResolver);
 
     if (breakpoint != null) {
       if (!session
@@ -191,10 +175,16 @@ public class TheRDebugProcess extends XDebugProcess {
     }
   }
 
-  @NotNull
-  private XSourcePosition calculatePosition(final int line) {
-    final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(myDebugger.getScriptPath());
+  private int getCurrentDebuggerLocation() {
+    final List<TheRStackFrame> stack = myDebugger.getStack();
 
-    return new XDebuggerUtilImpl().createPosition(virtualFile, line);
+    return stack.get(stack.size() - 1).getLocation().getLine();
+  }
+
+  private void printToConsole(@Nullable final String text, @NotNull final ConsoleViewContentType type) {
+    if (text != null) {
+      myConsole.print(text, type);
+      myConsole.print(LineSeparator.getSystemLineSeparator().getSeparatorString(), type);
+    }
   }
 }

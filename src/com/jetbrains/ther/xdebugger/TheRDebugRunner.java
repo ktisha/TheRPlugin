@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RunProfile;
@@ -72,7 +72,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        return new TheRDebugProcess(session, debugger);
+        return new TheRXDebugProcess(session, debugger);
       }
     };
   }

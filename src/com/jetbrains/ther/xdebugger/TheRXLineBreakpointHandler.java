@@ -1,17 +1,17 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
+public class TheRXLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
 
   @NotNull
-  private final TheRDebugProcess myDebugProcess;
+  private final TheRXDebugProcess myDebugProcess;
 
-  public TheRLineBreakpointHandler(@NotNull final TheRDebugProcess process) {
-    super(TheRLineBreakpointType.class);
+  public TheRXLineBreakpointHandler(@NotNull final TheRXDebugProcess process) {
+    super(TheRXLineBreakpointType.class);
 
     myDebugProcess = process;
   }

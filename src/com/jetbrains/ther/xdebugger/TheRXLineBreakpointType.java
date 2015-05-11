@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -10,7 +10,7 @@ import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
+public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
 
   @NotNull
   private static final String ID = "the-r-line";
@@ -19,9 +19,9 @@ public class TheRLineBreakpointType extends XLineBreakpointType<XBreakpointPrope
   private static final String TITLE = "The R breakpoints";
 
   @NotNull
-  private final TheRDebuggerEditorsProvider myProvider = new TheRDebuggerEditorsProvider();
+  private final TheRXDebuggerEditorsProvider myProvider = new TheRXDebuggerEditorsProvider();
 
-  public TheRLineBreakpointType() {
+  public TheRXLineBreakpointType() {
     super(ID, TITLE);
   }
 

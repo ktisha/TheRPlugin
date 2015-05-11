@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileTypes.FileType;
@@ -12,7 +12,7 @@ import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRDebuggerEditorsProvider extends XDebuggerEditorsProvider {
+public class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProvider {
 
   @NotNull
   private static final String FRAGMENT_NAME = "fragment.r";
@@ -29,7 +29,7 @@ public class TheRDebuggerEditorsProvider extends XDebuggerEditorsProvider {
                                  @NotNull final String text,
                                  @Nullable final XSourcePosition sourcePosition,
                                  @NotNull final EvaluationMode mode) {
-    final PsiFile psiFile = new TheRExpressionCodeFragmentImpl(project, FRAGMENT_NAME, text);
+    final PsiFile psiFile = new TheRCodeFragment(project, FRAGMENT_NAME, text);
 
     return PsiDocumentManager.getInstance(project).getDocument(psiFile);
   }

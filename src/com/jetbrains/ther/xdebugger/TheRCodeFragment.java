@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.intellij;
+package com.jetbrains.ther.xdebugger;
 
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -12,9 +12,9 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.ther.psi.TheRFileImpl;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRExpressionCodeFragmentImpl extends TheRFileImpl {
+public class TheRCodeFragment extends TheRFileImpl {
 
-  public TheRExpressionCodeFragmentImpl(@NotNull final Project project, @NotNull final String name, @NotNull final String text) {
+  public TheRCodeFragment(@NotNull final Project project, @NotNull final String name, @NotNull final String text) {
     super(createLightVirtualFileViewProvider(project, name, text));
 
     ((SingleRootFileViewProvider)getViewProvider()).forceCachedPsi(this);
