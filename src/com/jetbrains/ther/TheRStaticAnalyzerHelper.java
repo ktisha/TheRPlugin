@@ -149,7 +149,7 @@ public class TheRStaticAnalyzerHelper {
     @Override
     public StaticAnalysisResult applyRead(TheRReferenceExpression ref) {
       String name = ref.getName();
-      TheRType refType = TheRType.UNKNOWN;
+      TheRType refType = TheRUnknownType.INSTANCE;
       if (myReachTypes.containsKey(name)) {
         refType = myReachTypes.get(name);
       }
@@ -184,7 +184,7 @@ public class TheRStaticAnalyzerHelper {
           String name = ref.getName();
           TheRType baseType = myReachTypes.get(name);
           if (baseType == null) {
-            baseType = TheRType.UNKNOWN;
+            baseType = TheRUnknownType.INSTANCE;
           }
           final Set<TheRType> beforeTypes;
           if (baseType instanceof TheRUnionType) {
@@ -220,11 +220,49 @@ public class TheRStaticAnalyzerHelper {
           String name = base.getName();
           TheRType baseType = myReachTypes.get(name);
           if (baseType == null) {
-            baseType = TheRType.UNKNOWN;
+            baseType = TheRUnknownType.INSTANCE;
           }
           TheRType resultType = baseType.afterSubscriptionType(arguments, assignedValueType);
           result = new ReachTypes(this);
           result.myReachTypes.put(name, resultType);
+        }
+      }
+
+      if (assignee instanceof TheRCallExpression) {
+        TheRCallExpression callExpression = (TheRCallExpression)assignee;
+        TheRExpression function = callExpression.getExpression();
+        if (function instanceof TheRReferenceExpression) {
+          String functionName = function.getName();
+          List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
+          if ("class".equals(functionName) && arguments.size() == 1) { // add S3Class
+            TheRExpression arg = arguments.get(0);
+            if (arg instanceof TheRReferenceExpression) {
+              String name = arg.getName();
+              TheRType baseType = myReachTypes.get(name);
+              List<String> s3Classes = new ArrayList<String>();
+              if (assignedValue instanceof TheRStringLiteralExpression) {
+                String quoted = assignedValue.getText();
+                String s3Class = quoted.substring(1, quoted.length() - 1);
+                s3Classes.add(s3Class);
+              }
+              if (assignedValue instanceof TheRCallExpression) {
+                TheRCallExpression assignedValueCall = (TheRCallExpression)assignedValue;
+                if ("c".equals(assignedValueCall.getExpression().getName())) {
+                  for (TheRExpression s3ClassExpr : assignedValueCall.getArgumentList().getExpressionList()) {
+                    if (s3ClassExpr instanceof TheRStringLiteralExpression) {
+                      String quoted = s3ClassExpr.getText();
+                      String s3Class = quoted.substring(1, quoted.length() - 1);
+                      s3Classes.add(s3Class);
+                    }
+                  }
+                }
+              }
+              if (!s3Classes.isEmpty()) {
+                result = new ReachTypes(this);
+                result.myReachTypes.put(name, baseType.replaceS3Types(s3Classes));
+              }
+            }
+          }
         }
       }
 

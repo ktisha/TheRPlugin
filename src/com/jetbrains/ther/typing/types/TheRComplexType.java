@@ -4,7 +4,7 @@ public class TheRComplexType extends TheRAtomicType {
   public static TheRComplexType INSTANCE = new TheRComplexType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "complex";
   }
 }

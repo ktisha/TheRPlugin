@@ -4,7 +4,7 @@ public class TheRIntegerType extends TheRNumericType {
   public static TheRIntegerType INSTANCE = new TheRIntegerType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "integer";
   }
 }

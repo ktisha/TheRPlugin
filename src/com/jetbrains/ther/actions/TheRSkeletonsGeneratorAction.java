@@ -23,14 +23,15 @@ import com.intellij.util.DocumentUtil;
 import com.intellij.util.FileContentUtil;
 import com.jetbrains.ther.TheRHelp;
 import com.jetbrains.ther.TheRPsiUtils;
+import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
 import com.jetbrains.ther.psi.TheRRecursiveElementVisitor;
 import com.jetbrains.ther.psi.api.*;
-import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.typing.*;
 import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnknownType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -221,7 +222,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
 
                 TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody((TheRFunctionExpression)assignedValue);
-                if (type != TheRType.UNKNOWN) {
+                if (!TheRUnknownType.class.isInstance(type)) {
                   TheRUtils.appendToDocument(myPackageDocument, "## @return " + type.toString() + "\n");
                 }
                 else {
@@ -248,7 +249,7 @@ public class TheRSkeletonsGeneratorAction extends AnAction {
 
     private void insertTypeFromHelp(PsiElement assignee, final TheRHelp help) throws IOException {
       TheRType valueType = TheRSkeletonGeneratorHelper.guessReturnValueTypeFromHelp(help);
-      if (valueType != TheRType.UNKNOWN) {
+      if (!TheRUnknownType.class.isInstance(valueType)) {
         String valueTempFileName = myFile.getNameWithoutExtension() + "-value-temp.r";
         VirtualFile valueTempFile = myFile.getParent().findOrCreateChildData(this, valueTempFileName);
         final Document valueTempDocument = FileDocumentManager.getInstance().getDocument(valueTempFile);

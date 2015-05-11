@@ -144,7 +144,7 @@ public class TheRAnnotationParser {
   private void parseReturn(Substring line) {
     String typeName = line.trim().getValue();
     TheRType type = createType(typeName);
-    if (type != null && type != TheRType.UNKNOWN) {
+    if (type != null && !TheRUnknownType.class.isInstance(type)) {
       myType.setReturnType(type);
     }
   }
@@ -157,7 +157,7 @@ public class TheRAnnotationParser {
     Substring parameterName = split.get(0).trim();
     Substring typeName = split.get(1).trim();
     TheRType type = createType(typeName.getValue());
-    if (type != null && type != TheRType.UNKNOWN) {
+    if (type != null && !TheRUnknownType.class.isInstance(type)) {
       myType.addParameterType(parameterName.getValue(), type);
     }
   }
@@ -170,7 +170,7 @@ public class TheRAnnotationParser {
       if (type == null) {
         return null;
       }
-      if (type != TheRType.UNKNOWN) {
+      if (!TheRUnknownType.class.isInstance(type)) {
         types.add(type);
       }
     }

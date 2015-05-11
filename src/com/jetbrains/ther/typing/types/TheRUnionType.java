@@ -13,7 +13,7 @@ public class TheRUnionType extends TheRType {
   }
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "union";
   }
 
@@ -23,9 +23,9 @@ public class TheRUnionType extends TheRType {
 
   public static TheRType create(Set<TheRType> types) {
     if (types.isEmpty()) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
-    unpackUnions(types);
+    unpackUnions(types  );
     types = mergeSimilar(types);
     if (types.size() == 1) {
       return types.iterator().next();
@@ -134,5 +134,12 @@ public class TheRUnionType extends TheRType {
       elementTypes.add(type.getElementTypes());
     }
     return TheRUnionType.create(elementTypes);
+  }
+
+  @Override
+  public TheRUnionType clone() {
+    TheRUnionType result = (TheRUnionType)super.clone();
+    result.myTypes = new HashSet<TheRType>(myTypes);
+    return result;
   }
 }

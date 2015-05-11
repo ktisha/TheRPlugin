@@ -16,7 +16,7 @@ public class TheRMaxType extends TheRType {
   }
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "max type of" + StringUtil.join(myTypes, new Function<TheRType, String>() {
       @Override
       public String fun(TheRType type) {

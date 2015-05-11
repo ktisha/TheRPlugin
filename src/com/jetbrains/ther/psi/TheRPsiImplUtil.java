@@ -218,6 +218,6 @@ public class TheRPsiImplUtil {
     if (na.getNaReal() != null) {
       return TheRNumericType.INSTANCE;
     }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
   }
 }

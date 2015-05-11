@@ -28,7 +28,7 @@ public class TheRTypeProvider {
    */
   public static TheRType buildType(PsiElement element) {
     if (element == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     if (element instanceof TheRStringLiteralExpression) {
       return TheRCharacterType.INSTANCE;
@@ -71,7 +71,7 @@ public class TheRTypeProvider {
       TheRExpression base = expressionList.get(0);
       if (base != null) {
         TheRType type = getType(base);
-        if (type != TheRType.UNKNOWN) {
+        if (!TheRUnknownType.class.isInstance(type)) {
           return type.getSubscriptionType(expressionList.subList(1, expressionList.size()), isSingleBracket);
         }
       }
@@ -92,7 +92,7 @@ public class TheRTypeProvider {
         Set<TheRType> types = new HashSet<TheRType>();
         for (int i = 1; i < expressions.size(); i++) {
           TheRType type = getType(expressions.get(i));
-          if (type != TheRType.UNKNOWN) {
+          if (!TheRUnknownType.class.isInstance(type)) {
             types.add(type);
           }
         }
@@ -113,7 +113,7 @@ public class TheRTypeProvider {
     if (element instanceof TheROperatorExpression) {
       return getBinaryExpressionType((TheROperatorExpression)element);
     }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
   }
 
   private static TheRType getNumericType(TheRNumericLiteralExpression expression) {
@@ -123,13 +123,13 @@ public class TheRTypeProvider {
     if (expression.getComplex() != null) {
       return TheRComplexType.INSTANCE;
     }
-    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
+    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRUnknownType.INSTANCE;
   }
 
   private static TheRType getBinaryExpressionType(TheROperatorExpression expression) {
     TheRFunctionExpression function = TheRPsiUtils.getFunction(expression);
     if (function == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     List<TheRExpression> arguments = PsiTreeUtil.getChildrenOfTypeAsList(expression, TheRExpression.class);
     return getFunctionCallReturnType(function, arguments);
@@ -141,7 +141,7 @@ public class TheRTypeProvider {
     }
     TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
     if (function == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     return getFunctionCallReturnType(function, element.getArgumentList().getExpressionList());
   }
@@ -160,7 +160,7 @@ public class TheRTypeProvider {
       TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot, functionType);
     }
     catch (MatchingException e) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
 
     Map<String, TheRParameterConfiguration> paramToSuppliedConfiguration =
@@ -168,7 +168,7 @@ public class TheRTypeProvider {
 
     // step 2: check @type annotation
     if (!isMatchedTypes(functionType, matchedParams, matchedByTripleDot, paramToSuppliedConfiguration)) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
 
     //step 3: check @rule
@@ -232,7 +232,7 @@ public class TheRTypeProvider {
     if (type != null) {
       return type;
     }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
   }
 
   private static TheRType tryApplyRule(TheRFunctionType functionType,
@@ -273,7 +273,7 @@ public class TheRTypeProvider {
       }
       return rule.getReturnType().resolveType(env);
     }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
   }
 
 
@@ -330,7 +330,7 @@ public class TheRTypeProvider {
   private static TheRType getReferenceExpressionType(TheRReferenceExpression expression) {
     PsiReference reference = expression.getReference();
     if (reference == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     return TheRStaticAnalyzerHelper.getReferenceType(expression);
   }
@@ -338,11 +338,11 @@ public class TheRTypeProvider {
   public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {
     TheRExpression expression = functionExpression.getExpression();
     if (expression == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     Set<TheRType> types = new HashSet<TheRType>();
     TheRType type = getType(expression);
-    if (type != TheRType.UNKNOWN) {
+    if (!TheRUnknownType.class.isInstance(type)) {
       types.add(type);
     }
     collectReturnTypes(functionExpression, types);
@@ -356,7 +356,7 @@ public class TheRTypeProvider {
         List<TheRExpression> args = callExpression.getArgumentList().getExpressionList();
         if (args.size() == 1) {
           TheRType rType = TheRTypeProvider.getType(args.iterator().next());
-          if (rType != null && rType != TheRType.UNKNOWN) {
+          if (rType != null && !TheRUnknownType.class.isInstance(rType)) {
             types.add(rType);
           }
         }

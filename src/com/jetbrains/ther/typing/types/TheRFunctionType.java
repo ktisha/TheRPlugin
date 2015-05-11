@@ -27,7 +27,7 @@ public class TheRFunctionType extends TheRType {
   }
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "function";
   }
 
@@ -51,10 +51,10 @@ public class TheRFunctionType extends TheRType {
         typedParameter.setOptional(true);
       }
     }
-    if (myReturnType == null || myReturnType == TheRType.UNKNOWN) {
+    if (myReturnType == null || myReturnType instanceof TheRUnknownType) {
       if (PsiManager.getInstance(myFunctionExpression.getProject()).isInProject(myFunctionExpression)) {
         TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody(myFunctionExpression);
-        if (type != TheRType.UNKNOWN) {
+        if (!TheRUnknownType.class.isInstance(type)) {
           myReturnType = type;
         }
       }

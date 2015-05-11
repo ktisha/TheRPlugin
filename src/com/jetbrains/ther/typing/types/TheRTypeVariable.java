@@ -6,7 +6,7 @@ public class TheRTypeVariable extends TheRType {
   private final String myVarName;
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return myVarName;
   }
 

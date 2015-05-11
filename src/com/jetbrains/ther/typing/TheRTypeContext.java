@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
 import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnknownType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -98,12 +99,12 @@ public class TheRTypeContext {
     private final long myThreadId;
 
     private TheREvaluatingNowType() {
-      myResult = TheRType.UNKNOWN;
+      myResult = TheRUnknownType.INSTANCE;
       myThreadId = Thread.currentThread().getId();
     }
 
     @Override
-    public String getName() {
+    public String getCanonicalName() {
       return "evaluating now";
     }
 

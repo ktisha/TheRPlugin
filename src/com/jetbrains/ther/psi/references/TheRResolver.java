@@ -16,8 +16,11 @@ import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex;
+import com.jetbrains.ther.typing.TheRTypeProvider;
+import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -167,6 +170,58 @@ public class TheRResolver {
             return;
           }
         }
+      }
+    }
+  }
+
+  // TODO: massive refactoring awaits!!!
+  public static void resolveFunction(PsiElement myElement, String name, List<ResolveResult> result) {
+    PsiElement parent = myElement.getParent();
+    if (parent != null && parent instanceof TheRCallExpression) {
+      TheRCallExpression call = ((TheRCallExpression)parent);
+      List<TheRExpression> arguments = call.getArgumentList().getExpressionList();
+      if (call.getExpression().equals(myElement) && !arguments.isEmpty()) {
+        TheRExpression firstArgument = arguments.get(0);
+        List<ResolveResult> myResult = new ArrayList<ResolveResult>();
+
+        TheRResolver.resolveWithoutNamespaceInFile(myElement, name, myResult);
+        if (myResult.isEmpty()) {
+          TheRResolver.addFromSkeletonsAndRLibrary(myElement, myResult, name);
+        }
+
+        for (ResolveResult resolveResult : myResult) {
+          PsiElement resolved = resolveResult.getElement();
+          if (resolved instanceof TheRAssignmentStatement) {
+            TheRPsiElement assignedValue = ((TheRAssignmentStatement)resolved).getAssignedValue();
+            if (assignedValue instanceof TheRFunctionExpression) {
+              TheRFunctionExpression function = ((TheRFunctionExpression)assignedValue);
+              List<TheRCallExpression> nestedCalls = PsiTreeUtil.getChildrenOfTypeAsList(function, TheRCallExpression.class);
+              for (TheRCallExpression nestedCall : nestedCalls) {
+                if ("UseMethod".equals(nestedCall.getExpression().getText())) {
+                  TheRType firstType = TheRTypeProvider.getType(firstArgument);
+                  List<String> s3Classes = firstType.getS3Classes();
+                  s3Classes.add("default");
+                  for (String s3Class : s3Classes) {
+                    String genericName = name + "." + s3Class;
+                    List<ResolveResult> genericResult = new ArrayList<ResolveResult>();
+
+                    TheRResolver.resolveWithoutNamespaceInFile(myElement, genericName, genericResult);
+                    if (genericResult.isEmpty()) {
+                      TheRResolver.addFromSkeletonsAndRLibrary(myElement, genericResult, genericName);
+                    }
+
+                    if (!genericResult.isEmpty()) {
+                      result.addAll(genericResult);
+                      return;
+                    }
+
+                  }
+                }
+              }
+            }
+          }
+        }
+        result.addAll(myResult);
       }
     }
   }

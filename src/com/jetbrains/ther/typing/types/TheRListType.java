@@ -22,8 +22,8 @@ public class TheRListType extends TheRType {
     }
   }
 
-  private final Map<String, TheRType> myFields = new HashMap<String, TheRType>();
-  private final List<TypeDescriptor> myPositionalTypes = new ArrayList<TypeDescriptor>();
+  private Map<String, TheRType> myFields = new HashMap<String, TheRType>();
+  private List<TypeDescriptor> myPositionalTypes = new ArrayList<TypeDescriptor>();
   //shows if we know all fields
   private final boolean myPrecise;
 
@@ -42,7 +42,15 @@ public class TheRListType extends TheRType {
   }
 
   @Override
-  public String getName() {
+  public TheRListType clone() {
+    TheRListType result = (TheRListType)super.clone();
+    result.myFields = new HashMap<String, TheRType>(myFields);
+    result.myPositionalTypes = new ArrayList<TypeDescriptor>(myPositionalTypes);
+    return result;
+  }
+
+  @Override
+  public String getCanonicalName() {
     if (myPrecise) {
       return "list(" + StringUtil.join(myPositionalTypes, new Function<TypeDescriptor, String>() {
         @Override
@@ -132,7 +140,7 @@ public class TheRListType extends TheRType {
     for (String field : myFields.keySet()) {
       if (field.startsWith(name)) {
         if (partialMatching != null) {
-          return TheRType.UNKNOWN;
+          return TheRUnknownType.INSTANCE;
         }
         partialMatching = field;
       }
@@ -140,7 +148,7 @@ public class TheRListType extends TheRType {
     if (partialMatching != null) {
       return myFields.get(partialMatching);
     }
-    return myPrecise ? TheRNullType.INSTANCE : TheRType.UNKNOWN;
+    return myPrecise ? TheRNullType.INSTANCE : TheRUnknownType.INSTANCE;
   }
 
 
@@ -157,10 +165,10 @@ public class TheRListType extends TheRType {
       return this;
     }
     if (indices.size() > 1) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     TheRExpression index = indices.get(0);
-    TheRType type = TheRType.UNKNOWN;
+    TheRType type = TheRUnknownType.INSTANCE;
     String indexName = null;
     if (index instanceof TheRStringLiteralExpression) {
       String quoted = index.getText();
@@ -177,7 +185,7 @@ public class TheRListType extends TheRType {
         // Do nothing
       }
     }
-    if (type != TheRNullType.INSTANCE && type != TheRType.UNKNOWN && isSingleBracket) {
+    if (!TheRNullType.class.isInstance(type) && !TheRUnknownType.class.isInstance(type) && isSingleBracket) {
       TheRListType listType = new TheRListType();
       listType.addField(indexName, type);
       type = listType;
@@ -192,15 +200,15 @@ public class TheRListType extends TheRType {
       return this;
     }
     if (indices.size() > 1) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     if (valueType instanceof TheRListType) {
       TheRListType list = (TheRListType)valueType;
       if (!list.myPrecise) {
-        return TheRType.UNKNOWN;
+        return TheRUnknownType.INSTANCE;
       }
       if (list.myPositionalTypes.isEmpty()) {
-        return TheRType.UNKNOWN;
+        return TheRUnknownType.INSTANCE;
       }
       valueType = list.myPositionalTypes.get(0).myType;
     }
@@ -233,7 +241,7 @@ public class TheRListType extends TheRType {
   @Override
   public TheRType getElementTypes() {
     if (!myPrecise) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     Set<TheRType> elementTypes = new HashSet<TheRType>();
     for (TypeDescriptor descriptor : myPositionalTypes) {

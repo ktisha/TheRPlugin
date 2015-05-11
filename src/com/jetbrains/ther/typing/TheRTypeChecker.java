@@ -7,6 +7,7 @@ import com.jetbrains.ther.psi.api.TheRParameter;
 import com.jetbrains.ther.typing.types.TheRFunctionType;
 import com.jetbrains.ther.typing.types.TheRType;
 import com.jetbrains.ther.typing.types.TheRUnionType;
+import com.jetbrains.ther.typing.types.TheRUnknownType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,11 +25,11 @@ public class TheRTypeChecker {
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
       TheRType paramType = TheRTypeProvider.getParamType(parameter, functionType);
-      if (paramType == null || paramType.equals(TheRType.UNKNOWN)) {
+      if (paramType == null || paramType instanceof TheRUnknownType) {
         continue;
       }
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
-      if (argType != null && !argType.equals(TheRType.UNKNOWN)) {
+      if (argType != null && !TheRUnknownType.class.isInstance(argType)) {
         if (!matchTypes(paramType, argType)) {
           throw new MatchingException(parameter.getText() + " expected to be of type " + paramType +
                                       ", found type " + argType);

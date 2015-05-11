@@ -47,6 +47,12 @@ public class TheRReferenceImpl implements PsiPolyVariantReference {
     if (namespace != null) {
       TheRResolver.resolveWithNamespace(myElement.getProject(), name, namespace, result);
     }
+
+    TheRResolver.resolveFunction(myElement, name, result);
+    if (!result.isEmpty()) {
+      return result.toArray(new ResolveResult[result.size()]);
+    }
+
     TheRResolver.resolveWithoutNamespaceInFile(myElement, name, result);
     if (!result.isEmpty()) {
       return result.toArray(new ResolveResult[result.size()]);

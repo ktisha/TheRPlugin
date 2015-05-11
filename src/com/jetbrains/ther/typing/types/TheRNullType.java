@@ -4,7 +4,7 @@ public class TheRNullType extends TheRAtomicType {
   public static TheRType INSTANCE = new TheRNullType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "null";
   }
 }
