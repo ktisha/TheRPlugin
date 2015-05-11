@@ -2,22 +2,22 @@ package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.NotNull;
 
-public class TheRProcessResponseAndType {
+public class TheRProcessResponse {
 
   @NotNull
-  private final String myResponse;
+  private final String myText;
 
   @NotNull
   private final TheRProcessResponseType myType;
 
-  public TheRProcessResponseAndType(@NotNull final String response, @NotNull final TheRProcessResponseType type) {
-    myResponse = response;
+  public TheRProcessResponse(@NotNull final String text, @NotNull final TheRProcessResponseType type) {
+    myText = text;
     myType = type;
   }
 
   @NotNull
-  public String getResponse() {
-    return myResponse;
+  public String getText() {
+    return myText;
   }
 
   @NotNull

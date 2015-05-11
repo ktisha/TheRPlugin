@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseAndType;
+import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,13 +19,16 @@ public class TheRProcessReceiver {
   private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^" + BROWSE_REGEX + " $");
 
   @NotNull
-  private static final Pattern START_DEBUG_PATTERN = Pattern.compile("^debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+  private static final Pattern DEBUGGING_PATTERN = Pattern.compile("^debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
-  private static final Pattern END_DEBUG_PATTERN = Pattern.compile("^Tracing .* on exit.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^Tracing .* on entry.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
-  private static final Pattern ENDS_WITH_BROWSE_PATTERN = Pattern.compile("^.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^Tracing .* on exit.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+
+  @NotNull
+  private static final Pattern RESPONSE_AND_BROWSE_PATTERN = Pattern.compile("^.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
   private final InputStream myStream;
@@ -48,7 +51,7 @@ public class TheRProcessReceiver {
   }
 
   @NotNull
-  public TheRProcessResponseAndType receive() throws IOException, InterruptedException {
+  public TheRProcessResponse receive() throws IOException, InterruptedException {
     final StringBuilder sb = new StringBuilder();
     int pings = 0;
 
@@ -57,7 +60,7 @@ public class TheRProcessReceiver {
       appendResponse(sb);
 
       if (isComplete(sb)) {
-        return calculateResponseAndType(sb, pings);
+        return calculateResponse(sb, pings);
       }
 
       ping(); // pings interpreter to get tail of response
@@ -81,11 +84,11 @@ public class TheRProcessReceiver {
   }
 
   private boolean isComplete(@NotNull final CharSequence response) {
-    return endsWithPlusAndSpace(response) || ENDS_WITH_BROWSE_PATTERN.matcher(response).matches();
+    return endsWithPlusAndSpace(response) || RESPONSE_AND_BROWSE_PATTERN.matcher(response).matches();
   }
 
   @NotNull
-  private TheRProcessResponseAndType calculateResponseAndType(final StringBuilder response, final int pings) {
+  private TheRProcessResponse calculateResponse(final StringBuilder response, final int pings) {
     for (int i = 0; i < pings; i++) {
       response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR) - 1); // remove ping
     }
@@ -99,10 +102,10 @@ public class TheRProcessReceiver {
     final int index = response.indexOf(TheRDebugConstants.LINE_SEPARATOR);
 
     if (index == -1) {
-      return new TheRProcessResponseAndType("", type);
+      return new TheRProcessResponse("", type);
     }
     else {
-      return new TheRProcessResponseAndType(
+      return new TheRProcessResponse(
         response.substring(index + 1), // remove first line
         type
       );
@@ -119,15 +122,19 @@ public class TheRProcessReceiver {
       return TheRProcessResponseType.JUST_BROWSE;
     }
 
-    if (START_DEBUG_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.START_DEBUG;
+    if (DEBUGGING_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.DEBUGGING;
     }
 
-    if (END_DEBUG_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.END_DEBUG;
+    if (START_TRACE_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.START_TRACE;
     }
 
-    if (ENDS_WITH_BROWSE_PATTERN.matcher(response).matches()) {
+    if (END_TRACE_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.END_TRACE;
+    }
+
+    if (RESPONSE_AND_BROWSE_PATTERN.matcher(response).matches()) {
       return TheRProcessResponseType.RESPONSE_AND_BROWSE;
     }
 
@@ -138,7 +145,9 @@ public class TheRProcessReceiver {
     mySender.send(TheRDebugConstants.PING_COMMAND);
   }
 
-  private static boolean endsWithPlusAndSpace(@NotNull final CharSequence sequence) {
+  private boolean endsWithPlusAndSpace(@NotNull final CharSequence sequence) {
+    // TODO check line separator
+
     final int length = sequence.length();
 
     return length >= 2 && sequence.charAt(length - 1) == ' ' && sequence.charAt(length - 2) == '+';
