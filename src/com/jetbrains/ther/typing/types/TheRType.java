@@ -104,7 +104,7 @@ public abstract class TheRType implements Cloneable {
   }
 
   public List<String> getS3Classes() {
-    return myS3Classes;
+    return new ArrayList<String>(myS3Classes);
   }
 
   public TheRType replaceS3Types(List<String> s3Classes) {
