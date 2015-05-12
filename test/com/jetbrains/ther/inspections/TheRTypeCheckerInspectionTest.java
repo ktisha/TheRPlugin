@@ -52,6 +52,10 @@ public class TheRTypeCheckerInspectionTest extends TheRInspectionTest {
     doTest("vector.r");
   }
 
+  public void testDefaultValue() {
+    doTest("default-value.r");
+  }
+
   @Override
   protected String getTestDataPath() {
     return super.getTestDataPath() + "/typing/";

@@ -3,9 +3,7 @@ package com.jetbrains.ther.typing.types;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.TheRStaticAnalyzerHelper;
-import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
-import com.jetbrains.ther.psi.api.TheRFunctionExpression;
-import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.*;
 
 import java.util.*;
@@ -49,6 +47,23 @@ public class TheRFunctionType extends TheRType {
       TheRTypedParameter typedParameter = myParameters.get(name);
       if (typedParameter != null) {
         typedParameter.setOptional(true);
+      }
+    }
+    for (TheRTypedParameter parameter : myParameters.values()) {
+      Set<TheRType> parameterTypes = new HashSet<TheRType>();
+      TheRType fromAnnotation = parameter.getType();
+      if (fromAnnotation != null) {
+        parameterTypes.add(fromAnnotation);
+      }
+      TheRExpression defaultValue = parameter.getParameter().getExpression();
+      if (defaultValue != null) {
+        TheRType defaultType = TheRTypeProvider.getType(defaultValue);
+        if (!TheRUnknownType.class.isInstance(defaultType)) {
+          parameterTypes.add(defaultType);
+        }
+      }
+      if (!parameterTypes.isEmpty()) {
+        parameter.setType(TheRUnionType.create(parameterTypes));
       }
     }
     if (myReturnType == null || myReturnType instanceof TheRUnknownType) {
@@ -101,5 +116,12 @@ public class TheRFunctionType extends TheRType {
       }
     }
     return optionalParams;
+  }
+
+  public boolean isOptional(String param) {
+    if (param != null && myParameters.containsKey(param)) {
+      return myParameters.get(param).isOptional();
+    }
+    return true;
   }
 }

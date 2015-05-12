@@ -4,10 +4,7 @@ import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
-import com.jetbrains.ther.typing.types.TheRFunctionType;
-import com.jetbrains.ther.typing.types.TheRType;
-import com.jetbrains.ther.typing.types.TheRUnionType;
-import com.jetbrains.ther.typing.types.TheRUnknownType;
+import com.jetbrains.ther.typing.types.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +25,10 @@ public class TheRTypeChecker {
       if (paramType == null || paramType instanceof TheRUnknownType) {
         continue;
       }
+      boolean isOptional = functionType.isOptional(parameter.getName());
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
       if (argType != null && !TheRUnknownType.class.isInstance(argType)) {
-        if (!matchTypes(paramType, argType)) {
+        if (!matchTypes(paramType, argType, isOptional)) {
           throw new MatchingException(parameter.getText() + " expected to be of type " + paramType +
                                       ", found type " + argType);
         }
@@ -39,6 +37,13 @@ public class TheRTypeChecker {
   }
 
   public static boolean matchTypes(TheRType type, TheRType replacementType) {
+    return matchTypes(type, replacementType, false);
+  }
+
+  public static boolean matchTypes(TheRType type, TheRType replacementType, boolean isOptional) {
+    if (isOptional && replacementType instanceof TheRNullType) {
+      return true;
+    }
     if (type instanceof TheRUnionType) {
       return ((TheRUnionType) type).contains(replacementType);
     }
