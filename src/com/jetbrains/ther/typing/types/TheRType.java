@@ -18,6 +18,9 @@ public abstract class TheRType implements Cloneable {
         maxType = resolvedType;
       }
     }
+    if (maxType instanceof TheRListType) {
+      maxType = new TheRListType(false); // we know that list is max, but we don't know it's fields
+    }
     return maxType;
   }
 
@@ -38,6 +41,8 @@ public abstract class TheRType implements Cloneable {
       return 5;
     } else if (type instanceof TheRUnknownType) {
       return 6;
+    } else if (type instanceof TheRListType) {
+      return 7;
     } else {
       throw new IllegalArgumentException("Incorrect type: " + type.getName());
     }

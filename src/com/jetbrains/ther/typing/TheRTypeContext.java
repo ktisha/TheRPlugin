@@ -3,6 +3,7 @@ package com.jetbrains.ther.typing;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
+import com.jetbrains.ther.typing.types.TheRErrorType;
 import com.jetbrains.ther.typing.types.TheRType;
 import com.jetbrains.ther.typing.types.TheRUnknownType;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +23,16 @@ public class TheRTypeContext {
     myModificationCount = modificationCount;
   }
 
+  public static TheRType getTypeFromCache(TheRPsiElement element, boolean errorIsUnknown) {
+    TheRType type = getContext(element).getType(element);
+    if (errorIsUnknown && type instanceof TheRErrorType) {
+      return TheRUnknownType.INSTANCE;
+    }
+    return type;
+  }
+
   public static TheRType getTypeFromCache(TheRPsiElement element) {
-    return getContext(element).getType(element);
+    return getTypeFromCache(element, true);
   }
 
   public static void putTypeInCache(TheRPsiElement element, TheRType type) {

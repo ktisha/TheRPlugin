@@ -1,6 +1,7 @@
 package com.jetbrains.ther.inspections;
 
 import com.intellij.codeInspection.LocalInspectionToolSession;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -65,7 +66,7 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
               TheRTypeChecker.checkTypes(arguments, function);
             }
             catch (MatchingException e) {
-              registerProblem(myProblemHolder, callSite, e.getMessage());
+              registerProblem(myProblemHolder, callSite, e.getMessage(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
             }
           }
         }
