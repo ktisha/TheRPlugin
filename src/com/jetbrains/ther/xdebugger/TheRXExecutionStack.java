@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class TheRXExecutionStack extends XExecutionStack {
 
@@ -19,7 +20,11 @@ public class TheRXExecutionStack extends XExecutionStack {
 
     myStack = new ArrayList<TheRXStackFrame>(stack.size());
 
-    for (final TheRStackFrame frame : stack) {
+    final ListIterator<TheRStackFrame> stackIterator = stack.listIterator(stack.size());
+
+    while (stackIterator.hasPrevious()) {
+      final TheRStackFrame frame = stackIterator.previous();
+
       myStack.add(
         new TheRXStackFrame(
           locationResolver.resolve(frame.getLocation()),

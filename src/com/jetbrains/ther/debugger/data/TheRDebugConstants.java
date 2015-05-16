@@ -36,6 +36,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String BROWSER_COMMAND = "browser()";
 
+  @NotNull
+  public static final String KEEP_SOURCE_COMMAND = "options(keep.source=TRUE)";
+
   public static final char PING_COMMAND = '#';
 
   @NotNull

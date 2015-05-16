@@ -178,7 +178,7 @@ public class TheRXDebugProcess extends XDebugProcess {
   private int getCurrentDebuggerLocation() {
     final List<TheRStackFrame> stack = myDebugger.getStack();
 
-    return stack.get(stack.size() - 1).getLocation().getLine();
+    return myLocationResolver.resolve(stack.get(stack.size() - 1).getLocation()).getLine();
   }
 
   private void printToConsole(@Nullable final String text, @NotNull final ConsoleViewContentType type) {

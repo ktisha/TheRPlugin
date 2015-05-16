@@ -27,8 +27,7 @@ public class TheRProcess {
     mySender = new TheRProcessSender(myProcess.getOutputStream());
     myReceiver = new TheRProcessReceiver(myProcess.getInputStream(), mySender);
 
-    mySender.send(TheRDebugConstants.BROWSER_COMMAND);
-    myReceiver.receive();
+    initInterpreter();
   }
 
   @NotNull
@@ -45,5 +44,13 @@ public class TheRProcess {
 
   public void stop() {
     myProcess.destroy();
+  }
+
+  private void initInterpreter() throws IOException, InterruptedException {
+    mySender.send(TheRDebugConstants.BROWSER_COMMAND);
+    myReceiver.receive();
+
+    mySender.send(TheRDebugConstants.KEEP_SOURCE_COMMAND);
+    myReceiver.receive();
   }
 }

@@ -25,13 +25,13 @@ public class TheRScriptReader {
   public TheRScriptReader(@NotNull final String scriptPath) throws FileNotFoundException {
     myReader = new BufferedReader(new FileReader(scriptPath));
 
-    myCurrentPosition = 0;
-    myNextPosition = 0;
+    myCurrentPosition = -1;
+    myNextPosition = -1;
   }
 
   @Nullable
   public String getNextCommand() throws IOException {
-    final String result = calculateCurrentCommand(myCachedCommand);
+    final String result = calculateCurrentCommand();
 
     myCachedCommand = calculateNextCommand();
 
@@ -51,8 +51,8 @@ public class TheRScriptReader {
   }
 
   @Nullable
-  private String calculateCurrentCommand(@Nullable final String cachedCommand) throws IOException {
-    String result = cachedCommand;
+  private String calculateCurrentCommand() throws IOException {
+    String result = myCachedCommand;
 
     if (result == null) {
       do {
@@ -65,12 +65,17 @@ public class TheRScriptReader {
       }
       while (isCommentOrSpaces(result));
     }
+    else {
+      myCurrentPosition = myNextPosition;
+    }
 
     return result;
   }
 
   @Nullable
   private String calculateNextCommand() throws IOException {
+    myNextPosition = myCurrentPosition;
+
     String result;
 
     do {

@@ -145,24 +145,33 @@ public class TheRDebugger {
       );
 
       // TODO check type
-      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-      final int line = 0;
+      final TheRProcessResponse firstInstructionResponse = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
 
-      // TODO sometimes line number are not shown
-      // final TheRProcessResponseAndType firstInstructionResponseAndType = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-      // int line = Integer.parseInt(firstInstructionResponseAndType.getText().substring("debug at #".length()));
+      final int lineStart = "debug at #".length();
+      final int lineEnd = firstInstructionResponse.getText().indexOf(':', lineStart);
+      final int line = Integer.parseInt(firstInstructionResponse.getText().substring(lineStart, lineEnd));
 
       myStackHandler.addFrame();
-      myCurrentLocation = new TheRLocation(function, line);
+      myCurrentLocation = new TheRLocation(function, line - 1);
     }
 
     if (response.getType() == TheRProcessResponseType.END_TRACE) {
       myStackHandler.removeFrame();
-      myCurrentLocation = myStackHandler.getCurrentLocation();
+
+      // myCurrentLocation = myStackHandler.getCurrentLocation();
+      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextPosition()); // TODO update
     }
 
     if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
       myOutput.setNormalOutput(response.getText());
+
+      if (!myStackHandler.isMain()) {
+        final int lineStart = "debug at #".length();
+        final int lineEnd = response.getText().indexOf(':', lineStart);
+        final int line = Integer.parseInt(response.getText().substring(lineStart, lineEnd));
+
+        myCurrentLocation = new TheRLocation(myStackHandler.getCurrentLocation().getFunction(), line - 1);
+      }
     }
   }
 
