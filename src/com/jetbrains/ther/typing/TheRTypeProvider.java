@@ -106,6 +106,9 @@ public class TheRTypeProvider {
       if (elementType instanceof TheRListType) {
         return ((TheRListType)elementType).getFieldType(memberExpression.getTag());
       }
+      if (elementType instanceof TheRAtomicType) {
+        return new TheRErrorType("$ operator is invalid for atomic vectors");
+      }
     }
     if (element instanceof TheRSliceExpression) {
       TheRSliceExpression sliceExpression = ((TheRSliceExpression)element);
@@ -233,11 +236,6 @@ public class TheRTypeProvider {
     if (type != null) {
       return type;
     }
-    //TODO: uncomment this
-    //type = guessTypeFromFunctionBody(parameter);
-    if (type != null) {
-      return type;
-    }
     return TheRUnknownType.INSTANCE;
   }
 
@@ -328,6 +326,15 @@ public class TheRTypeProvider {
     }
     if (typeName.equals("complex")) {
       return TheRComplexType.INSTANCE;
+    }
+    if (typeName.equals("integer")) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (typeName.equals("null")) {
+      return TheRNullType.INSTANCE;
+    }
+    if (typeName.equals("raw")) {
+      return TheRRawType.INSTANCE;
     }
     //we need to return null in this case to create type variable
     return null;

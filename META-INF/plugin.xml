@@ -64,9 +64,6 @@
                      implementationClass="com.jetbrains.ther.inspections.TheRUnusedInspection" groupKey=""/-->
     <!--localInspection language="TheR" shortName="RUnresolvedReferenceInspection" displayName="R Unresolved Reference Inspection" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspection" groupKey=""/-->
-    <localInspection language="TheR" shortName="RErrorTypeInspection" displayName="R Error Type Checker" enabledByDefault="true" level="WARNING"
-                     implementationClass="com.jetbrains.ther.inspections.TheRErrorTypeInspection" groupKey=""/>
-
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
   </extensions>
 </idea-plugin>

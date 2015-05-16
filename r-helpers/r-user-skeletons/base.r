@@ -538,7 +538,7 @@ library <- function (package, help, pos = 2, lib.loc = NULL, character.only = FA
 }
 
 
-## @type length : integer
+## @type length : numeric
 ## @type mode : character
 ## @rule (mode="logical")->logical
 ## @rule (mode="numeric")->numeric
@@ -547,6 +547,7 @@ library <- function (package, help, pos = 2, lib.loc = NULL, character.only = FA
 ## @rule (mode="complex")->complex
 ## @rule (mode="character")->character
 ## @rule (mode="raw")->raw
+## @rule (mode : character) -> error(Wrong mode)
 vector <- function (mode = "logical", length = 0L)
 .Internal(vector(mode, length))
 
@@ -594,3 +595,12 @@ logical <- function (length = 0L)
 ## @type length : integer
 integer <- function (length = 0L)
 .Internal(vector("integer", length))
+
+## @rule (data : T) -> T[matrix]
+matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
+{
+    if (is.object(data) || !is.atomic(data))
+        data <- as.vector(data)
+    .Internal(matrix(data, nrow, ncol, byrow, dimnames, missing(nrow),
+        missing(ncol)))
+}

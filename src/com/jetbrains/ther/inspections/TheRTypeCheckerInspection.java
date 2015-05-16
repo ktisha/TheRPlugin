@@ -10,6 +10,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.MatchingException;
 import com.jetbrains.ther.typing.TheRTypeChecker;
+import com.jetbrains.ther.typing.TheRTypeContext;
+import com.jetbrains.ther.typing.types.TheRErrorType;
+import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +44,15 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
       PsiReference referenceToFunction = callExpression.getExpression().getReference();
       List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
       checkFunctionCall(callExpression, referenceToFunction, arguments);
+      visitExpression(callExpression);
+    }
+
+    @Override
+    public void visitExpression(@NotNull TheRExpression o) {
+      TheRType type = TheRTypeContext.getTypeFromCache(o, false);
+      if (type instanceof TheRErrorType) {
+        registerProblem(myProblemHolder, o, ((TheRErrorType)type).getErrorMessage(), ProblemHighlightType.GENERIC_ERROR);
+      }
     }
 
     @Override

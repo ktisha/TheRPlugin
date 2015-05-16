@@ -12,7 +12,9 @@ public class TheRTypeVariable extends TheRType {
 
   @Override
   public TheRType resolveType(TheRTypeEnvironment env) {
-    return env.getType(myVarName).resolveType(env);
+    TheRType substitutionType = env.getType(myVarName);
+    substitutionType = substitutionType.replaceS3Types(getS3Classes()); // push down s3
+    return substitutionType.resolveType(env);
   }
 
   public TheRTypeVariable(String name) {

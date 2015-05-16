@@ -25,4 +25,6 @@ public abstract class TheRAtomicType extends TheRType {
   public TheRType getElementTypes() {
     return this;
   }
+
+
 }

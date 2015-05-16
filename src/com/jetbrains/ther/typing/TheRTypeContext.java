@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
@@ -15,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TheRTypeContext {
   private static final Map<Project, TheRTypeContext> CONTEXT = new HashMap<Project, TheRTypeContext>();
+  private static final Logger LOG = Logger.getInstance(TheRTypeContext.class);
   private final Map<TheRPsiElement, TheRType> cache = new HashMap<TheRPsiElement, TheRType>();
   private final Lock cacheLock = new ReentrantLock();
   private long myModificationCount = -1;
@@ -78,8 +80,14 @@ public class TheRTypeContext {
           //noinspection SynchronizationOnLocalVariableOrMethodParameter
           synchronized (evaluatingType) {
             if (evaluatingType.isNotRecursive()) {
+              int numberOfAttempts = 0;
               while (!evaluatingType.isReady()) {
                 evaluatingType.wait(5000);
+                if (5 == numberOfAttempts++) { // it's sad
+                  cacheLock.unlock();
+                  LOG.info("Possible deadlock, break waiting");
+                  return TheRTypeProvider.buildType(element);
+                }
               }
             }
           }

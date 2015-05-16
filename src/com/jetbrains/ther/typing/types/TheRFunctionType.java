@@ -54,12 +54,12 @@ public class TheRFunctionType extends TheRType {
       TheRType fromAnnotation = parameter.getType();
       if (fromAnnotation != null) {
         parameterTypes.add(fromAnnotation);
-      }
-      TheRExpression defaultValue = parameter.getParameter().getExpression();
-      if (defaultValue != null) {
-        TheRType defaultType = TheRTypeProvider.getType(defaultValue);
-        if (!TheRUnknownType.class.isInstance(defaultType)) {
-          parameterTypes.add(defaultType);
+        TheRExpression defaultValue = parameter.getParameter().getExpression();
+        if (defaultValue != null) {
+          TheRType defaultType = TheRTypeProvider.getType(defaultValue);
+          if (!TheRUnknownType.class.isInstance(defaultType)) {
+            parameterTypes.add(defaultType);
+          }
         }
       }
       if (!parameterTypes.isEmpty()) {
@@ -105,7 +105,7 @@ public class TheRFunctionType extends TheRType {
   }
 
   public void addRule(TheRFunctionRule rule) {
-    myRules.add(rule);
+    myRules.add(0, rule); // we are parsing from bottom to top
   }
 
   public List<TheRParameter> getOptionalParams() {
@@ -118,6 +118,7 @@ public class TheRFunctionType extends TheRType {
     return optionalParams;
   }
 
+  @SuppressWarnings("SimplifiableIfStatement")
   public boolean isOptional(String param) {
     if (param != null && myParameters.containsKey(param)) {
       return myParameters.get(param).isOptional();

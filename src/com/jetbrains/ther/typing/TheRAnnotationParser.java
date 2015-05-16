@@ -25,6 +25,8 @@ public class TheRAnnotationParser {
   public static final Pattern COMMA_PATTERN = Pattern.compile(",");
   public static final Pattern EQUALS_PATTERN = Pattern.compile("=");
   public static final Pattern MAX_PATTERN = Pattern.compile("max\\((.*)\\)");
+  public static final Pattern ERROR_PATTERN = Pattern.compile("error\\((.*)\\)");
+  public static final Pattern S3_PATTERN = Pattern.compile("([^\\[\\]]*)\\[(.*)\\]");
   private static final String OPTIONAL_TAG = "optional";
   private TheRFunctionType myType;
 
@@ -86,6 +88,18 @@ public class TheRAnnotationParser {
 
   private TheRType findType(Substring typeSubstring) {
     String typeName = typeSubstring.trim().getValue();
+    Matcher s3Matcher = S3_PATTERN.matcher(typeName);
+    if (s3Matcher.matches()) {
+      Substring baseTypeSubstring = new Substring(s3Matcher.group(1));
+      Substring s3ClassesSubstring = new Substring(s3Matcher.group(2));
+      TheRType baseType = findType(baseTypeSubstring);
+      List<String> s3Classes = new ArrayList<String>();
+      for (Substring s3Class : s3ClassesSubstring.split(COMMA_PATTERN)) {
+        s3Classes.add(s3Class.trim().toString());
+      }
+      baseType = baseType.replaceS3Types(s3Classes);
+      return baseType;
+    }
     Matcher maxMatcher = MAX_PATTERN.matcher(typeName);
     if (maxMatcher.matches()) {
       Substring types = new Substring(maxMatcher.group(1));
@@ -94,6 +108,10 @@ public class TheRAnnotationParser {
         typesList.add(findType(type));
       }
       return new TheRMaxType(typesList);
+    }
+    Matcher errorMatcher = ERROR_PATTERN.matcher(typeName);
+    if (errorMatcher.matches()) {
+      return new TheRErrorType(errorMatcher.group(1));
     }
     TheRType type = createType(typeName);
     return type != null ? type : new TheRTypeVariable(typeName);
