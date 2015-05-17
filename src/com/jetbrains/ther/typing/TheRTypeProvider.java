@@ -271,7 +271,7 @@ public class TheRTypeProvider {
           TheRExpression exprValue = exprConf.getValue();
 
           // TODO : evaluate expressions?
-          if (exprValue == null || !exprValue.getText().equals(ruleValue.getText())) {
+          if (exprValue == null || !matchExpressions(exprValue, ruleValue)) {
             continue rulefor;
           }
         }
@@ -279,6 +279,19 @@ public class TheRTypeProvider {
       return rule.getReturnType().resolveType(env);
     }
     return TheRUnknownType.INSTANCE;
+  }
+
+  private static boolean matchExpressions(TheRExpression substitution, TheRExpression base) {
+    if (base instanceof TheRReferenceExpression) {
+      String name = base.getName();
+      if ("string".equals(name) && substitution instanceof TheRStringLiteralExpression) {
+        return true;
+      }
+      if ("number".equals(name) && substitution instanceof TheRNumericLiteralExpression) {
+        return true;
+      }
+    }
+    return substitution.getText().equals(base.getText());
   }
 
 

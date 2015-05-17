@@ -547,7 +547,7 @@ library <- function (package, help, pos = 2, lib.loc = NULL, character.only = FA
 ## @rule (mode="complex")->complex
 ## @rule (mode="character")->character
 ## @rule (mode="raw")->raw
-## @rule (mode : character) -> error(Wrong mode)
+## @rule (mode=string) -> error(Wrong mode)
 vector <- function (mode = "logical", length = 0L)
 .Internal(vector(mode, length))
 
