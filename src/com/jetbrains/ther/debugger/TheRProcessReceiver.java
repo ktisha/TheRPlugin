@@ -25,6 +25,10 @@ public class TheRProcessReceiver {
   private static final Pattern START_TRACE_PATTERN = Pattern.compile("^Tracing .* on entry.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
+  private static final Pattern CONTINUE_TRACE_PATTERN =
+    Pattern.compile("^Tracing .* on exit.*debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
+
+  @NotNull
   private static final Pattern END_TRACE_PATTERN = Pattern.compile("^Tracing .* on exit.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
@@ -128,6 +132,10 @@ public class TheRProcessReceiver {
 
     if (START_TRACE_PATTERN.matcher(response).matches()) {
       return TheRProcessResponseType.START_TRACE;
+    }
+
+    if (CONTINUE_TRACE_PATTERN.matcher(response).matches()) {
+      return TheRProcessResponseType.CONTINUE_TRACE;
     }
 
     if (END_TRACE_PATTERN.matcher(response).matches()) {

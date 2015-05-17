@@ -126,7 +126,7 @@ public class TheRDebugger {
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
-    if (response.getType() == TheRProcessResponseType.DEBUGGING) {
+    if (response.getType() == TheRProcessResponseType.DEBUGGING || response.getType() == TheRProcessResponseType.CONTINUE_TRACE) {
       // TODO check type
       myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
       // TODO check type
@@ -153,8 +153,11 @@ public class TheRDebugger {
       final int lineEnd = firstInstructionResponse.getText().indexOf(':', lineStart);
       final int line = Integer.parseInt(firstInstructionResponse.getText().substring(lineStart, lineEnd));
 
-      myStackHandler.addFrame();
       myCurrentLocation = new TheRLocation(function, line - 1);
+
+      if (response.getType() == TheRProcessResponseType.DEBUGGING) {
+        myStackHandler.addFrame();
+      }
     }
 
     if (response.getType() == TheRProcessResponseType.END_TRACE) {
