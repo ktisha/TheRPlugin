@@ -113,7 +113,8 @@ public class TheRTypeProvider {
     if (element instanceof TheRSliceExpression) {
       TheRSliceExpression sliceExpression = ((TheRSliceExpression)element);
       for (TheRExpression expression : sliceExpression.getExpressionList()) {
-        if (!TheRNumericType.class.isInstance(getType(expression))) {
+        TheRType expressionType = getType(expression);
+        if (!TheRUnknownType.class.isInstance(expressionType) && !TheRNumericType.class.isInstance(expressionType)) {
           return new TheRErrorType("Wrong arguments in slicing");
         }
       }

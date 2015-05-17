@@ -6,7 +6,10 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.TheRTypeContext;
 import com.jetbrains.ther.typing.TheRTypeProvider;
-import com.jetbrains.ther.typing.types.*;
+import com.jetbrains.ther.typing.types.TheRListType;
+import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnionType;
+import com.jetbrains.ther.typing.types.TheRUnknownType;
 
 import java.util.*;
 
@@ -143,7 +146,10 @@ public class TheRStaticAnalyzerHelper {
     }
 
     public TheRType getResultType() {
-      return myResult;
+      if (myResult != null) {
+        return myResult;
+      }
+      return TheRUnknownType.INSTANCE;
     }
 
     @Override

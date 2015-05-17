@@ -5,23 +5,39 @@ import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.typing.TheRTypeEnvironment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class TheRType implements Cloneable {
   private List<String> myS3Classes = new ArrayList<String>();
 
   public static TheRType getMaxType(List<TheRType> types, TheRTypeEnvironment env) {
-    TheRType maxType = null;
+    Set<TheRType> maxTypes = new HashSet<TheRType>();
     for (TheRType type : types) {
       TheRType resolvedType = type.resolveType(env);
-      if (maxType == null || TheRType.getOrder(resolvedType) > TheRType.getOrder(maxType)) {
-        maxType = resolvedType;
+      Set<TheRType> currentTypes = new HashSet<TheRType>();
+      if (resolvedType instanceof TheRUnionType) {
+        currentTypes.addAll(((TheRUnionType)resolvedType).getTypes());
+      } else if (resolvedType instanceof TheRListType) {
+        currentTypes.add(new TheRListType(false));
+      } else {
+        currentTypes.add(resolvedType);
+      }
+      if (maxTypes.isEmpty()) {
+        maxTypes.addAll(currentTypes);
+      } else {
+        Set<TheRType> newMaxTypes = new HashSet<TheRType>();
+        for (TheRType maxType : maxTypes) {
+          for (TheRType currentType : currentTypes) {
+            boolean currentIsMore = TheRType.getOrder(currentType) > TheRType.getOrder(maxType);
+            newMaxTypes.add(currentIsMore ? currentType : maxType);
+          }
+        }
+        maxTypes = newMaxTypes;
       }
     }
-    if (maxType instanceof TheRListType) {
-      maxType = new TheRListType(false); // we know that list is max, but we don't know it's fields
-    }
-    return maxType;
+    return TheRUnionType.create(maxTypes);
   }
 
   public static int getOrder(TheRType type) {

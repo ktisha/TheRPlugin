@@ -27,6 +27,9 @@ public class TheRTypeContext {
 
   public static TheRType getTypeFromCache(TheRPsiElement element, boolean errorIsUnknown) {
     TheRType type = getContext(element).getType(element);
+    if (type == null) {
+      LOG.error("Type for " + element.getText() + " is null. WTF");
+    }
     if (errorIsUnknown && type instanceof TheRErrorType) {
       return TheRUnknownType.INSTANCE;
     }
@@ -84,7 +87,6 @@ public class TheRTypeContext {
               while (!evaluatingType.isReady()) {
                 evaluatingType.wait(5000);
                 if (5 == numberOfAttempts++) { // it's sad
-                  cacheLock.unlock();
                   LOG.info("Possible deadlock, break waiting");
                   return TheRTypeProvider.buildType(element);
                 }
@@ -126,6 +128,9 @@ public class TheRTypeContext {
     }
 
     public TheRType getResult() {
+      if (myResult == null) {
+          LOG.error("Result type is null. WTF");
+      }
       return myResult;
     }
 

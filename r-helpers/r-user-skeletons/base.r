@@ -552,18 +552,18 @@ vector <- function (mode = "logical", length = 0L)
 .Internal(vector(mode, length))
 
 ## @return character
-## @type length : integer
+## @type length : numeric
 character <- function (length = 0L)
 .Internal(vector("character", length))
 
 
 ## @return raw
-## @type length : integer
+## @type length : numeric
 raw <- function (length = 0L)
 .Internal(vector("raw", length))
 
 ## @return numeric
-## @type length : integer
+## @type length : numeric
 double <- function (length = 0L)
 .Internal(vector("double", length))
 
@@ -587,12 +587,12 @@ complex <- function (length.out = 0L, real = numeric(), imaginary = numeric(),
 }
 
 ## @return logical
-## @type length : integer
+## @type length : numeric
 logical <- function (length = 0L)
 .Internal(vector("logical", length))
 
 ## @return integer
-## @type length : integer
+## @type length : numeric
 integer <- function (length = 0L)
 .Internal(vector("integer", length))
 
@@ -604,3 +604,13 @@ matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NUL
     .Internal(matrix(data, nrow, ncol, byrow, dimnames, missing(nrow),
         missing(ncol)))
 }
+
+## @optional e2
+## @type e1 : complex
+## @type e2 : complex
+"+" <- function (e1, e2)  .Primitive("+")
+
+## @oprtional e2
+## @type e1 : complex
+## @type e2 : complex
+"-" <- function (e1, e2)  .Primitive("-")

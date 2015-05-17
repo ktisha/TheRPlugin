@@ -5,7 +5,6 @@ import com.intellij.util.Function;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRNumericLiteralExpression;
 import com.jetbrains.ther.psi.api.TheRStringLiteralExpression;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -131,7 +130,6 @@ public class TheRListType extends TheRType {
     }
   }
 
-  @Nullable
   public TheRType getFieldType(String name) {
     if (myFields.containsKey(name)) {
       return myFields.get(name);
