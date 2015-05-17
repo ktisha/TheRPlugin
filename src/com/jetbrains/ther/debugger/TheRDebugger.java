@@ -100,19 +100,21 @@ public class TheRDebugger {
     boolean accepted = false;
 
     while (!accepted) {
-      final String command = myScriptReader.getNextCommand();
+      final TheRScriptCommand command = myScriptReader.getCurrentCommand();
 
-      if (command == null) {
+      if (command.getCommand() == null) {
         return false;
       }
 
-      final TheRProcessResponse response = myProcess.execute(command);
+      final TheRProcessResponse response = myProcess.execute(command.getCommand());
 
-      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextPosition());
+      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextCommand().getPosition());
 
       handleResponse(response);
 
       accepted = response.getType() != TheRProcessResponseType.PLUS;
+
+      myScriptReader.advance();
     }
 
     return true;
@@ -159,13 +161,15 @@ public class TheRDebugger {
       myStackHandler.removeFrame();
 
       // myCurrentLocation = myStackHandler.getCurrentLocation();
-      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextPosition()); // TODO update
+      myCurrentLocation =
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getCurrentCommand().getPosition()); // TODO update
     }
 
     if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
-      myOutput.setNormalOutput(response.getText());
-
-      if (!myStackHandler.isMain()) {
+      if (myStackHandler.isMain()) {
+        myOutput.setNormalOutput(response.getText());
+      }
+      else {
         final int lineStart = "debug at #".length();
         final int lineEnd = response.getText().indexOf(':', lineStart);
         final int line = Integer.parseInt(response.getText().substring(lineStart, lineEnd));

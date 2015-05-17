@@ -2,11 +2,11 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRScriptCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -15,83 +15,60 @@ public class TheRScriptReader {
   @NotNull
   private final BufferedReader myReader;
 
-  private int myCurrentPosition;
+  @NotNull
+  private TheRScriptCommand myCurrentCommand;
 
-  private int myNextPosition;
+  @NotNull
+  private TheRScriptCommand myNextCommand;
 
-  @Nullable
-  private String myCachedCommand;
-
-  public TheRScriptReader(@NotNull final String scriptPath) throws FileNotFoundException {
+  public TheRScriptReader(@NotNull final String scriptPath) throws IOException {
     myReader = new BufferedReader(new FileReader(scriptPath));
 
-    myCurrentPosition = -1;
-    myNextPosition = -1;
+    myCurrentCommand = new TheRScriptCommand(String.valueOf(TheRDebugConstants.PING_COMMAND), -1);
+    myNextCommand = readNextCommand(-1);
   }
 
-  @Nullable
-  public String getNextCommand() throws IOException {
-    final String result = calculateCurrentCommand();
+  public void advance() throws IOException {
+    myCurrentCommand = myNextCommand;
 
-    myCachedCommand = calculateNextCommand();
-
-    return result;
+    if (myCurrentCommand.getCommand() != null) {
+      myNextCommand = readNextCommand(myCurrentCommand.getPosition());
+    }
   }
 
-  public int getCurrentPosition() {
-    return myCurrentPosition;
+  @NotNull
+  public TheRScriptCommand getCurrentCommand() {
+    return myCurrentCommand;
   }
 
-  public int getNextPosition() {
-    return myNextPosition;
+  @NotNull
+  public TheRScriptCommand getNextCommand() {
+    return myNextCommand;
   }
 
   public void close() throws IOException {
     myReader.close();
   }
 
-  @Nullable
-  private String calculateCurrentCommand() throws IOException {
-    String result = myCachedCommand;
-
-    if (result == null) {
-      do {
-        result = myReader.readLine();
-        myCurrentPosition++;
-
-        if (result == null) {
-          return null;
-        }
-      }
-      while (isCommentOrSpaces(result));
-    }
-    else {
-      myCurrentPosition = myNextPosition;
-    }
-
-    return result;
-  }
-
-  @Nullable
-  private String calculateNextCommand() throws IOException {
-    myNextPosition = myCurrentPosition;
-
+  @NotNull
+  private TheRScriptCommand readNextCommand(final int currentPosition) throws IOException {
     String result;
+    int position = currentPosition;
 
     do {
       result = myReader.readLine();
-      myNextPosition++;
-
-      if (result == null) {
-        return null;
-      }
+      position++;
     }
     while (isCommentOrSpaces(result));
 
-    return result;
+    return new TheRScriptCommand(result, position);
   }
 
-  private boolean isCommentOrSpaces(@NotNull final String line) {
+  private boolean isCommentOrSpaces(@Nullable final String line) {
+    if (line == null) {
+      return false;
+    }
+
     for (int i = 0; i < line.length(); i++) {
       if (StringUtil.isWhiteSpace(line.charAt(i))) {
         continue;
