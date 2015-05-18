@@ -37,7 +37,7 @@ public class TheRXExecutionStack extends XExecutionStack {
   @Nullable
   @Override
   public XStackFrame getTopFrame() {
-    return myStack.isEmpty() ? null : myStack.get(myStack.size() - 1);
+    return myStack.isEmpty() ? null : myStack.get(0);
   }
 
   @Override
