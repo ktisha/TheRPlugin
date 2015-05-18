@@ -120,6 +120,32 @@ public class TheRPsiUtils {
     return null;
   }
 
+  /**
+   * No package loading. Use only for documentation.
+   */
+  @Nullable
+  public static String getHelpForFunction(@NotNull PsiElement assignee) {
+    File file = TheRHelpersLocator.getHelperFile("r-help-without-package.r");
+    final String path = TheRInterpreterService.getInstance().getInterpreterPath();
+    String helperPath = file.getAbsolutePath();
+    final Process process;
+    try {
+      String assigneeText =
+        assignee.getText().replaceAll("\"", "");
+      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
+      final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
+      final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
+      String stdout = output.getStdout();
+      if (stdout.startsWith("No documentation")) {
+        return null;
+      }
+      return stdout;
+    }
+    catch (IOException e) {
+      LOG.error(e);
+    }
+    return null;
+  }
   @NotNull
   public static <T extends TheRPsiElement> T[] getAllChildrenOfType(@NotNull PsiElement element, @NotNull Class<T> aClass) {
     List<T> result = new SmartList<T>();

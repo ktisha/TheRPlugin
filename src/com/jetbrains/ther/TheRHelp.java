@@ -1,6 +1,7 @@
 package com.jetbrains.ther;
 
 public class TheRHelp {
+  public String myDescription;
   public String myArguments;
   public String myValue;
   public String myUsage;
@@ -56,6 +57,9 @@ public class TheRHelp {
       }
       else if ("Examples".equals(section)) {
         myExamples = sectionText.toString();
+      }
+      else if ("Description".equals(section)) {
+        myDescription = sectionText.toString();
       }
     }
   }

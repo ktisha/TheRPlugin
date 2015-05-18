@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -138,19 +137,18 @@ public class TheRPsiImplUtil {
 
   @Nullable
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
-    final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
-    if (statement == null) return null;
+
+    final TheRBlockExpression blockExpression = (TheRBlockExpression)functionExpression.getLastChild();
+    if (blockExpression == null) return null;
 
     final List<PsiComment> comments = new ArrayList<PsiComment>();
-    for (PsiElement sibling = statement.getPrevSibling(); sibling != null && !(sibling instanceof TheRExpression);
-         sibling = sibling.getPrevSibling()) {
+    for (PsiElement sibling = blockExpression.getFirstChild(); sibling != null && !(sibling instanceof TheRExpression);
+         sibling = sibling.getNextSibling()) {
       if (sibling instanceof PsiComment) {
         comments.add((PsiComment)sibling);
       }
     }
-
     if (comments.isEmpty()) return null;
-    Collections.reverse(comments);
     return getCommentText(comments);
   }
   @NotNull
