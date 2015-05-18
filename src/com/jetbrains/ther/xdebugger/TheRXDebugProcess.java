@@ -33,22 +33,24 @@ public class TheRXDebugProcess extends XDebugProcess {
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints; // TODO use XSourcePosition as a key
+  private final TheRLocationResolver myLocationResolver;
 
   @NotNull
-  private final TheRLocationResolver myLocationResolver;
+  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints; // TODO use XSourcePosition as a key
 
   @NotNull
   private final ConsoleView myConsole;
 
-  public TheRXDebugProcess(@NotNull final XDebugSession session, @NotNull final TheRDebugger debugger)
+  public TheRXDebugProcess(@NotNull final XDebugSession session,
+                           @NotNull final TheRDebugger debugger,
+                           @NotNull final TheRLocationResolver locationResolver)
     throws ExecutionException {
     super(session);
 
     myDebugger = debugger;
+    myLocationResolver = locationResolver;
 
     myBreakpoints = new HashMap<Integer, XLineBreakpoint<XBreakpointProperties>>();
-    myLocationResolver = new TheRLocationResolver();
 
     myConsole = (ConsoleView)super.createConsole();
   }
@@ -112,6 +114,8 @@ public class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void resume() {
     try {
+      // TODO resume from breakpoint
+
       while ((!myBreakpoints.containsKey(getCurrentDebuggerLocation()))) {
         final boolean executed = myDebugger.executeInstruction();
 

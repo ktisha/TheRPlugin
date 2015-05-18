@@ -44,10 +44,25 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
     final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,
-      createDebugProcessStarter(createDebugger(environment))
+      createDebugProcessStarter(
+        createDebugger(environment),
+        createResolver(environment)
+      )
     );
 
     return session.getRunContentDescriptor();
+  }
+
+  @NotNull
+  private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger,
+                                                         @NotNull final TheRLocationResolver locationResolver) {
+    return new XDebugProcessStarter() {
+      @NotNull
+      @Override
+      public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
+        return new TheRXDebugProcess(session, debugger, locationResolver);
+      }
+    };
   }
 
   @NotNull
@@ -67,13 +82,9 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger) {
-    return new XDebugProcessStarter() {
-      @NotNull
-      @Override
-      public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        return new TheRXDebugProcess(session, debugger);
-      }
-    };
+  private TheRLocationResolver createResolver(@NotNull final ExecutionEnvironment environment) {
+    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
+
+    return new TheRLocationResolver(runConfiguration.getProject(), runConfiguration.getScriptName());
   }
 }
