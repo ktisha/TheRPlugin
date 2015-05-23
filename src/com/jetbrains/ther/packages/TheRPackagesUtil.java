@@ -1,13 +1,13 @@
 package com.jetbrains.ther.packages;
 
 import com.google.common.collect.Lists;
+import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.text.DateFormatUtil;
 import com.intellij.webcore.packaging.InstalledPackage;
-import com.intellij.webcore.packaging.PackageManagementService;
 import com.intellij.webcore.packaging.RepoPackage;
 import com.jetbrains.ther.TheRHelpersLocator;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
@@ -109,40 +109,54 @@ public final class TheRPackagesUtil {
     }
   }
 
-  public static void installPackage(@NotNull RepoPackage repoPackage) throws IOException, TheRPackageManagementException {
-    TheRRunResult result = runHelperWithArgs(R_INSTALL_PACKAGE, repoPackage.getName());
-    if (result == null) {
-      throw new TheRPackageManagementException(
-        new PackageManagementService.ErrorDescription("Path to interpreter didn't set", null, null, null));
+  public static void installPackage(@NotNull RepoPackage repoPackage)
+    throws ExecutionException {
+    TheRRunResult result = null;
+    try {
+      result = runHelperWithArgs(R_INSTALL_PACKAGE, repoPackage.getName());
     }
-    final String stderr = result.getOutput().getStderr();
+    catch (IOException e) {
+      throw new ExecutionException("Some I/O errors occurs while installing");
+    }
+    if (result == null) {
+      throw new ExecutionException("Path to interpreter didn't set");//TODO Fix
+    }
+    final String stderr = result.getStdErr();
     if (!stderr.contains(String.format("DONE (%s)", repoPackage.getName()))) {
 
-      throw new TheRPackageManagementException(
-        new PackageManagementService.ErrorDescription("Some error during the installation", result.command,
-                                                      stderr, null));
+      throw new TheRExecutionException("Some error during the installation", result.getCommand(), result.getStdOut(), result.getStdErr(),
+                                       result.getExitCode());
     }
   }
 
-  public static void uninstallPackage(List<InstalledPackage> repoPackage) throws IOException, TheRPackageManagementException {
+  public static void uninstallPackage(List<InstalledPackage> repoPackage) throws ExecutionException {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (StringUtil.isEmptyOrSpaces(path)) {
-      throw new TheRPackageManagementException(
-        new PackageManagementService.ErrorDescription("Path to interpreter didn't set", null, null, null));
+      throw new ExecutionException("Path to interpreter didn't set");
     }
+    StringBuilder commandBuilder = getCommand(path, repoPackage);
+    String command = commandBuilder.toString();
+    Process process = null;
+    try {
+      process = Runtime.getRuntime().exec(command);
+    }
+    catch (IOException e) {
+      throw new ExecutionException("Some I/O errors occurs while installing");
+    }
+    final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
+    final ProcessOutput output = processHandler.runProcess((int)(5 * DateFormatUtil.MINUTE));
+    if (output.getExitCode() != 0) {
+      throw new TheRExecutionException("Can't remove package", command, output.getStdout(), output.getStderr(), output.getExitCode());
+    }
+  }
+
+  private static StringBuilder getCommand(String path, List<InstalledPackage> repoPackage) {
     StringBuilder commandBuilder = new StringBuilder();
     commandBuilder.append(path).append(" CMD REMOVE");
     for (InstalledPackage aRepoPackage : repoPackage) {
       commandBuilder.append(" ").append(aRepoPackage.getName());
     }
-    String command = commandBuilder.toString();
-    Process process = Runtime.getRuntime().exec(command);
-    final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-    final ProcessOutput output = processHandler.runProcess((int)(5 * DateFormatUtil.MINUTE));
-    if (output.getExitCode() != 0) {
-      throw new TheRPackageManagementException(new PackageManagementService.ErrorDescription("Can't remove package", command,
-                                                                                             output.getStderr(), null));
-    }
+    return commandBuilder;
   }
 
   @Nullable
@@ -179,20 +193,33 @@ public final class TheRPackagesUtil {
   }
 
   public static class TheRRunResult {
-    private String command;
-    private ProcessOutput output;
+    private final String myCommand;
+    private final String myStdOut;
+    private final String myStdErr;
+    private int myExitCode;
 
     public TheRRunResult(@NotNull String command, @NotNull ProcessOutput output) {
-      this.command = command;
-      this.output = output;
+      this.myCommand = command;
+      this.myExitCode = output.getExitCode();
+      this.myStdOut = output.getStdout();
+      this.myStdErr = output.getStderr();
     }
+
 
     public String getCommand() {
-      return command;
+      return myCommand;
     }
 
-    public ProcessOutput getOutput() {
-      return output;
+    public String getStdOut() {
+      return myStdOut;
+    }
+
+    public String getStdErr() {
+      return myStdErr;
+    }
+
+    public int getExitCode() {
+      return myExitCode;
     }
   }
 }

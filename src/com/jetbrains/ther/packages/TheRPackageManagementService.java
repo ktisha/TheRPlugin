@@ -1,5 +1,7 @@
 package com.jetbrains.ther.packages;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.CatchingConsumer;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.PackageManagementService;
@@ -14,14 +16,12 @@ import java.util.List;
  */
 public class TheRPackageManagementService extends PackageManagementService {
 
-  private static TheRPackageManagementService instance;
+  private final Project myProject;
 
-  public static TheRPackageManagementService getInstance() {
-    if (instance == null) {
-      instance = new TheRPackageManagementService();
-    }
-    return instance;
+  public TheRPackageManagementService(Project project) {
+    myProject = project;
   }
+
 
   @Override
   public boolean canModifyRepository(String repositoryUrl) {
@@ -47,18 +47,33 @@ public class TheRPackageManagementService extends PackageManagementService {
   @Override
   public void installPackage(final RepoPackage repoPackage, String version, boolean forceUpgrade, String extraOptions,
                              final Listener listener, boolean installToUser) {
-    try {
-      listener.operationStarted(String.format("Trying install package %s with all packages packages which these packages depend on/link" +
-                                              " to/import/suggest (and so on recursively).", repoPackage.getName()));
-      TheRPackagesUtil.installPackage(repoPackage);
-      listener.operationFinished(repoPackage.getName(), null);
+
+    final TheRPackageTaskManager manager = new TheRPackageTaskManager(myProject, new TheRPackageTaskManager.TaskListener() {
+      @Override
+      public void started() {
+        listener.operationStarted(repoPackage.getName());
+      }
+
+      @Override
+      public void finished(List<ExecutionException> exceptions) {
+        listener.operationFinished(repoPackage.getName(), toErrorDescription(exceptions));
+      }
+    });
+    manager.install(repoPackage);
+  }
+
+  private ErrorDescription toErrorDescription(List<ExecutionException> exceptions) {
+    //noinspection LoopStatementThatDoesntLoop
+    for (ExecutionException e : exceptions) {
+      if (e instanceof TheRExecutionException) {
+        TheRExecutionException exception = (TheRExecutionException)e;
+        return new ErrorDescription(exception.getMessage(), exception.getCommand(), exception.getStderr(), null);
+      }
+      else {
+        return new ErrorDescription(e.getMessage(), null, null, null);
+      }
     }
-    catch (IOException e) {
-      listener.operationFinished("I/O error", new ErrorDescription("Some I/O error is occurred", null, null, null));
-    }
-    catch (TheRPackageManagementException e) {
-      listener.operationFinished("Installation error", e.getErrorDescription());
-    }
+    return null;
   }
 
   @Override
@@ -67,18 +82,31 @@ public class TheRPackageManagementService extends PackageManagementService {
   }
 
   @Override
-  public void uninstallPackages(List<InstalledPackage> list, Listener listener) {
-    try {
-      listener.operationStarted("Try to remove packages");
-      TheRPackagesUtil.uninstallPackage(list);
-      listener.operationFinished("Packages removed", null);
-    }
-    catch (IOException e) {
-      listener.operationFinished("I/O error", new ErrorDescription("Some I/O error is occurred", null, null, null));
-    }
-    catch (TheRPackageManagementException e) {
-      listener.operationFinished("Error while remove package", e.getErrorDescription());
-    }
+  public void uninstallPackages(List<InstalledPackage> installedPackages, final Listener listener) {
+    //try {
+    //  listener.operationStarted("Try to remove packages");
+    //  TheRPackagesUtil.uninstallPackage(list);
+    //  listener.operationFinished("Packages removed", null);
+    //}
+    //catch (IOException e) {
+    //  listener.operationFinished("I/O error", new ErrorDescription("Some I/O error is occurred", null, null, null));
+    //}
+    //catch (TheRPackageManagementException e) {
+    //  listener.operationFinished("Error while remove package", e.getErrorDescription());
+    //}
+    final String packageName = installedPackages.size() == 1 ? installedPackages.get(0).getName() : null;
+    final TheRPackageTaskManager manager = new TheRPackageTaskManager(myProject, new TheRPackageTaskManager.TaskListener() {
+      @Override
+      public void started() {
+        listener.operationStarted(packageName);
+      }
+
+      @Override
+      public void finished(List<ExecutionException> exceptions) {
+        listener.operationFinished(packageName, toErrorDescription(exceptions));
+      }
+    });
+    manager.uninstall(installedPackages);
   }
 
   @Override

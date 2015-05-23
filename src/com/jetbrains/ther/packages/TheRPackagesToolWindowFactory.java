@@ -11,11 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * Created by sasha on 4/20/15.
+ * @author avesloguzova
  */
 public class TheRPackagesToolWindowFactory implements ToolWindowFactory {
-
-  private TheRInstalledPackagesPanel packagesPanel;
 
   public TheRPackagesToolWindowFactory() {
 
@@ -26,9 +24,9 @@ public class TheRPackagesToolWindowFactory implements ToolWindowFactory {
   public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 
     PackagesNotificationPanel notificationPanel = new PackagesNotificationPanel();
-    packagesPanel = new TheRInstalledPackagesPanel(project, notificationPanel);
+    TheRInstalledPackagesPanel packagesPanel = new TheRInstalledPackagesPanel(project, notificationPanel);
     packagesPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
-    packagesPanel.updatePackages(new TheRPackageManagementService());
+    packagesPanel.updatePackages(new TheRPackageManagementService(project));
     ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
     Content content = contentFactory.createContent(packagesPanel, "", false);
     toolWindow.getContentManager().addContent(content);
