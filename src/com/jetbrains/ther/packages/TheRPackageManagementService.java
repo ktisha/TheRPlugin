@@ -6,6 +6,8 @@ import com.intellij.util.CatchingConsumer;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.PackageManagementService;
 import com.intellij.webcore.packaging.RepoPackage;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -22,6 +24,25 @@ public class TheRPackageManagementService extends PackageManagementService {
     myProject = project;
   }
 
+  @Nullable
+  public static ErrorDescription toErrorDescription(@NotNull List<ExecutionException> exceptions) {
+    //noinspection LoopStatementThatDoesntLoop
+    for (ExecutionException e : exceptions) {
+      if (e instanceof TheRExecutionException) {
+        TheRExecutionException exception = (TheRExecutionException)e;
+        return new ErrorDescription(exception.getMessage(), exception.getCommand(), exception.getStderr(), null);
+      }
+      else {
+        return new ErrorDescription(e.getMessage(), null, null, null);
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  public List<String> getAllRepositories() {
+    return null;
+  }
 
   @Override
   public boolean canModifyRepository(String repositoryUrl) {
@@ -62,20 +83,6 @@ public class TheRPackageManagementService extends PackageManagementService {
     manager.install(repoPackage);
   }
 
-  private ErrorDescription toErrorDescription(List<ExecutionException> exceptions) {
-    //noinspection LoopStatementThatDoesntLoop
-    for (ExecutionException e : exceptions) {
-      if (e instanceof TheRExecutionException) {
-        TheRExecutionException exception = (TheRExecutionException)e;
-        return new ErrorDescription(exception.getMessage(), exception.getCommand(), exception.getStderr(), null);
-      }
-      else {
-        return new ErrorDescription(e.getMessage(), null, null, null);
-      }
-    }
-    return null;
-  }
-
   @Override
   public boolean canInstallToUser() {
     return false;
@@ -83,17 +90,6 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public void uninstallPackages(List<InstalledPackage> installedPackages, final Listener listener) {
-    //try {
-    //  listener.operationStarted("Try to remove packages");
-    //  TheRPackagesUtil.uninstallPackage(list);
-    //  listener.operationFinished("Packages removed", null);
-    //}
-    //catch (IOException e) {
-    //  listener.operationFinished("I/O error", new ErrorDescription("Some I/O error is occurred", null, null, null));
-    //}
-    //catch (TheRPackageManagementException e) {
-    //  listener.operationFinished("Error while remove package", e.getErrorDescription());
-    //}
     final String packageName = installedPackages.size() == 1 ? installedPackages.get(0).getName() : null;
     final TheRPackageTaskManager manager = new TheRPackageTaskManager(myProject, new TheRPackageTaskManager.TaskListener() {
       @Override
