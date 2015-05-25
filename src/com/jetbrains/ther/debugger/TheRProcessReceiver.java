@@ -8,31 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.regex.Pattern;
 
 public class TheRProcessReceiver {
-
-  @NotNull
-  private static final String BROWSE_REGEX = "Browse\\[\\d+\\]>";
-
-  @NotNull
-  private static final Pattern JUST_BROWSE_PATTERN = Pattern.compile("^" + BROWSE_REGEX + " $");
-
-  @NotNull
-  private static final Pattern DEBUGGING_PATTERN = Pattern.compile("^debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
-
-  @NotNull
-  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^Tracing .* on entry.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
-
-  @NotNull
-  private static final Pattern CONTINUE_TRACE_PATTERN =
-    Pattern.compile("^Tracing .* on exit.*debugging in.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
-
-  @NotNull
-  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^Tracing .* on exit.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
-
-  @NotNull
-  private static final Pattern RESPONSE_AND_BROWSE_PATTERN = Pattern.compile("^.*" + BROWSE_REGEX + " $", Pattern.DOTALL);
 
   @NotNull
   private final InputStream myStream;
@@ -63,11 +40,11 @@ public class TheRProcessReceiver {
       waitForResponse();
       appendResponse(sb);
 
-      if (isComplete(sb)) {
+      if (TheRProcessResponseTypeCalculator.isComplete(sb)) {
         return calculateResponse(sb, pings);
       }
 
-      ping(); // pings interpreter to get tail of response
+      mySender.send(TheRDebugConstants.PING_COMMAND); // pings interpreter to get tail of response
       pings++;
     }
   }
@@ -83,81 +60,43 @@ public class TheRProcessReceiver {
 
   private void appendResponse(@NotNull final StringBuilder sb) throws IOException {
     while (myStream.available() != 0) {
-      sb.append(myBuffer, 0, myReader.read(myBuffer));
-    }
-  }
+      final int length = myReader.read(myBuffer);
 
-  private boolean isComplete(@NotNull final CharSequence response) {
-    return endsWithPlusAndSpace(response) || RESPONSE_AND_BROWSE_PATTERN.matcher(response).matches();
+      sb.append(myBuffer, 0, length);
+    }
   }
 
   @NotNull
-  private TheRProcessResponse calculateResponse(final StringBuilder response, final int pings) {
-    for (int i = 0; i < pings; i++) {
-      response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR) - 1); // remove ping
-    }
+  private TheRProcessResponse calculateResponse(@NotNull final StringBuilder response, final int pings) {
+    removePings(response, pings);
 
     final TheRProcessResponseType type = calculateResponseType(
       response.substring(response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1)
     );
 
-    response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR)); // remove last line
+    return new TheRProcessResponse(getFromSecondToPenult(response), type);
+  }
 
-    final int index = response.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-
-    if (index == -1) {
-      return new TheRProcessResponse("", type);
-    }
-    else {
-      return new TheRProcessResponse(
-        response.substring(index + 1), // remove first line
-        type
+  private void removePings(@NotNull final StringBuilder response, final int pings) {
+    for (int i = 0; i < pings; i++) {
+      response.setLength(
+        response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR) - 1
       );
     }
   }
 
   @NotNull
   private TheRProcessResponseType calculateResponseType(@NotNull final CharSequence response) {
-    if (endsWithPlusAndSpace(response)) {
-      return TheRProcessResponseType.PLUS;
-    }
-
-    if (JUST_BROWSE_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.JUST_BROWSE;
-    }
-
-    if (DEBUGGING_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.DEBUGGING;
-    }
-
-    if (START_TRACE_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.START_TRACE;
-    }
-
-    if (CONTINUE_TRACE_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.CONTINUE_TRACE;
-    }
-
-    if (END_TRACE_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.END_TRACE;
-    }
-
-    if (RESPONSE_AND_BROWSE_PATTERN.matcher(response).matches()) {
-      return TheRProcessResponseType.RESPONSE_AND_BROWSE;
-    }
-
-    return null; // TODO exception
+    // TODO exception
+    return TheRProcessResponseTypeCalculator.calculate(response);
   }
 
-  private void ping() throws IOException {
-    mySender.send(TheRDebugConstants.PING_COMMAND);
-  }
+  @NotNull
+  private String getFromSecondToPenult(@NotNull final StringBuilder response) {
+    response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR)); // remove last line
 
-  private boolean endsWithPlusAndSpace(@NotNull final CharSequence sequence) {
-    // TODO check line separator
+    final int index = response.indexOf(TheRDebugConstants.LINE_SEPARATOR);
 
-    final int length = sequence.length();
-
-    return length >= 2 && sequence.charAt(length - 1) == ' ' && sequence.charAt(length - 2) == '+';
+    return (index == -1) ? "" : response.substring(index + 1); // remove first line
   }
 }
