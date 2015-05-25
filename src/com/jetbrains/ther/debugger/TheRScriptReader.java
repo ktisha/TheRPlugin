@@ -6,14 +6,14 @@ import com.jetbrains.ther.debugger.data.TheRScriptCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 
 public class TheRScriptReader {
 
   @NotNull
-  private final BufferedReader myReader;
+  private final LineNumberReader myReader;
 
   @NotNull
   private TheRScriptCommand myCurrentCommand;
@@ -22,17 +22,17 @@ public class TheRScriptReader {
   private TheRScriptCommand myNextCommand;
 
   public TheRScriptReader(@NotNull final String scriptPath) throws IOException {
-    myReader = new BufferedReader(new FileReader(scriptPath));
+    myReader = new LineNumberReader(new FileReader(scriptPath));
 
     myCurrentCommand = new TheRScriptCommand(String.valueOf(TheRDebugConstants.PING_COMMAND), -1);
-    myNextCommand = readNextCommand(-1);
+    myNextCommand = readNextCommand();
   }
 
   public void advance() throws IOException {
     myCurrentCommand = myNextCommand;
 
     if (myCurrentCommand.getCommand() != null) {
-      myNextCommand = readNextCommand(myCurrentCommand.getPosition());
+      myNextCommand = readNextCommand();
     }
   }
 
@@ -51,15 +51,15 @@ public class TheRScriptReader {
   }
 
   @NotNull
-  private TheRScriptCommand readNextCommand(final int currentPosition) throws IOException {
+  private TheRScriptCommand readNextCommand() throws IOException {
     String result;
-    int position = currentPosition;
 
     do {
       result = myReader.readLine();
-      position++;
     }
     while (isCommentOrSpaces(result));
+
+    final int position = (result == null) ? -1 : myReader.getLineNumber() - 1;
 
     return new TheRScriptCommand(result, position);
   }
