@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package com.jetbrains.ther.parsing;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
+import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
 import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 import static com.jetbrains.ther.parsing.TheRParserUtil.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
-import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class TheRParser implements PsiParser {
@@ -27,6 +28,9 @@ public class TheRParser implements PsiParser {
     }
     else if (t == THE_R_ASSIGNMENT_STATEMENT) {
       r = assignment_statement(b, 0);
+    }
+    else if (t == THE_R_AT_EXPRESSION) {
+      r = expression(b, 0, 26);
     }
     else if (t == THE_R_BLOCK_EXPRESSION) {
       r = block_expression(b, 0);
@@ -123,13 +127,13 @@ public class TheRParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION, THE_R_EMPTY_EXPRESSION,
-      THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION, THE_R_HELP_EXPRESSION,
-      THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION, THE_R_NA_LITERAL_EXPRESSION,
-      THE_R_NEXT_STATEMENT, THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION, THE_R_OPERATOR_EXPRESSION,
-      THE_R_PARENTHESIZED_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT, THE_R_SLICE_EXPRESSION,
-      THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_TILDE_EXPRESSION, THE_R_UNARY_TILDE_EXPRESSION,
-      THE_R_WHILE_STATEMENT),
+    create_token_set_(THE_R_AT_EXPRESSION, THE_R_BLOCK_EXPRESSION, THE_R_BREAK_STATEMENT, THE_R_CALL_EXPRESSION,
+      THE_R_EMPTY_EXPRESSION, THE_R_EXPRESSION, THE_R_FOR_STATEMENT, THE_R_FUNCTION_EXPRESSION,
+      THE_R_HELP_EXPRESSION, THE_R_IF_STATEMENT, THE_R_LOGICAL_LITERAL_EXPRESSION, THE_R_MEMBER_EXPRESSION,
+      THE_R_NA_LITERAL_EXPRESSION, THE_R_NEXT_STATEMENT, THE_R_NULL_LITERAL_EXPRESSION, THE_R_NUMERIC_LITERAL_EXPRESSION,
+      THE_R_OPERATOR_EXPRESSION, THE_R_PARENTHESIZED_EXPRESSION, THE_R_REFERENCE_EXPRESSION, THE_R_REPEAT_STATEMENT,
+      THE_R_SLICE_EXPRESSION, THE_R_STRING_LITERAL_EXPRESSION, THE_R_SUBSCRIPTION_EXPRESSION, THE_R_TILDE_EXPRESSION,
+      THE_R_UNARY_TILDE_EXPRESSION, THE_R_WHILE_STATEMENT),
   };
 
   /* ********************************************************** */
@@ -919,7 +923,7 @@ public class TheRParser implements PsiParser {
   // 24: POSTFIX(subscription_expression)
   // 25: POSTFIX(call_expression)
   // 26: POSTFIX(member_expression)
-  // 27: BINARY(at_expression)
+  // 27: POSTFIX(at_expression)
   // 28: POSTFIX(namespace_access_expression)
   // 29: ATOM(reference_expression)
   // 30: ATOM(numeric_literal_expression) ATOM(string_literal_expression) ATOM(logical_literal_expression) ATOM(null_literal_expression) ATOM(na_literal_expression)
@@ -1019,8 +1023,8 @@ public class TheRParser implements PsiParser {
         exit_section_(b, l, m, THE_R_MEMBER_EXPRESSION, r, true, null);
       }
       else if (g < 27 && at_expression_0(b, l + 1)) {
-        r = expression(b, l, 27);
-        exit_section_(b, l, m, THE_R_REFERENCE_EXPRESSION, r, true, null);
+        r = true;
+        exit_section_(b, l, m, THE_R_AT_EXPRESSION, r, true, null);
       }
       else if (g < 28 && namespace_access_expression_0(b, l + 1)) {
         r = true;
@@ -2092,13 +2096,14 @@ public class TheRParser implements PsiParser {
     return true;
   }
 
-  // '@' nl*
+  // '@' nl* member_tag
   private static boolean at_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "at_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, THE_R_AT);
     r = r && at_expression_0_1(b, l + 1);
+    r = r && member_tag(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

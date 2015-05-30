@@ -247,4 +247,20 @@ public class TheRListType extends TheRType {
     }
     return TheRUnionType.create(elementTypes);
   }
+
+  @Override
+  public TheRType getMemberType(String tag) {
+    return getFieldType(tag);
+  }
+
+  @Override
+  public TheRType afterMemberType(String tag, TheRType valueType) {
+    TheRListType clone = clone();
+    if (valueType instanceof TheRNullType) {
+      clone.removeField(tag);
+    } else {
+      clone.addField(tag, valueType);
+    }
+    return clone;
+  }
 }

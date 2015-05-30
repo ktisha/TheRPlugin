@@ -158,6 +158,18 @@ public class TheRPsiImplUtil {
     return "...";
   }
 
+  public static String getTag(TheRAtExpression atExpression) {
+    PsiElement identifier = atExpression.getIdentifier();
+    if (identifier != null) {
+      return identifier.getText();
+    }
+    PsiElement name = atExpression.getString();
+    if (name != null) {
+      return name.getText().substring(1, name.getText().length() - 1);
+    }
+    return "...";
+  }
+
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
     final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
     if (statement == null) return null;

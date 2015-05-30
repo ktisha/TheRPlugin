@@ -18,7 +18,7 @@ public class TheRTypeChecker {
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
     TheRFunctionType functionType = (TheRFunctionType)TheRTypeProvider.getType(functionExpression);
     assert functionType != null;
-    matchArgs(arguments, functionExpression, matchedParams, matchedByTripleDot, functionType);
+    matchArgs(arguments, matchedParams, matchedByTripleDot, functionType);
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
       TheRType paramType = TheRTypeProvider.getParamType(parameter, functionType);
@@ -51,25 +51,24 @@ public class TheRTypeChecker {
   }
 
   public static void matchArgs(List<TheRExpression> arguments,
-                               TheRFunctionExpression function,
                                Map<TheRExpression, TheRParameter> matchedParams,
                                List<TheRExpression> matchedByTripleDot,
                                TheRFunctionType functionType) throws MatchingException {
-    ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(function.getParameterList().getParameterList());
-    ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
+    List<TheRParameter> formalArguments = functionType.getFormalArguments();
+    List<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     exactMatching(formalArguments, suppliedArguments, matchedParams);
     partialMatching(formalArguments, suppliedArguments, matchedParams);
     positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot, functionType);
   }
 
-  static void partialMatching(ArrayList<TheRParameter> formalArguments,
-                              ArrayList<TheRExpression> suppliedArguments,
+  static void partialMatching(List<TheRParameter> formalArguments,
+                              List<TheRExpression> suppliedArguments,
                               Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
     matchParams(formalArguments, suppliedArguments, true, matchedParams);
   }
 
-  static void exactMatching(ArrayList<TheRParameter> formalArguments,
-                            ArrayList<TheRExpression> suppliedArguments,
+  static void exactMatching(List<TheRParameter> formalArguments,
+                            List<TheRExpression> suppliedArguments,
                             Map<TheRExpression, TheRParameter> matchedParams) throws MatchingException {
     matchParams(formalArguments, suppliedArguments, false, matchedParams);
   }

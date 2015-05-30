@@ -26,5 +26,8 @@ public abstract class TheRAtomicType extends TheRType {
     return this;
   }
 
-
+  @Override
+  public TheRType getMemberType(String tag) {
+    return new TheRErrorType("$ operator is invalid for atomic vectors");
+  }
 }

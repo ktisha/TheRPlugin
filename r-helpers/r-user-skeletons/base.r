@@ -610,7 +610,10 @@ matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NUL
 ## @type e2 : complex
 "+" <- function (e1, e2)  .Primitive("+")
 
-## @oprtional e2
+## @optional e2
 ## @type e1 : complex
 ## @type e2 : complex
 "-" <- function (e1, e2)  .Primitive("-")
+
+## @optional fdef
+standardGeneric <- function (f, fdef)  .Primitive("standardGeneric")

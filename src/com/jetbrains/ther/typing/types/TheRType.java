@@ -133,4 +133,18 @@ public abstract class TheRType implements Cloneable {
     result.myS3Classes = new ArrayList<String>(s3Classes);
     return result;
   }
+
+  public TheRType getMemberType(String tag) {
+    return TheRUnknownType.INSTANCE;
+  }
+
+  public TheRType getSlotType(String tag) {
+    return new TheRErrorType(toString() + " don't have slots");
+  }
+
+  public TheRType afterMemberType(String tag, TheRType valueType) {
+    TheRListType result = new TheRListType(false);
+    result.addField(tag, valueType);
+    return result;
+  }
 }

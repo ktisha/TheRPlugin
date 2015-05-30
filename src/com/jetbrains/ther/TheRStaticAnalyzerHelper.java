@@ -6,7 +6,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.TheRTypeContext;
 import com.jetbrains.ther.typing.TheRTypeProvider;
-import com.jetbrains.ther.typing.types.TheRListType;
 import com.jetbrains.ther.typing.types.TheRType;
 import com.jetbrains.ther.typing.types.TheRUnionType;
 import com.jetbrains.ther.typing.types.TheRUnknownType;
@@ -201,16 +200,7 @@ public class TheRStaticAnalyzerHelper {
           }
           Set<TheRType> afterTypes = new HashSet<TheRType>();
           for (TheRType type : beforeTypes) {
-            if (!TheRListType.class.isInstance(type)) {
-              type = new TheRListType(false);
-            }
-            TheRListType list = new TheRListType((TheRListType) type);
-            if ("NULL".equals(assignedValue.getText())) {
-              list.removeField(tag);
-            } else {
-              list.addField(tag, assignedValueType);
-            }
-            afterTypes.add(list);
+            afterTypes.add(type.afterMemberType(tag, assignedValueType));
           }
           TheRType resultType = TheRUnionType.create(afterTypes);
           result = new ReachTypes(this);
@@ -244,7 +234,6 @@ public class TheRStaticAnalyzerHelper {
             TheRExpression arg = arguments.get(0);
             if (arg instanceof TheRReferenceExpression) {
               String name = arg.getName();
-              TheRType baseType = myReachTypes.get(name);
               List<String> s3Classes = new ArrayList<String>();
               if (assignedValue instanceof TheRStringLiteralExpression) {
                 String quoted = assignedValue.getText();
@@ -263,16 +252,15 @@ public class TheRStaticAnalyzerHelper {
                   }
                 }
               }
-              if (!s3Classes.isEmpty()) {
+              if (!s3Classes.isEmpty() && myReachTypes.containsKey(name)) {
                 result = new ReachTypes(this);
-                result.myReachTypes.put(name, baseType.replaceS3Types(s3Classes));
+                result.myReachTypes.put(name, myReachTypes.get(name).replaceS3Types(s3Classes));
               }
             }
           }
         }
       }
 
-      //TODO: check for class(x) <- "clazz" here
       return result;
     }
 
@@ -477,6 +465,10 @@ public class TheRStaticAnalyzerHelper {
         return withBody;
       }
       return withoutBody.merge(withBody);
+    }
+    if (where instanceof TheRAtExpression) {
+      TheRAtExpression atExpression = (TheRAtExpression)where;
+      return analyze(atExpression.getExpression(), parentResult);
     }
     //TODO: look at other expressions (for, call expression)
     return parentResult;

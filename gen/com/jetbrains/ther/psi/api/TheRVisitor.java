@@ -14,6 +14,10 @@ public class TheRVisitor extends PsiElementVisitor {
     visitNamedElement(o);
   }
 
+  public void visitAtExpression(@NotNull TheRAtExpression o) {
+    visitExpression(o);
+  }
+
   public void visitBlockExpression(@NotNull TheRBlockExpression o) {
     visitExpression(o);
   }

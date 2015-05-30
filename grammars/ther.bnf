@@ -133,7 +133,9 @@ private member_tag ::= identifier | string | '...'
 member_expression ::= expression '$' nl* member_tag {
   methods = [ getTag ]
 }
-at_expression ::= expression '@' nl* expression { elementType=reference_expression }
+at_expression ::= expression '@' nl* member_tag {
+  methods = [ getTag ]
+}
 namespace_access_expression ::= expression ('::' | ':::') identifier { elementType=reference_expression }
 
 //statements

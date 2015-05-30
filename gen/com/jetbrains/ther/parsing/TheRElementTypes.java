@@ -12,6 +12,7 @@ public interface TheRElementTypes {
 
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
   IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
+  IElementType THE_R_AT_EXPRESSION = new TheRElementType("THE_R_AT_EXPRESSION");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");
   IElementType THE_R_CALL_EXPRESSION = new TheRElementType("THE_R_CALL_EXPRESSION");
@@ -117,6 +118,9 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_ASSIGNMENT_STATEMENT) {
         return new TheRAssignmentStatementImpl(node);
+      }
+      else if (type == THE_R_AT_EXPRESSION) {
+        return new TheRAtExpressionImpl(node);
       }
       else if (type == THE_R_BLOCK_EXPRESSION) {
         return new TheRBlockExpressionImpl(node);

@@ -24,6 +24,17 @@ public class TheRFunctionType extends TheRType {
     createFunctionType();
   }
 
+  public TheRFunctionType(TheRS4ClassType returnType) {
+    myReturnType = returnType;
+    myFunctionExpression = null;
+
+    for (String slot : returnType.getSlots()) {
+      TheRTypedParameter typedParameter = new TheRTypedParameter(slot, returnType.getSlotType(slot), null);
+      typedParameter.setOptional(true);
+      myParameters.put(slot, typedParameter);
+    }
+  }
+
   @Override
   public String getCanonicalName() {
     return "function";
@@ -124,5 +135,11 @@ public class TheRFunctionType extends TheRType {
       return myParameters.get(param).isOptional();
     }
     return true;
+  }
+
+  public List<TheRParameter> getFormalArguments() {
+    return myFunctionExpression != null
+           ? myFunctionExpression.getParameterList().getParameterList()
+           : Collections.<TheRParameter>emptyList();
   }
 }
