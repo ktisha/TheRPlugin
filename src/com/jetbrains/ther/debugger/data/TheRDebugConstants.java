@@ -8,8 +8,8 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String LINE_SEPARATOR = LineSeparator.getSystemLineSeparator().getSeparatorString();
 
-  public static final long INITIAL_SLEEP = 50;
-  public static final int DEFAULT_BUFFER = 1024;
+  public static final long INITIAL_SLEEP = 2;
+  public static final int DEFAULT_BUFFER = 2048;
 
   @NotNull
   public static final String SERVICE_FUNCTION_PREFIX = "intellij_ther_";
@@ -54,6 +54,23 @@ public final class TheRDebugConstants {
   public static final String DEBUG_COMMAND = "debug";
 
   public static final char EXECUTE_AND_STEP_COMMAND = 'n';
+
+  // responses
+
+  @NotNull
+  public static final String PLUS_AND_SPACE = "+ ";
+
+  @NotNull
+  public static final String BROWSE_PREFIX = "Browse[";
+
+  @NotNull
+  public static final String BROWSE_SUFFIX = "]> ";
+
+  @NotNull
+  public static final String DEBUGGING_IN = "debugging in";
+
+  @NotNull
+  public static final String TRACING = "Tracing";
 
   // language
 
