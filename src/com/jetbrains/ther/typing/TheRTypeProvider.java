@@ -104,13 +104,6 @@ public class TheRTypeProvider {
       return elementType.getMemberType(memberExpression.getTag());
     }
     if (element instanceof TheRSliceExpression) {
-      TheRSliceExpression sliceExpression = ((TheRSliceExpression)element);
-      for (TheRExpression expression : sliceExpression.getExpressionList()) {
-        TheRType expressionType = getType(expression);
-        if (!TheRUnknownType.class.isInstance(expressionType) && !TheRNumericType.class.isInstance(expressionType)) {
-          return new TheRErrorType("Wrong arguments in slicing");
-        }
-      }
       return TheRNumericType.INSTANCE; // TODO: think!
     }
     if (element instanceof TheROperatorExpression) {

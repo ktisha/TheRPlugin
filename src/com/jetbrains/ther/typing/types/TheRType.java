@@ -112,7 +112,7 @@ public abstract class TheRType implements Cloneable {
     return getName();
   }
 
-  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType, boolean isSingleBracket) {
     // TODO : valueType is union
     if (arguments.isEmpty()) {
       return this;

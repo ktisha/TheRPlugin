@@ -4,7 +4,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.psi.api.*;
-import com.jetbrains.ther.typing.TheRTypeContext;
 import com.jetbrains.ther.typing.TheRTypeProvider;
 import com.jetbrains.ther.typing.types.TheRType;
 import com.jetbrains.ther.typing.types.TheRUnionType;
@@ -158,7 +157,7 @@ public class TheRStaticAnalyzerHelper {
       if (myReachTypes.containsKey(name)) {
         refType = myReachTypes.get(name);
       }
-      TheRTypeContext.putTypeInCache(ref, refType);
+      //TheRTypeContext.putTypeInCache(ref, refType);
       if (myResult == null && ref.equals(myWhat)) {
         myResult = refType;
       }
@@ -218,7 +217,8 @@ public class TheRStaticAnalyzerHelper {
           if (baseType == null) {
             baseType = TheRUnknownType.INSTANCE;
           }
-          TheRType resultType = baseType.afterSubscriptionType(arguments, assignedValueType);
+          boolean isSingleBracket = subscriptionExpression.getLbracket() != null;
+          TheRType resultType = baseType.afterSubscriptionType(arguments, assignedValueType, isSingleBracket);
           result = new ReachTypes(this);
           result.myReachTypes.put(name, resultType);
         }

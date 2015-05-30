@@ -167,11 +167,11 @@ public class TheRS4ClassType extends TheRType {
   }
 
   @Override
-  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType, boolean isSingle) {
     if (mySuperClass == null) {
       return TheRUnknownType.INSTANCE;
     }
-    return mySuperClass.afterSubscriptionType(arguments, valueType);
+    return mySuperClass.afterSubscriptionType(arguments, valueType, isSingle);
   }
 
   @Override

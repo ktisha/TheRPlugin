@@ -119,10 +119,10 @@ public class TheRUnionType extends TheRType {
   }
 
   @Override
-  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType, boolean isSingle) {
     HashSet<TheRType> afterTypes = new HashSet<TheRType>();
     for (TheRType type : myTypes) {
-      afterTypes.add(type.afterSubscriptionType(arguments, valueType));
+      afterTypes.add(type.afterSubscriptionType(arguments, valueType, isSingle));
     }
     return TheRUnionType.create(afterTypes);
   }

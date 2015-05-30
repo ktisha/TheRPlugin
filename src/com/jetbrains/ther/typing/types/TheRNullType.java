@@ -7,4 +7,9 @@ public class TheRNullType extends TheRAtomicType {
   public String getCanonicalName() {
     return "null";
   }
+
+  @Override
+  public TheRType getMemberType(String tag) {
+    return INSTANCE;
+  }
 }

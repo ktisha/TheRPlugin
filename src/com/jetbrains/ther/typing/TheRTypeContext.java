@@ -25,28 +25,41 @@ public class TheRTypeContext {
     myModificationCount = modificationCount;
   }
 
-  public static TheRType getTypeFromCache(TheRPsiElement element, boolean errorIsUnknown) {
-    TheRType type = getContext(element).getType(element);
+  public static Map<TheRPsiElement, TheRErrorType> getExpressionsWithError(Project project) {
+    return TheRTypeContext.getContext(project).getExpressionsWithError();
+  }
+
+  public Map<TheRPsiElement, TheRErrorType> getExpressionsWithError() {
+    Map<TheRPsiElement, TheRErrorType> errors = new HashMap<TheRPsiElement, TheRErrorType>();
+    cacheLock.lock();
+    for (Map.Entry<TheRPsiElement, TheRType> entry : cache.entrySet()) {
+      TheRPsiElement element = entry.getKey();
+      TheRType type = entry.getValue();
+      if (type instanceof TheRErrorType) {
+        errors.put(element, (TheRErrorType)type);
+      }
+    }
+    cacheLock.unlock();
+    return errors;
+  }
+
+  public static TheRType getTypeFromCache(TheRPsiElement element) {
+    TheRType type = getContext(element.getProject()).getType(element);
     if (type == null) {
       LOG.error("Type for " + element.getText() + " is null. WTF");
     }
-    if (errorIsUnknown && type instanceof TheRErrorType) {
+    if (type instanceof TheRErrorType) {
       return TheRUnknownType.INSTANCE;
     }
     return type;
   }
 
-  public static TheRType getTypeFromCache(TheRPsiElement element) {
-    return getTypeFromCache(element, true);
-  }
-
   public static void putTypeInCache(TheRPsiElement element, TheRType type) {
-    getContext(element).putType(element, type);
+    getContext(element.getProject()).putType(element, type);
   }
 
   @NotNull
-  private static TheRTypeContext getContext(TheRPsiElement element) {
-    final Project project = element.getProject();
+  private static TheRTypeContext getContext(Project project) {
     final PsiModificationTracker tracker = PsiModificationTracker.SERVICE.getInstance(project);
     TheRTypeContext context;
     synchronized (CONTEXT) {
@@ -66,7 +79,7 @@ public class TheRTypeContext {
     if (typeInCache == null) {
       cache.put(element, type);
     } else if (!TheREvaluatingNowType.class.isInstance(typeInCache) && !typeInCache.equals(type)) {
-      throw new RuntimeException("Wrong types for element");
+      throw new RuntimeException("Wrong types for element " + element.toString() + " : " + typeInCache + " and " + type.toString());
     }
     cacheLock.unlock();
   }

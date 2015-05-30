@@ -617,3 +617,6 @@ matrix <- function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NUL
 
 ## @optional fdef
 standardGeneric <- function (f, fdef)  .Primitive("standardGeneric")
+
+isTRUE <- function (x)
+identical(TRUE, x)

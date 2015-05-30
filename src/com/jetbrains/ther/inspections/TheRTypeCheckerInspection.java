@@ -11,12 +11,13 @@ import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.MatchingException;
 import com.jetbrains.ther.typing.TheRTypeChecker;
 import com.jetbrains.ther.typing.TheRTypeContext;
+import com.jetbrains.ther.typing.TheRTypeProvider;
 import com.jetbrains.ther.typing.types.TheRErrorType;
-import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 public class TheRTypeCheckerInspection extends TheRLocalInspection {
   @Nls
@@ -45,14 +46,7 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
       List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
       checkFunctionCall(callExpression, referenceToFunction, arguments);
       visitExpression(callExpression);
-    }
-
-    @Override
-    public void visitExpression(@NotNull TheRExpression o) {
-      TheRType type = TheRTypeContext.getTypeFromCache(o, false);
-      if (type instanceof TheRErrorType) {
-        registerProblem(myProblemHolder, o, ((TheRErrorType)type).getErrorMessage(), ProblemHighlightType.GENERIC_ERROR);
-      }
+      TheRTypeProvider.getType(callExpression);
     }
 
     @Override
@@ -64,6 +58,22 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
       PsiReference referenceToFunction = operator.getReference();
       List<TheRExpression> arguments = PsiTreeUtil.getChildrenOfTypeAsList(operatorExpression, TheRExpression.class);
       checkFunctionCall(operatorExpression, referenceToFunction, arguments);
+      TheRTypeProvider.getType(operatorExpression);
+    }
+
+    @Override
+    public void visitAtExpression(@NotNull TheRAtExpression o) {
+      TheRTypeProvider.getType(o);
+    }
+
+    @Override
+    public void visitMemberExpression(@NotNull TheRMemberExpression o) {
+      TheRTypeProvider.getType(o);
+    }
+
+    @Override
+    public void visitSubscriptionExpression(@NotNull TheRSubscriptionExpression o) {
+      TheRTypeProvider.getType(o);
     }
 
     private void checkFunctionCall(PsiElement callSite, PsiReference referenceToFunction, List<TheRExpression> arguments) {
@@ -89,5 +99,13 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
   @Override
   public boolean isEnabledByDefault() {
     return true;
+  }
+
+  @Override
+  public void inspectionFinished(@NotNull LocalInspectionToolSession session, @NotNull ProblemsHolder problemsHolder) {
+    Map<TheRPsiElement, TheRErrorType> errors = TheRTypeContext.getExpressionsWithError(problemsHolder.getProject());
+    for (Map.Entry<TheRPsiElement, TheRErrorType> error : errors.entrySet()) {
+      registerProblem(problemsHolder, error.getKey(), error.getValue().getErrorMessage(), ProblemHighlightType.GENERIC_ERROR);
+    }
   }
 }

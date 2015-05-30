@@ -11,14 +11,14 @@ public abstract class TheRAtomicType extends TheRType {
   }
 
   @Override
-  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType) {
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType, boolean isSingle) {
     if (arguments.isEmpty()) {
       return this;
     }
     if (valueType instanceof TheRAtomicType) {
       return TheRType.getOrder(this) > TheRType.getOrder(valueType) ? this : valueType;
     }
-    return super.afterSubscriptionType(arguments, valueType);
+    return super.afterSubscriptionType(arguments, valueType, isSingle);
   }
 
   @Override

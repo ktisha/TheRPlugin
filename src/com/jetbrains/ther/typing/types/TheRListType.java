@@ -193,14 +193,14 @@ public class TheRListType extends TheRType {
 
   // handles assignment to subscription expression
   @Override
-  public TheRType afterSubscriptionType(List<TheRExpression> indices, TheRType valueType) {
+  public TheRType afterSubscriptionType(List<TheRExpression> indices, TheRType valueType, boolean isSingleBracket) {
     if (indices.isEmpty()) {
       return this;
     }
     if (indices.size() > 1) {
       return TheRUnknownType.INSTANCE;
     }
-    if (valueType instanceof TheRListType) {
+    if (isSingleBracket && valueType instanceof TheRListType) {
       TheRListType list = (TheRListType)valueType;
       if (!list.myPrecise) {
         return TheRUnknownType.INSTANCE;
@@ -262,5 +262,13 @@ public class TheRListType extends TheRType {
       clone.addField(tag, valueType);
     }
     return clone;
+  }
+
+  public Collection<String> getFields() {
+    return myFields.keySet();
+  }
+
+  public boolean hasField(String field) {
+    return !myPrecise || myFields.containsKey(field);
   }
 }
