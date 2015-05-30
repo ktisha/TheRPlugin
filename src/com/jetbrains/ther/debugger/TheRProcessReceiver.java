@@ -70,11 +70,11 @@ public class TheRProcessReceiver {
   private TheRProcessResponse calculateResponse(@NotNull final StringBuilder response, final int pings) {
     removePings(response, pings);
 
-    final TheRProcessResponseType type = calculateResponseType(
-      response.substring(response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1)
-    );
+    final TheRProcessResponseType type = calculateResponseType(response);
 
-    return new TheRProcessResponse(getFromSecondToPenult(response), type);
+    response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR)); // remove last line
+
+    return new TheRProcessResponse(toStringFromSecondLine(response), type);
   }
 
   private void removePings(@NotNull final StringBuilder response, final int pings) {
@@ -86,17 +86,16 @@ public class TheRProcessReceiver {
   }
 
   @NotNull
-  private TheRProcessResponseType calculateResponseType(@NotNull final CharSequence response) {
+  private TheRProcessResponseType calculateResponseType(@NotNull final StringBuilder response) {
     // TODO exception
-    return TheRProcessResponseTypeCalculator.calculate(response);
+
+    return TheRProcessResponseTypeCalculator.calculate(response, response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
   }
 
   @NotNull
-  private String getFromSecondToPenult(@NotNull final StringBuilder response) {
-    response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR)); // remove last line
-
+  private String toStringFromSecondLine(@NotNull final StringBuilder response) {
     final int index = response.indexOf(TheRDebugConstants.LINE_SEPARATOR);
 
-    return (index == -1) ? "" : response.substring(index + 1); // remove first line
+    return (index == -1) ? "" : response.substring(index + 1);
   }
 }
