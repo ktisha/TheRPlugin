@@ -1,5 +1,6 @@
 package com.jetbrains.ther.packages;
 
+import com.google.common.collect.Lists;
 import com.intellij.execution.ExecutionException;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.CatchingConsumer;
@@ -39,14 +40,40 @@ public class TheRPackageManagementService extends PackageManagementService {
     return null;
   }
 
-  @Nullable
+  @NotNull
   public List<String> getAllRepositories() {
-    return null;
+    return TheRPackagesUtil.getEnabledRepositories(); //TODO Caching of this value
   }
 
-  @Override
-  public boolean canModifyRepository(String repositoryUrl) {
-    return false;
+  @NotNull
+  public List<TheRDefaultRepository> getDefaultRepositories() {
+    return Lists.newArrayList(TheRPackagesUtil.getDeafaultRepositories()); //TODO Caching of this value
+  }
+
+  public List<String> getMirrors() {
+    return Lists.newArrayList(TheRPackagesUtil.getCRANMirrors());
+  }
+
+  public int getCRANMirror() {
+    return TheRPackageService.getInstance().CRANMirror;
+  }
+
+  public void setCRANMirror(int index) {
+    TheRPackageService.getInstance().CRANMirror = index;
+  }
+
+  public void setRepositories(List<TheRRepository> repositories) {
+    List<String> userRepositories = Lists.newArrayList();
+    List<Integer> defaultRepositories = Lists.newArrayList();
+    for (TheRRepository repository : repositories) {
+      if (repository instanceof TheRDefaultRepository) {
+        defaultRepositories.add(((TheRDefaultRepository)repository).getIndex());
+      }
+      else {
+        userRepositories.add(repository.getUrl());
+      }
+    }
+    TheRPackagesUtil.setRepositories(defaultRepositories, userRepositories);
   }
 
   @Override
@@ -56,8 +83,7 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public List<RepoPackage> reloadAllPackages() throws IOException {
-    TheRPackagesUtil.getAvailablePackages();
-    return getAllPackages();
+    return TheRPackagesUtil.getAvailablePackages();
   }
 
   @Override
@@ -107,12 +133,9 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public void fetchPackageVersions(String s, CatchingConsumer<List<String>, Exception> consumer) {
-
   }
 
   @Override
   public void fetchPackageDetails(String s, CatchingConsumer<String, Exception> consumer) {
-
-
   }
 }

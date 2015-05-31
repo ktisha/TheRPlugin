@@ -10,25 +10,28 @@ import com.intellij.util.text.DateFormatUtil;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.RepoPackage;
 import com.jetbrains.ther.TheRHelpersLocator;
+import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author avesloguzova
  */
 public final class TheRPackagesUtil {
 
-  public static final String R_INSTALLED_PACKAGES = "r-packages-installed.r";
-  public static final String R_ALL_PACKAGES = "r-packages-all.r";
-  public static final String R_INSTALL_PACKAGE = "r-packages-install.r";
+  public static final String R_INSTALLED_PACKAGES = "r-packages/r-packages-installed.r";
+  public static final String R_ALL_PACKAGES = "r-packages/r-packages-all.r";
+  public static final String R_INSTALL_PACKAGE = "r-packages/r-packages-install.r";
   public static final String ARGUMENT_DELIMETER = " ";
-
+  public static final String R_PACKAGES_DEFAULT_REPOS = "r-packages/r-packages-default-repos.r";
+  private static final Pattern urlPattern = Pattern.compile("\".+\"");
   private static final Logger LOG = Logger.getInstance(TheRPackagesUtil.class.getName());
-
   private static final Set<String> basePackages = new HashSet<String>(Arrays.asList(
     new String[]{"base", "utils", "stats", "datasets", "graphics",
       "grDevices", "grid", "methods", "tools", "parallel", "compiler", "splines", "tcltk", "stats4"}));
@@ -88,32 +91,109 @@ public final class TheRPackagesUtil {
 
     List<RepoPackage> packages = new ArrayList<RepoPackage>();
     for (Map.Entry<String, String> entry : packageToVersionMap.entrySet()) {
-      packages.add(new RepoPackage(entry.getKey(), "", entry.getValue()));
+      String[] splitted = entry.getValue().split(ARGUMENT_DELIMETER);
+      packages.add(new RepoPackage(entry.getKey(), splitted[1], splitted[0]));
     }
     return packages;
   }
 
-  public static void getAvailablePackages() throws IOException {
-    final String stdout = getHelperSuccsessOutput(R_ALL_PACKAGES);
-    if (StringUtil.isEmptyOrSpaces(stdout)) {
-      return;
+  public static void setRepositories(List<Integer> defaultRepositories,
+                                     List<String> userRepositories) {
+    TheRPackageService service = TheRPackageService.getInstance();
+    service.defaultRepos.clear();
+    service.defaultRepos.addAll(defaultRepositories);
+    service.userRepos.clear();
+    service.userRepos.addAll(userRepositories);
+  }
+
+
+  @NotNull
+  public static List<TheRDefaultRepository> getDeafaultRepositories() {
+    try {
+      String output = getHelperSuccsessOutput(R_PACKAGES_DEFAULT_REPOS);
+      if (output != null) {
+        return toDefaultPackages((output));
+      }
+    }
+    catch (IOException e) {
+      LOG.error("Can't run R interpreter.");
+    }
+    return Lists.newArrayList();
+  }
+
+  private static List<TheRDefaultRepository> toDefaultPackages(String output) {
+    List<String> urls = getURLs(output);
+    List<TheRDefaultRepository> repos = Lists.newArrayList();
+    for (int i = 0; i < urls.size(); i++) {
+      repos.add(new TheRDefaultRepository(urls.get(i), i + 1));
+    }
+    return repos;
+  }
+
+  @NotNull
+  public static List<String> getEnabledRepositories() {
+    TheRPackageService service = TheRPackageService.getInstance();
+    List<TheRDefaultRepository> defaultRepo = getDeafaultRepositories();
+    List<Integer> enabledDefaultRepo = service.defaultRepos;
+    List<String> usersRepo = service.userRepos;
+    List<String> result = Lists.newArrayList();
+    result.addAll(usersRepo);
+    for (Integer i : enabledDefaultRepo) {
+      result.add(defaultRepo.get(i - 1).getUrl());
+    }
+    return result;
+  }
+
+
+  @NotNull
+  public static List<String> getCRANMirrors() {
+
+    ProcessOutput output = TheRUtils.getProcessOutput("getCRANmirrors()[,\"URL\"]");
+    if (output != null && output.getExitCode() == 0) {
+      return getURLs(output.getStdout());
+    }
+    return Lists.newArrayList();
+  }
+
+  @NotNull
+  private static List<String> getURLs(@NotNull String stdout) {
+    List<String> reposURL = Lists.newArrayList();
+    final Matcher matcher = urlPattern.matcher(stdout);
+    while (matcher.find()) {
+      reposURL.add(matcher.group().replace('\"', ' ').trim());
+    }
+    return reposURL;
+  }
+
+  public static List<RepoPackage> getAvailablePackages() throws IOException {
+    List<String> args = getHelperRepositoryArguments();
+    final TheRRunResult result = runHelperWithArgs(R_ALL_PACKAGES, args.toArray(new String[args.size()]));
+    if (result == null || result.getExitCode() != 0) {
+      return null;
     }
     Map<String, String> packages = getPackages();
     packages.clear();
-    final String[] splittedOutput = StringUtil.splitByLines(stdout);
+    List<RepoPackage> packageList = Lists.newArrayList();
+    final String[] splittedOutput = StringUtil.splitByLines(result.getStdOut());
     for (String line : splittedOutput) {
       final List<String> packageAttributes = StringUtil.split(line, ARGUMENT_DELIMETER);
-      if (packageAttributes.size() == 3) {
-        packages.put(packageAttributes.get(1).replace("\"", ""), packageAttributes.get(2).replace("\"", ""));
+      if (packageAttributes.size() >= 3) {
+        RepoPackage repoPackage = new RepoPackage(packageAttributes.get(1).replace("\"", ""), packageAttributes.get(3).replace("\"", ""),
+                                                  packageAttributes.get(2).replace("\"", ""));
+        packages.put(repoPackage.getName(), repoPackage.getLatestVersion() + ARGUMENT_DELIMETER + repoPackage.getRepoUrl());
+        packageList.add(repoPackage);
       }
     }
+    return packageList;
   }
 
   public static void installPackage(@NotNull RepoPackage repoPackage)
     throws ExecutionException {
-    TheRRunResult result = null;
+    TheRRunResult result;
+    List<String> args = getHelperRepositoryArguments();
+    args.add(0, repoPackage.getName());
     try {
-      result = runHelperWithArgs(R_INSTALL_PACKAGE, repoPackage.getName());
+      result = runHelperWithArgs(R_INSTALL_PACKAGE, args.toArray(new String[args.size()]));
     }
     catch (IOException e) {
       throw new ExecutionException("Some I/O errors occurs while installing");
@@ -134,9 +214,9 @@ public final class TheRPackagesUtil {
     if (StringUtil.isEmptyOrSpaces(path)) {
       throw new ExecutionException("Path to interpreter didn't set");
     }
-    StringBuilder commandBuilder = getCommand(path, repoPackage);
+    StringBuilder commandBuilder = getRemovePackageCommand(path, repoPackage);
     String command = commandBuilder.toString();
-    Process process = null;
+    Process process;
     try {
       process = Runtime.getRuntime().exec(command);
     }
@@ -150,7 +230,7 @@ public final class TheRPackagesUtil {
     }
   }
 
-  private static StringBuilder getCommand(String path, List<InstalledPackage> repoPackage) {
+  private static StringBuilder getRemovePackageCommand(String path, List<InstalledPackage> repoPackage) {
     StringBuilder commandBuilder = new StringBuilder();
     commandBuilder.append(path).append(" CMD REMOVE");
     for (InstalledPackage aRepoPackage : repoPackage) {
@@ -165,7 +245,7 @@ public final class TheRPackagesUtil {
     if (StringUtil.isEmptyOrSpaces(path)) {
       return null;
     }
-    String command = getCommand(helper, path, args);
+    String command = getHelperCommand(helper, path, args);
     Process process;
     process = Runtime.getRuntime().exec(command);
     final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
@@ -178,7 +258,7 @@ public final class TheRPackagesUtil {
   }
 
   @NotNull
-  private static String getCommand(@NotNull String helper, String path, String[] args) {
+  private static String getHelperCommand(@NotNull String helper, String path, String[] args) {
     final String helperPath = TheRHelpersLocator.getHelperPath(helper);
     StringBuilder execStr = new StringBuilder();
     execStr.append(path).append(" --slave -f ").append(helperPath).append(" --args");
@@ -188,9 +268,24 @@ public final class TheRPackagesUtil {
     return execStr.toString();
   }
 
-  public static void updatePackage(InstalledPackage installedPackage) {
-
+  public static List<String> getHelperRepositoryArguments() {
+    TheRPackageService service = TheRPackageService.getInstance();
+    List<String> args = Lists.newArrayList();
+    args.add(String.valueOf(service.CRANMirror + 1));
+    if (service.defaultRepos.size() > 0) {
+      args.add(String.valueOf(service.defaultRepos.size()));
+      for (Integer repository : service.defaultRepos) {
+        args.add(String.valueOf(repository));
+      }
+    }
+    else {
+      args.add(String.valueOf(1));
+      args.add(String.valueOf(1));
+    }
+    args.addAll(service.userRepos);
+    return args;
   }
+
 
   public static class TheRRunResult {
     private final String myCommand;

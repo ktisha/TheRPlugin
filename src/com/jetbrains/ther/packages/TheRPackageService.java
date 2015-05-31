@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by sasha on 4/27/15.
+ * @author avesloguzova
  */
 @State(name = "TheRPackageService",
   storages = {
@@ -19,8 +19,10 @@ import java.util.Map;
 )
 public class TheRPackageService implements PersistentStateComponent<TheRPackageService> {
 
-  public List<String> allRepositories = Lists.newArrayList();
   public Map<String, String> allPackages = ContainerUtil.newConcurrentMap();
+  public int CRANMirror = 1;
+  public List<Integer> defaultRepos = Lists.newArrayList();
+  public List<String> userRepos = Lists.newArrayList();
 
   public static TheRPackageService getInstance() {
     return ServiceManager.getService(TheRPackageService.class);
@@ -37,13 +39,4 @@ public class TheRPackageService implements PersistentStateComponent<TheRPackageS
     XmlSerializerUtil.copyBean(state, this);
   }
 
-  public void addRepository(String url) {
-    allRepositories.add(url);
-  }
-
-  public void removeRepository(String url) {
-    if (allRepositories.contains(url)) {
-      allRepositories.remove(url);
-    }
-  }
 }

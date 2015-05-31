@@ -3,9 +3,7 @@ package com.jetbrains.ther.packages;
 import com.intellij.execution.ExecutionException;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by av on 5/22/15.
- */
+
 public class TheRExecutionException extends ExecutionException {
 
   @NotNull private final String myCommand;

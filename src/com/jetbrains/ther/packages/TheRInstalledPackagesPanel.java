@@ -2,11 +2,11 @@ package com.jetbrains.ther.packages;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.webcore.packaging.InstalledPackage;
-import com.intellij.webcore.packaging.InstalledPackagesPanel;
-import com.intellij.webcore.packaging.PackagesNotificationPanel;
+import com.intellij.webcore.packaging.*;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.packages.ui.TheRManagePackagesDialog;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author avesloguzova
@@ -24,6 +24,22 @@ public class TheRInstalledPackagesPanel extends InstalledPackagesPanel {
   @Override
   protected boolean canUninstallPackage(InstalledPackage aPackage) {
     return hasInterpreterPath() && !TheRPackagesUtil.isPackageBase(aPackage);
+  }
+
+  @Override
+  @NotNull
+  protected ManagePackagesDialog createManagePackagesDialog() {
+    return new TheRManagePackagesDialog(this.myProject, this.myPackageManagementService, new PackageManagementService.Listener() {
+      public void operationStarted(String packageName) {
+        myPackagesTable.setPaintBusy(true);
+      }
+
+      public void operationFinished(String packageName, @Nullable PackageManagementService.ErrorDescription errorDescription) {
+        myNotificationArea.showResult(packageName, errorDescription);
+        myPackagesTable.clearSelection();
+        doUpdatePackages(myPackageManagementService);
+      }
+    });
   }
 
   @Override
