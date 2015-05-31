@@ -137,5 +137,6 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public void fetchPackageDetails(String s, CatchingConsumer<String, Exception> consumer) {
+    TheRPackagesUtil.fetchPackageDetails(s, consumer);
   }
 }

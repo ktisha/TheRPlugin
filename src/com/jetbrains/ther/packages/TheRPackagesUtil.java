@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.CatchingConsumer;
 import com.intellij.util.text.DateFormatUtil;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.RepoPackage;
@@ -30,6 +32,7 @@ public final class TheRPackagesUtil {
   public static final String R_INSTALL_PACKAGE = "r-packages/r-packages-install.r";
   public static final String ARGUMENT_DELIMETER = " ";
   public static final String R_PACKAGES_DEFAULT_REPOS = "r-packages/r-packages-default-repos.r";
+  public static final String R_PACKAGES_DETAILS = "r-packages/r-packages-details.r";
   private static final Pattern urlPattern = Pattern.compile("\".+\"");
   private static final Logger LOG = Logger.getInstance(TheRPackagesUtil.class.getName());
   private static final Set<String> basePackages = new HashSet<String>(Arrays.asList(
@@ -43,6 +46,7 @@ public final class TheRPackagesUtil {
   public static String getHelperSuccsessOutput(String helper) throws IOException {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (StringUtil.isEmptyOrSpaces(path)) {
+      LOG.info("Path to interpreter didn't set");
       return null;
     }
     final String helperPath = TheRHelpersLocator.getHelperPath(helper);
@@ -165,6 +169,7 @@ public final class TheRPackagesUtil {
     return reposURL;
   }
 
+  @Nullable
   public static List<RepoPackage> getAvailablePackages() throws IOException {
     List<String> args = getHelperRepositoryArguments();
     final TheRRunResult result = runHelperWithArgs(R_ALL_PACKAGES, args.toArray(new String[args.size()]));
@@ -199,7 +204,7 @@ public final class TheRPackagesUtil {
       throw new ExecutionException("Some I/O errors occurs while installing");
     }
     if (result == null) {
-      throw new ExecutionException("Path to interpreter didn't set");//TODO Fix
+      throw new ExecutionException("Path to interpreter didn't set");
     }
     final String stderr = result.getStdErr();
     if (!stderr.contains(String.format("DONE (%s)", repoPackage.getName()))) {
@@ -239,10 +244,57 @@ public final class TheRPackagesUtil {
     return commandBuilder;
   }
 
+  public static void fetchPackageDetails(@NotNull final String packageName, final CatchingConsumer<String, Exception> consumer) {
+    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          String details = loadPackageDetails(packageName);
+          consumer.consume(formatDetails(details));
+        }
+        catch (IOException e) {
+          consumer.consume(e);
+        }
+        catch (ExecutionException e) {
+          consumer.consume(e);
+        }
+      }
+    });
+  }
+
+  private static String formatDetails(String details) {
+    String[] splittedString = details.split("\n");
+    StringBuilder builder = new StringBuilder();
+    for (String string : splittedString) {
+      builder.append(string);
+      builder.append("<br>");
+    }
+    return builder.toString();
+  }
+
+  private static String loadPackageDetails(@NotNull String packageName) throws IOException, ExecutionException {
+    TheRRunResult result;
+    List<String> args = getHelperRepositoryArguments();
+    args.add(0, packageName);
+
+    result = runHelperWithArgs(R_PACKAGES_DETAILS, args.toArray(new String[args.size()]));
+    if (result != null && result.getExitCode() == 0) {
+      return result.getStdOut();
+    }
+    else {
+      if (result == null) {
+        throw new ExecutionException("Can't fetch package details.");
+      }
+      throw new TheRExecutionException("Can't fetch package details.", result.getCommand(), result.getStdOut(), result.getStdErr(),
+                                       result.getExitCode());
+    }
+  }
+
   @Nullable
-  public static TheRRunResult runHelperWithArgs(@NotNull String helper, String... args) throws IOException {
+  private static TheRRunResult runHelperWithArgs(@NotNull String helper, String... args) throws IOException {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (StringUtil.isEmptyOrSpaces(path)) {
+      LOG.info("Path to interpreter didn't set");
       return null;
     }
     String command = getHelperCommand(helper, path, args);
@@ -268,7 +320,8 @@ public final class TheRPackagesUtil {
     return execStr.toString();
   }
 
-  public static List<String> getHelperRepositoryArguments() {
+  @NotNull
+  private static List<String> getHelperRepositoryArguments() {
     TheRPackageService service = TheRPackageService.getInstance();
     List<String> args = Lists.newArrayList();
     args.add(String.valueOf(service.CRANMirror + 1));
@@ -300,15 +353,17 @@ public final class TheRPackagesUtil {
       this.myStdErr = output.getStderr();
     }
 
-
+    @NotNull
     public String getCommand() {
       return myCommand;
     }
 
+    @NotNull
     public String getStdOut() {
       return myStdOut;
     }
 
+    @NotNull
     public String getStdErr() {
       return myStdErr;
     }
