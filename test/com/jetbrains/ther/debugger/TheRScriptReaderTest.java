@@ -78,6 +78,27 @@ public class TheRScriptReaderTest {
     reader.close();
   }
 
+  @Test
+  public void read03() throws IOException {
+    final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "03.r").getAbsolutePath();
+    final TheRScriptReader reader = new TheRScriptReader(scriptPath);
+
+    checkCommand(String.valueOf(TheRDebugConstants.PING_COMMAND), -1, reader.getCurrentCommand());
+    checkCommand("x <- c(1)", 3, reader.getNextCommand());
+
+    reader.advance();
+
+    checkCommand("x <- c(1)", 3, reader.getCurrentCommand());
+    checkCommand(null, -1, reader.getNextCommand());
+
+    reader.advance();
+
+    checkCommand(null, -1, reader.getCurrentCommand());
+    checkCommand(null, -1, reader.getNextCommand());
+
+    reader.close();
+  }
+
   private void checkCommand(@Nullable final String expectedCommand,
                             final int expectedPosition,
                             @NotNull final TheRScriptCommand actualCommand) {
