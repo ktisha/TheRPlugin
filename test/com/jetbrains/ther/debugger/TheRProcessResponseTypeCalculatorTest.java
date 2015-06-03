@@ -1,33 +1,50 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.TheRProcessResponseTypeCalculator.calculate;
 import static com.jetbrains.ther.debugger.TheRProcessResponseTypeCalculator.isComplete;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static org.junit.Assert.*;
 
 public class TheRProcessResponseTypeCalculatorTest {
 
+  @NotNull
+  private static final String INTELLIJ_THER_X_EXIT = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_EXIT_FUNCTION_SUFFIX;
+
+  @NotNull
+  private static final String INTELLIJ_THER_X_ENTER = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_ENTER_FUNCTION_SUFFIX;
+
   @Test
   public void completePlus() {
-    assertTrue(isComplete("x <- function() {\n+ "));
+    assertTrue(isComplete("x <- function() {\n" + PLUS_AND_SPACE));
   }
 
   @Test
   public void completeBrowser() {
-    assertTrue(isComplete("ls()\n[1] \"x\"\nBrowse[1]> "));
+    assertTrue(isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
+  }
+
+  @Test
+  public void completeIncomplete() {
+    assertFalse(isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX));
   }
 
   @Test
   public void calculatePlus() {
-    assertEquals(TheRProcessResponseType.PLUS, calculate("+ "));
+    assertEquals(TheRProcessResponseType.PLUS, calculate(PLUS_AND_SPACE));
   }
 
   @Test
   public void calculateJustBrowse() {
-    assertEquals(TheRProcessResponseType.JUST_BROWSE, calculate("Browse[1]> "));
+    assertEquals(TheRProcessResponseType.JUST_BROWSE, calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
+  }
+
+  @Test
+  public void calculateIncomplete() {
+    assertNull(calculate("ls()\n[1] \"x\"\n" + BROWSE_PREFIX));
   }
 
   @Test
@@ -35,17 +52,17 @@ public class TheRProcessResponseTypeCalculatorTest {
     assertEquals(
       TheRProcessResponseType.DEBUGGING,
       calculate(
-        "debugging in: x()\n" +
+        DEBUGGING_IN + ": x()\n" +
         "debug: {\n" +
-        "    on.exit(.doTrace(intellij_ther_x_exit(), \"on exit\"))\n" +
+        "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
         "    {\n" +
-        "        .doTrace(intellij_ther_x_enter(), \"on entry\")\n" +
+        "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
         "        {\n" +
         "            print(\"x\")\n" +
         "        }\n" +
         "    }\n" +
         "}\n" +
-        "Browse[3]> "
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
       )
     );
   }
@@ -55,12 +72,12 @@ public class TheRProcessResponseTypeCalculatorTest {
     assertEquals(
       TheRProcessResponseType.START_TRACE,
       calculate(
-        "Tracing x() on entry \n" +
+        TRACING + " x() on entry \n" +
         "[1] \"enter x\"\n" +
         "debug: {\n" +
         "    print(\"x\")\n" +
         "}\n" +
-        "Browse[3]> "
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
       )
     );
   }
@@ -70,20 +87,20 @@ public class TheRProcessResponseTypeCalculatorTest {
     assertEquals(
       TheRProcessResponseType.CONTINUE_TRACE,
       calculate(
-        "Tracing FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
+        TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
         "[1] \"exit x\"\n" +
         "exiting from: FUN(c(-1, 0, 1)[[1L]], ...)\n" +
-        "debugging in: FUN(c(-1, 0, 1)[[2L]], ...)\n" +
+        DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
         "debug: {\n" +
-        "    on.exit(.doTrace(intellij_ther_x_exit(), \"on exit\"))\n" +
+        "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
         "    {\n" +
-        "        .doTrace(intellij_ther_x_enter(), \"on entry\")\n" +
+        "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
         "        {\n" +
         "            print(\"x\")\n" +
         "        }\n" +
         "    }\n" +
         "}\n" +
-        "Browse[3]> "
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
       )
     );
   }
@@ -93,10 +110,10 @@ public class TheRProcessResponseTypeCalculatorTest {
     assertEquals(
       TheRProcessResponseType.END_TRACE,
       calculate(
-        "Tracing FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+        TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
         "[1] \"exit x\"\n" +
         "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-        "Browse[1]> "
+        BROWSE_PREFIX + "1" + BROWSE_SUFFIX
       )
     );
   }
@@ -107,8 +124,13 @@ public class TheRProcessResponseTypeCalculatorTest {
       TheRProcessResponseType.RESPONSE_AND_BROWSE,
       calculate(
         "[1] \"x\"\n" +
-        "Browse[1]> "
+        BROWSE_PREFIX + "1" + BROWSE_SUFFIX
       )
     );
+  }
+
+  @Test
+  public void calculateOffset() {
+    assertNull(calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX, BROWSE_PREFIX.length()));
   }
 }

@@ -1,23 +1,25 @@
 package com.jetbrains.ther.debugger;
 
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+
 public final class TheRProcessResponseTypeCalculator {
 
   @NotNull
-  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TheRDebugConstants.TRACING + " .* on entry");
+  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry");
 
   @NotNull
   private static final Pattern CONTINUE_TRACE_PATTERN =
-    Pattern.compile("^" + TheRDebugConstants.TRACING + " .* on exit.*" + TheRDebugConstants.DEBUGGING_IN, Pattern.DOTALL);
+    Pattern.compile("^" + TRACING + " .* on exit.*" + DEBUGGING_IN, Pattern.DOTALL);
 
   @NotNull
-  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TheRDebugConstants.TRACING + " .* on exit");
+  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit");
 
   public static boolean isComplete(@NotNull final CharSequence response) {
     return endsPlusAndSpace(response) || endsBrowseAndSpace(response);
@@ -31,11 +33,11 @@ public final class TheRProcessResponseTypeCalculator {
   @Nullable
   public static TheRProcessResponseType calculate(@NotNull final CharSequence response) {
     if (justPlusAndSpace(response)) {
-      return TheRProcessResponseType.PLUS;
+      return PLUS;
     }
 
     if (justBrowseAndSpace(response)) {
-      return TheRProcessResponseType.JUST_BROWSE;
+      return JUST_BROWSE;
     }
 
     if (!endsBrowseAndSpace(response)) {
@@ -43,48 +45,48 @@ public final class TheRProcessResponseTypeCalculator {
     }
 
     if (debugging(response)) {
-      return TheRProcessResponseType.DEBUGGING;
+      return DEBUGGING;
     }
 
     if (START_TRACE_PATTERN.matcher(response).find()) {
-      return TheRProcessResponseType.START_TRACE;
+      return START_TRACE;
     }
 
     if (CONTINUE_TRACE_PATTERN.matcher(response).find()) {
-      return TheRProcessResponseType.CONTINUE_TRACE;
+      return CONTINUE_TRACE;
     }
 
     if (END_TRACE_PATTERN.matcher(response).find()) {
-      return TheRProcessResponseType.END_TRACE;
+      return END_TRACE;
     }
 
-    return TheRProcessResponseType.RESPONSE_AND_BROWSE;
+    return RESPONSE_AND_BROWSE;
   }
 
   private static boolean endsPlusAndSpace(@NotNull final CharSequence sequence) {
     final int length = sequence.length();
 
-    return isSubstring(TheRDebugConstants.PLUS_AND_SPACE, sequence, length - TheRDebugConstants.PLUS_AND_SPACE.length()) &&
+    return isSubstring(PLUS_AND_SPACE, sequence, length - PLUS_AND_SPACE.length()) &&
            isSubstring(
-             TheRDebugConstants.LINE_SEPARATOR,
+             LINE_SEPARATOR,
              sequence,
-             length - TheRDebugConstants.PLUS_AND_SPACE.length() - TheRDebugConstants.LINE_SEPARATOR.length()
+             length - PLUS_AND_SPACE.length() - LINE_SEPARATOR.length()
            );
   }
 
   private static boolean endsBrowseAndSpace(@NotNull final CharSequence sequence) {
     final int length = sequence.length();
 
-    if (isSubstring(TheRDebugConstants.BROWSE_SUFFIX, sequence, length - TheRDebugConstants.BROWSE_SUFFIX.length())) {
-      final int index = readDigitsBackward(sequence, length - TheRDebugConstants.BROWSE_SUFFIX.length() - 1);
+    if (isSubstring(BROWSE_SUFFIX, sequence, length - BROWSE_SUFFIX.length())) {
+      final int index = readDigitsBackward(sequence, length - BROWSE_SUFFIX.length() - 1);
 
       return index != -1 &&
-             index != length - TheRDebugConstants.BROWSE_SUFFIX.length() - 1 &&
-             isSubstring(TheRDebugConstants.BROWSE_PREFIX, sequence, index - TheRDebugConstants.BROWSE_PREFIX.length() + 1) &&
+             index != length - BROWSE_SUFFIX.length() - 1 &&
+             isSubstring(BROWSE_PREFIX, sequence, index - BROWSE_PREFIX.length() + 1) &&
              isSubstring(
-               TheRDebugConstants.LINE_SEPARATOR,
+               LINE_SEPARATOR,
                sequence,
-               index - TheRDebugConstants.BROWSE_PREFIX.length() + 1 - TheRDebugConstants.LINE_SEPARATOR.length()
+               index - BROWSE_PREFIX.length() + 1 - LINE_SEPARATOR.length()
              );
     }
     else {
@@ -95,19 +97,19 @@ public final class TheRProcessResponseTypeCalculator {
   private static boolean justPlusAndSpace(@NotNull final CharSequence sequence) {
     // don't use "equals" here because it is not overridden in OffsetSequence
 
-    return sequence.length() == TheRDebugConstants.PLUS_AND_SPACE.length() && isSubstring(TheRDebugConstants.PLUS_AND_SPACE, sequence, 0);
+    return sequence.length() == PLUS_AND_SPACE.length() && isSubstring(PLUS_AND_SPACE, sequence, 0);
   }
 
   private static boolean justBrowseAndSpace(@NotNull final CharSequence sequence) {
     final int length = sequence.length();
 
-    return isSubstring(TheRDebugConstants.BROWSE_PREFIX, sequence, 0) &&
-           isSubstring(TheRDebugConstants.BROWSE_SUFFIX, sequence, length - TheRDebugConstants.BROWSE_SUFFIX.length()) &&
-           isDigits(sequence, TheRDebugConstants.BROWSE_PREFIX.length(), length - TheRDebugConstants.BROWSE_SUFFIX.length() - 1);
+    return isSubstring(BROWSE_PREFIX, sequence, 0) &&
+           isSubstring(BROWSE_SUFFIX, sequence, length - BROWSE_SUFFIX.length()) &&
+           isDigits(sequence, BROWSE_PREFIX.length(), length - BROWSE_SUFFIX.length() - 1);
   }
 
   private static boolean debugging(@NotNull final CharSequence sequence) {
-    return isSubstring(TheRDebugConstants.DEBUGGING_IN, sequence, 0);
+    return isSubstring(DEBUGGING_IN, sequence, 0);
   }
 
   private static boolean isSubstring(@NotNull final CharSequence sequence,
