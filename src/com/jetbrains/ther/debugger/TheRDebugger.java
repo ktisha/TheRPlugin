@@ -126,7 +126,7 @@ public class TheRDebugger {
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
-    if (response.getType() == TheRProcessResponseType.DEBUGGING || response.getType() == TheRProcessResponseType.CONTINUE_TRACE) {
+    if (response.getType() == TheRProcessResponseType.DEBUGGING_IN || response.getType() == TheRProcessResponseType.CONTINUE_TRACE) {
       // TODO check type
       myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
       // TODO check type
@@ -155,7 +155,7 @@ public class TheRDebugger {
 
       myCurrentLocation = new TheRLocation(function, line - 1);
 
-      if (response.getType() == TheRProcessResponseType.DEBUGGING) {
+      if (response.getType() == TheRProcessResponseType.DEBUGGING_IN) {
         myStackHandler.addFrame();
       }
     }
@@ -169,16 +169,15 @@ public class TheRDebugger {
     }
 
     if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
-      if (myStackHandler.isMain()) {
-        myOutput.setNormalOutput(response.getText());
-      }
-      else {
-        final int lineStart = "debug at #".length();
-        final int lineEnd = response.getText().indexOf(':', lineStart);
-        final int line = Integer.parseInt(response.getText().substring(lineStart, lineEnd));
+      myOutput.setNormalOutput(response.getText());
+    }
 
-        myCurrentLocation = new TheRLocation(myStackHandler.getCurrentLocation().getFunction(), line - 1);
-      }
+    if (response.getType() == TheRProcessResponseType.DEBUG_AT) {
+      final int lineStart = "debug at #".length();
+      final int lineEnd = response.getText().indexOf(':', lineStart);
+      final int line = Integer.parseInt(response.getText().substring(lineStart, lineEnd));
+
+      myCurrentLocation = new TheRLocation(myStackHandler.getCurrentLocation().getFunction(), line - 1);
     }
   }
 

@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger;
 
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -48,9 +49,9 @@ public class TheRProcessResponseTypeCalculatorTest {
   }
 
   @Test
-  public void calculateDebugging() {
+  public void calculateDebuggingIn() {
     assertEquals(
-      TheRProcessResponseType.DEBUGGING,
+      TheRProcessResponseType.DEBUGGING_IN,
       calculate(
         DEBUGGING_IN + ": x()\n" +
         "debug: {\n" +
@@ -62,6 +63,17 @@ public class TheRProcessResponseTypeCalculatorTest {
         "        }\n" +
         "    }\n" +
         "}\n" +
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
+      )
+    );
+  }
+
+  @Test
+  public void calculateDebugAt() {
+    assertEquals(
+      TheRProcessResponseType.DEBUG_AT,
+      calculate(
+        TheRDebugConstants.DEBUG_AT + "1: x <- c(1)\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
       )
     );

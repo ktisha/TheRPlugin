@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger;
 
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ public final class TheRProcessResponseTypeCalculator {
 
   @NotNull
   private static final Pattern CONTINUE_TRACE_PATTERN =
-    Pattern.compile("^" + TRACING + " .* on exit.*" + DEBUGGING_IN, Pattern.DOTALL);
+    Pattern.compile("^" + TRACING + " .* on exit.*" + TheRDebugConstants.DEBUGGING_IN, Pattern.DOTALL);
 
   @NotNull
   private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit");
@@ -45,7 +46,11 @@ public final class TheRProcessResponseTypeCalculator {
     }
 
     if (debugging(response)) {
-      return DEBUGGING;
+      return TheRProcessResponseType.DEBUGGING_IN;
+    }
+
+    if (debugAt(response)) {
+      return TheRProcessResponseType.DEBUG_AT;
     }
 
     if (START_TRACE_PATTERN.matcher(response).find()) {
@@ -109,7 +114,11 @@ public final class TheRProcessResponseTypeCalculator {
   }
 
   private static boolean debugging(@NotNull final CharSequence sequence) {
-    return isSubstring(DEBUGGING_IN, sequence, 0);
+    return isSubstring(TheRDebugConstants.DEBUGGING_IN, sequence, 0);
+  }
+
+  private static boolean debugAt(@NotNull final CharSequence sequence) {
+    return isSubstring(TheRDebugConstants.DEBUG_AT, sequence, 0);
   }
 
   private static boolean isSubstring(@NotNull final CharSequence sequence,
