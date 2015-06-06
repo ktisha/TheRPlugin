@@ -25,7 +25,7 @@ public class TheRProcess {
     myProcess = builder.start();
 
     mySender = new TheRProcessSender(myProcess.getOutputStream());
-    myReceiver = new TheRProcessReceiver(myProcess.getInputStream(), mySender);
+    myReceiver = new TheRProcessReceiver(myProcess.getInputStream());
 
     initInterpreter();
   }
