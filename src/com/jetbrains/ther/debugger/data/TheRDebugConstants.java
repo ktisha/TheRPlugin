@@ -39,7 +39,8 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String KEEP_SOURCE_COMMAND = "options(keep.source=TRUE)";
 
-  public static final char PING_COMMAND = '#';
+  @NotNull
+  public static final String NOP_COMMAND = "#";
 
   @NotNull
   public static final String LS_COMMAND = "ls()";

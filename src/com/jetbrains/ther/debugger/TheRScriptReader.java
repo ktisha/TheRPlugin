@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRScriptCommand;
+import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,34 +16,34 @@ public class TheRScriptReader {
   private final LineNumberReader myReader;
 
   @NotNull
-  private TheRScriptCommand myCurrentCommand;
+  private TheRScriptLine myCurrentLine;
 
   @NotNull
-  private TheRScriptCommand myNextCommand;
+  private TheRScriptLine myNextLine;
 
   public TheRScriptReader(@NotNull final String scriptPath) throws IOException {
     myReader = new LineNumberReader(new FileReader(scriptPath));
 
-    myCurrentCommand = new TheRScriptCommand(String.valueOf(TheRDebugConstants.PING_COMMAND), -1);
-    myNextCommand = readNextCommand();
+    myCurrentLine = new TheRScriptLine(TheRDebugConstants.NOP_COMMAND, -1);
+    myNextLine = readNextLine();
   }
 
   public void advance() throws IOException {
-    myCurrentCommand = myNextCommand;
+    myCurrentLine = myNextLine;
 
-    if (myCurrentCommand.getCommand() != null) {
-      myNextCommand = readNextCommand();
+    if (myCurrentLine.getText() != null) {
+      myNextLine = readNextLine();
     }
   }
 
   @NotNull
-  public TheRScriptCommand getCurrentCommand() {
-    return myCurrentCommand;
+  public TheRScriptLine getCurrentLine() {
+    return myCurrentLine;
   }
 
   @NotNull
-  public TheRScriptCommand getNextCommand() {
-    return myNextCommand;
+  public TheRScriptLine getNextLine() {
+    return myNextLine;
   }
 
   public void close() throws IOException {
@@ -51,17 +51,14 @@ public class TheRScriptReader {
   }
 
   @NotNull
-  private TheRScriptCommand readNextCommand() throws IOException {
-    String result;
+  private TheRScriptLine readNextLine() throws IOException {
+    final String line = myReader.readLine();
 
-    do {
-      result = myReader.readLine();
-    }
-    while (isCommentOrSpaces(result));
+    final int position = (line == null) ? -1 : myReader.getLineNumber() - 1;
 
-    final int position = (result == null) ? -1 : myReader.getLineNumber() - 1;
+    final String result = isCommentOrSpaces(line) ? TheRDebugConstants.NOP_COMMAND : line;
 
-    return new TheRScriptCommand(result, position);
+    return new TheRScriptLine(result, position);
   }
 
   private boolean isCommentOrSpaces(@Nullable final String line) {

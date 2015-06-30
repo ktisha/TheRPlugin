@@ -100,15 +100,15 @@ public class TheRDebugger {
     boolean accepted = false;
 
     while (!accepted) {
-      final TheRScriptCommand command = myScriptReader.getCurrentCommand();
+      final TheRScriptLine command = myScriptReader.getCurrentLine();
 
-      if (command.getCommand() == null) {
+      if (command.getText() == null) {
         return false;
       }
 
-      final TheRProcessResponse response = myProcess.execute(command.getCommand());
+      final TheRProcessResponse response = myProcess.execute(command.getText());
 
-      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextCommand().getPosition());
+      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextLine().getNumber());
 
       handleResponse(response);
 
@@ -165,7 +165,7 @@ public class TheRDebugger {
 
       // myCurrentLocation = myStackHandler.getCurrentLocation();
       myCurrentLocation =
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getCurrentCommand().getPosition()); // TODO update
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getCurrentLine().getNumber()); // TODO update
     }
 
     if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
