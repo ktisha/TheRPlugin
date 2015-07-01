@@ -20,9 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TheRXDebugProcess extends XDebugProcess {
 
@@ -36,7 +34,10 @@ public class TheRXDebugProcess extends XDebugProcess {
   private final TheRLocationResolver myLocationResolver;
 
   @NotNull
-  private final Map<Integer, XLineBreakpoint<XBreakpointProperties>> myBreakpoints; // TODO use XSourcePosition as a key
+  private final Map<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
+
+  @NotNull
+  private final Set<XSourcePositionWrapper> myTempBreakpoints;
 
   @NotNull
   private final ConsoleView myConsole;
@@ -50,7 +51,8 @@ public class TheRXDebugProcess extends XDebugProcess {
     myDebugger = debugger;
     myLocationResolver = locationResolver;
 
-    myBreakpoints = new HashMap<Integer, XLineBreakpoint<XBreakpointProperties>>();
+    myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
+    myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
 
     myConsole = (ConsoleView)super.createConsole();
   }
@@ -125,7 +127,7 @@ public class TheRXDebugProcess extends XDebugProcess {
 
         handleInterpreterOutput();
       }
-      while ((!myBreakpoints.containsKey(getCurrentDebuggerLocation())));
+      while (!isBreakpoint());
 
       updateDebugInformation();
     }
@@ -139,7 +141,9 @@ public class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void runToPosition(@NotNull final XSourcePosition position) {
-    // TODO impl
+    myTempBreakpoints.add(new XSourcePositionWrapper(position));
+
+    resume();
   }
 
   @Override
@@ -148,11 +152,16 @@ public class TheRXDebugProcess extends XDebugProcess {
   }
 
   public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpoints.put(breakpoint.getLine(), breakpoint);
+    myBreakpoints.put(
+      new XSourcePositionWrapper(breakpoint.getSourcePosition()),
+      breakpoint
+    );
   }
 
   public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpoints.remove(breakpoint.getLine());
+    myBreakpoints.remove(
+      new XSourcePositionWrapper(breakpoint.getSourcePosition())
+    );
   }
 
   private void handleInterpreterOutput() {
@@ -163,8 +172,10 @@ public class TheRXDebugProcess extends XDebugProcess {
   }
 
   private void updateDebugInformation() {
+    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
+    final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(wrapper);
+
     final XDebugSession session = getSession();
-    final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(getCurrentDebuggerLocation());
     final TheRXSuspendContext suspendContext = new TheRXSuspendContext(myDebugger.getStack(), myLocationResolver);
 
     if (breakpoint != null) {
@@ -175,19 +186,54 @@ public class TheRXDebugProcess extends XDebugProcess {
     }
     else {
       session.positionReached(suspendContext);
+
+      myTempBreakpoints.remove(wrapper);
     }
   }
 
-  private int getCurrentDebuggerLocation() {
-    final List<TheRStackFrame> stack = myDebugger.getStack();
+  private boolean isBreakpoint() {
+    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
 
-    return myLocationResolver.resolve(stack.get(stack.size() - 1).getLocation()).getLine();
+    return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
   }
 
   private void printToConsole(@Nullable final String text, @NotNull final ConsoleViewContentType type) {
     if (text != null) {
       myConsole.print(text, type);
       myConsole.print(LineSeparator.getSystemLineSeparator().getSeparatorString(), type);
+    }
+  }
+
+  @NotNull
+  private XSourcePosition getCurrentDebuggerLocation() {
+    final List<TheRStackFrame> stack = myDebugger.getStack();
+
+    return myLocationResolver.resolve(stack.get(stack.size() - 1).getLocation());
+  }
+
+  private static class XSourcePositionWrapper {
+
+    @NotNull
+    private final XSourcePosition myPosition;
+
+    private XSourcePositionWrapper(@NotNull final XSourcePosition position) {
+      myPosition = position;
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object o) {
+      if (o == this) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      final XSourcePositionWrapper wrapper = (XSourcePositionWrapper)o;
+
+      return myPosition.getLine() == wrapper.myPosition.getLine() &&
+             myPosition.getFile().getPath().equals(wrapper.myPosition.getFile().getPath());
+    }
+
+    @Override
+    public int hashCode() {
+      return 31 * myPosition.getLine() + myPosition.getFile().getPath().hashCode();
     }
   }
 }
