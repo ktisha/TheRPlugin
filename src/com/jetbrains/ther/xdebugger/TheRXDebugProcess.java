@@ -114,9 +114,7 @@ public class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void resume() {
     try {
-      // TODO resume from breakpoint
-
-      while ((!myBreakpoints.containsKey(getCurrentDebuggerLocation()))) {
+      do {
         final boolean executed = myDebugger.executeInstruction();
 
         if (!executed) {
@@ -127,6 +125,7 @@ public class TheRXDebugProcess extends XDebugProcess {
 
         handleInterpreterOutput();
       }
+      while ((!myBreakpoints.containsKey(getCurrentDebuggerLocation())));
 
       updateDebugInformation();
     }
