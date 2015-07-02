@@ -67,7 +67,8 @@ public class TheRDebugger {
     }
 
     myStackHandler
-      .updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections.unmodifiableList(TheRDebuggerUtils.loadVars(myProcess))));
+      .updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections
+        .unmodifiableList(TheRDebuggerUtils.loadVars(myProcess, new LoadableVarHandlerImpl()))));
 
     return true;
   }

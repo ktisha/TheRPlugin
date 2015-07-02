@@ -8,8 +8,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class VarHandler {
+// TODO [dbg][test]
+public class LoadableVarHandlerImpl implements LoadableVarHandler {
 
+  @Override
   @Nullable
   public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
     throws IOException, InterruptedException {
@@ -25,6 +27,7 @@ public class VarHandler {
     return type;
   }
 
+  @Override
   @NotNull
   public String handleValue(@NotNull final TheRProcess process,
                             @NotNull final String name,
@@ -58,27 +61,27 @@ public class VarHandler {
   }
 
   @NotNull
-  private static String createEnterFunction(@NotNull final String var) {
+  private String createEnterFunction(@NotNull final String var) {
     return createEnterFunctionName(var) + " <- function() { print(\"enter " + var + "\") }";
   }
 
   @NotNull
-  private static String createEnterFunctionName(@NotNull final String var) {
+  private String createEnterFunctionName(@NotNull final String var) {
     return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
   }
 
   @NotNull
-  private static String createExitFunction(@NotNull final String var) {
+  private String createExitFunction(@NotNull final String var) {
     return createExitFunctionName(var) + " <- function() { print(\"exit " + var + "\") }";
   }
 
   @NotNull
-  private static String createExitFunctionName(@NotNull final String var) {
+  private String createExitFunctionName(@NotNull final String var) {
     return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 
   @NotNull
-  private static String createTraceCommand(@NotNull final String var) {
+  private String createTraceCommand(@NotNull final String var) {
     return TheRDebugConstants.TRACE_COMMAND +
            "(" +
            var +
@@ -90,7 +93,7 @@ public class VarHandler {
   }
 
   @NotNull
-  private static String createDebugCommand(@NotNull final String var) {
+  private String createDebugCommand(@NotNull final String var) {
     return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
   }
 }

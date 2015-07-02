@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+// TODO [dbg][test]
 public class TheRProcessReceiver {
 
   @NotNull
@@ -62,9 +63,14 @@ public class TheRProcessReceiver {
 
   @NotNull
   private TheRProcessResponseType calculateResponseType(@NotNull final StringBuilder response) {
-    // TODO exception
+    final TheRProcessResponseType responseType =
+      TheRProcessResponseTypeCalculator.calculate(response, response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
 
-    return TheRProcessResponseTypeCalculator.calculate(response, response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
+    if (responseType == null) {
+      throw new IllegalArgumentException(); // TODO [dbg][update]
+    }
+
+    return responseType;
   }
 
   @NotNull

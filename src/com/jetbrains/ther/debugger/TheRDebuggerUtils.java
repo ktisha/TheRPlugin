@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 public final class TheRDebuggerUtils {
 
   @NotNull
-  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final VarHandler handler)
+  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final LoadableVarHandler handler)
     throws IOException, InterruptedException {
     final String text = executeAndCheckType(
       process,
@@ -71,7 +71,7 @@ public final class TheRDebuggerUtils {
   }
 
   @Nullable
-  private static TheRVar loadVar(@NotNull final TheRProcess process, @NotNull final VarHandler handler, @NotNull final String var)
+  private static TheRVar loadVar(@NotNull final TheRProcess process, @NotNull final LoadableVarHandler handler, @NotNull final String var)
     throws IOException, InterruptedException {
     final String type = handler.handleType(
       process,
@@ -104,7 +104,7 @@ public final class TheRDebuggerUtils {
 
   @NotNull
   private static String loadValue(@NotNull final TheRProcess process,
-                                  @NotNull final VarHandler handler,
+                                  @NotNull final LoadableVarHandler handler,
                                   @NotNull final String var,
                                   @NotNull final String type)
     throws IOException, InterruptedException {

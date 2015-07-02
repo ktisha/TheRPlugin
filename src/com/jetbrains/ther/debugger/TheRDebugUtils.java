@@ -4,6 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.Nullable;
 
+// TODO [dbg][test]
 public final class TheRDebugUtils {
 
   public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {
