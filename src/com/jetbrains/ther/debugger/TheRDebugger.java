@@ -1,16 +1,12 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class TheRDebugger {
 
@@ -70,7 +66,8 @@ public class TheRDebugger {
       executeFunctionInstruction();
     }
 
-    updateCurrentStackFrame();
+    myStackHandler
+      .updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections.unmodifiableList(TheRDebuggerUtils.loadVars(myProcess))));
 
     return true;
   }
@@ -188,149 +185,5 @@ public class TheRDebugger {
 
       myCurrentLocation = new TheRLocation(myStackHandler.getCurrentLocation().getFunction(), line - 1);
     }
-  }
-
-  private void updateCurrentStackFrame() throws IOException, InterruptedException {
-    // TODO check type
-    final TheRProcessResponse response = myProcess.execute(TheRDebugConstants.LS_COMMAND);
-    final String text = response.getText();
-
-    final List<TheRVar> vars = new ArrayList<TheRVar>();
-
-    for (final String variableName : calculateVariableNames(text)) {
-      final TheRVar var = loadVar(variableName);
-
-      if (var != null) {
-        vars.add(var);
-      }
-    }
-
-    myStackHandler.updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections.unmodifiableList(vars)));
-  }
-
-  @NotNull
-  private List<String> calculateVariableNames(@NotNull final String response) {
-    final List<String> result = new ArrayList<String>();
-
-    for (final String line : StringUtil.splitByLines(response)) {
-      for (final String token : StringUtil.tokenize(new StringTokenizer(line))) {
-        final String var = getVariableName(token);
-
-        if (var != null) {
-          result.add(var);
-        }
-      }
-    }
-
-    return result;
-  }
-
-  @Nullable
-  private TheRVar loadVar(@NotNull final String var) throws IOException, InterruptedException {
-    final String type = loadType(var);
-
-    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
-      if (var.startsWith(TheRDebugConstants.SERVICE_FUNCTION_PREFIX)) {
-        return null;
-      }
-      else {
-        traceAndDebug(var);
-      }
-    }
-
-    return new TheRVar(var, type, loadValue(var, type));
-  }
-
-  @Nullable
-  private String getVariableName(@NotNull final String token) {
-    final boolean isNotEmptyQuotedString = StringUtil.isQuotedString(token) && token.length() > 2;
-
-    if (isNotEmptyQuotedString) {
-      return token.substring(1, token.length() - 1);
-    }
-    else {
-      return null;
-    }
-  }
-
-  @NotNull
-  private String loadType(@NotNull final String var) throws IOException, InterruptedException {
-    // TODO check type
-    final TheRProcessResponse response = myProcess.execute(TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")");
-
-    return response.getText();
-  }
-
-  private void traceAndDebug(@NotNull final String var) throws IOException, InterruptedException {
-    // TODO check type
-    myProcess.execute(createEnterFunction(var));
-    // TODO check type
-    myProcess.execute(createExitFunction(var));
-    // TODO check type
-    myProcess.execute(createTraceCommand(var));
-    // TODO check type
-    myProcess.execute(createDebugCommand(var));
-  }
-
-  @NotNull
-  private String loadValue(@NotNull final String var, @NotNull final String type) throws IOException, InterruptedException {
-    // TODO check type
-    final TheRProcessResponse response = myProcess.execute(var);
-    final String value = response.getText();
-
-    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
-      final String[] lines = StringUtil.splitByLinesKeepSeparators(value);
-      final StringBuilder sb = new StringBuilder();
-
-      for (int i = 2; i < lines.length - 1; i++) {
-        sb.append(lines[i]);
-      }
-
-      while (StringUtil.endsWithLineBreak(sb)) {
-        sb.setLength(sb.length() - 1);
-      }
-
-      return sb.toString();
-    }
-    else {
-      return value;
-    }
-  }
-
-  @NotNull
-  private String createEnterFunction(@NotNull final String var) {
-    return createEnterFunctionName(var) + " <- function() { print(\"enter " + var + "\") }";
-  }
-
-  @NotNull
-  private String createEnterFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private String createExitFunction(@NotNull final String var) {
-    return createExitFunctionName(var) + " <- function() { print(\"exit " + var + "\") }";
-  }
-
-  @NotNull
-  private String createExitFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_EXIT_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private String createTraceCommand(@NotNull final String var) {
-    return TheRDebugConstants.TRACE_COMMAND +
-           "(" +
-           var +
-           ", " +
-           createEnterFunctionName(var) +
-           ", exit = " +
-           createExitFunctionName(var) +
-           ")";
-  }
-
-  @NotNull
-  private String createDebugCommand(@NotNull final String var) {
-    return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
   }
 }
