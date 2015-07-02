@@ -98,15 +98,22 @@ public class TheRDebugger {
 
   private boolean executeScriptInstruction() throws IOException, InterruptedException {
     boolean accepted = false;
+    boolean firstLine = true;
 
     while (!accepted) {
-      final TheRScriptLine command = myScriptReader.getCurrentLine();
+      final TheRScriptLine line = myScriptReader.getCurrentLine();
 
-      if (command.getText() == null) {
+      if (line.getText() == null) {
         return false;
       }
 
-      final TheRProcessResponse response = myProcess.execute(command.getText());
+      if (TheRDebugUtils.isCommentOrSpaces(line.getText()) && firstLine) {
+        myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextLine().getNumber());
+        myScriptReader.advance();
+        break;
+      }
+
+      final TheRProcessResponse response = myProcess.execute(line.getText());
 
       myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextLine().getNumber());
 
@@ -115,6 +122,8 @@ public class TheRDebugger {
       accepted = response.getType() != TheRProcessResponseType.PLUS;
 
       myScriptReader.advance();
+
+      firstLine = false;
     }
 
     return true;

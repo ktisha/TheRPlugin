@@ -21,38 +21,38 @@ public class TheRScriptReaderTest {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "01.r").getAbsolutePath();
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
-    checkCommand(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 0, reader.getNextLine());
+    checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
+    checkLine("", 0, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 0, reader.getCurrentLine());
-    checkCommand("x <- c(1)", 1, reader.getNextLine());
+    checkLine("", 0, reader.getCurrentLine());
+    checkLine("x <- c(1)", 1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("x <- c(1)", 1, reader.getCurrentLine());
-    checkCommand("y <- c(2)", 2, reader.getNextLine());
+    checkLine("x <- c(1)", 1, reader.getCurrentLine());
+    checkLine("y <- c(2)", 2, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("y <- c(2)", 2, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 3, reader.getNextLine());
+    checkLine("y <- c(2)", 2, reader.getCurrentLine());
+    checkLine("", 3, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 3, reader.getCurrentLine());
-    checkCommand("z <- c(2)", 4, reader.getNextLine());
+    checkLine("", 3, reader.getCurrentLine());
+    checkLine("z <- c(2)", 4, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("z <- c(2)", 4, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine("z <- c(2)", 4, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(null, -1, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine(null, -1, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }
@@ -62,33 +62,33 @@ public class TheRScriptReaderTest {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "02.r").getAbsolutePath();
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
-    checkCommand(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkCommand("x <- c(1)", 0, reader.getNextLine());
+    checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
+    checkLine("x <- c(1)", 0, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("x <- c(1)", 0, reader.getCurrentLine());
-    checkCommand("y <- c(2)", 1, reader.getNextLine());
+    checkLine("x <- c(1)", 0, reader.getCurrentLine());
+    checkLine("y <- c(2)", 1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("y <- c(2)", 1, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 2, reader.getNextLine());
+    checkLine("y <- c(2)", 1, reader.getCurrentLine());
+    checkLine("", 2, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 2, reader.getCurrentLine());
-    checkCommand("z <- c(2)", 3, reader.getNextLine());
+    checkLine("", 2, reader.getCurrentLine());
+    checkLine("z <- c(2)", 3, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("z <- c(2)", 3, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine("z <- c(2)", 3, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(null, -1, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine(null, -1, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }
@@ -98,41 +98,41 @@ public class TheRScriptReaderTest {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "03.r").getAbsolutePath();
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
-    checkCommand(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 0, reader.getNextLine());
+    checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
+    checkLine("# just comment", 0, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 0, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 1, reader.getNextLine());
+    checkLine("# just comment", 0, reader.getCurrentLine());
+    checkLine("    # spaces and comment", 1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 1, reader.getCurrentLine());
-    checkCommand(NOP_COMMAND, 2, reader.getNextLine());
+    checkLine("    # spaces and comment", 1, reader.getCurrentLine());
+    checkLine("", 2, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(NOP_COMMAND, 2, reader.getCurrentLine());
-    checkCommand("x <- c(1)", 3, reader.getNextLine());
+    checkLine("", 2, reader.getCurrentLine());
+    checkLine("x <- c(1)", 3, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand("x <- c(1)", 3, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine("x <- c(1)", 3, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
-    checkCommand(null, -1, reader.getCurrentLine());
-    checkCommand(null, -1, reader.getNextLine());
+    checkLine(null, -1, reader.getCurrentLine());
+    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }
 
-  private void checkCommand(@Nullable final String expectedCommand,
-                            final int expectedPosition,
-                            @NotNull final TheRScriptLine actualCommand) {
-    assertEquals(expectedCommand, actualCommand.getText());
-    assertEquals(expectedPosition, actualCommand.getNumber());
+  private void checkLine(@Nullable final String expectedText,
+                         final int expectedPosition,
+                         @NotNull final TheRScriptLine actualLine) {
+    assertEquals(expectedText, actualLine.getText());
+    assertEquals(expectedPosition, actualLine.getNumber());
   }
 }

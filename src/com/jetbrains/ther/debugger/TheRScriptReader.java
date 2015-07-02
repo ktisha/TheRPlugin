@@ -54,8 +54,6 @@ public class TheRScriptReader {
 
     final int position = (line == null) ? -1 : myReader.getLineNumber() - 1;
 
-    final String result = TheRDebugUtils.isCommentOrSpaces(line) ? TheRDebugConstants.NOP_COMMAND : line;
-
-    return new TheRScriptLine(result, position);
+    return new TheRScriptLine(line, position);
   }
 }
