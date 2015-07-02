@@ -54,7 +54,8 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String DEBUG_COMMAND = "debug";
 
-  public static final char EXECUTE_AND_STEP_COMMAND = 'n';
+  @NotNull
+  public static final String EXECUTE_AND_STEP_COMMAND = "n";
 
   // responses
 

@@ -23,7 +23,7 @@ public final class TheRDebuggerUtils {
       process,
       TheRDebugConstants.LS_COMMAND,
       TheRProcessResponseType.RESPONSE_AND_BROWSE
-    ).getText();
+    );
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
 
@@ -39,9 +39,9 @@ public final class TheRDebuggerUtils {
   }
 
   @NotNull
-  public static TheRProcessResponse executeAndCheckType(@NotNull final TheRProcess process,
-                                                        @NotNull final String command,
-                                                        @NotNull final TheRProcessResponseType expectedType)
+  public static String executeAndCheckType(@NotNull final TheRProcess process,
+                                           @NotNull final String command,
+                                           @NotNull final TheRProcessResponseType expectedType)
     throws IOException, InterruptedException {
     final TheRProcessResponse response = process.execute(command);
 
@@ -49,9 +49,8 @@ public final class TheRDebuggerUtils {
       throw new IOException(); // TODO [dbg][update]
     }
 
-    return response;
+    return response.getText();
   }
-
 
   @NotNull
   private static List<String> calculateVariableNames(@NotNull final String response) {
@@ -80,7 +79,7 @@ public final class TheRDebuggerUtils {
         process,
         TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
         TheRProcessResponseType.RESPONSE_AND_BROWSE
-      ).getText()
+      )
     );
 
     if (type == null) {
@@ -112,7 +111,7 @@ public final class TheRDebuggerUtils {
       process,
       var,
       type,
-      executeAndCheckType(process, var, TheRProcessResponseType.RESPONSE_AND_BROWSE).getText()
+      executeAndCheckType(process, var, TheRProcessResponseType.RESPONSE_AND_BROWSE)
     );
   }
 }
