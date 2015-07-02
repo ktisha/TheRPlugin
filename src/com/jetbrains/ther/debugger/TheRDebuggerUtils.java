@@ -17,7 +17,8 @@ import java.util.StringTokenizer;
 public final class TheRDebuggerUtils {
 
   @NotNull
-  public static List<TheRVar> loadVars(@NotNull final TheRProcess process) throws IOException, InterruptedException {
+  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final VarHandler handler)
+    throws IOException, InterruptedException {
     final String text = executeAndCheckType(
       process,
       TheRDebugConstants.LS_COMMAND,
@@ -27,7 +28,7 @@ public final class TheRDebuggerUtils {
     final List<TheRVar> vars = new ArrayList<TheRVar>();
 
     for (final String variableName : calculateVariableNames(text)) {
-      final TheRVar var = loadVar(process, variableName);
+      final TheRVar var = loadVar(process, handler, variableName);
 
       if (var != null) {
         vars.add(var);
@@ -70,24 +71,23 @@ public final class TheRDebuggerUtils {
   }
 
   @Nullable
-  private static TheRVar loadVar(@NotNull final TheRProcess process, @NotNull final String var) throws IOException, InterruptedException {
-    final String type = executeAndCheckType(
+  private static TheRVar loadVar(@NotNull final TheRProcess process, @NotNull final VarHandler handler, @NotNull final String var)
+    throws IOException, InterruptedException {
+    final String type = handler.handleType(
       process,
-      TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
-      TheRProcessResponseType.RESPONSE_AND_BROWSE
-    ).getText();
+      var,
+      executeAndCheckType(
+        process,
+        TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
+        TheRProcessResponseType.RESPONSE_AND_BROWSE
+      ).getText()
+    );
 
-    // TODO [dbg][update]
-    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
-      if (var.startsWith(TheRDebugConstants.SERVICE_FUNCTION_PREFIX)) {
-        return null;
-      }
-      else {
-        traceAndDebug(process, var);
-      }
+    if (type == null) {
+      return null;
     }
 
-    return new TheRVar(var, type, loadValue(process, var, type));
+    return new TheRVar(var, type, loadValue(process, handler, var, type));
   }
 
   @Nullable
@@ -102,73 +102,17 @@ public final class TheRDebuggerUtils {
     }
   }
 
-  private static void traceAndDebug(@NotNull final TheRProcess process, @NotNull final String var)
+  @NotNull
+  private static String loadValue(@NotNull final TheRProcess process,
+                                  @NotNull final VarHandler handler,
+                                  @NotNull final String var,
+                                  @NotNull final String type)
     throws IOException, InterruptedException {
-    executeAndCheckType(process, createEnterFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    executeAndCheckType(process, createExitFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    executeAndCheckType(process, createTraceCommand(var), TheRProcessResponseType.RESPONSE_AND_BROWSE);
-    executeAndCheckType(process, createDebugCommand(var), TheRProcessResponseType.JUST_BROWSE);
-  }
-
-  @NotNull
-  private static String loadValue(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
-    throws IOException, InterruptedException {
-    final String value = executeAndCheckType(process, var, TheRProcessResponseType.RESPONSE_AND_BROWSE).getText();
-
-    // TODO [dbg][update]
-    if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
-      final String[] lines = StringUtil.splitByLinesKeepSeparators(value);
-      final StringBuilder sb = new StringBuilder();
-
-      for (int i = 2; i < lines.length - 1; i++) {
-        sb.append(lines[i]);
-      }
-
-      while (StringUtil.endsWithLineBreak(sb)) {
-        sb.setLength(sb.length() - 1);
-      }
-
-      return sb.toString();
-    }
-    else {
-      return value;
-    }
-  }
-
-  @NotNull
-  private static String createEnterFunction(@NotNull final String var) {
-    return createEnterFunctionName(var) + " <- function() { print(\"enter " + var + "\") }";
-  }
-
-  @NotNull
-  private static String createEnterFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private static String createExitFunction(@NotNull final String var) {
-    return createExitFunctionName(var) + " <- function() { print(\"exit " + var + "\") }";
-  }
-
-  @NotNull
-  private static String createExitFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_EXIT_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private static String createTraceCommand(@NotNull final String var) {
-    return TheRDebugConstants.TRACE_COMMAND +
-           "(" +
-           var +
-           ", " +
-           createEnterFunctionName(var) +
-           ", exit = " +
-           createExitFunctionName(var) +
-           ")";
-  }
-
-  @NotNull
-  private static String createDebugCommand(@NotNull final String var) {
-    return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
+    return handler.handleValue(
+      process,
+      var,
+      type,
+      executeAndCheckType(process, var, TheRProcessResponseType.RESPONSE_AND_BROWSE).getText()
+    );
   }
 }
