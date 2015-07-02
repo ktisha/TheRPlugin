@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 
+// TODO [xdbg][test]
 public class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
@@ -105,12 +106,12 @@ public class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepInto() {
-    // TODO impl
+    // TODO [xdbg][impl]
   }
 
   @Override
   public void startStepOut() {
-    // TODO impl
+    // TODO [xdbg][impl]
   }
 
   @Override

@@ -8,6 +8,7 @@ import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import org.jetbrains.annotations.NotNull;
 
+// TODO [xdbg][test]
 public class TheRXStackFrame extends XStackFrame {
 
   @NotNull

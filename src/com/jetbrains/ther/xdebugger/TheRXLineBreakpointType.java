@@ -16,6 +16,7 @@ import com.jetbrains.ther.debugger.TheRDebugUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO [xdbg][test]
 public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
 
   @NotNull
@@ -60,7 +61,12 @@ public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProp
     final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
     final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
 
-    final String text = document.getText(new TextRange(document.getLineStartOffset(line), document.getLineEndOffset(line)));
+    final String text = document.getText(
+      new TextRange(
+        document.getLineStartOffset(line),
+        document.getLineEndOffset(line)
+      )
+    );
 
     return TheRDebugUtils.isCommentOrSpaces(text);
   }

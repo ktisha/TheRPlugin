@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO [xdbg][test]
 public class TheRLocationResolver {
 
   @NotNull
@@ -56,7 +57,7 @@ public class TheRLocationResolver {
     final Integer offset = myFunctionLine.get(location.getFunction());
 
     if (offset == null) {
-      return 0; // TODO update
+      return 0; // TODO [xdbg][update]
     }
     else {
       return offset;

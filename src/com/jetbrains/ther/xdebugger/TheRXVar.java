@@ -7,6 +7,7 @@ import com.intellij.xdebugger.frame.XValuePlace;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import org.jetbrains.annotations.NotNull;
 
+// TODO [xdbg][test]
 public class TheRXVar extends XNamedValue {
 
   @NotNull
