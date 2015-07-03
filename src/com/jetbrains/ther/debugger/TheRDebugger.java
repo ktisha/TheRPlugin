@@ -45,7 +45,7 @@ public class TheRDebugger {
 
     myOutput = new TheROutput();
 
-    myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 0);
+    myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, 0);
     myStackHandler.updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections.<TheRVar>emptyList()));
   }
 
@@ -106,14 +106,14 @@ public class TheRDebugger {
       }
 
       if (TheRDebugUtils.isCommentOrSpaces(line.getText()) && firstLine) {
-        myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextLine().getNumber());
+        myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getNextLine().getNumber());
         myScriptReader.advance();
         break;
       }
 
       final TheRProcessResponse response = myProcess.execute(line.getText());
 
-      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getNextLine().getNumber());
+      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getNextLine().getNumber());
 
       handleResponse(response);
 
@@ -160,7 +160,7 @@ public class TheRDebugger {
       final int lineEnd = firstInstructionResponse.getText().indexOf(':', lineStart);
       final int line = Integer.parseInt(firstInstructionResponse.getText().substring(lineStart, lineEnd));
 
-      myCurrentLocation = new TheRLocation(function, line - 1);
+      myCurrentLocation = new TheRLocation(new TheRFunction(Collections.singletonList(function)), line - 1); // TODO [dbg][update]
 
       if (response.getType() == TheRProcessResponseType.DEBUGGING_IN) {
         myStackHandler.addFrame();
@@ -172,7 +172,7 @@ public class TheRDebugger {
 
       // myCurrentLocation = myStackHandler.getCurrentLocation();
       myCurrentLocation =
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, myScriptReader.getCurrentLine().getNumber()); // TODO update
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getCurrentLine().getNumber()); // TODO update
     }
 
     if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {

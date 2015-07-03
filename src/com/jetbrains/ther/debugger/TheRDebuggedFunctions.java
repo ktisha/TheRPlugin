@@ -1,11 +1,11 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.List;
 
 public class TheRDebuggedFunctions {
 
@@ -13,72 +13,29 @@ public class TheRDebuggedFunctions {
   private final TheRDebuggedFunctionsNode myRoot;
 
   public TheRDebuggedFunctions() {
-    myRoot = new TheRDebuggedFunctionsNode(TheRDebugConstants.MAIN_FUNCTION_NAME, null);
+    myRoot = new TheRDebuggedFunctionsNode(TheRDebugConstants.MAIN_FUNCTION.getName(), null);
   }
 
-  public boolean isDebugged(@NotNull final String function) {
-    final TheRDebuggedFunctionsNode node = loadNode(function);
+  public boolean isDebugged(@NotNull final TheRFunction function) {
+    final TheRDebuggedFunctionsNode node = loadNode(myRoot, function.getDefinition().iterator());
 
     return node != null && node.isDebugged();
   }
 
-  public void add(@NotNull final String function) {
-    final TheRDebuggedFunctionsNode node = loadOrCreateNode(function);
+  public void add(@NotNull final TheRFunction function) {
+    final TheRDebuggedFunctionsNode node = loadOrCreateNode(myRoot, function.getDefinition().iterator());
 
     node.setDebugged(true);
   }
 
-  public void remove(@NotNull final String function) {
-    remove(loadNode(function));
+  public void remove(@NotNull final TheRFunction function) {
+    remove(loadNode(myRoot, function.getDefinition().iterator()));
   }
 
-  public boolean hasDebuggedInner(@NotNull final String function) {
-    final TheRDebuggedFunctionsNode node = loadNode(function);
+  public boolean hasDebuggedInner(@NotNull final TheRFunction function) {
+    final TheRDebuggedFunctionsNode node = loadNode(myRoot, function.getDefinition().iterator());
 
     return node != null && !node.getChildren().isEmpty();
-  }
-
-  public boolean isDebugged(@NotNull final List<String> innerFunction) {
-    final TheRDebuggedFunctionsNode node = loadNode(myRoot, innerFunction.iterator());
-
-    return node != null && node.isDebugged();
-  }
-
-  public void add(@NotNull final List<String> innerFunction) {
-    final TheRDebuggedFunctionsNode node = loadOrCreateNode(myRoot, innerFunction.iterator());
-
-    node.setDebugged(true);
-  }
-
-  public void remove(@NotNull final List<String> innerFunction) {
-    remove(loadNode(myRoot, innerFunction.iterator()));
-  }
-
-  public boolean hasDebuggedInner(@NotNull final List<String> innerFunction) {
-    final TheRDebuggedFunctionsNode node = loadNode(myRoot, innerFunction.iterator());
-
-    return node != null && !node.getChildren().isEmpty();
-  }
-
-  @Nullable
-  private TheRDebuggedFunctionsNode loadNode(@NotNull final String function) {
-    return myRoot.getChildren().get(function);
-  }
-
-  @NotNull
-  private TheRDebuggedFunctionsNode loadOrCreateNode(@NotNull final String function) {
-    final TheRDebuggedFunctionsNode node = myRoot.getChildren().get(function);
-
-    if (node == null) {
-      final TheRDebuggedFunctionsNode newNode = new TheRDebuggedFunctionsNode(function, myRoot);
-
-      myRoot.getChildren().put(function, newNode);
-
-      return newNode;
-    }
-    else {
-      return node;
-    }
   }
 
   @Nullable

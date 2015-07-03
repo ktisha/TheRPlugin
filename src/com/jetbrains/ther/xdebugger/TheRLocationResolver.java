@@ -13,11 +13,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +33,7 @@ public class TheRLocationResolver {
   private final Document myDocument;
 
   @NotNull
-  private final Map<String, Integer> myFunctionLine;
+  private final Map<TheRFunction, Integer> myFunctionLine;
 
   public TheRLocationResolver(@NotNull final Project project, @NotNull final String scriptPath) {
     myVirtualFile = LocalFileSystem.getInstance().findFileByPath(scriptPath);
@@ -39,7 +41,7 @@ public class TheRLocationResolver {
     final PsiFile psiFile = PsiManager.getInstance(project).findFile(myVirtualFile);
     myDocument = PsiDocumentManager.getInstance(project).getDocument(psiFile);
 
-    myFunctionLine = new HashMap<String, Integer>();
+    myFunctionLine = new HashMap<TheRFunction, Integer>();
 
     PsiTreeUtil.processElements(psiFile, new FunctionDefinitionProcessor());
   }
@@ -50,7 +52,7 @@ public class TheRLocationResolver {
   }
 
   private int calculateFunctionLine(@NotNull final TheRLocation location) {
-    if (location.getFunction().equals(TheRDebugConstants.MAIN_FUNCTION_NAME)) {
+    if (location.getFunction().equals(TheRDebugConstants.MAIN_FUNCTION)) {
       return 0;
     }
 
@@ -72,7 +74,7 @@ public class TheRLocationResolver {
         final String name = ((TheRAssignmentStatement)element.getParent()).getName();
         final int line = myDocument.getLineNumber(element.getTextOffset());
 
-        myFunctionLine.put(name, line);
+        myFunctionLine.put(new TheRFunction(Collections.singletonList(name)), line); // TODO [xdbg][update]
       }
 
       return true;

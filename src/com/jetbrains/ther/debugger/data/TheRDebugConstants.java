@@ -3,6 +3,8 @@ package com.jetbrains.ther.debugger.data;
 import com.intellij.util.LineSeparator;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+
 public final class TheRDebugConstants {
 
   @NotNull
@@ -21,7 +23,7 @@ public final class TheRDebugConstants {
   public static final String SERVICE_EXIT_FUNCTION_SUFFIX = "_exit";
 
   @NotNull
-  public static final String MAIN_FUNCTION_NAME = "intellij_ther_main";
+  public static final TheRFunction MAIN_FUNCTION = new TheRFunction(Collections.singletonList("intellij_ther_main"));
 
   // interpreter parameters
 
