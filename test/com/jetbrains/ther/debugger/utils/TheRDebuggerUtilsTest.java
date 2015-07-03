@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE_AND_BROWSE;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.executeAndCheckType;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.isCommentOrSpaces;
 import static org.junit.Assert.*;
 
@@ -50,31 +49,6 @@ public class TheRDebuggerUtilsTest {
     assertEquals(expected, actual);
   }
 
-  @Test(expected = IOException.class)
-  public void invalidCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE_AND_BROWSE);
-
-    executeAndCheckType(
-      process,
-      "def",
-      TheRProcessResponseType.PLUS
-    );
-  }
-
-  @Test
-  public void correctCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE_AND_BROWSE);
-
-    assertEquals(
-      "abc",
-      executeAndCheckType(
-        process,
-        "def",
-        RESPONSE_AND_BROWSE
-      )
-    );
-  }
-
   @Test
   public void commentChecking() {
     assertTrue(isCommentOrSpaces(" # abc "));
@@ -95,7 +69,7 @@ public class TheRDebuggerUtilsTest {
     assertFalse(isCommentOrSpaces(" abc "));
   }
 
-  private static class MockTheRProcess implements TheRProcess {
+  private static class MockTheRProcess extends TheRProcess {
 
     @NotNull
     private final String myText;
@@ -138,7 +112,7 @@ public class TheRDebuggerUtilsTest {
     }
   }
 
-  private static class VarsTheRProcess implements TheRProcess {
+  private static class VarsTheRProcess extends TheRProcess {
 
     private boolean myIsXTypeAsked = false;
     private boolean myIsYTypeAsked = false;

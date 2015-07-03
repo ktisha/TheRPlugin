@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-public class TheRProcessImpl implements TheRProcess {
+public class TheRProcessImpl extends TheRProcess {
 
   @NotNull
   private final Process myProcess;

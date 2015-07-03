@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.utils;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -14,14 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-// TODO [dbg][test]
 public final class TheRDebuggerUtils {
 
   @NotNull
   public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
     throws IOException, InterruptedException {
-    final String text = executeAndCheckType(
-      process,
+    final String text = process.execute(
       TheRDebugConstants.LS_COMMAND,
       TheRProcessResponseType.RESPONSE_AND_BROWSE
     );
@@ -37,20 +34,6 @@ public final class TheRDebuggerUtils {
     }
 
     return vars;
-  }
-
-  @NotNull
-  public static String executeAndCheckType(@NotNull final TheRProcess process,
-                                           @NotNull final String command,
-                                           @NotNull final TheRProcessResponseType expectedType)
-    throws IOException, InterruptedException {
-    final TheRProcessResponse response = process.execute(command);
-
-    if (response.getType() != expectedType) {
-      throw new IOException(); // TODO [dbg][update]
-    }
-
-    return response.getText();
   }
 
   public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {
@@ -94,8 +77,7 @@ public final class TheRDebuggerUtils {
     final String type = handler.handleType(
       process,
       var,
-      executeAndCheckType(
-        process,
+      process.execute(
         TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
         TheRProcessResponseType.RESPONSE_AND_BROWSE
       )
@@ -130,7 +112,7 @@ public final class TheRDebuggerUtils {
       process,
       var,
       type,
-      executeAndCheckType(process, var, TheRProcessResponseType.RESPONSE_AND_BROWSE)
+      process.execute(var, TheRProcessResponseType.RESPONSE_AND_BROWSE)
     );
   }
 }

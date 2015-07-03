@@ -31,7 +31,7 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
   @Override
   @NotNull
   public String handleValue(@NotNull final TheRProcess process,
-                            @NotNull final String name,
+                            @NotNull final String var,
                             @NotNull final String type,
                             @NotNull final String value) {
     if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
@@ -55,10 +55,10 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
 
   private void traceAndDebug(@NotNull final TheRProcess process, @NotNull final String var)
     throws IOException, InterruptedException {
-    TheRDebuggerUtils.executeAndCheckType(process, createEnterFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    TheRDebuggerUtils.executeAndCheckType(process, createExitFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    TheRDebuggerUtils.executeAndCheckType(process, createTraceCommand(var), TheRProcessResponseType.RESPONSE_AND_BROWSE);
-    TheRDebuggerUtils.executeAndCheckType(process, createDebugCommand(var), TheRProcessResponseType.JUST_BROWSE);
+    process.execute(createEnterFunction(var), TheRProcessResponseType.JUST_BROWSE);
+    process.execute(createExitFunction(var), TheRProcessResponseType.JUST_BROWSE);
+    process.execute(createTraceCommand(var), TheRProcessResponseType.RESPONSE_AND_BROWSE);
+    process.execute(createDebugCommand(var), TheRProcessResponseType.JUST_BROWSE);
   }
 
   @NotNull
