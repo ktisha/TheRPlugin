@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class TheRDebugger {
    * @throws InterruptedException if thread was interrupted while waiting interpreter's response
    */
   public TheRDebugger(@NotNull final String interpreterPath, @NotNull final String scriptPath) throws IOException, InterruptedException {
-    myProcess = new TheRProcess(interpreterPath);
+    myProcess = new TheRProcessImpl(interpreterPath);
     myScriptReader = new TheRScriptReader(scriptPath);
 
     myStackHandler = new TheRStackHandler();
