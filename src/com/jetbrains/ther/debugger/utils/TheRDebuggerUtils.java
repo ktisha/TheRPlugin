@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.utils;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 public final class TheRDebuggerUtils {
 
   @NotNull
-  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final LoadableVarHandler handler)
+  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
     throws IOException, InterruptedException {
     final String text = executeAndCheckType(
       process,
@@ -53,6 +53,22 @@ public final class TheRDebuggerUtils {
     return response.getText();
   }
 
+  public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {
+    if (line == null) {
+      return false;
+    }
+
+    for (int i = 0; i < line.length(); i++) {
+      if (StringUtil.isWhiteSpace(line.charAt(i))) {
+        continue;
+      }
+
+      return line.charAt(i) == TheRDebugConstants.COMMENT_SYMBOL;
+    }
+
+    return true;
+  }
+
   @NotNull
   private static List<String> calculateVariableNames(@NotNull final String response) {
     final List<String> result = new ArrayList<String>();
@@ -71,7 +87,9 @@ public final class TheRDebuggerUtils {
   }
 
   @Nullable
-  private static TheRVar loadVar(@NotNull final TheRProcess process, @NotNull final LoadableVarHandler handler, @NotNull final String var)
+  private static TheRVar loadVar(@NotNull final TheRProcess process,
+                                 @NotNull final TheRLoadableVarHandler handler,
+                                 @NotNull final String var)
     throws IOException, InterruptedException {
     final String type = handler.handleType(
       process,
@@ -104,7 +122,7 @@ public final class TheRDebuggerUtils {
 
   @NotNull
   private static String loadValue(@NotNull final TheRProcess process,
-                                  @NotNull final LoadableVarHandler handler,
+                                  @NotNull final TheRLoadableVarHandler handler,
                                   @NotNull final String var,
                                   @NotNull final String type)
     throws IOException, InterruptedException {

@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.utils;
 
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public interface LoadableVarHandler {
+public interface TheRLoadableVarHandler {
 
   @Nullable
   String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)

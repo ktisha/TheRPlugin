@@ -3,6 +3,8 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
+import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -69,7 +71,7 @@ public class TheRDebugger {
 
     myStackHandler
       .updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections
-        .unmodifiableList(TheRDebuggerUtils.loadVars(myProcess, new LoadableVarHandlerImpl()))));
+        .unmodifiableList(TheRDebuggerUtils.loadVars(myProcess, new TheRLoadableVarHandlerImpl()))));
 
     return true;
   }
@@ -106,7 +108,7 @@ public class TheRDebugger {
         return false;
       }
 
-      if (TheRDebugUtils.isCommentOrSpaces(line.getText()) && firstLine) {
+      if (TheRDebuggerUtils.isCommentOrSpaces(line.getText()) && firstLine) {
         myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getNextLine().getNumber());
         myScriptReader.advance();
         break;

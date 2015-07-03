@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.utils;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 // TODO [dbg][test]
-public class LoadableVarHandlerImpl implements LoadableVarHandler {
+public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
 
   @Override
   @Nullable

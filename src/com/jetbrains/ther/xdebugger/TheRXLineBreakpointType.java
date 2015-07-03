@@ -12,7 +12,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.breakpoints.XLineBreakpointType;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.jetbrains.ther.TheRFileType;
-import com.jetbrains.ther.debugger.TheRDebugUtils;
+import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +68,6 @@ public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProp
       )
     );
 
-    return TheRDebugUtils.isCommentOrSpaces(text);
+    return TheRDebuggerUtils.isCommentOrSpaces(text);
   }
 }
