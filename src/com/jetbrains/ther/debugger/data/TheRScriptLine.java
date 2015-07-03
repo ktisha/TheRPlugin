@@ -22,4 +22,19 @@ public class TheRScriptLine {
   public int getNumber() {
     return myNumber;
   }
+
+  @Override
+  public boolean equals(@Nullable final Object o) {
+    if (o == this) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final TheRScriptLine line = (TheRScriptLine)o;
+
+    return myNumber == line.myNumber && (myText == null ? line.myText == null : myText.equals(line.myText));
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * (myText == null ? 0 : myText.hashCode()) + myNumber;
+  }
 }

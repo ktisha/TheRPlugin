@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class TheRProcessResponse {
 
@@ -23,5 +24,20 @@ public class TheRProcessResponse {
   @NotNull
   public TheRProcessResponseType getType() {
     return myType;
+  }
+
+  @Override
+  public boolean equals(@Nullable final Object o) {
+    if (o == this) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    final TheRProcessResponse response = (TheRProcessResponse)o;
+
+    return myType == response.myType && myText.equals(response.myText);
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * myText.hashCode() + myType.hashCode();
   }
 }

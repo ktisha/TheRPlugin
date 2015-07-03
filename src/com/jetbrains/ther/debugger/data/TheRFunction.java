@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// TODO [dbg][test]
 public class TheRFunction {
 
   @NotNull
@@ -15,7 +14,7 @@ public class TheRFunction {
 
   public TheRFunction(@NotNull final List<String> definition) {
     if (definition.isEmpty()) {
-      throw new IllegalArgumentException(); // TODO [dbg][update]
+      throw new IllegalArgumentException("Definition of function couldn't be empty");
     }
 
     myDefinition = Collections.unmodifiableList(new ArrayList<String>(definition));
