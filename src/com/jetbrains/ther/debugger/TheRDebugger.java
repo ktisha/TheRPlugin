@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

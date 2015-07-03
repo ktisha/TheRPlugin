@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

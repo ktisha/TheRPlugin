@@ -1,13 +1,13 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.TheRProcessResponseTypeCalculator.calculate;
-import static com.jetbrains.ther.debugger.TheRProcessResponseTypeCalculator.isComplete;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseTypeCalculator.calculate;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseTypeCalculator.isComplete;
 import static org.junit.Assert.*;
 
 public class TheRProcessResponseTypeCalculatorTest {
@@ -80,6 +80,18 @@ public class TheRProcessResponseTypeCalculatorTest {
   }
 
   @Test
+  public void calculateDebugAtWithResponse() {
+    assertEquals(
+      TheRProcessResponseType.DEBUG_AT,
+      calculate(
+        "[1] 1 2 3\n" +
+        TheRDebugConstants.DEBUG_AT + "1: x <- c(1)\n" +
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
+      )
+    );
+  }
+
+  @Test
   public void calculateStartTrace() {
     assertEquals(
       TheRProcessResponseType.START_TRACE,
@@ -118,10 +130,48 @@ public class TheRProcessResponseTypeCalculatorTest {
   }
 
   @Test
+  public void calculateContinueTraceWithResponse() {
+    assertEquals(
+      TheRProcessResponseType.CONTINUE_TRACE,
+      calculate(
+        "[1] 1 2 3\n" +
+        TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
+        "[1] \"exit x\"\n" +
+        "exiting from: FUN(c(-1, 0, 1)[[1L]], ...)\n" +
+        DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
+        "debug: {\n" +
+        "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
+        "    {\n" +
+        "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
+        "        {\n" +
+        "            print(\"x\")\n" +
+        "        }\n" +
+        "    }\n" +
+        "}\n" +
+        BROWSE_PREFIX + "3" + BROWSE_SUFFIX
+      )
+    );
+  }
+
+  @Test
   public void calculateEndTrace() {
     assertEquals(
       TheRProcessResponseType.END_TRACE,
       calculate(
+        TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+        "[1] \"exit x\"\n" +
+        "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+        BROWSE_PREFIX + "1" + BROWSE_SUFFIX
+      )
+    );
+  }
+
+  @Test
+  public void calculateEndTraceWithResponse() {
+    assertEquals(
+      TheRProcessResponseType.END_TRACE,
+      calculate(
+        "[1] 1 2 3\n" +
         TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
         "[1] \"exit x\"\n" +
         "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)\n" +

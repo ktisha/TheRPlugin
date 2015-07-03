@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
@@ -6,20 +6,18 @@ import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.Reader;
 
-// TODO [dbg][test]
-public class TheRProcessReceiver {
+class TheRProcessReceiver {
 
   @NotNull
-  private final InputStreamReader myReader;
+  private final Reader myReader;
 
   @NotNull
   private final char[] myBuffer;
 
-  public TheRProcessReceiver(@NotNull final InputStream stream) {
-    myReader = new InputStreamReader(stream);
+  public TheRProcessReceiver(@NotNull final Reader reader) {
+    myReader = reader;
     myBuffer = new char[TheRDebugConstants.DEFAULT_BUFFER];
   }
 
@@ -67,7 +65,7 @@ public class TheRProcessReceiver {
       TheRProcessResponseTypeCalculator.calculate(response, response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
 
     if (responseType == null) {
-      throw new IllegalArgumentException(); // TODO [dbg][update]
+      throw new IllegalArgumentException("Response is incomplete");
     }
 
     return responseType;

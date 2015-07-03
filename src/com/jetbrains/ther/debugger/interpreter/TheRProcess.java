@@ -1,12 +1,13 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
-// TODO [dbg][test]
 public class TheRProcess {
 
   @NotNull
@@ -25,8 +26,8 @@ public class TheRProcess {
 
     myProcess = builder.start();
 
-    mySender = new TheRProcessSender(myProcess.getOutputStream());
-    myReceiver = new TheRProcessReceiver(myProcess.getInputStream());
+    mySender = new TheRProcessSender(new OutputStreamWriter(myProcess.getOutputStream()));
+    myReceiver = new TheRProcessReceiver(new InputStreamReader(myProcess.getInputStream()));
 
     initInterpreter();
   }

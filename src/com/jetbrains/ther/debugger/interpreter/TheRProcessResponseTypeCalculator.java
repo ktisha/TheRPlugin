@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
 
-public final class TheRProcessResponseTypeCalculator {
+final class TheRProcessResponseTypeCalculator {
 
   @NotNull
   private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry");
