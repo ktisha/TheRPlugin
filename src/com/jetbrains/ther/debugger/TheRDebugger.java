@@ -179,7 +179,7 @@ public class TheRDebugger {
         new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getCurrentLine().getNumber()); // TODO update
     }
 
-    if (response.getType() == TheRProcessResponseType.RESPONSE_AND_BROWSE) {
+    if (response.getType() == TheRProcessResponseType.RESPONSE) {
       myOutput.setNormalOutput(response.getText());
     }
 

@@ -40,7 +40,7 @@ public class TheRProcessResponseTypeCalculatorTest {
 
   @Test
   public void calculateJustBrowse() {
-    assertEquals(TheRProcessResponseType.JUST_BROWSE, calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
+    assertEquals(TheRProcessResponseType.EMPTY, calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
   }
 
   @Test
@@ -183,7 +183,7 @@ public class TheRProcessResponseTypeCalculatorTest {
   @Test
   public void calculateResponseAndBrowse() {
     assertEquals(
-      TheRProcessResponseType.RESPONSE_AND_BROWSE,
+      TheRProcessResponseType.RESPONSE,
       calculate(
         "[1] \"x\"\n" +
         BROWSE_PREFIX + "1" + BROWSE_SUFFIX

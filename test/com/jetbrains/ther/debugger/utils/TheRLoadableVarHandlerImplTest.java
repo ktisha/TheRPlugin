@@ -110,12 +110,12 @@ public class TheRLoadableVarHandlerImplTest {
       if (myCounter == 2) {
         myCounter++;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE_AND_BROWSE);
+        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE);
       }
 
       myCounter++;
 
-      return new TheRProcessResponse("text", TheRProcessResponseType.JUST_BROWSE);
+      return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
     }
 
     @Override

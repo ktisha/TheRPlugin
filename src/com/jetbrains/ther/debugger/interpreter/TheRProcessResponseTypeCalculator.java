@@ -38,7 +38,7 @@ final class TheRProcessResponseTypeCalculator {
     }
 
     if (justBrowseAndSpace(response)) {
-      return JUST_BROWSE;
+      return EMPTY;
     }
 
     if (!endsBrowseAndSpace(response)) {
@@ -65,7 +65,7 @@ final class TheRProcessResponseTypeCalculator {
       return END_TRACE;
     }
 
-    return RESPONSE_AND_BROWSE;
+    return RESPONSE;
   }
 
   private static boolean endsPlusAndSpace(@NotNull final CharSequence sequence) {

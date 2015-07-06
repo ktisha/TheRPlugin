@@ -20,7 +20,7 @@ public final class TheRDebuggerUtils {
     throws IOException, InterruptedException {
     final String text = process.execute(
       TheRDebugConstants.LS_COMMAND,
-      TheRProcessResponseType.RESPONSE_AND_BROWSE
+      TheRProcessResponseType.RESPONSE
     );
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
@@ -79,7 +79,7 @@ public final class TheRDebuggerUtils {
       var,
       process.execute(
         TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
-        TheRProcessResponseType.RESPONSE_AND_BROWSE
+        TheRProcessResponseType.RESPONSE
       )
     );
 
@@ -112,7 +112,7 @@ public final class TheRDebuggerUtils {
       process,
       var,
       type,
-      process.execute(var, TheRProcessResponseType.RESPONSE_AND_BROWSE)
+      process.execute(var, TheRProcessResponseType.RESPONSE)
     );
   }
 }

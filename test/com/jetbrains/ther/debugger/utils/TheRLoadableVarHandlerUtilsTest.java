@@ -95,13 +95,13 @@ public class TheRLoadableVarHandlerUtilsTest {
       if (command.equals(expectedEnterFunction())) {
         myIsEnterExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.JUST_BROWSE);
+        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
       }
 
       if (command.equals(expectedExitFunction())) {
         myIsExitExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.JUST_BROWSE);
+        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
       }
 
       if (command.equals(expectedTraceCommand())) {
@@ -111,7 +111,7 @@ public class TheRLoadableVarHandlerUtilsTest {
 
         myIsTraceExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE_AND_BROWSE);
+        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE);
       }
 
       if (command.equals(expectedDebugCommand())) {
@@ -119,7 +119,7 @@ public class TheRLoadableVarHandlerUtilsTest {
           throw new IllegalStateException("Enter and exit function should be defined. Also target function should be marked as traced");
         }
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.JUST_BROWSE);
+        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
       }
 
       throw new IllegalStateException("Unexpected command");

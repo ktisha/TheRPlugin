@@ -7,14 +7,14 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE_AND_BROWSE;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
 import static org.junit.Assert.assertEquals;
 
 public class TheRProcessTest {
 
   @Test(expected = IOException.class)
   public void invalidCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE_AND_BROWSE);
+    final TheRProcess process = new MockTheRProcess("abc", RESPONSE);
 
     process.execute(
       "def",
@@ -24,13 +24,13 @@ public class TheRProcessTest {
 
   @Test
   public void correctCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE_AND_BROWSE);
+    final TheRProcess process = new MockTheRProcess("abc", RESPONSE);
 
     assertEquals(
       "abc",
       process.execute(
         "def",
-        RESPONSE_AND_BROWSE
+        RESPONSE
       )
     );
   }

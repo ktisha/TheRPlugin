@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE_AND_BROWSE;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.isCommentOrSpaces;
 import static org.junit.Assert.*;
 
@@ -21,7 +21,7 @@ public class TheRDebuggerUtilsTest {
 
   @Test
   public void noVarsLoading() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("character(0)", RESPONSE_AND_BROWSE);
+    final TheRProcess process = new MockTheRProcess("character(0)", RESPONSE);
     final TheRLoadableVarHandler handler = new NoVarsTheRLoadableVarHandler();
 
     assertTrue(
@@ -123,7 +123,7 @@ public class TheRDebuggerUtilsTest {
       if (command.equals(TheRDebugConstants.LS_COMMAND)) {
         return new TheRProcessResponse(
           "[1] \"x\"\n[2] \"y\"",
-          RESPONSE_AND_BROWSE
+          RESPONSE
         );
       }
 
@@ -132,7 +132,7 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "typeX",
-          RESPONSE_AND_BROWSE
+          RESPONSE
         );
       }
 
@@ -141,7 +141,7 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "typeY",
-          RESPONSE_AND_BROWSE
+          RESPONSE
         );
       }
 
@@ -152,7 +152,7 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "valueX",
-          RESPONSE_AND_BROWSE
+          RESPONSE
         );
       }
 

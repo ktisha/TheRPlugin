@@ -11,10 +11,10 @@ final class TheRLoadableVarHandlerUtils {
 
   public static void traceAndDebug(@NotNull final TheRProcess process, @NotNull final String var)
     throws IOException, InterruptedException {
-    process.execute(enterFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    process.execute(exitFunction(var), TheRProcessResponseType.JUST_BROWSE);
-    process.execute(traceCommand(var), TheRProcessResponseType.RESPONSE_AND_BROWSE);
-    process.execute(debugCommand(var), TheRProcessResponseType.JUST_BROWSE);
+    process.execute(enterFunction(var), TheRProcessResponseType.EMPTY);
+    process.execute(exitFunction(var), TheRProcessResponseType.EMPTY);
+    process.execute(traceCommand(var), TheRProcessResponseType.RESPONSE);
+    process.execute(debugCommand(var), TheRProcessResponseType.EMPTY);
   }
 
   @NotNull
