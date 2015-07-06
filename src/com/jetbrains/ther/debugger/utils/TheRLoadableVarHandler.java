@@ -14,7 +14,7 @@ public interface TheRLoadableVarHandler {
 
   @NotNull
   String handleValue(@NotNull final TheRProcess process,
-                     @NotNull final String name,
+                     @NotNull final String var,
                      @NotNull final String type,
                      @NotNull final String value);
 }
