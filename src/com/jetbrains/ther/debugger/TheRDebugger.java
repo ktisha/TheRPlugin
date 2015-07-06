@@ -25,6 +25,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRScriptReader myScriptReader;
 
   @NotNull
+  private final TheROutputReceiver myOutputReceiver;
+
+  @NotNull
   private final List<TheRFunctionDebugger> myDebuggers;
 
   @NotNull
@@ -33,10 +36,13 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   private final List<TheRStackFrame> myUnmodifiableStack;
 
-  public TheRDebugger(@NotNull final TheRProcess process, @NotNull final TheRScriptReader scriptReader)
+  public TheRDebugger(@NotNull final TheRProcess process,
+                      @NotNull final TheRScriptReader scriptReader,
+                      @NotNull final TheROutputReceiver outputReceiver)
     throws IOException, InterruptedException {
     myProcess = process;
     myScriptReader = scriptReader;
+    myOutputReceiver = outputReceiver;
 
     myDebuggers = new ArrayList<TheRFunctionDebugger>();
     myStack = new ArrayList<TheRStackFrame>();
@@ -94,7 +100,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @Override
   public void appendOutput(@NotNull final String text) {
-    // TODO [dbg][impl]
+    myOutputReceiver.receive(text);
   }
 
   @Override

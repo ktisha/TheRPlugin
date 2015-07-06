@@ -4,7 +4,6 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.util.LineSeparator;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -13,6 +12,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +33,9 @@ public class TheRXDebugProcess extends XDebugProcess {
   private final TheRLocationResolver myLocationResolver;
 
   @NotNull
+  private final TheROutputBuffer myOutputBuffer;
+
+  @NotNull
   private final Map<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
 
   @NotNull
@@ -43,11 +46,13 @@ public class TheRXDebugProcess extends XDebugProcess {
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRLocationResolver locationResolver) {
+                           @NotNull final TheRLocationResolver locationResolver,
+                           @NotNull final TheROutputBuffer outputBuffer) {
     super(session);
 
     myDebugger = debugger;
     myLocationResolver = locationResolver;
+    myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
@@ -83,13 +88,13 @@ public class TheRXDebugProcess extends XDebugProcess {
     try {
       final boolean executed = myDebugger.advance();
 
+      printInterpreterOutput();
+
       if (!executed) {
         getSession().stop();
 
         return;
       }
-
-      handleInterpreterOutput();
 
       updateDebugInformation();
     }
@@ -117,13 +122,13 @@ public class TheRXDebugProcess extends XDebugProcess {
       do {
         final boolean executed = myDebugger.advance();
 
+        printInterpreterOutput();
+
         if (!executed) {
           getSession().stop();
 
           return;
         }
-
-        handleInterpreterOutput();
       }
       while (!isBreakpoint());
 
@@ -162,13 +167,20 @@ public class TheRXDebugProcess extends XDebugProcess {
     );
   }
 
-  private void handleInterpreterOutput() {
-    /*
-    final TheROutput output = myDebugger.getOutput();
+  private void printInterpreterOutput() {
+    final Queue<String> messages = myOutputBuffer.getMessages();
 
-    printToConsole(output.getNormalOutput(), ConsoleViewContentType.NORMAL_OUTPUT);
-    printToConsole(output.getErrorOutput(), ConsoleViewContentType.ERROR_OUTPUT);
-    */ // TODO [xdbg][impl]
+    while (!messages.isEmpty()) {
+      final String message = messages.poll();
+
+      if (message != null) {
+        myConsole.print(message, ConsoleViewContentType.NORMAL_OUTPUT);
+        myConsole.print(
+          TheRDebugConstants.LINE_SEPARATOR,
+          ConsoleViewContentType.NORMAL_OUTPUT
+        );
+      }
+    }
   }
 
   private void updateDebugInformation() {
@@ -195,13 +207,6 @@ public class TheRXDebugProcess extends XDebugProcess {
     final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
 
     return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
-  }
-
-  private void printToConsole(@Nullable final String text, @NotNull final ConsoleViewContentType type) {
-    if (text != null) {
-      myConsole.print(text, type);
-      myConsole.print(LineSeparator.getSystemLineSeparator().getSeparatorString(), type);
-    }
   }
 
   @NotNull
