@@ -45,6 +45,12 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     myVars = loadVars();
   }
 
+  @NotNull
+  @Override
+  public TheRFunction getFunction() {
+    return myFunction;
+  }
+
   @Override
   public int getCurrentLineNumber() {
     return myCurrentLineNumber;
@@ -57,8 +63,13 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
   }
 
   @Override
+  public boolean hasNext() {
+    return myCurrentLineNumber != -1;
+  }
+
+  @Override
   public void advance() throws IOException, InterruptedException {
-    if (myCurrentLineNumber == -1) {
+    if (!hasNext()) {
       throw new IllegalStateException(); // TODO [dbg][update]
     }
 
@@ -114,7 +125,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
 
     myCurrentLineNumber = loadLineNumber();
     myVars = loadVars();
@@ -150,7 +161,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     final int begin = TheRDebugConstants.DEBUG_AT.length();
     final int end = text.indexOf(':', begin);
 
-    return Integer.parseInt(text.substring(begin, end));
+    return Integer.parseInt(text.substring(begin, end)) - 1;
   }
 
   @NotNull
@@ -159,7 +170,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
 
-    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
 
     final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
     final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);

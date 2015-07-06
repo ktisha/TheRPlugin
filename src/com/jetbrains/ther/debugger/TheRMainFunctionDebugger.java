@@ -27,6 +27,8 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   private List<TheRVar> myVars;
 
+  private boolean isRunning = false;
+
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheRLoadableVarHandler varHandler,
@@ -39,6 +41,12 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     myVars = loadVars(); // TODO [dbg][update]
   }
 
+  @NotNull
+  @Override
+  public TheRFunction getFunction() {
+    return TheRDebugConstants.MAIN_FUNCTION;
+  }
+
   public int getCurrentLineNumber() {
     return myScriptReader.getCurrentLine().getNumber();
   }
@@ -48,10 +56,17 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     return myVars;
   }
 
+  @Override
+  public boolean hasNext() {
+    return !isRunning || getCurrentLineNumber() != -1;
+  }
+
   public void advance() throws IOException, InterruptedException {
-    if (getCurrentLineNumber() == -1) {
+    if (!hasNext()) {
       throw new IllegalStateException(); // TODO [dbg][update]
     }
+
+    isRunning = true;
 
     boolean accepted = false;
     boolean isFirstLine = true;
@@ -104,6 +119,7 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
         break;
       case PLUS:
+      case EMPTY:
         break;
       default:
         throw new IllegalStateException(); // TODO [dbg][update]
@@ -123,7 +139,7 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
 
-    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
 
     final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
     final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);

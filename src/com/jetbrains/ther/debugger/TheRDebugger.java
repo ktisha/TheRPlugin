@@ -1,18 +1,20 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.data.TheRFunction;
+import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TheRDebugger {
+public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
@@ -24,67 +26,67 @@ public class TheRDebugger {
   private final TheRScriptReader myScriptReader;
 
   @NotNull
-  private final TheRStackHandler myStackHandler;
+  private final List<TheRFunctionDebugger> myFunctionDebuggers;
 
   @NotNull
-  private final TheROutput myOutput;
+  private final List<TheRStackFrame> myStack;
 
   @NotNull
-  private TheRLocation myCurrentLocation;
+  private final List<TheRStackFrame> myUnmodifiableStack;
 
-  /**
-   * Constructs new instance of debugger with specified interpreter and script.
-   *
-   * @param interpreterPath path to interpreter
-   * @param scriptPath      path to script
-   * @throws IOException          if script couldn't be opened or interpreter couldn't be started
-   * @throws InterruptedException if thread was interrupted while waiting interpreter's response
-   */
   public TheRDebugger(@NotNull final String interpreterPath, @NotNull final String scriptPath) throws IOException, InterruptedException {
     myProcess = new TheRProcessImpl(interpreterPath);
     myScriptReader = new TheRScriptReader(scriptPath);
 
-    myStackHandler = new TheRStackHandler();
-    myStackHandler.addFrame();
+    myFunctionDebuggers = new ArrayList<TheRFunctionDebugger>();
+    myStack = new ArrayList<TheRStackFrame>();
+    myUnmodifiableStack = Collections.unmodifiableList(myStack);
 
-    myOutput = new TheROutput();
-
-    myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, 0);
-    myStackHandler.updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections.<TheRVar>emptyList()));
+    appendDebugger(
+      new TheRMainFunctionDebugger(
+        myProcess,
+        this,
+        new TheRLoadableVarHandlerImpl(),
+        myScriptReader
+      )
+    );
   }
 
-  /**
-   * @return true, or false if the end of the source has been reached
-   * @throws IOException          if script couldn't be read or communication with interpreter was broken
-   * @throws InterruptedException if thread was interrupted while waiting interpreter's response
-   */
-  public boolean executeInstruction() throws IOException, InterruptedException {
-    myOutput.reset();
-
-    if (myStackHandler.isMain()) {
-      if (!executeScriptInstruction()) {
+  public boolean advance() throws IOException, InterruptedException {
+    while (!topDebugger().hasNext()) {
+      if (myFunctionDebuggers.size() == 1) {
         return false;
       }
-    }
-    else {
-      executeFunctionInstruction();
+
+      popDebugger();
     }
 
-    myStackHandler
-      .updateCurrentFrame(new TheRStackFrame(myCurrentLocation, Collections
-        .unmodifiableList(TheRDebuggerUtils.loadVars(myProcess, new TheRLoadableVarHandlerImpl()))));
+    topDebugger().advance(); // Don't forget that advance could append new debugger
+
+    while (!topDebugger().hasNext()) {
+      if (myFunctionDebuggers.size() == 1) {
+        return false;
+      }
+
+      popDebugger();
+    }
+
+    final TheRFunctionDebugger topDebugger = topDebugger();
+
+    myStack.set(
+      myStack.size() - 1,
+      new TheRStackFrame(
+        new TheRLocation(topDebugger.getFunction(), topDebugger.getCurrentLineNumber()),
+        topDebugger.getVars()
+      )
+    );
 
     return true;
   }
 
   @NotNull
   public List<TheRStackFrame> getStack() {
-    return myStackHandler.getStack();
-  }
-
-  @NotNull
-  public TheROutput getOutput() {
-    return myOutput;
+    return myUnmodifiableStack;
   }
 
   public void stop() {
@@ -98,97 +100,42 @@ public class TheRDebugger {
     myProcess.stop();
   }
 
-  private boolean executeScriptInstruction() throws IOException, InterruptedException {
-    boolean accepted = false;
-    boolean firstLine = true;
-
-    while (!accepted) {
-      final TheRScriptLine line = myScriptReader.getCurrentLine();
-
-      if (line.getText() == null) {
-        return false;
-      }
-
-      if (TheRDebuggerUtils.isCommentOrSpaces(line.getText()) && firstLine) {
-        myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getNextLine().getNumber());
-        myScriptReader.advance();
-        break;
-      }
-
-      final TheRProcessResponse response = myProcess.execute(line.getText());
-
-      myCurrentLocation = new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getNextLine().getNumber());
-
-      handleResponse(response);
-
-      accepted = response.getType() != TheRProcessResponseType.PLUS;
-
-      myScriptReader.advance();
-
-      firstLine = false;
-    }
-
-    return true;
+  @Override
+  public void appendNormalOutput(@NotNull final String text) {
+    // TODO [dbg][impl]
   }
 
-  private void executeFunctionInstruction() throws IOException, InterruptedException {
-    // TODO check type
-    handleResponse(myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND));
+  @Override
+  public void appendErrorOutput(@NotNull final String text) {
+    // TODO [dbg][impl]
   }
 
-  private void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
-    if (response.getType() == TheRProcessResponseType.DEBUGGING_IN || response.getType() == TheRProcessResponseType.CONTINUE_TRACE) {
-      // TODO check type
-      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-      // TODO check type
-      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-      // TODO check type
-      myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-      // TODO check type
-      final TheRProcessResponse entryResponse = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+  @Override
+  public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+    myFunctionDebuggers.add(debugger);
+    myStack.add(null);
+  }
 
-      final String entryText = entryResponse.getText();
+  @Override
+  public void setReturnLineNumber(final int lineNumber) {
+    // TODO [dbg][impl]
+  }
 
-      final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-      final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
+  @NotNull
+  @Override
+  public TheRFunction resolveFunction(@NotNull final TheRFunction currentFunction, @NotNull final String nextFunctionName) {
+    return new TheRFunction(
+      Collections.singletonList(nextFunctionName)
+    ); // TODO [dbg][update]
+  }
 
-      final String function = entryText.substring(
-        firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
-        secondLineSeparator - "\"".length()
-      );
+  private void popDebugger() {
+    myFunctionDebuggers.remove(myFunctionDebuggers.size() - 1);
+    myStack.remove(myStack.size() - 1);
+  }
 
-      // TODO check type
-      final TheRProcessResponse firstInstructionResponse = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-
-      final int lineStart = "debug at #".length();
-      final int lineEnd = firstInstructionResponse.getText().indexOf(':', lineStart);
-      final int line = Integer.parseInt(firstInstructionResponse.getText().substring(lineStart, lineEnd));
-
-      myCurrentLocation = new TheRLocation(new TheRFunction(Collections.singletonList(function)), line - 1); // TODO [dbg][update]
-
-      if (response.getType() == TheRProcessResponseType.DEBUGGING_IN) {
-        myStackHandler.addFrame();
-      }
-    }
-
-    if (response.getType() == TheRProcessResponseType.END_TRACE) {
-      myStackHandler.removeFrame();
-
-      // myCurrentLocation = myStackHandler.getCurrentLocation();
-      myCurrentLocation =
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION, myScriptReader.getCurrentLine().getNumber()); // TODO update
-    }
-
-    if (response.getType() == TheRProcessResponseType.RESPONSE) {
-      myOutput.setNormalOutput(response.getText());
-    }
-
-    if (response.getType() == TheRProcessResponseType.DEBUG_AT) {
-      final int lineStart = "debug at #".length();
-      final int lineEnd = response.getText().indexOf(':', lineStart);
-      final int line = Integer.parseInt(response.getText().substring(lineStart, lineEnd));
-
-      myCurrentLocation = new TheRLocation(myStackHandler.getCurrentLocation().getFunction(), line - 1);
-    }
+  @NotNull
+  private TheRFunctionDebugger topDebugger() {
+    return myFunctionDebuggers.get(myFunctionDebuggers.size() - 1);
   }
 }

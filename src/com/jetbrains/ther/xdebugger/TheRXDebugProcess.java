@@ -1,6 +1,5 @@
 package com.jetbrains.ther.xdebugger;
 
-import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
@@ -14,7 +13,6 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.jetbrains.ther.debugger.TheRDebugger;
-import com.jetbrains.ther.debugger.data.TheROutput;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,8 +43,7 @@ public class TheRXDebugProcess extends XDebugProcess {
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRLocationResolver locationResolver)
-    throws ExecutionException {
+                           @NotNull final TheRLocationResolver locationResolver) {
     super(session);
 
     myDebugger = debugger;
@@ -84,7 +81,7 @@ public class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void startStepOver() {
     try {
-      final boolean executed = myDebugger.executeInstruction();
+      final boolean executed = myDebugger.advance();
 
       if (!executed) {
         getSession().stop();
@@ -118,7 +115,7 @@ public class TheRXDebugProcess extends XDebugProcess {
   public void resume() {
     try {
       do {
-        final boolean executed = myDebugger.executeInstruction();
+        final boolean executed = myDebugger.advance();
 
         if (!executed) {
           getSession().stop();
@@ -166,10 +163,12 @@ public class TheRXDebugProcess extends XDebugProcess {
   }
 
   private void handleInterpreterOutput() {
+    /*
     final TheROutput output = myDebugger.getOutput();
 
     printToConsole(output.getNormalOutput(), ConsoleViewContentType.NORMAL_OUTPUT);
     printToConsole(output.getErrorOutput(), ConsoleViewContentType.ERROR_OUTPUT);
+    */ // TODO [xdbg][impl]
   }
 
   private void updateDebugInformation() {
