@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -37,6 +36,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final List<TheRStackFrame> myUnmodifiableStack;
 
   public TheRDebugger(@NotNull final TheRProcess process,
+                      @NotNull final TheRFunctionResolver functionResolver,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver)
     throws IOException, InterruptedException {
@@ -52,6 +52,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       new TheRMainFunctionDebugger(
         myProcess,
         this,
+        functionResolver,
         new TheRLoadableVarHandlerImpl(),
         myScriptReader
       )
@@ -112,14 +113,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @Override
   public void setReturnLineNumber(final int lineNumber) {
     // TODO [dbg][impl]
-  }
-
-  @NotNull
-  @Override
-  public TheRFunction resolveFunction(@NotNull final TheRFunction currentFunction, @NotNull final String nextFunctionName) {
-    return new TheRFunction(
-      Collections.singletonList(nextFunctionName)
-    ); // TODO [dbg][update]
   }
 
   private void popDebugger() {

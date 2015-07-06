@@ -10,13 +10,16 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
+class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   private final TheRProcess myProcess;
 
   @NotNull
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
+
+  @NotNull
+  private final TheRFunctionResolver myFunctionResolver;
 
   @NotNull
   private final TheRLoadableVarHandler myVarHandler;
@@ -32,10 +35,12 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                  @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheRScriptReader scriptReader) throws IOException, InterruptedException {
     myProcess = process;
     myDebuggerHandler = debuggerHandler;
+    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
     myScriptReader = scriptReader;
 
@@ -109,6 +114,7 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
           new TheRFunctionDebuggerImpl(
             myProcess,
             myDebuggerHandler,
+            myFunctionResolver,
             myVarHandler,
             new TheRFunction(
               Collections.singletonList(

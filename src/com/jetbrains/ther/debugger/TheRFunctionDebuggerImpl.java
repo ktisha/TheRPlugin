@@ -14,13 +14,16 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_ST
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
-public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
+class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
 
   @NotNull
   private final TheRProcess myProcess;
 
   @NotNull
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
+
+  @NotNull
+  private final TheRFunctionResolver myFunctionResolver;
 
   @NotNull
   private final TheRLoadableVarHandler myVarHandler;
@@ -35,10 +38,12 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
 
   public TheRFunctionDebuggerImpl(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                  @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheRFunction function) throws IOException, InterruptedException {
     myProcess = process;
     myDebuggerHandler = debuggerHandler;
+    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
     myFunction = function;
 
@@ -146,8 +151,9 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
       new TheRFunctionDebuggerImpl(
         myProcess,
         myDebuggerHandler,
+        myFunctionResolver,
         myVarHandler,
-        myDebuggerHandler.resolveFunction(myFunction, nextFunction)
+        myFunctionResolver.resolve(myFunction, nextFunction)
       )
     );
   }
