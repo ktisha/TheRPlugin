@@ -46,7 +46,7 @@ public final class TheRDebuggerUtils {
   }
 
   @NotNull
-  public static String loadFunctionName(@NotNull final TheRProcess process) throws IOException, InterruptedException { // TODO [dbg][test]
+  public static String loadFunctionName(@NotNull final TheRProcess process) throws IOException, InterruptedException {
     process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);

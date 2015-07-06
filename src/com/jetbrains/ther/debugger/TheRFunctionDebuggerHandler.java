@@ -5,9 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TheRFunctionDebuggerHandler {
 
-  void appendNormalOutput(@NotNull final String text);
-
-  void appendErrorOutput(@NotNull final String text);
+  void appendOutput(@NotNull final String text);
 
   void appendDebugger(@NotNull final TheRFunctionDebugger debugger);
 

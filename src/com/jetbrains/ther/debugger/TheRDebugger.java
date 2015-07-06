@@ -5,7 +5,6 @@ import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +25,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRScriptReader myScriptReader;
 
   @NotNull
-  private final List<TheRFunctionDebugger> myFunctionDebuggers;
+  private final List<TheRFunctionDebugger> myDebuggers;
 
   @NotNull
   private final List<TheRStackFrame> myStack;
@@ -34,11 +33,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   private final List<TheRStackFrame> myUnmodifiableStack;
 
-  public TheRDebugger(@NotNull final String interpreterPath, @NotNull final String scriptPath) throws IOException, InterruptedException {
-    myProcess = new TheRProcessImpl(interpreterPath);
-    myScriptReader = new TheRScriptReader(scriptPath);
+  public TheRDebugger(@NotNull final TheRProcess process, @NotNull final TheRScriptReader scriptReader)
+    throws IOException, InterruptedException {
+    myProcess = process;
+    myScriptReader = scriptReader;
 
-    myFunctionDebuggers = new ArrayList<TheRFunctionDebugger>();
+    myDebuggers = new ArrayList<TheRFunctionDebugger>();
     myStack = new ArrayList<TheRStackFrame>();
     myUnmodifiableStack = Collections.unmodifiableList(myStack);
 
@@ -53,18 +53,10 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   public boolean advance() throws IOException, InterruptedException {
-    while (!topDebugger().hasNext()) {
-      if (myFunctionDebuggers.size() == 1) {
-        return false;
-      }
-
-      popDebugger();
-    }
-
     topDebugger().advance(); // Don't forget that advance could append new debugger
 
     while (!topDebugger().hasNext()) {
-      if (myFunctionDebuggers.size() == 1) {
+      if (myDebuggers.size() == 1) {
         return false;
       }
 
@@ -101,18 +93,13 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   @Override
-  public void appendNormalOutput(@NotNull final String text) {
-    // TODO [dbg][impl]
-  }
-
-  @Override
-  public void appendErrorOutput(@NotNull final String text) {
+  public void appendOutput(@NotNull final String text) {
     // TODO [dbg][impl]
   }
 
   @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
-    myFunctionDebuggers.add(debugger);
+    myDebuggers.add(debugger);
     myStack.add(null);
   }
 
@@ -130,12 +117,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   private void popDebugger() {
-    myFunctionDebuggers.remove(myFunctionDebuggers.size() - 1);
+    myDebuggers.remove(myDebuggers.size() - 1);
     myStack.remove(myStack.size() - 1);
   }
 
   @NotNull
   private TheRFunctionDebugger topDebugger() {
-    return myFunctionDebuggers.get(myFunctionDebuggers.size() - 1);
+    return myDebuggers.get(myDebuggers.size() - 1);
   }
 }

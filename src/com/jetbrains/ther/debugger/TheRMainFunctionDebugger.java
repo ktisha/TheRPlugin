@@ -120,7 +120,7 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
         break;
       case RESPONSE:
-        myDebuggerHandler.appendNormalOutput(response.getText());
+        myDebuggerHandler.appendOutput(response.getText());
 
         break;
       case PLUS:

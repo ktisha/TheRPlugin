@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.isCommentOrSpaces;
 import static org.junit.Assert.*;
 
@@ -47,6 +48,16 @@ public class TheRDebuggerUtilsTest {
     );
 
     assertEquals(expected, actual);
+  }
+
+  @Test
+  public void functionNameLoading() throws IOException, InterruptedException {
+    final TheRProcess process = new FunctionNameTheRProcess();
+
+    assertEquals(
+      "abc",
+      TheRDebuggerUtils.loadFunctionName(process)
+    );
   }
 
   @Test
@@ -219,6 +230,40 @@ public class TheRDebuggerUtilsTest {
       }
 
       throw new IllegalArgumentException("Unexpected var");
+    }
+  }
+
+  private static class FunctionNameTheRProcess extends TheRProcess {
+
+    private int myCounter = 0;
+
+    @NotNull
+    @Override
+    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
+      if (myCounter < 3) {
+        myCounter++;
+
+        return new TheRProcessResponse("text", RESPONSE);
+      }
+
+      if (myCounter == 3) {
+        myCounter++;
+
+        return new TheRProcessResponse(
+          "Tracing abc(c(1:3)) on entry\n" +
+          "[1] \"enter abc\"\n" +
+          "debug: {\n" +
+          "    x^2\n" +
+          "}",
+          START_TRACE
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+
+    @Override
+    public void stop() {
     }
   }
 }

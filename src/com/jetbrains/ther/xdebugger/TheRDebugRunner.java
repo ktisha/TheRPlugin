@@ -13,6 +13,8 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.TheRScriptReader;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -71,7 +73,10 @@ public class TheRDebugRunner extends GenericProgramRunner {
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
 
     try {
-      return new TheRDebugger(interpreterPath, runConfiguration.getScriptName());
+      return new TheRDebugger(
+        new TheRProcessImpl(interpreterPath),
+        new TheRScriptReader(runConfiguration.getScriptName())
+      );
     }
     catch (final IOException e) {
       throw new ExecutionException(e);
