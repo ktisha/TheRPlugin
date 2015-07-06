@@ -27,7 +27,8 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   private List<TheRVar> myVars;
 
-  private boolean isRunning = false;
+  private boolean myIsRunning;
+  private boolean myIsNewDebuggerAppended;
 
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
@@ -38,7 +39,10 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     myVarHandler = varHandler;
     myScriptReader = scriptReader;
 
-    myVars = loadVars(); // TODO [dbg][update]
+    myVars = Collections.emptyList();
+
+    myIsRunning = false;
+    myIsNewDebuggerAppended = false;
   }
 
   @NotNull
@@ -58,27 +62,22 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   @Override
   public boolean hasNext() {
-    return !isRunning || getCurrentLineNumber() != -1;
+    return !myIsRunning || getCurrentLineNumber() != -1;
   }
 
   public void advance() throws IOException, InterruptedException {
     if (!hasNext()) {
-      throw new IllegalStateException(); // TODO [dbg][update]
+      throw new IllegalStateException("Advance should be called only if hasNext returns true");
     }
 
-    isRunning = true;
+    myIsRunning = true;
+    myIsNewDebuggerAppended = false;
 
     boolean accepted = false;
     boolean isFirstLine = true;
 
     while (!accepted) {
       final TheRScriptLine line = myScriptReader.getCurrentLine();
-
-      if (line.getText() == null) {
-        myVars = Collections.emptyList(); // TODO [dbg][update]
-
-        return;
-      }
 
       if (TheRDebuggerUtils.isCommentOrSpaces(line.getText()) && isFirstLine) {
         myScriptReader.advance();
@@ -96,19 +95,25 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       myScriptReader.advance();
     }
 
-    myVars = loadVars();
+    if (!myIsNewDebuggerAppended) {
+      myVars = TheRDebuggerUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+    }
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
     switch (response.getType()) {
       case DEBUGGING_IN:
+        myIsNewDebuggerAppended = true;
+
         myDebuggerHandler.appendDebugger(
           new TheRFunctionDebuggerImpl(
             myProcess,
             myDebuggerHandler,
             myVarHandler,
             new TheRFunction(
-              Collections.singletonList(loadFunctionName())
+              Collections.singletonList(
+                TheRDebuggerUtils.loadFunctionName(myProcess)
+              )
             )
           )
         );
@@ -122,31 +127,7 @@ public class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       case EMPTY:
         break;
       default:
-        throw new IllegalStateException(); // TODO [dbg][update]
+        throw new IllegalStateException("Unexpected response from interpreter");
     }
-  }
-
-  @NotNull
-  private List<TheRVar> loadVars() throws IOException, InterruptedException {
-    return Collections.unmodifiableList(
-      TheRDebuggerUtils.loadVars(myProcess, myVarHandler)
-    );
-  }
-
-  @NotNull
-  private String loadFunctionName() throws IOException, InterruptedException {
-    myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-
-    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
-
-    final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-    final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
-
-    return entryText.substring(
-      firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
-      secondLineSeparator - "\"".length()
-    );
   }
 }

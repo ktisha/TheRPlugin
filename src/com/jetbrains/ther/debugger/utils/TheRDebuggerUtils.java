@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -34,6 +35,31 @@ public final class TheRDebuggerUtils {
     }
 
     return vars;
+  }
+
+  @NotNull
+  public static List<TheRVar> loadUnmodifiableVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
+    throws IOException, InterruptedException {
+    return Collections.unmodifiableList(
+      loadVars(process, handler)
+    );
+  }
+
+  @NotNull
+  public static String loadFunctionName(@NotNull final TheRProcess process) throws IOException, InterruptedException { // TODO [dbg][test]
+    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+
+    final String entryText = process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
+
+    final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
+    final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
+
+    return entryText.substring(
+      firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
+      secondLineSeparator - "\"".length()
+    );
   }
 
   public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {

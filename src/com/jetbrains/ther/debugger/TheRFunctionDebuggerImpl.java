@@ -3,7 +3,6 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
 
@@ -42,7 +43,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     myFunction = function;
 
     myCurrentLineNumber = loadLineNumber();
-    myVars = loadVars();
+    myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
   @NotNull
@@ -70,10 +71,8 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
   @Override
   public void advance() throws IOException, InterruptedException {
     if (!hasNext()) {
-      throw new IllegalStateException(); // TODO [dbg][update]
+      throw new IllegalStateException("Advance should be called only if hasNext returns true");
     }
-
-    // TODO [dbg][if_not_debugged]
 
     final TheRProcessResponse response = myProcess.execute(EXECUTE_AND_STEP_COMMAND);
     final String text = response.getText();
@@ -92,7 +91,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
         handleDebuggingIn();
         break;
       default:
-        throw new IllegalStateException(); // TODO [dbg][update]
+        throw new IllegalStateException("Unexpected response from interpreter");
     }
   }
 
@@ -105,18 +104,11 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     );
   }
 
-  @NotNull
-  private List<TheRVar> loadVars() throws IOException, InterruptedException {
-    return Collections.unmodifiableList(
-      TheRDebuggerUtils.loadVars(myProcess, myVarHandler)
-    );
-  }
-
   private void handleDebugAt(@NotNull final String text) throws IOException, InterruptedException {
     // TODO [dbg][response]
 
     myCurrentLineNumber = extractLineNumber(text);
-    myVars = loadVars();
+    myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
   private void handleContinueTrace(@NotNull final String text) throws IOException, InterruptedException {
@@ -128,16 +120,19 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
 
     myCurrentLineNumber = loadLineNumber();
-    myVars = loadVars();
+    myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
   private void handleEndTrace(@NotNull final String text) {
     // TODO [dbg][response]
 
     final String[] lines = StringUtil.splitByLines(text);
+    final String lastLine = lines.length == 0 ? null : lines[lines.length - 1];
 
-    if (lines.length != 0 && lines[lines.length - 1].startsWith(TheRDebugConstants.DEBUG_AT)) {
-      myDebuggerHandler.setReturnLineNumber(extractLineNumber(lines[lines.length - 1]));
+    if (lastLine != null && lastLine.startsWith(TheRDebugConstants.DEBUG_AT)) {
+      myDebuggerHandler.setReturnLineNumber(
+        extractLineNumber(lastLine)
+      );
     }
 
     myCurrentLineNumber = -1;
@@ -145,7 +140,7 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
   }
 
   private void handleDebuggingIn() throws IOException, InterruptedException {
-    final String nextFunction = loadFunctionName();
+    final String nextFunction = loadFunctionName(myProcess);
 
     myDebuggerHandler.appendDebugger(
       new TheRFunctionDebuggerImpl(
@@ -162,22 +157,5 @@ public class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     final int end = text.indexOf(':', begin);
 
     return Integer.parseInt(text.substring(begin, end)) - 1;
-  }
-
-  @NotNull
-  private String loadFunctionName() throws IOException, InterruptedException {
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-
-    final String entryText = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
-
-    final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-    final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
-
-    return entryText.substring(
-      firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
-      secondLineSeparator - "\"".length()
-    );
   }
 }
