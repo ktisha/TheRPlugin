@@ -22,37 +22,30 @@ public class TheRScriptReaderTest {
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkLine("", 0, reader.getNextLine());
 
     reader.advance();
 
     checkLine("", 0, reader.getCurrentLine());
-    checkLine("x <- c(1)", 1, reader.getNextLine());
 
     reader.advance();
 
     checkLine("x <- c(1)", 1, reader.getCurrentLine());
-    checkLine("y <- c(2)", 2, reader.getNextLine());
 
     reader.advance();
 
     checkLine("y <- c(2)", 2, reader.getCurrentLine());
-    checkLine("", 3, reader.getNextLine());
 
     reader.advance();
 
     checkLine("", 3, reader.getCurrentLine());
-    checkLine("z <- c(2)", 4, reader.getNextLine());
 
     reader.advance();
 
     checkLine("z <- c(2)", 4, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
     checkLine(null, -1, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }
@@ -63,32 +56,26 @@ public class TheRScriptReaderTest {
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkLine("x <- c(1)", 0, reader.getNextLine());
 
     reader.advance();
 
     checkLine("x <- c(1)", 0, reader.getCurrentLine());
-    checkLine("y <- c(2)", 1, reader.getNextLine());
 
     reader.advance();
 
     checkLine("y <- c(2)", 1, reader.getCurrentLine());
-    checkLine("", 2, reader.getNextLine());
 
     reader.advance();
 
     checkLine("", 2, reader.getCurrentLine());
-    checkLine("z <- c(2)", 3, reader.getNextLine());
 
     reader.advance();
 
     checkLine("z <- c(2)", 3, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
     checkLine(null, -1, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }
@@ -99,32 +86,26 @@ public class TheRScriptReaderTest {
     final TheRScriptReader reader = new TheRScriptReader(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
-    checkLine("# just comment", 0, reader.getNextLine());
 
     reader.advance();
 
     checkLine("# just comment", 0, reader.getCurrentLine());
-    checkLine("    # spaces and comment", 1, reader.getNextLine());
 
     reader.advance();
 
     checkLine("    # spaces and comment", 1, reader.getCurrentLine());
-    checkLine("", 2, reader.getNextLine());
 
     reader.advance();
 
     checkLine("", 2, reader.getCurrentLine());
-    checkLine("x <- c(1)", 3, reader.getNextLine());
 
     reader.advance();
 
     checkLine("x <- c(1)", 3, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.advance();
 
     checkLine(null, -1, reader.getCurrentLine());
-    checkLine(null, -1, reader.getNextLine());
 
     reader.close();
   }

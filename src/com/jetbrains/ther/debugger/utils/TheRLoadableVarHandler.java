@@ -13,8 +13,7 @@ public interface TheRLoadableVarHandler {
     throws IOException, InterruptedException;
 
   @NotNull
-  String handleValue(@NotNull final TheRProcess process,
-                     @NotNull final String var,
+  String handleValue(@NotNull final String var,
                      @NotNull final String type,
                      @NotNull final String value);
 }

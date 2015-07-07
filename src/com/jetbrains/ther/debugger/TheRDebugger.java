@@ -43,8 +43,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRDebuggerEvaluator evaluator,
                       @NotNull final TheRFunctionResolver functionResolver,
                       @NotNull final TheRScriptReader scriptReader,
-                      @NotNull final TheROutputReceiver outputReceiver)
-    throws IOException, InterruptedException {
+                      @NotNull final TheROutputReceiver outputReceiver) {
     myProcess = process;
     myEvaluator = evaluator;
     myScriptReader = scriptReader;

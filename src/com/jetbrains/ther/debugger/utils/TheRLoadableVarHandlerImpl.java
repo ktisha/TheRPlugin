@@ -28,8 +28,7 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
 
   @Override
   @NotNull
-  public String handleValue(@NotNull final TheRProcess process,
-                            @NotNull final String var,
+  public String handleValue(@NotNull final String var,
                             @NotNull final String type,
                             @NotNull final String value) {
     if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {

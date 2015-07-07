@@ -38,7 +38,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
-                                  @NotNull final TheRScriptReader scriptReader) throws IOException, InterruptedException {
+                                  @NotNull final TheRScriptReader scriptReader) {
     myProcess = process;
     myDebuggerHandler = debuggerHandler;
     myFunctionResolver = functionResolver;

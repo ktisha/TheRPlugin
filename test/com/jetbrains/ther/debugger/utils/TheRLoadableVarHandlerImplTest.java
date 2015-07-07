@@ -56,7 +56,6 @@ public class TheRLoadableVarHandlerImplTest {
       "    x ^ 2\n" +
       "}",
       new TheRLoadableVarHandlerImpl().handleValue(
-        new NoCommandTheRProcess(),
         "abc",
         TheRDebugConstants.FUNCTION_TYPE,
         "Object with tracing code, class \"functionWithTrace\"\n" +
@@ -75,7 +74,6 @@ public class TheRLoadableVarHandlerImplTest {
     assertEquals(
       "valueAbc",
       new TheRLoadableVarHandlerImpl().handleValue(
-        new NoCommandTheRProcess(),
         "abc",
         "typeAbc",
         "valueAbc"

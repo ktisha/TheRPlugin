@@ -135,7 +135,6 @@ public final class TheRDebuggerUtils {
                                   @NotNull final String type)
     throws IOException, InterruptedException {
     return handler.handleValue(
-      process,
       var,
       type,
       process.execute(var, TheRProcessResponseType.RESPONSE)

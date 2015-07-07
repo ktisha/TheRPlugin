@@ -16,32 +16,19 @@ public class TheRScriptReader {
   @NotNull
   private TheRScriptLine myCurrentLine;
 
-  @NotNull
-  private TheRScriptLine myNextLine;
-
   public TheRScriptReader(@NotNull final String scriptPath) throws IOException {
     myReader = new LineNumberReader(new FileReader(scriptPath));
 
     myCurrentLine = new TheRScriptLine(TheRDebugConstants.NOP_COMMAND, -1);
-    myNextLine = readNextLine();
   }
 
   public void advance() throws IOException {
-    myCurrentLine = myNextLine;
-
-    if (myCurrentLine.getText() != null) {
-      myNextLine = readNextLine();
-    }
+    myCurrentLine = readNextLine();
   }
 
   @NotNull
   public TheRScriptLine getCurrentLine() {
     return myCurrentLine;
-  }
-
-  @NotNull
-  public TheRScriptLine getNextLine() {
-    return myNextLine;
   }
 
   public void close() throws IOException {

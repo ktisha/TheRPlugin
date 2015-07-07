@@ -115,8 +115,7 @@ public class TheRDebuggerUtilsTest {
 
     @NotNull
     @Override
-    public String handleValue(@NotNull final TheRProcess process,
-                              @NotNull final String var,
+    public String handleValue(@NotNull final String var,
                               @NotNull final String type,
                               @NotNull final String value) {
       throw new IllegalStateException("HandleValue shouldn't be called");
@@ -209,8 +208,7 @@ public class TheRDebuggerUtilsTest {
 
     @NotNull
     @Override
-    public String handleValue(@NotNull final TheRProcess process,
-                              @NotNull final String var,
+    public String handleValue(@NotNull final String var,
                               @NotNull final String type,
                               @NotNull final String value) {
       if (var.equals("x")) {
