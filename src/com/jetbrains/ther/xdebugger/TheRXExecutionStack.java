@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 // TODO [xdbg][test]
-public class TheRXExecutionStack extends XExecutionStack {
+class TheRXExecutionStack extends XExecutionStack {
 
   @NotNull
   private final List<TheRXStackFrame> myStack;

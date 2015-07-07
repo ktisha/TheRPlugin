@@ -8,7 +8,7 @@ import com.jetbrains.ther.debugger.data.TheRVar;
 import org.jetbrains.annotations.NotNull;
 
 // TODO [xdbg][test]
-public class TheRXVar extends XNamedValue {
+class TheRXVar extends XNamedValue {
 
   @NotNull
   private final TheRVar myVar;
@@ -21,6 +21,11 @@ public class TheRXVar extends XNamedValue {
 
   @Override
   public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
-    node.setPresentation(AllIcons.Debugger.Value, myVar.getType(), myVar.getValue(), false);
+    node.setPresentation(
+      AllIcons.Debugger.Value,
+      myVar.getType(),
+      myVar.getValue(),
+      false
+    );
   }
 }

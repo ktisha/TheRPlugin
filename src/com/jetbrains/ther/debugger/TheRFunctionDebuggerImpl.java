@@ -14,6 +14,7 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_ST
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
+// TODO [dbg][test]
 class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
 
   @NotNull

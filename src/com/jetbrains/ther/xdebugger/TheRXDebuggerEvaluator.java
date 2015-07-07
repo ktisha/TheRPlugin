@@ -10,7 +10,8 @@ import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
+// TODO [xdbg][test]
+class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
   @NotNull
   private final TheRDebuggerEvaluator myEvaluator;

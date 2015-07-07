@@ -46,7 +46,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
-    final TheROutputBuffer outputBuffer = new TheROutputBufferImpl();
+    final TheROutputBuffer outputBuffer = new TheROutputBuffer();
 
     final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,

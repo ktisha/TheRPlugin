@@ -12,7 +12,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.ther.psi.TheRFileImpl;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRCodeFragment extends TheRFileImpl {
+class TheRCodeFragment extends TheRFileImpl {
 
   public TheRCodeFragment(@NotNull final Project project, @NotNull final String name, @NotNull final String text) {
     super(createLightVirtualFileViewProvider(project, name, text));

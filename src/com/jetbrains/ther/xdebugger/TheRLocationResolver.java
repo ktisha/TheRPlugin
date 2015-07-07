@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TODO [xdbg][test]
-public class TheRLocationResolver {
+class TheRLocationResolver {
 
   @NotNull
   private final VirtualFile myVirtualFile;

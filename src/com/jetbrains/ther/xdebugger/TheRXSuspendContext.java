@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class TheRXSuspendContext extends XSuspendContext {
+class TheRXSuspendContext extends XSuspendContext {
 
   @NotNull
   private final TheRXExecutionStack myExecutionStack;

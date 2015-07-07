@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // TODO [xdbg][test]
-public class TheRXStackFrame extends XStackFrame {
+class TheRXStackFrame extends XStackFrame {
 
   @NotNull
   private final TheRStackFrame myFrame;

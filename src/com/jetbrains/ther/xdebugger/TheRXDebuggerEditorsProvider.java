@@ -12,7 +12,7 @@ import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProvider {
+class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProvider {
 
   @NotNull
   private static final String FRAGMENT_NAME = "fragment.r";

@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 // TODO [xdbg][test]
-public class TheRXDebugProcess extends XDebugProcess {
+class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
