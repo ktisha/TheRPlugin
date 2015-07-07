@@ -28,8 +28,8 @@ public class TheRXExecutionStack extends XExecutionStack {
 
       myStack.add(
         new TheRXStackFrame(
-          locationResolver.resolve(frame.getLocation()),
-          frame
+          frame,
+          locationResolver.resolve(frame.getLocation())
         )
       );
     }

@@ -12,11 +12,9 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.jetbrains.ther.debugger.TheRDebugger;
-import com.jetbrains.ther.debugger.TheRFunctionResolver;
-import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.TheRScriptReader;
+import com.jetbrains.ther.debugger.*;
 import com.jetbrains.ther.debugger.data.TheRFunction;
+import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
@@ -82,8 +80,11 @@ public class TheRDebugRunner extends GenericProgramRunner {
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
 
     try {
+      final TheRProcess process = new TheRProcessImpl(interpreterPath);
+
       return new TheRDebugger(
-        new TheRProcessImpl(interpreterPath),
+        process,
+        new TheRDebuggerEvaluatorImpl(process),
         createFunctionResolver(environment),
         new TheRScriptReader(runConfiguration.getScriptName()),
         outputReceiver
