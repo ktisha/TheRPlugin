@@ -85,7 +85,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       final TheRScriptLine line = myScriptReader.getCurrentLine();
 
       if (TheRDebuggerUtils.isCommentOrSpaces(line.getText()) && isFirstLine) {
-        myScriptReader.advance();
+        forwardCommentsAndEmptyLines();
 
         return;
       }
@@ -100,8 +100,16 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       myScriptReader.advance();
     }
 
+    forwardCommentsAndEmptyLines();
+
     if (!myIsNewDebuggerAppended) {
       myVars = TheRDebuggerUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+    }
+  }
+
+  private void forwardCommentsAndEmptyLines() throws IOException {
+    while (TheRDebuggerUtils.isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
+      myScriptReader.advance();
     }
   }
 
