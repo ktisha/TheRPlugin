@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.data;
 
+import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,9 +16,15 @@ public class TheRStackFrame {
   @NotNull
   private final List<TheRVar> myVars;
 
-  public TheRStackFrame(@NotNull final TheRLocation location, @NotNull final List<TheRVar> vars) {
+  @NotNull
+  private final TheRDebuggerEvaluator myEvaluator;
+
+  public TheRStackFrame(@NotNull final TheRLocation location,
+                        @NotNull final List<TheRVar> vars,
+                        @NotNull final TheRDebuggerEvaluator evaluator) {
     myLocation = location;
     myVars = Collections.unmodifiableList(new ArrayList<TheRVar>(vars));
+    myEvaluator = evaluator;
   }
 
   @NotNull
@@ -28,6 +35,11 @@ public class TheRStackFrame {
   @NotNull
   public List<TheRVar> getVars() {
     return myVars;
+  }
+
+  @NotNull
+  public TheRDebuggerEvaluator getEvaluator() {
+    return myEvaluator;
   }
 
   @Override

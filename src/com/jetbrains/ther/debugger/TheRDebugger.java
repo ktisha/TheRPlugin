@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// TODO [dbg][test]
 public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @NotNull
@@ -19,6 +20,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @NotNull
   private final TheRProcess myProcess;
+
+  @NotNull
+  private final TheRDebuggerEvaluator myEvaluator;
 
   @NotNull
   private final TheRScriptReader myScriptReader;
@@ -36,11 +40,13 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final List<TheRStackFrame> myUnmodifiableStack;
 
   public TheRDebugger(@NotNull final TheRProcess process,
+                      @NotNull final TheRDebuggerEvaluator evaluator,
                       @NotNull final TheRFunctionResolver functionResolver,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver)
     throws IOException, InterruptedException {
     myProcess = process;
+    myEvaluator = evaluator;
     myScriptReader = scriptReader;
     myOutputReceiver = outputReceiver;
 
@@ -76,7 +82,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       myStack.size() - 1,
       new TheRStackFrame(
         new TheRLocation(topDebugger.getFunction(), topDebugger.getCurrentLineNumber()),
-        topDebugger.getVars()
+        topDebugger.getVars(),
+        myEvaluator
       )
     );
 
