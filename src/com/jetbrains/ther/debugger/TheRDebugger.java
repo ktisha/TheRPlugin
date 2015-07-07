@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
+import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -22,10 +22,16 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRProcess myProcess;
 
   @NotNull
-  private final TheRDebuggerEvaluatorFactory myEvaluatorFactory;
+  private final TheRFunctionDebuggerFactory myDebuggerFactory;
 
   @NotNull
   private final TheRFunctionResolver myFunctionResolver;
+
+  @NotNull
+  private final TheRLoadableVarHandler myVarHandler;
+
+  @NotNull
+  private final TheRDebuggerEvaluatorFactory myEvaluatorFactory;
 
   @NotNull
   private final TheRScriptReader myScriptReader;
@@ -42,17 +48,19 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   private final List<TheRStackFrame> myUnmodifiableStack;
 
-  @NotNull
-  private final TheRLoadableVarHandlerImpl myVarHandler;
-
   public TheRDebugger(@NotNull final TheRProcess process,
-                      @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
+                      @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                       @NotNull final TheRFunctionResolver functionResolver,
+                      @NotNull final TheRLoadableVarHandler varHandler,
+                      @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver) {
     myProcess = process;
-    myEvaluatorFactory = evaluatorFactory;
+    myDebuggerFactory = debuggerFactory;
     myFunctionResolver = functionResolver;
+    myVarHandler = varHandler;
+
+    myEvaluatorFactory = evaluatorFactory;
     myScriptReader = scriptReader;
     myOutputReceiver = outputReceiver;
 
@@ -60,11 +68,11 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack = new ArrayList<TheRStackFrame>();
     myUnmodifiableStack = Collections.unmodifiableList(myStack);
 
-    myVarHandler = new TheRLoadableVarHandlerImpl();
 
     appendDebugger(
-      new TheRMainFunctionDebugger(
+      myDebuggerFactory.getMainFunctionDebugger(
         myProcess,
+        myDebuggerFactory,
         this,
         functionResolver,
         myVarHandler,
@@ -88,6 +96,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
       myProcess,
+      myDebuggerFactory,
       this,
       myFunctionResolver,
       myVarHandler,

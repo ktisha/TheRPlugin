@@ -10,10 +10,11 @@ public class TheRDebuggerEvaluatorFactoryImpl implements TheRDebuggerEvaluatorFa
   @NotNull
   @Override
   public TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
+                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                             @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                             @NotNull final TheRFunctionResolver functionResolver,
                                             @NotNull final TheRLoadableVarHandler varHandler,
                                             @NotNull final TheRFunction function) {
-    return new TheRDebuggerEvaluatorImpl(process, debuggerHandler, functionResolver, varHandler, function);
+    return new TheRDebuggerEvaluatorImpl(process, debuggerFactory, debuggerHandler, functionResolver, varHandler, function);
   }
 }

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import org.jetbrains.annotations.NotNull;
 
-interface TheRFunctionDebuggerHandler {
+public interface TheRFunctionDebuggerHandler {
 
   void appendOutput(@NotNull final String text);
 

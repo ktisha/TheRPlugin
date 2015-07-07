@@ -16,6 +16,7 @@ import com.jetbrains.ther.debugger.*;
 import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
+import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -84,8 +85,10 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
       return new TheRDebugger(
         process,
-        new TheRDebuggerEvaluatorFactoryImpl(),
+        new TheRFunctionDebuggerFactoryImpl(),
         createFunctionResolver(environment),
+        new TheRLoadableVarHandlerImpl(),
+        new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReader(runConfiguration.getScriptName()),
         outputReceiver
       );

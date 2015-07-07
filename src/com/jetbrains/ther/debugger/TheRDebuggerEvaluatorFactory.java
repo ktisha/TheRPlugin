@@ -9,6 +9,7 @@ public interface TheRDebuggerEvaluatorFactory {
 
   @NotNull
   TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
+                                     @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                      @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                      @NotNull final TheRFunctionResolver functionResolver,
                                      @NotNull final TheRLoadableVarHandler varHandler,

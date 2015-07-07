@@ -17,6 +17,9 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private final TheRProcess myProcess;
 
   @NotNull
+  private final TheRFunctionDebuggerFactory myDebuggerFactory;
+
+  @NotNull
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
@@ -35,11 +38,13 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private boolean myIsNewDebuggerAppended;
 
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
+                                  @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheRScriptReader scriptReader) {
     myProcess = process;
+    myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
@@ -126,8 +131,9 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
         myIsNewDebuggerAppended = true;
 
         myDebuggerHandler.appendDebugger(
-          new TheRFunctionDebuggerImpl(
+          myDebuggerFactory.getNotMainFunctionDebugger(
             myProcess,
+            myDebuggerFactory,
             myDebuggerHandler,
             myFunctionResolver,
             myVarHandler,

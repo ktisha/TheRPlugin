@@ -15,10 +15,13 @@ import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionNa
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
-class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
+class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   private final TheRProcess myProcess;
+
+  @NotNull
+  private final TheRFunctionDebuggerFactory myDebuggerFactory;
 
   @NotNull
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
@@ -37,12 +40,14 @@ class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
   @NotNull
   private List<TheRVar> myVars;
 
-  public TheRFunctionDebuggerImpl(@NotNull final TheRProcess process,
-                                  @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                  @NotNull final TheRFunctionResolver functionResolver,
-                                  @NotNull final TheRLoadableVarHandler varHandler,
-                                  @NotNull final TheRFunction function) throws IOException, InterruptedException {
+  public TheRNotMainFunctionDebugger(@NotNull final TheRProcess process,
+                                     @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
+                                     @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                     @NotNull final TheRFunctionResolver functionResolver,
+                                     @NotNull final TheRLoadableVarHandler varHandler,
+                                     @NotNull final TheRFunction function) throws IOException, InterruptedException {
     myProcess = process;
+    myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
@@ -155,8 +160,9 @@ class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     final String nextFunction = loadFunctionName(myProcess);
 
     myDebuggerHandler.appendDebugger(
-      new TheRFunctionDebuggerImpl(
+      myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,
+        myDebuggerFactory,
         myDebuggerHandler,
         myFunctionResolver,
         myVarHandler,

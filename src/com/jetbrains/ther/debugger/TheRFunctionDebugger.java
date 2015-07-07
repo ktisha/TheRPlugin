@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.List;
 
-interface TheRFunctionDebugger {
+public interface TheRFunctionDebugger {
 
   @NotNull
   TheRFunction getFunction();

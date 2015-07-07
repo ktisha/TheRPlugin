@@ -12,10 +12,13 @@ import java.io.IOException;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 
 // TODO [dbg][test]
-public class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
+class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
   private final TheRProcess myProcess;
+
+  @NotNull
+  private final TheRFunctionDebuggerFactory myDebuggerFactory;
 
   @NotNull
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
@@ -30,12 +33,14 @@ public class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private final TheRFunction myFunction;
 
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
+                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                    @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                    @NotNull final TheRFunctionResolver functionResolver,
                                    @NotNull final TheRLoadableVarHandler varHandler,
                                    @NotNull final TheRFunction function) {
 
     myProcess = process;
+    myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
@@ -81,8 +86,9 @@ public class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     if (response.getType() == TheRProcessResponseType.DEBUGGING_IN) {
       final String nextFunction = loadFunctionName(myProcess);
 
-      final TheRFunctionDebugger debugger = new TheRFunctionDebuggerImpl(
+      final TheRFunctionDebugger debugger = myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,
+        myDebuggerFactory,
         myDebuggerHandler,
         myFunctionResolver,
         myVarHandler,
