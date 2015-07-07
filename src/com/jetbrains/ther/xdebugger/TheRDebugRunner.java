@@ -84,7 +84,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
       return new TheRDebugger(
         process,
-        new TheRDebuggerEvaluatorImpl(process),
+        new TheRDebuggerEvaluatorFactoryImpl(),
         createFunctionResolver(environment),
         new TheRScriptReader(runConfiguration.getScriptName()),
         outputReceiver

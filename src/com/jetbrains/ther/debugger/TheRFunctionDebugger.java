@@ -20,4 +20,7 @@ interface TheRFunctionDebugger {
   boolean hasNext();
 
   void advance() throws IOException, InterruptedException;
+
+  @NotNull
+  String getResult();
 }

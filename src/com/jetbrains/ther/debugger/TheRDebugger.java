@@ -22,7 +22,10 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRProcess myProcess;
 
   @NotNull
-  private final TheRDebuggerEvaluator myEvaluator;
+  private final TheRDebuggerEvaluatorFactory myEvaluatorFactory;
+
+  @NotNull
+  private final TheRFunctionResolver myFunctionResolver;
 
   @NotNull
   private final TheRScriptReader myScriptReader;
@@ -39,13 +42,17 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   private final List<TheRStackFrame> myUnmodifiableStack;
 
+  @NotNull
+  private final TheRLoadableVarHandlerImpl myVarHandler;
+
   public TheRDebugger(@NotNull final TheRProcess process,
-                      @NotNull final TheRDebuggerEvaluator evaluator,
+                      @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRFunctionResolver functionResolver,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver) {
     myProcess = process;
-    myEvaluator = evaluator;
+    myEvaluatorFactory = evaluatorFactory;
+    myFunctionResolver = functionResolver;
     myScriptReader = scriptReader;
     myOutputReceiver = outputReceiver;
 
@@ -53,12 +60,14 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack = new ArrayList<TheRStackFrame>();
     myUnmodifiableStack = Collections.unmodifiableList(myStack);
 
+    myVarHandler = new TheRLoadableVarHandlerImpl();
+
     appendDebugger(
       new TheRMainFunctionDebugger(
         myProcess,
         this,
         functionResolver,
-        new TheRLoadableVarHandlerImpl(),
+        myVarHandler,
         myScriptReader
       )
     );
@@ -77,12 +86,20 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     final TheRFunctionDebugger topDebugger = topDebugger();
 
+    final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
+      myProcess,
+      this,
+      myFunctionResolver,
+      myVarHandler,
+      topDebugger.getFunction()
+    );
+
     myStack.set(
       myStack.size() - 1,
       new TheRStackFrame(
         new TheRLocation(topDebugger.getFunction(), topDebugger.getCurrentLineNumber()),
         topDebugger.getVars(),
-        myEvaluator
+        evaluator
       )
     );
 

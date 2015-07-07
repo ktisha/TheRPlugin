@@ -101,6 +101,12 @@ class TheRFunctionDebuggerImpl implements TheRFunctionDebugger {
     }
   }
 
+  @NotNull
+  @Override
+  public String getResult() {
+    return ""; // TODO [dbg][impl]
+  }
+
   private int loadLineNumber() throws IOException, InterruptedException {
     return extractLineNumber(
       myProcess.execute(

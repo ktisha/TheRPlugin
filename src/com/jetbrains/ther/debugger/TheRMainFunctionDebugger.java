@@ -108,6 +108,12 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
   }
 
+  @NotNull
+  @Override
+  public String getResult() {
+    return ""; // TODO [dbg][update]
+  }
+
   private void forwardCommentsAndEmptyLines() throws IOException {
     while (TheRDebuggerUtils.isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
       myScriptReader.advance();
