@@ -19,7 +19,9 @@ public abstract class TheRProcess {
     final TheRProcessResponse response = execute(command);
 
     if (response.getType() != expectedType) {
-      throw new IOException(); // TODO [dbg][update]
+      throw new IOException(
+        "Actual response type is not the same as expected: [actual: " + response.getType() + ", expected: " + expectedType + "]"
+      );
     }
 
     return response.getText();

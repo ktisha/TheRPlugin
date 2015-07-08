@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseTypeCalculator.calculate;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseTypeCalculator.isComplete;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
 import static org.junit.Assert.*;
 
-public class TheRProcessResponseTypeCalculatorTest {
+public class TheRProcessResponseCalculatorTest {
 
   @NotNull
   private static final String INTELLIJ_THER_X_EXIT = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_EXIT_FUNCTION_SUFFIX;
@@ -35,17 +35,17 @@ public class TheRProcessResponseTypeCalculatorTest {
 
   @Test
   public void calculatePlus() {
-    assertEquals(TheRProcessResponseType.PLUS, calculate(PLUS_AND_SPACE));
+    assertEquals(TheRProcessResponseType.PLUS, calculate(PLUS_AND_SPACE).getType());
   }
 
   @Test
   public void calculateJustBrowse() {
-    assertEquals(TheRProcessResponseType.EMPTY, calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
+    assertEquals(TheRProcessResponseType.EMPTY, calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX).getType());
   }
 
-  @Test
+  @Test(expected = IllegalArgumentException.class)
   public void calculateIncomplete() {
-    assertNull(calculate("ls()\n[1] \"x\"\n" + BROWSE_PREFIX));
+    calculate("ls()\n[1] \"x\"\n" + BROWSE_PREFIX);
   }
 
   @Test
@@ -64,7 +64,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "    }\n" +
         "}\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -75,7 +75,7 @@ public class TheRProcessResponseTypeCalculatorTest {
       calculate(
         TheRDebugConstants.DEBUG_AT + "1: x <- c(1)\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -87,7 +87,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "[1] 1 2 3\n" +
         TheRDebugConstants.DEBUG_AT + "1: x <- c(1)\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -102,7 +102,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "    print(\"x\")\n" +
         "}\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -125,7 +125,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "    }\n" +
         "}\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -149,7 +149,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "    }\n" +
         "}\n" +
         BROWSE_PREFIX + "3" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -162,7 +162,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "[1] \"exit x\"\n" +
         "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)\n" +
         BROWSE_PREFIX + "1" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -176,7 +176,7 @@ public class TheRProcessResponseTypeCalculatorTest {
         "[1] \"exit x\"\n" +
         "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)\n" +
         BROWSE_PREFIX + "1" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
   }
 
@@ -187,12 +187,7 @@ public class TheRProcessResponseTypeCalculatorTest {
       calculate(
         "[1] \"x\"\n" +
         BROWSE_PREFIX + "1" + BROWSE_SUFFIX
-      )
+      ).getType()
     );
-  }
-
-  @Test
-  public void calculateOffset() {
-    assertNull(calculate(BROWSE_PREFIX + "1" + BROWSE_SUFFIX, BROWSE_PREFIX.length()));
   }
 }

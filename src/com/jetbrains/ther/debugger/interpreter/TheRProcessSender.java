@@ -4,14 +4,14 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 class TheRProcessSender {
 
   @NotNull
-  private final OutputStreamWriter myWriter;
+  private final Writer myWriter;
 
-  public TheRProcessSender(@NotNull final OutputStreamWriter writer) {
+  public TheRProcessSender(@NotNull final Writer writer) {
     myWriter = writer;
   }
 

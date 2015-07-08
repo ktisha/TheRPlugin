@@ -1,8 +1,8 @@
 package com.jetbrains.ther.debugger.interpreter;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,8 +33,12 @@ class TheRProcessReceiver {
         millis *= 2;
       }
       else {
-        if (TheRProcessResponseTypeCalculator.isComplete(sb)) {
-          return calculateResponse(sb);
+        if (TheRProcessResponseCalculator.isComplete(sb)) {
+          return TheRProcessResponseCalculator.calculate(
+            sb.substring(
+              getSecondLineIndex(sb)
+            )
+          );
         }
 
         millis = TheRDebugConstants.INITIAL_SLEEP;
@@ -50,31 +54,17 @@ class TheRProcessReceiver {
     return length != 0;
   }
 
-  @NotNull
-  private TheRProcessResponse calculateResponse(@NotNull final StringBuilder response) {
-    final TheRProcessResponseType type = calculateResponseType(response);
+  private int getSecondLineIndex(@NotNull final StringBuilder sb) {
+    int index = 0;
 
-    response.setLength(response.lastIndexOf(TheRDebugConstants.LINE_SEPARATOR)); // remove last line
-
-    return new TheRProcessResponse(toStringFromSecondLine(response), type);
-  }
-
-  @NotNull
-  private TheRProcessResponseType calculateResponseType(@NotNull final StringBuilder response) {
-    final TheRProcessResponseType responseType =
-      TheRProcessResponseTypeCalculator.calculate(response, response.indexOf(TheRDebugConstants.LINE_SEPARATOR) + 1);
-
-    if (responseType == null) {
-      throw new IllegalArgumentException("Response is incomplete");
+    while (!StringUtil.isLineBreak(sb.charAt(index))) {
+      index++;
     }
 
-    return responseType;
-  }
+    while (StringUtil.isLineBreak(sb.charAt(index))) {
+      index++;
+    }
 
-  @NotNull
-  private String toStringFromSecondLine(@NotNull final StringBuilder response) {
-    final int index = response.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-
-    return (index == -1) ? "" : response.substring(index + 1);
+    return index;
   }
 }
