@@ -14,21 +14,24 @@ import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
 final class TheRProcessResponseCalculator {
 
   @NotNull
-  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry$");
+  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");
 
   @NotNull
-  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit$");
+  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit( )*$");
+
+  @NotNull
+  private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)+");
 
   public static boolean isComplete(@NotNull final CharSequence response) {
     return endsLineBreakAndPlusAndSpace(response) || endsLineBreakAndBrowseAndSpace(response);
   }
 
   @NotNull
-  public static TheRProcessResponse calculate(@NotNull final String response) {
-    final String[] lines = StringUtil.splitByLines(response);
+  public static TheRProcessResponse calculate(@NotNull final CharSequence response) {
+    final String[] lines = LINE_BREAK_PATTERN.split(response);
 
     return new TheRProcessResponse(
-      concatExcludeLast(lines),
+      concatExcludingFirstAndLast(lines),
       calculateType(lines)
     );
   }
@@ -57,10 +60,10 @@ final class TheRProcessResponseCalculator {
   }
 
   @NotNull
-  private static String concatExcludeLast(@NotNull final String[] lines) {
+  private static String concatExcludingFirstAndLast(@NotNull final String[] lines) {
     final StringBuilder sb = new StringBuilder();
 
-    for (int i = 0; i < lines.length - 1; i++) {
+    for (int i = 1; i < lines.length - 1; i++) {
       sb.append(lines[i]);
 
       if (i != lines.length - 2) {
@@ -125,28 +128,28 @@ final class TheRProcessResponseCalculator {
   }
 
   private static boolean justPlusAndSpace(@NotNull final String[] lines) {
-    return lines.length == 1 && lines[0].equals(PLUS_AND_SPACE);
+    return lines.length == 2 && lines[1].equals(PLUS_AND_SPACE);
   }
 
   private static boolean justBrowseAndSpace(@NotNull final String[] lines) {
-    return lines.length == 1 && justBrowseAndSpace(lines[0]);
+    return lines.length == 2 && justBrowseAndSpace(lines[1]);
   }
 
   private static boolean endsBrowseAndSpace(@NotNull final String[] lines) {
-    return lines.length > 0 && justBrowseAndSpace(lines[lines.length - 1]);
+    return lines.length > 1 && justBrowseAndSpace(lines[lines.length - 1]);
   }
 
   private static boolean debugging(@NotNull final String[] lines) {
-    return lines.length > 0 && lines[0].startsWith(TheRDebugConstants.DEBUGGING_IN);
+    return lines.length > 1 && lines[1].startsWith(TheRDebugConstants.DEBUGGING_IN);
   }
 
   private static boolean debugAt(@NotNull final String[] lines) {
-    return lines.length > 1 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT);
+    return lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT);
   }
 
   private static boolean startTrace(@NotNull final String[] lines) {
-    for (final String line : lines) {
-      if (START_TRACE_PATTERN.matcher(line).find()) {
+    for (int i = 1; i < lines.length - 1; i++) {
+      if (START_TRACE_PATTERN.matcher(lines[i]).find()) {
         return true;
       }
     }
@@ -155,7 +158,7 @@ final class TheRProcessResponseCalculator {
   }
 
   private static boolean continueTrace(@NotNull final String[] lines) {
-    for (int i = 0; i < lines.length - 5; i++) {
+    for (int i = 1; i < lines.length - 5; i++) {
       if (continueTrace(lines, i)) {
         return true;
       }
@@ -165,8 +168,8 @@ final class TheRProcessResponseCalculator {
   }
 
   private static boolean endTrace(@NotNull final String[] lines) {
-    for (final String line : lines) {
-      if (END_TRACE_PATTERN.matcher(line).find()) {
+    for (int i = 1; i < lines.length - 1; i++) {
+      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
         return true;
       }
     }

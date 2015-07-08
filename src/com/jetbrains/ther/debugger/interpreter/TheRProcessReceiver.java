@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.interpreter;
 
-import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
@@ -34,11 +33,7 @@ class TheRProcessReceiver {
       }
       else {
         if (TheRProcessResponseCalculator.isComplete(sb)) {
-          return TheRProcessResponseCalculator.calculate(
-            sb.substring(
-              getSecondLineIndex(sb)
-            )
-          );
+          return TheRProcessResponseCalculator.calculate(sb);
         }
 
         millis = TheRDebugConstants.INITIAL_SLEEP;
@@ -52,19 +47,5 @@ class TheRProcessReceiver {
     sb.append(myBuffer, 0, length);
 
     return length != 0;
-  }
-
-  private int getSecondLineIndex(@NotNull final StringBuilder sb) {
-    int index = 0;
-
-    while (!StringUtil.isLineBreak(sb.charAt(index))) {
-      index++;
-    }
-
-    while (StringUtil.isLineBreak(sb.charAt(index))) {
-      index++;
-    }
-
-    return index;
   }
 }
