@@ -79,6 +79,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String TRACING = "Tracing";
 
+  @NotNull
+  public static final String EXITING_FROM = "exiting from:";
+
   // language
 
   public static final char COMMENT_SYMBOL = '#';

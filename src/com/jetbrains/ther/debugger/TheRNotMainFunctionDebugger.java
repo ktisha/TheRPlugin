@@ -5,11 +5,13 @@ import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
@@ -40,6 +42,9 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   private List<TheRVar> myVars;
 
+  @NotNull
+  private String myResult;
+
   public TheRNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                      @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                      @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
@@ -55,6 +60,8 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
 
     myCurrentLineNumber = loadLineNumber();
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
+
+    myResult = "";
   }
 
   @NotNull
@@ -109,7 +116,11 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   @Override
   public String getResult() {
-    return ""; // TODO [dbg][impl]
+    if (hasNext()) {
+      throw new IllegalStateException("GetResult should be called only if hasNext returns false");
+    }
+
+    return myResult;
   }
 
   private int loadLineNumber() throws IOException, InterruptedException {
@@ -144,7 +155,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     // TODO [dbg][response]
 
     final String[] lines = StringUtil.splitByLines(text);
-    final String lastLine = lines.length == 0 ? null : lines[lines.length - 1];
+    final String lastLine = getLineFromTheEndOrNull(lines, 0);
 
     if (lastLine != null && lastLine.startsWith(TheRDebugConstants.DEBUG_AT)) {
       myDebuggerHandler.setReturnLineNumber(
@@ -154,6 +165,8 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
 
     myCurrentLineNumber = -1;
     myVars = Collections.emptyList();
+
+    myResult = extractResult(lines);
   }
 
   private void handleDebuggingIn() throws IOException, InterruptedException {
@@ -176,5 +189,29 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     final int end = text.indexOf(':', begin);
 
     return Integer.parseInt(text.substring(begin, end)) - 1;
+  }
+
+  @Nullable
+  private String getLineFromTheEndOrNull(final @NotNull String[] lines, final int index) {
+    return lines.length < index + 1 ? null : lines[lines.length - index - 1];
+  }
+
+  @NotNull
+  private String extractResult(@NotNull final String[] lines) {
+    final String candidate = getTraceLastLine(lines);
+
+    if (candidate == null || candidate.startsWith(TheRDebugConstants.EXITING_FROM)) {
+      return "";
+    }
+    else {
+      return candidate;
+    }
+  }
+
+  @Nullable
+  private String getTraceLastLine(@NotNull final String[] lines) {
+    final String lastLine = getLineFromTheEndOrNull(lines, 0);
+
+    return (lastLine != null && lastLine.startsWith(DEBUG_AT)) ? getLineFromTheEndOrNull(lines, 1) : lastLine;
   }
 }

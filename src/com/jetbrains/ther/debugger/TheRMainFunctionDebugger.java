@@ -116,7 +116,11 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   @Override
   public String getResult() {
-    return ""; // TODO [dbg][update]
+    if (hasNext()) {
+      throw new IllegalStateException("GetResult should be called only if hasNext returns false");
+    }
+
+    return "";
   }
 
   private void forwardCommentsAndEmptyLines() throws IOException {

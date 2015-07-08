@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
@@ -83,26 +82,14 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private String evaluate(@NotNull final String expression) throws IOException, InterruptedException {
     final TheRProcessResponse response = myProcess.execute(expression);
 
-    if (response.getType() == TheRProcessResponseType.DEBUGGING_IN) {
-      final String nextFunction = loadFunctionName(myProcess);
-
-      final TheRFunctionDebugger debugger = myDebuggerFactory.getNotMainFunctionDebugger(
-        myProcess,
-        myDebuggerFactory,
-        myDebuggerHandler,
-        myFunctionResolver,
-        myVarHandler,
-        myFunctionResolver.resolve(myFunction, nextFunction)
-      );
-
-      while (debugger.hasNext()) {
-        debugger.advance();
-      }
-
-      return debugger.getResult();
-    }
-    else {
-      return response.getText(); // TODO [dbg][update]
+    switch (response.getType()) {
+      case DEBUGGING_IN:
+        return evaluateFunction();
+      case EMPTY:
+      case RESPONSE:
+        return response.getText();
+      default:
+        throw new IOException("Unexpected response");
     }
   }
 
@@ -110,5 +97,25 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     final int prefixLength = "[1] ".length();
 
     return text.length() > prefixLength && Boolean.parseBoolean(text.substring(prefixLength));
+  }
+
+  @NotNull
+  private String evaluateFunction() throws IOException, InterruptedException {
+    final String nextFunction = loadFunctionName(myProcess);
+
+    final TheRFunctionDebugger debugger = myDebuggerFactory.getNotMainFunctionDebugger(
+      myProcess,
+      myDebuggerFactory,
+      myDebuggerHandler,
+      myFunctionResolver,
+      myVarHandler,
+      myFunctionResolver.resolve(myFunction, nextFunction)
+    );
+
+    while (debugger.hasNext()) {
+      debugger.advance();
+    }
+
+    return debugger.getResult();
   }
 }
