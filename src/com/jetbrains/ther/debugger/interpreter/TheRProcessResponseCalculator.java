@@ -260,8 +260,14 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryDebugAt(@NotNull final String[] lines) {
-    if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT)) {
-      return new TypeAndOutputLineBounds(DEBUG_AT, 1, lines.length - 2);
+    if (lines.length > 2) {
+      final int debugAtLine = findDebugAt(lines, 0);
+
+      if (debugAtLine < lines.length - 1) {
+        return new TypeAndOutputLineBounds(DEBUG_AT, 1, debugAtLine);
+      } else {
+        return null;
+      }
     }
     else {
       return null;

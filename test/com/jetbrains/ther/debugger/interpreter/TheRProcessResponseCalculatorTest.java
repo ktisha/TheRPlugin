@@ -114,6 +114,19 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
+  public void calculateDebugAtFunction() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TheRDebugConstants.DEBUG_AT + "2: x <- function() {\n" +
+      "print(\"x\")\n" +
+      "}",
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      DEBUG_AT,
+      ""
+    );
+  }
+
+  @Test
   public void calculateStartTrace() {
     check(
       EXECUTE_AND_STEP_COMMAND,
@@ -194,7 +207,7 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n"+
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       END_TRACE,
@@ -208,8 +221,8 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n"+
-      "[1] 1 2 3\n"+
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       END_TRACE,
