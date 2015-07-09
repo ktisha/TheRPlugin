@@ -35,22 +35,22 @@ public class TheRProcessResponse {
   }
 
   @NotNull
-  public TextRange getOutputRange() { // TODO [dbg][update]
+  public TextRange getOutputRange() {
     return myOutputRange;
   }
 
   @Override
-  public boolean equals(@Nullable final Object o) { // TODO [dbg][update]
+  public boolean equals(@Nullable final Object o) {
     if (o == this) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
     final TheRProcessResponse response = (TheRProcessResponse)o;
 
-    return myType == response.myType && myText.equals(response.myText);
+    return myType == response.myType && myText.equals(response.myText) && myOutputRange.equals(response.myOutputRange);
   }
 
   @Override
-  public int hashCode() { // TODO [dbg][update]
-    return 31 * myText.hashCode() + myType.hashCode();
+  public int hashCode() {
+    return 31 * (31 * myText.hashCode() + myType.hashCode()) + myOutputRange.hashCode();
   }
 }

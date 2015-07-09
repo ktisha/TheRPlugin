@@ -51,7 +51,7 @@ public class TheRProcessResponseCalculatorTest {
   @Test
   public void calculateJustBrowse() {
     check(
-      "debug(x)",
+      DEBUG_COMMAND + "(x)",
       "",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       EMPTY,
@@ -134,7 +134,7 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      "exiting from: FUN(c(-1, 0, 1)[[1L]], ...)\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       "debug: {\n" +
       "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
@@ -155,10 +155,10 @@ public class TheRProcessResponseCalculatorTest {
   public void calculateContinueTraceWithResponse() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      "[1] 1 2 3\n" +
       TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      "exiting from: FUN(c(-1, 0, 1)[[1L]], ...)\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
+      "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       "debug: {\n" +
       "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
@@ -181,7 +181,7 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)",
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       END_TRACE,
       ""
@@ -192,10 +192,25 @@ public class TheRProcessResponseCalculatorTest {
   public void calculateEndTraceWithResponse() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      "[1] 1 2 3\n" +
       TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
       "[1] \"exit x\"\n" +
-      "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)",
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n"+
+      "[1] 1 2 3",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      END_TRACE,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
+  public void calculateEndTraceWithResponseAndDebugAt() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n"+
+      "[1] 1 2 3\n"+
+      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       END_TRACE,
       "[1] 1 2 3"

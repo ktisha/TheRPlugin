@@ -68,6 +68,9 @@ final class TheRProcessResponseCalculator {
                                                      @NotNull final TypeAndOutputLineBounds typeAndOutputLineBounds) {
     final StringBuilder sb = new StringBuilder();
 
+    final TextRange preCalculatedRange =
+      (typeAndOutputLineBounds.myOutputEnd <= typeAndOutputLineBounds.myOutputBegin) ? TextRange.EMPTY_RANGE : null;
+
     int outputBegin = 0;
     int outputEnd = 0;
 
@@ -78,14 +81,16 @@ final class TheRProcessResponseCalculator {
         sb.append(TheRDebugConstants.LINE_SEPARATOR);
       }
 
-      outputBegin += calculateOutputBeginAddition(lines, typeAndOutputLineBounds.myOutputBegin, i);
-      outputEnd += calculateOutputEndAddition(lines, typeAndOutputLineBounds.myOutputEnd, i);
+      if (preCalculatedRange == null) {
+        outputBegin += calculateOutputBeginAddition(lines, typeAndOutputLineBounds.myOutputBegin, i);
+        outputEnd += calculateOutputEndAddition(lines, typeAndOutputLineBounds.myOutputEnd, i);
+      }
     }
 
     return new TheRProcessResponse(
       sb.toString(),
       typeAndOutputLineBounds.myType,
-      new TextRange(outputBegin, outputEnd)
+      preCalculatedRange == null ? new TextRange(outputBegin, outputEnd) : preCalculatedRange
     );
   }
 
@@ -113,18 +118,6 @@ final class TheRProcessResponseCalculator {
       return candidate;
     }
 
-    candidate = tryDebugAt(lines);
-
-    if (candidate != null) {
-      return candidate;
-    }
-
-    candidate = tryStartTrace(lines);
-
-    if (candidate != null) {
-      return candidate;
-    }
-
     candidate = tryContinueTrace(lines);
 
     if (candidate != null) {
@@ -132,6 +125,18 @@ final class TheRProcessResponseCalculator {
     }
 
     candidate = tryEndTrace(lines);
+
+    if (candidate != null) {
+      return candidate;
+    }
+
+    candidate = tryDebugAt(lines);
+
+    if (candidate != null) {
+      return candidate;
+    }
+
+    candidate = tryStartTrace(lines);
 
     if (candidate != null) {
       return candidate;
@@ -223,6 +228,37 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
+  private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
+    for (int i = 1; i < lines.length - 5; i++) {
+      if (lines[i + 2].startsWith(EXITING_FROM) && END_TRACE_PATTERN.matcher(lines[i]).find()) {
+        for (int j = i + 3; j < lines.length; j++) {
+          if (lines[j].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
+            return new TypeAndOutputLineBounds(CONTINUE_TRACE, i + 3, j);
+          }
+        }
+
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  @Nullable
+  private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
+    for (int i = 1; i < lines.length - 1; i++) {
+      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
+        final int outputLineBegin = findExitingFrom(lines, i + 1) + 1;
+        final int outputLineEnd = findDebugAt(lines, outputLineBegin);
+
+        return new TypeAndOutputLineBounds(END_TRACE, outputLineBegin, outputLineEnd);
+      }
+    }
+
+    return null;
+  }
+
+  @Nullable
   private static TypeAndOutputLineBounds tryDebugAt(@NotNull final String[] lines) {
     if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT)) {
       return new TypeAndOutputLineBounds(DEBUG_AT, 1, lines.length - 2);
@@ -237,28 +273,6 @@ final class TheRProcessResponseCalculator {
     for (int i = 1; i < lines.length - 1; i++) {
       if (START_TRACE_PATTERN.matcher(lines[i]).find()) {
         return new TypeAndOutputLineBounds(START_TRACE, 1, i);
-      }
-    }
-
-    return null;
-  }
-
-  @Nullable
-  private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
-    for (int i = 1; i < lines.length - 5; i++) {
-      if (continueTrace(lines, i)) {
-        return new TypeAndOutputLineBounds(CONTINUE_TRACE, 1, i);
-      }
-    }
-
-    return null;
-  }
-
-  @Nullable
-  private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
-    for (int i = 1; i < lines.length - 1; i++) {
-      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
-        return new TypeAndOutputLineBounds(END_TRACE, 1, i);
       }
     }
 
@@ -285,10 +299,24 @@ final class TheRProcessResponseCalculator {
            isDigits(line, BROWSE_PREFIX.length(), line.length() - BROWSE_SUFFIX.length() - 1);
   }
 
-  private static boolean continueTrace(@NotNull final String[] lines, final int i) {
-    return lines[i + 2].startsWith(EXITING_FROM) &&
-           lines[i + 3].startsWith(TheRDebugConstants.DEBUGGING_IN) &&
-           END_TRACE_PATTERN.matcher(lines[i]).find();
+  private static int findExitingFrom(@NotNull final String[] lines, final int index) {
+    int result = index;
+
+    while (!lines[result].startsWith(EXITING_FROM)) {
+      result++;
+    }
+
+    return result;
+  }
+
+  private static int findDebugAt(@NotNull final String[] lines, final int index) {
+    int result = index;
+
+    while (result < lines.length && !lines[result].startsWith(TheRDebugConstants.DEBUG_AT)) {
+      result++;
+    }
+
+    return result;
   }
 
   private static boolean isDigits(@NotNull final CharSequence sequence, final int beginIndex, final int endIndex) { // [l..r]

@@ -1,18 +1,15 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
@@ -98,7 +95,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
         handleContinueTrace(response);
         break;
       case END_TRACE:
-        handleEndTrace(response.getText());
+        handleEndTrace(response);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn();
@@ -146,22 +143,17 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
-  private void handleEndTrace(@NotNull final String text) {
-    // TODO [dbg][update]
+  private void handleEndTrace(@NotNull final TheRProcessResponse response) {
+    myResult = response.getOutputRange().substring(response.getText());
 
-    final String[] lines = StringUtil.splitByLines(text);
-    final String lastLine = getLineFromTheEndOrNull(lines, 0);
+    final int returnLineNumber = extractReturnLineNumber(response);
 
-    if (lastLine != null && lastLine.startsWith(TheRDebugConstants.DEBUG_AT)) {
-      myDebuggerHandler.setReturnLineNumber(
-        extractLineNumber(lastLine)
-      );
+    if (returnLineNumber != -1) {
+      myDebuggerHandler.setReturnLineNumber(returnLineNumber);
     }
 
     myCurrentLineNumber = -1;
     myVars = Collections.emptyList();
-
-    myResult = extractResult(lines);
   }
 
   private void handleDebuggingIn() throws IOException, InterruptedException {
@@ -189,7 +181,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     return Integer.parseInt(text.substring(begin, end)) - 1;
   }
 
-  private void appendOutput(final @NotNull TheRProcessResponse response) {
+  private void appendOutput(@NotNull final TheRProcessResponse response) {
     final TextRange outputRange = response.getOutputRange();
 
     if (!outputRange.isEmpty()) {
@@ -201,27 +193,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     }
   }
 
-  @Nullable
-  private String getLineFromTheEndOrNull(final @NotNull String[] lines, final int index) {
-    return lines.length < index + 1 ? null : lines[lines.length - index - 1];
-  }
-
-  @NotNull
-  private String extractResult(@NotNull final String[] lines) {
-    final String candidate = getTraceLastLine(lines);
-
-    if (candidate == null || candidate.startsWith(TheRDebugConstants.EXITING_FROM)) {
-      return "";
-    }
-    else {
-      return candidate;
-    }
-  }
-
-  @Nullable
-  private String getTraceLastLine(@NotNull final String[] lines) {
-    final String lastLine = getLineFromTheEndOrNull(lines, 0);
-
-    return (lastLine != null && lastLine.startsWith(DEBUG_AT)) ? getLineFromTheEndOrNull(lines, 1) : lastLine;
+  private int extractReturnLineNumber(@NotNull final TheRProcessResponse response) {
+    return -1; // TODO [dbg][impl]
   }
 }
