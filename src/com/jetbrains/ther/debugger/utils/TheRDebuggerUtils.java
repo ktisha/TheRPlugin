@@ -1,8 +1,6 @@
 package com.jetbrains.ther.debugger.utils;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
@@ -14,14 +12,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE;
+
 public final class TheRDebuggerUtils {
 
   @NotNull
   public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
     throws IOException, InterruptedException {
     final String text = process.execute(
-      TheRDebugConstants.LS_COMMAND,
-      TheRProcessResponseType.RESPONSE
+      LS_COMMAND,
+      RESPONSE
     );
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
@@ -47,18 +49,15 @@ public final class TheRDebuggerUtils {
 
   @NotNull
   public static String loadFunctionName(@NotNull final TheRProcess process) throws IOException, InterruptedException {
-    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
 
-    final String entryText = process.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
-
-    final int firstLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR);
-    final int secondLineSeparator = entryText.indexOf(TheRDebugConstants.LINE_SEPARATOR, firstLineSeparator + 1);
-
-    return entryText.substring(
-      firstLineSeparator + "[1] \"".length() + "enter ".length() + 1,
-      secondLineSeparator - "\"".length()
+    return extractFunctionName(
+      process.execute(
+        EXECUTE_AND_STEP_COMMAND,
+        START_TRACE
+      )
     );
   }
 
@@ -72,10 +71,34 @@ public final class TheRDebuggerUtils {
         continue;
       }
 
-      return line.charAt(i) == TheRDebugConstants.COMMENT_SYMBOL;
+      return line.charAt(i) == COMMENT_SYMBOL;
     }
 
     return true;
+  }
+
+  public static int findNextLineBegin(@NotNull final CharSequence sequence, final int index) {
+    int current = index;
+
+    while (current < sequence.length() && !StringUtil.isLineBreak(sequence.charAt(current))) {
+      current++;
+    }
+
+    while (current < sequence.length() && StringUtil.isLineBreak(sequence.charAt(current))) {
+      current++;
+    }
+
+    return current;
+  }
+
+  public static int findCurrentLineEnd(@NotNull final CharSequence sequence, final int index) {
+    int current = index;
+
+    while (current < sequence.length() && !StringUtil.isLineBreak(sequence.charAt(current))) {
+      current++;
+    }
+
+    return current;
   }
 
   @NotNull
@@ -104,8 +127,8 @@ public final class TheRDebuggerUtils {
       process,
       var,
       process.execute(
-        TheRDebugConstants.TYPEOF_COMMAND + "(" + var + ")",
-        TheRProcessResponseType.RESPONSE
+        TYPEOF_COMMAND + "(" + var + ")",
+        RESPONSE
       )
     );
 
@@ -114,6 +137,17 @@ public final class TheRDebuggerUtils {
     }
 
     return new TheRVar(var, type, loadValue(process, handler, var, type));
+  }
+
+  @NotNull
+  private static String extractFunctionName(final @NotNull String entryText) throws IOException, InterruptedException {
+    final int secondLineBegin = findNextLineBegin(entryText, 0);
+    final int secondLineEnd = findCurrentLineEnd(entryText, secondLineBegin);
+
+    return entryText.substring(
+      secondLineBegin + "[1] \"".length() + "enter ".length(),
+      secondLineEnd - "\"".length()
+    );
   }
 
   @Nullable
@@ -137,7 +171,7 @@ public final class TheRDebuggerUtils {
     return handler.handleValue(
       var,
       type,
-      process.execute(var, TheRProcessResponseType.RESPONSE)
+      process.execute(var, RESPONSE)
     );
   }
 }

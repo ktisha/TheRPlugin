@@ -32,21 +32,29 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
                             @NotNull final String type,
                             @NotNull final String value) {
     if (type.equals(TheRDebugConstants.FUNCTION_TYPE)) {
-      final String[] lines = StringUtil.splitByLinesKeepSeparators(value);
-      final StringBuilder sb = new StringBuilder();
+      final int thirdLineBegin = TheRDebuggerUtils.findNextLineBegin(value, TheRDebuggerUtils.findNextLineBegin(value, 0));
 
-      for (int i = 2; i < lines.length - 1; i++) {
-        sb.append(lines[i]);
-      }
-
-      while (StringUtil.endsWithLineBreak(sb)) {
-        sb.setLength(sb.length() - 1);
-      }
-
-      return sb.toString();
+      return value.substring(
+        thirdLineBegin,
+        findLastButOneLineEnd(value) + 1
+      );
     }
     else {
       return value;
     }
+  }
+
+  private int findLastButOneLineEnd(@NotNull final String text) {
+    int current = text.length() - 1;
+
+    while (current > -1 && !StringUtil.isLineBreak(text.charAt(current))) {
+      current--;
+    }
+
+    while (current > -1 && StringUtil.isLineBreak(text.charAt(current))) {
+      current--;
+    }
+
+    return current;
   }
 }
