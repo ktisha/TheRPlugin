@@ -66,13 +66,8 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   @Override
-  public TheRFunction getFunction() {
-    return myFunction;
-  }
-
-  @Override
-  public int getCurrentLineNumber() {
-    return myCurrentLineNumber;
+  public TheRLocation getLocation() {
+    return new TheRLocation(myFunction, myCurrentLineNumber);
   }
 
   @Override
@@ -180,7 +175,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
         myFunctionResolver,
         myVarHandler,
         myFunctionResolver.resolve(
-          new TheRLocation(myFunction, myCurrentLineNumber),
+          getLocation(),
           nextFunction
         )
       )

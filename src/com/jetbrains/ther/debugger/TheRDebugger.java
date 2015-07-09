@@ -92,11 +92,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     }
 
     final TheRFunctionDebugger topDebugger = topDebugger();
-
-    final TheRLocation topLocation = new TheRLocation(
-      topDebugger.getFunction(),
-      topDebugger.getCurrentLineNumber()
-    );
+    final TheRLocation topLocation = topDebugger.getLocation();
 
     final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
       myProcess,

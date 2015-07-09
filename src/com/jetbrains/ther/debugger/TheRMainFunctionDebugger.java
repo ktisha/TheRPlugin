@@ -2,13 +2,14 @@ package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.*;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
@@ -58,12 +59,11 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   @Override
-  public TheRFunction getFunction() {
-    return TheRDebugConstants.MAIN_FUNCTION;
-  }
-
-  public int getCurrentLineNumber() {
-    return myScriptReader.getCurrentLine().getNumber();
+  public TheRLocation getLocation() {
+    return new TheRLocation(
+      TheRDebugConstants.MAIN_FUNCTION,
+      getCurrentLineNumber()
+    );
   }
 
   @NotNull
@@ -90,7 +90,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     while (!accepted) {
       final TheRScriptLine line = myScriptReader.getCurrentLine();
 
-      if (TheRDebuggerUtils.isCommentOrSpaces(line.getText()) && isFirstLine) {
+      if (isCommentOrSpaces(line.getText()) && isFirstLine) {
         forwardCommentsAndEmptyLines();
 
         return;
@@ -109,7 +109,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     forwardCommentsAndEmptyLines();
 
     if (!myIsNewDebuggerAppended) {
-      myVars = TheRDebuggerUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+      myVars = loadUnmodifiableVars(myProcess, myVarHandler);
     }
   }
 
@@ -123,8 +123,12 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     return "";
   }
 
+  private int getCurrentLineNumber() {
+    return myScriptReader.getCurrentLine().getNumber();
+  }
+
   private void forwardCommentsAndEmptyLines() throws IOException {
-    while (TheRDebuggerUtils.isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
+    while (isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
       myScriptReader.advance();
     }
   }
@@ -141,10 +145,9 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
             myDebuggerHandler,
             myFunctionResolver,
             myVarHandler,
-            new TheRFunction(
-              Collections.singletonList(
-                TheRDebuggerUtils.loadFunctionName(myProcess)
-              )
+            myFunctionResolver.resolve(
+              getLocation(),
+              loadFunctionName(myProcess)
             )
           )
         );
