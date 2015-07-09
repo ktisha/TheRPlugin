@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger;
 
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -88,17 +89,16 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     }
 
     final TheRProcessResponse response = myProcess.execute(EXECUTE_AND_STEP_COMMAND);
-    final String text = response.getText();
 
     switch (response.getType()) {
       case DEBUG_AT:
-        handleDebugAt(text);
+        handleDebugAt(response);
         break;
       case CONTINUE_TRACE:
-        handleContinueTrace(text);
+        handleContinueTrace(response);
         break;
       case END_TRACE:
-        handleEndTrace(text);
+        handleEndTrace(response.getText());
         break;
       case DEBUGGING_IN:
         handleDebuggingIn();
@@ -127,15 +127,15 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     );
   }
 
-  private void handleDebugAt(@NotNull final String text) throws IOException, InterruptedException {
-    // TODO [dbg][response]
+  private void handleDebugAt(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+    appendOutput(response);
 
-    myCurrentLineNumber = extractLineNumber(text);
+    myCurrentLineNumber = extractLineNumber(response.getText());
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
-  private void handleContinueTrace(@NotNull final String text) throws IOException, InterruptedException {
-    // TODO [dbg][response]
+  private void handleContinueTrace(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+    appendOutput(response);
 
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
@@ -147,7 +147,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void handleEndTrace(@NotNull final String text) {
-    // TODO [dbg][response]
+    // TODO [dbg][update]
 
     final String[] lines = StringUtil.splitByLines(text);
     final String lastLine = getLineFromTheEndOrNull(lines, 0);
@@ -187,6 +187,18 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     final int end = text.indexOf(':', begin);
 
     return Integer.parseInt(text.substring(begin, end)) - 1;
+  }
+
+  private void appendOutput(final @NotNull TheRProcessResponse response) {
+    final TextRange outputRange = response.getOutputRange();
+
+    if (!outputRange.isEmpty()) {
+      myDebuggerHandler.appendOutput(
+        outputRange.substring(
+          response.getText()
+        )
+      );
+    }
   }
 
   @Nullable

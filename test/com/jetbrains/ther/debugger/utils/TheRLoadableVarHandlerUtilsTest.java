@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.utils;
 
+import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -95,13 +96,21 @@ public class TheRLoadableVarHandlerUtilsTest {
       if (command.equals(expectedEnterFunction())) {
         myIsEnterExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
+        return new TheRProcessResponse(
+          "text",
+          TheRProcessResponseType.EMPTY,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       if (command.equals(expectedExitFunction())) {
         myIsExitExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
+        return new TheRProcessResponse(
+          "text",
+          TheRProcessResponseType.EMPTY,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       if (command.equals(expectedTraceCommand())) {
@@ -111,7 +120,11 @@ public class TheRLoadableVarHandlerUtilsTest {
 
         myIsTraceExecuted = true;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE);
+        return new TheRProcessResponse(
+          "text",
+          TheRProcessResponseType.RESPONSE,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       if (command.equals(expectedDebugCommand())) {
@@ -119,7 +132,11 @@ public class TheRLoadableVarHandlerUtilsTest {
           throw new IllegalStateException("Enter and exit function should be defined. Also target function should be marked as traced");
         }
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
+        return new TheRProcessResponse(
+          "text",
+          TheRProcessResponseType.EMPTY,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       throw new IllegalStateException("Unexpected command");

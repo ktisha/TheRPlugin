@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.utils;
 
+import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
@@ -108,12 +109,20 @@ public class TheRLoadableVarHandlerImplTest {
       if (myCounter == 2) {
         myCounter++;
 
-        return new TheRProcessResponse("text", TheRProcessResponseType.RESPONSE);
+        return new TheRProcessResponse(
+          "text",
+          TheRProcessResponseType.RESPONSE,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       myCounter++;
 
-      return new TheRProcessResponse("text", TheRProcessResponseType.EMPTY);
+      return new TheRProcessResponse(
+        "text",
+        TheRProcessResponseType.EMPTY,
+        TextRange.EMPTY_RANGE
+      );
     }
 
     @Override

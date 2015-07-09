@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.data;
 
+import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,9 +12,16 @@ public class TheRProcessResponse {
   @NotNull
   private final TheRProcessResponseType myType;
 
-  public TheRProcessResponse(@NotNull final String text, @NotNull final TheRProcessResponseType type) {
+  @NotNull
+  private final TextRange myOutputRange;
+
+
+  public TheRProcessResponse(@NotNull final String text,
+                             @NotNull final TheRProcessResponseType type,
+                             @NotNull final TextRange outputRange) {
     myText = text;
     myType = type;
+    myOutputRange = outputRange;
   }
 
   @NotNull
@@ -26,8 +34,13 @@ public class TheRProcessResponse {
     return myType;
   }
 
+  @NotNull
+  public TextRange getOutputRange() { // TODO [dbg][update]
+    return myOutputRange;
+  }
+
   @Override
-  public boolean equals(@Nullable final Object o) {
+  public boolean equals(@Nullable final Object o) { // TODO [dbg][update]
     if (o == this) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
@@ -37,7 +50,7 @@ public class TheRProcessResponse {
   }
 
   @Override
-  public int hashCode() {
+  public int hashCode() { // TODO [dbg][update]
     return 31 * myText.hashCode() + myType.hashCode();
   }
 }

@@ -43,7 +43,8 @@ public class TheRProcessResponseCalculatorTest {
       "x <- function() {",
       "",
       PLUS_AND_SPACE,
-      PLUS
+      PLUS,
+      ""
     );
   }
 
@@ -53,7 +54,8 @@ public class TheRProcessResponseCalculatorTest {
       "debug(x)",
       "",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      EMPTY
+      EMPTY,
+      ""
     );
   }
 
@@ -63,7 +65,8 @@ public class TheRProcessResponseCalculatorTest {
       "ls()",
       "[1] \"x\"",
       BROWSE_PREFIX,
-      RESPONSE
+      RESPONSE,
+      "[1] \"x\""
     );
   }
 
@@ -82,7 +85,8 @@ public class TheRProcessResponseCalculatorTest {
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      DEBUGGING_IN
+      DEBUGGING_IN,
+      ""
     );
   }
 
@@ -92,7 +96,8 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      DEBUG_AT
+      DEBUG_AT,
+      ""
     );
   }
 
@@ -103,7 +108,8 @@ public class TheRProcessResponseCalculatorTest {
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      DEBUG_AT
+      DEBUG_AT,
+      "[1] 1 2 3"
     );
   }
 
@@ -117,7 +123,8 @@ public class TheRProcessResponseCalculatorTest {
       "    print(\"x\")\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      START_TRACE
+      START_TRACE,
+      ""
     );
   }
 
@@ -139,7 +146,8 @@ public class TheRProcessResponseCalculatorTest {
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      CONTINUE_TRACE
+      CONTINUE_TRACE,
+      ""
     );
   }
 
@@ -162,7 +170,8 @@ public class TheRProcessResponseCalculatorTest {
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      CONTINUE_TRACE
+      CONTINUE_TRACE,
+      "[1] 1 2 3"
     );
   }
 
@@ -174,7 +183,8 @@ public class TheRProcessResponseCalculatorTest {
       "[1] \"exit x\"\n" +
       "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE
+      END_TRACE,
+      ""
     );
   }
 
@@ -187,7 +197,8 @@ public class TheRProcessResponseCalculatorTest {
       "[1] \"exit x\"\n" +
       "exiting from: FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE
+      END_TRACE,
+      "[1] 1 2 3"
     );
   }
 
@@ -197,17 +208,20 @@ public class TheRProcessResponseCalculatorTest {
       "ls()",
       "[1] \"x\"",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RESPONSE
+      RESPONSE,
+      "[1] \"x\""
     );
   }
 
   private void check(@NotNull final String command,
                      @NotNull final String expectedResponse,
                      @NotNull final String tail,
-                     @NotNull final TheRProcessResponseType expectedType) {
+                     @NotNull final TheRProcessResponseType expectedType,
+                     @NotNull final String expectedOutput) {
     final TheRProcessResponse response = calculate(command + "\n" + expectedResponse + "\n" + tail);
 
     assertEquals(expectedResponse, response.getText());
     assertEquals(expectedType, response.getType());
+    assertEquals(expectedOutput, response.getOutputRange().substring(response.getText()));
   }
 }

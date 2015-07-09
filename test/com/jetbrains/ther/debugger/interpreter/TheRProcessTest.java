@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
+import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +52,7 @@ public class TheRProcessTest {
     @NotNull
     @Override
     public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      return new TheRProcessResponse(myText, myType);
+      return new TheRProcessResponse(myText, myType, TextRange.EMPTY_RANGE);
     }
 
     @Override

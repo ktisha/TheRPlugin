@@ -1,15 +1,19 @@
 package com.jetbrains.ther.debugger.interpreter;
 
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUG_AT;
 
 final class TheRProcessResponseCalculator {
 
@@ -28,11 +32,11 @@ final class TheRProcessResponseCalculator {
 
   @NotNull
   public static TheRProcessResponse calculate(@NotNull final CharSequence response) {
-    final String[] lines = LINE_BREAK_PATTERN.split(response);
+    final String[] lines = LINE_BREAK_PATTERN.split(response); // Don't forget that first line is command
 
-    return new TheRProcessResponse(
-      concatExcludingFirstAndLast(lines),
-      calculateType(lines)
+    return calculateResult(
+      lines,
+      calculateTypeAndOutputLineBounds(lines)
     );
   }
 
@@ -60,8 +64,12 @@ final class TheRProcessResponseCalculator {
   }
 
   @NotNull
-  private static String concatExcludingFirstAndLast(@NotNull final String[] lines) {
+  private static TheRProcessResponse calculateResult(@NotNull final String[] lines,
+                                                     @NotNull final TypeAndOutputLineBounds typeAndOutputLineBounds) {
     final StringBuilder sb = new StringBuilder();
+
+    int outputBegin = 0;
+    int outputEnd = 0;
 
     for (int i = 1; i < lines.length - 1; i++) {
       sb.append(lines[i]);
@@ -69,46 +77,67 @@ final class TheRProcessResponseCalculator {
       if (i != lines.length - 2) {
         sb.append(TheRDebugConstants.LINE_SEPARATOR);
       }
+
+      outputBegin += calculateOutputBeginAddition(lines, typeAndOutputLineBounds.myOutputBegin, i);
+      outputEnd += calculateOutputEndAddition(lines, typeAndOutputLineBounds.myOutputEnd, i);
     }
 
-    return sb.toString();
+    return new TheRProcessResponse(
+      sb.toString(),
+      typeAndOutputLineBounds.myType,
+      new TextRange(outputBegin, outputEnd)
+    );
   }
 
   @NotNull
-  private static TheRProcessResponseType calculateType(@NotNull final String[] lines) {
-    if (justPlusAndSpace(lines)) {
-      return PLUS;
+  private static TypeAndOutputLineBounds calculateTypeAndOutputLineBounds(@NotNull final String[] lines) {
+    TypeAndOutputLineBounds candidate = tryJustPlusAndSpace(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    if (justBrowseAndSpace(lines)) {
-      return EMPTY;
+    candidate = tryJustBrowseAndSpace(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
     if (!endsBrowseAndSpace(lines)) {
       throw new IllegalArgumentException("Response is incomplete");
     }
 
-    if (debugging(lines)) {
-      return TheRProcessResponseType.DEBUGGING_IN;
+    candidate = tryDebugging(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    if (debugAt(lines)) {
-      return TheRProcessResponseType.DEBUG_AT;
+    candidate = tryDebugAt(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    if (startTrace(lines)) {
-      return START_TRACE;
+    candidate = tryStartTrace(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    if (continueTrace(lines)) {
-      return CONTINUE_TRACE;
+    candidate = tryContinueTrace(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    if (endTrace(lines)) {
-      return END_TRACE;
+    candidate = tryEndTrace(lines);
+
+    if (candidate != null) {
+      return candidate;
     }
 
-    return RESPONSE;
+    return new TypeAndOutputLineBounds(RESPONSE, 0, lines.length);
   }
 
   private static boolean isSubsequence(@NotNull final CharSequence sequence,
@@ -127,54 +156,113 @@ final class TheRProcessResponseCalculator {
     return true;
   }
 
-  private static boolean justPlusAndSpace(@NotNull final String[] lines) {
-    return lines.length == 2 && lines[1].equals(PLUS_AND_SPACE);
+  private static int calculateOutputBeginAddition(@NotNull final String[] lines,
+                                                  final int outputLineBegin,
+                                                  final int i) {
+    int result = 0;
+
+    if (i < outputLineBegin) {
+      result += lines[i].length();
+
+      if (i != lines.length - 2) {
+        result += TheRDebugConstants.LINE_SEPARATOR.length();
+      }
+    }
+
+    return result;
   }
 
-  private static boolean justBrowseAndSpace(@NotNull final String[] lines) {
-    return lines.length == 2 && justBrowseAndSpace(lines[1]);
+  private static int calculateOutputEndAddition(@NotNull final String[] lines,
+                                                final int outputLineEnd,
+                                                final int i) {
+    int result = 0;
+
+    if (i < outputLineEnd) {
+      result += lines[i].length();
+
+      if (i != lines.length - 2 && i != outputLineEnd - 1) {
+        result += TheRDebugConstants.LINE_SEPARATOR.length();
+      }
+    }
+
+    return result;
+  }
+
+  @Nullable
+  private static TypeAndOutputLineBounds tryJustPlusAndSpace(@NotNull final String[] lines) {
+    if (lines.length == 2 && lines[1].equals(PLUS_AND_SPACE)) {
+      return new TypeAndOutputLineBounds(PLUS, 1, 1);
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Nullable
+  private static TypeAndOutputLineBounds tryJustBrowseAndSpace(@NotNull final String[] lines) {
+    if (lines.length == 2 && justBrowseAndSpace(lines[1])) {
+      return new TypeAndOutputLineBounds(EMPTY, 1, 1);
+    }
+    else {
+      return null;
+    }
   }
 
   private static boolean endsBrowseAndSpace(@NotNull final String[] lines) {
     return lines.length > 1 && justBrowseAndSpace(lines[lines.length - 1]);
   }
 
-  private static boolean debugging(@NotNull final String[] lines) {
-    return lines.length > 1 && lines[1].startsWith(TheRDebugConstants.DEBUGGING_IN);
+  @Nullable
+  private static TypeAndOutputLineBounds tryDebugging(@NotNull final String[] lines) {
+    if (lines.length > 1 && lines[1].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
+      return new TypeAndOutputLineBounds(DEBUGGING_IN, 1, 1);
+    }
+    else {
+      return null;
+    }
   }
 
-  private static boolean debugAt(@NotNull final String[] lines) {
-    return lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT);
+  @Nullable
+  private static TypeAndOutputLineBounds tryDebugAt(@NotNull final String[] lines) {
+    if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT)) {
+      return new TypeAndOutputLineBounds(DEBUG_AT, 1, lines.length - 2);
+    }
+    else {
+      return null;
+    }
   }
 
-  private static boolean startTrace(@NotNull final String[] lines) {
+  @Nullable
+  private static TypeAndOutputLineBounds tryStartTrace(@NotNull final String[] lines) {
     for (int i = 1; i < lines.length - 1; i++) {
       if (START_TRACE_PATTERN.matcher(lines[i]).find()) {
-        return true;
+        return new TypeAndOutputLineBounds(START_TRACE, 1, i);
       }
     }
 
-    return false;
+    return null;
   }
 
-  private static boolean continueTrace(@NotNull final String[] lines) {
+  @Nullable
+  private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
     for (int i = 1; i < lines.length - 5; i++) {
       if (continueTrace(lines, i)) {
-        return true;
+        return new TypeAndOutputLineBounds(CONTINUE_TRACE, 1, i);
       }
     }
 
-    return false;
+    return null;
   }
 
-  private static boolean endTrace(@NotNull final String[] lines) {
+  @Nullable
+  private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
     for (int i = 1; i < lines.length - 1; i++) {
       if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
-        return true;
+        return new TypeAndOutputLineBounds(END_TRACE, 1, i);
       }
     }
 
-    return false;
+    return null;
   }
 
   private static int readDigitsBackward(@NotNull final CharSequence sequence, final int beginIndex) {
@@ -208,5 +296,21 @@ final class TheRProcessResponseCalculator {
            endIndex >= beginIndex &&
            endIndex < sequence.length() &&
            readDigitsBackward(sequence, endIndex) == beginIndex - 1;
+  }
+
+  private static class TypeAndOutputLineBounds {
+
+    @NotNull
+    private final TheRProcessResponseType myType;
+
+    private final int myOutputBegin;
+
+    private final int myOutputEnd;
+
+    public TypeAndOutputLineBounds(@NotNull final TheRProcessResponseType type, final int outputBegin, final int outputEnd) {
+      myType = type;
+      myOutputBegin = outputBegin;
+      myOutputEnd = outputEnd;
+    }
   }
 }

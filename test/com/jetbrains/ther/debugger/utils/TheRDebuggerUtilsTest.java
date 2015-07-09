@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.utils;
 
+import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
@@ -152,7 +153,7 @@ public class TheRDebuggerUtilsTest {
     @NotNull
     @Override
     public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      return new TheRProcessResponse(myText, myType);
+      return new TheRProcessResponse(myText, myType, TextRange.EMPTY_RANGE);
     }
 
     @Override
@@ -189,7 +190,8 @@ public class TheRDebuggerUtilsTest {
       if (command.equals(TheRDebugConstants.LS_COMMAND)) {
         return new TheRProcessResponse(
           "[1] \"x\"\n[2] \"y\"",
-          RESPONSE
+          RESPONSE,
+          TextRange.EMPTY_RANGE
         );
       }
 
@@ -198,7 +200,8 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "typeX",
-          RESPONSE
+          RESPONSE,
+          TextRange.EMPTY_RANGE
         );
       }
 
@@ -207,7 +210,8 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "typeY",
-          RESPONSE
+          RESPONSE,
+          TextRange.EMPTY_RANGE
         );
       }
 
@@ -218,7 +222,8 @@ public class TheRDebuggerUtilsTest {
 
         return new TheRProcessResponse(
           "valueX",
-          RESPONSE
+          RESPONSE,
+          TextRange.EMPTY_RANGE
         );
       }
 
@@ -297,7 +302,11 @@ public class TheRDebuggerUtilsTest {
       if (myCounter < 3) {
         myCounter++;
 
-        return new TheRProcessResponse("text", RESPONSE);
+        return new TheRProcessResponse(
+          "text",
+          RESPONSE,
+          TextRange.EMPTY_RANGE
+        );
       }
 
       if (myCounter == 3) {
@@ -309,7 +318,8 @@ public class TheRDebuggerUtilsTest {
           "debug: {\n" +
           "    x^2\n" +
           "}",
-          START_TRACE
+          START_TRACE,
+          TextRange.EMPTY_RANGE
         );
       }
 
