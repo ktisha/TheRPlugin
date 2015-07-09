@@ -29,17 +29,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
       expression,
       new TheRDebuggerEvaluator.ConditionReceiver() {
         @Override
-        public void receiveResult(@NotNull final Boolean result) {
+        public void receiveResult(final boolean result) {
           justResult[0] = result;
         }
 
         @Override
         public void receiveError(@NotNull final Exception e) {
-          // TODO [xdbg][update]
-        }
-
-        @Override
-        public void receiveError(@NotNull final String error) {
           // TODO [xdbg][update]
         }
       }
@@ -70,11 +65,6 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
         @Override
         public void receiveError(@NotNull final Exception e) {
           callback.errorOccurred(e.getMessage());
-        }
-
-        @Override
-        public void receiveError(@NotNull final String error) {
-          callback.errorOccurred(error);
         }
       }
     );

@@ -8,18 +8,17 @@ public interface TheRDebuggerEvaluator {
 
   void evalExpression(@NotNull final String expression, @NotNull final ExpressionReceiver receiver);
 
-  interface Receiver<T> {
+  interface ConditionReceiver {
 
-    void receiveResult(@NotNull final T result);
+    void receiveResult(final boolean result);
 
     void receiveError(@NotNull final Exception e);
-
-    void receiveError(@NotNull final String error);
   }
 
-  interface ConditionReceiver extends Receiver<Boolean> {
-  }
+  interface ExpressionReceiver {
 
-  interface ExpressionReceiver extends Receiver<String> {
+    void receiveResult(@NotNull final String result);
+
+    void receiveError(@NotNull final Exception e);
   }
 }

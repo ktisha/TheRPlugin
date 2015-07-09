@@ -179,7 +179,10 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
         myDebuggerHandler,
         myFunctionResolver,
         myVarHandler,
-        myFunctionResolver.resolve(myFunction, nextFunction)
+        myFunctionResolver.resolve(
+          new TheRLocation(myFunction, myCurrentLineNumber),
+          nextFunction
+        )
       )
     );
   }

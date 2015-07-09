@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger;
 
-import com.jetbrains.ther.debugger.data.TheRFunction;
+import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
@@ -29,21 +29,21 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
-  private final TheRFunction myFunction;
+  private final TheRLocation myLocation;
 
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
                                    @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                    @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                    @NotNull final TheRFunctionResolver functionResolver,
                                    @NotNull final TheRLoadableVarHandler varHandler,
-                                   @NotNull final TheRFunction function) {
+                                   @NotNull final TheRLocation location) {
 
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
-    myFunction = function;
+    myLocation = location;
   }
 
   @Override
@@ -109,7 +109,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       myDebuggerHandler,
       myFunctionResolver,
       myVarHandler,
-      myFunctionResolver.resolve(myFunction, nextFunction)
+      myFunctionResolver.resolve(myLocation, nextFunction)
     );
 
     while (debugger.hasNext()) {

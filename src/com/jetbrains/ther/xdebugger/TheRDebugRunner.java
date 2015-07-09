@@ -14,6 +14,7 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.*;
 import com.jetbrains.ther.debugger.data.TheRFunction;
+import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
@@ -113,7 +114,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
     return new TheRFunctionResolver() {
       @NotNull
       @Override
-      public TheRFunction resolve(@NotNull final TheRFunction currentFunction, @NotNull final String nextFunctionName) {
+      public TheRFunction resolve(@NotNull final TheRLocation currentLocation, @NotNull final String nextFunctionName) {
         return new TheRFunction(Collections.singletonList(nextFunctionName)); // TODO [xdbg][impl]
       }
     };

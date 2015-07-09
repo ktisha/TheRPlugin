@@ -68,7 +68,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack = new ArrayList<TheRStackFrame>();
     myUnmodifiableStack = Collections.unmodifiableList(myStack);
 
-
     appendDebugger(
       myDebuggerFactory.getMainFunctionDebugger(
         myProcess,
@@ -94,19 +93,24 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     final TheRFunctionDebugger topDebugger = topDebugger();
 
+    final TheRLocation topLocation = new TheRLocation(
+      topDebugger.getFunction(),
+      topDebugger.getCurrentLineNumber()
+    );
+
     final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
       myProcess,
       myDebuggerFactory,
       this,
       myFunctionResolver,
       myVarHandler,
-      topDebugger.getFunction()
+      topLocation
     );
 
     myStack.set(
       myStack.size() - 1,
       new TheRStackFrame(
-        new TheRLocation(topDebugger.getFunction(), topDebugger.getCurrentLineNumber()),
+        topLocation,
         topDebugger.getVars(),
         evaluator
       )
