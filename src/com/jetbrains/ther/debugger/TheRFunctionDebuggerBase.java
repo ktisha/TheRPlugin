@@ -14,6 +14,7 @@ import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
@@ -134,7 +135,12 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
-    myResult = response.getOutputRange().substring(response.getText());
+    final TextRange outputRange = response.getOutputRange();
+    myResult = outputRange.substring(response.getText());
+
+    if (outputRange.getStartOffset() == 0) {
+      appendOutput(response);
+    }
 
     final int returnLineNumber = extractLineNumberIfPossible(response);
 
@@ -179,15 +185,14 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response) {
-    final int debugAtBegin = findNextLineAfterOutputBegin(response);
-
+    final int debugAtIndex = findSupposedlyDebugAtIndex(response);
     final String text = response.getText();
 
-    if (debugAtBegin == text.length()) {
+    if (debugAtIndex == text.length() || !text.startsWith(DEBUG_AT, debugAtIndex)) {
       return -1;
     }
 
-    return extractLineNumber(text, debugAtBegin);
+    return extractLineNumber(text, debugAtIndex);
   }
 
   private int extractLineNumber(@NotNull final String text, final int index) {
@@ -207,5 +212,25 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     }
 
     return result;
+  }
+
+  private int findSupposedlyDebugAtIndex(@NotNull final TheRProcessResponse response) {
+    if (response.getOutputRange().getStartOffset() == 0) {
+      final String text = response.getText();
+
+      return findNextLineBegin(
+        text,
+        findNextLineBegin(
+          text,
+          findNextLineBegin(
+            text,
+            response.getOutputRange().getEndOffset()
+          )
+        )
+      );
+    }
+    else {
+      return findNextLineAfterOutputBegin(response);
+    }
   }
 }
