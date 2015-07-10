@@ -1,12 +1,16 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
 
 public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFactory {
 
@@ -19,16 +23,41 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                          @NotNull final TheRLoadableVarHandler varHandler,
                                                          @NotNull final TheRLocation prevLocation)
     throws IOException, InterruptedException {
-    final String functionName = TheRDebuggerUtils.loadFunctionName(process);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
+    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
 
-    return new TheRNotMainBraceFunctionDebugger(
-      process,
-      debuggerFactory,
-      debuggerHandler,
-      functionResolver,
-      varHandler,
-      functionResolver.resolve(prevLocation, functionName)
-    );
+    final TheRProcessResponse startTraceResponse = process.execute(EXECUTE_AND_STEP_COMMAND);
+
+    switch (startTraceResponse.getType()) {
+      case START_TRACE_BRACE:
+        return new TheRNotMainBraceFunctionDebugger(
+          process,
+          debuggerFactory,
+          debuggerHandler,
+          functionResolver,
+          varHandler,
+          functionResolver.resolve(
+            prevLocation,
+            TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
+          )
+        );
+
+      case START_TRACE_UNBRACE:
+        return new TheRNotMainUnbraceFunctionDebugger(
+          process,
+          debuggerFactory,
+          debuggerHandler,
+          functionResolver,
+          varHandler,
+          functionResolver.resolve(
+            prevLocation,
+            TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
+          )
+        );
+      default:
+        throw new IOException("Unexpected response from interpreter");
+    }
   }
 
   @NotNull

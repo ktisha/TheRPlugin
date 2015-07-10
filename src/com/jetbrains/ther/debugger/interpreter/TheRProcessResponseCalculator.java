@@ -265,7 +265,8 @@ final class TheRProcessResponseCalculator {
 
       if (debugAtLine < lines.length - 1) {
         return new TypeAndOutputLineBounds(DEBUG_AT, 1, debugAtLine);
-      } else {
+      }
+      else {
         return null;
       }
     }
@@ -276,9 +277,12 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryStartTrace(@NotNull final String[] lines) {
-    for (int i = 1; i < lines.length - 1; i++) {
-      if (START_TRACE_PATTERN.matcher(lines[i]).find()) {
-        return new TypeAndOutputLineBounds(START_TRACE_BRACE, 1, i);
+    if (START_TRACE_PATTERN.matcher(lines[1]).find()) {
+      if (lines.length == 5) {
+        return new TypeAndOutputLineBounds(START_TRACE_UNBRACE, 1, 1);
+      }
+      else {
+        return new TypeAndOutputLineBounds(START_TRACE_BRACE, 1, 1);
       }
     }
 

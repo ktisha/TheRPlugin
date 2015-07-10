@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.*;
 import static org.junit.Assert.*;
 
@@ -52,12 +51,16 @@ public class TheRDebuggerUtilsTest {
   }
 
   @Test
-  public void functionNameLoading() throws IOException, InterruptedException {
-    final TheRProcess process = new FunctionNameTheRProcess();
-
+  public void functionNameExtracting() throws IOException, InterruptedException {
     assertEquals(
       "abc",
-      TheRDebuggerUtils.loadFunctionName(process)
+      extractFunctionName(
+        "Tracing abc(c(1:3)) on entry\n" +
+        "[1] \"enter abc\"\n" +
+        "debug: {\n" +
+        "    x^2\n" +
+        "}"
+      )
     );
   }
 
@@ -289,45 +292,6 @@ public class TheRDebuggerUtilsTest {
       }
 
       throw new IllegalArgumentException("Unexpected var");
-    }
-  }
-
-  private static class FunctionNameTheRProcess extends TheRProcess {
-
-    private int myCounter = 0;
-
-    @NotNull
-    @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      if (myCounter < 3) {
-        myCounter++;
-
-        return new TheRProcessResponse(
-          "text",
-          RESPONSE,
-          TextRange.EMPTY_RANGE
-        );
-      }
-
-      if (myCounter == 3) {
-        myCounter++;
-
-        return new TheRProcessResponse(
-          "Tracing abc(c(1:3)) on entry\n" +
-          "[1] \"enter abc\"\n" +
-          "debug: {\n" +
-          "    x^2\n" +
-          "}",
-          START_TRACE_BRACE,
-          TextRange.EMPTY_RANGE
-        );
-      }
-
-      throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
     }
   }
 }

@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE_BRACE;
 
 public final class TheRDebuggerUtils {
 
@@ -48,16 +47,13 @@ public final class TheRDebuggerUtils {
   }
 
   @NotNull
-  public static String loadFunctionName(@NotNull final TheRProcess process) throws IOException, InterruptedException {
-    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
-    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
-    process.execute(EXECUTE_AND_STEP_COMMAND, RESPONSE);
+  public static String extractFunctionName(@NotNull final String startTraceText) {
+    final int secondLineBegin = findNextLineBegin(startTraceText, 0);
+    final int secondLineEnd = findCurrentLineEnd(startTraceText, secondLineBegin);
 
-    return extractFunctionName(
-      process.execute(
-        EXECUTE_AND_STEP_COMMAND,
-        START_TRACE_BRACE
-      )
+    return startTraceText.substring(
+      secondLineBegin + "[1] \"".length() + "enter ".length(),
+      secondLineEnd - "\"".length()
     );
   }
 
@@ -137,17 +133,6 @@ public final class TheRDebuggerUtils {
     }
 
     return new TheRVar(var, type, loadValue(process, handler, var, type));
-  }
-
-  @NotNull
-  private static String extractFunctionName(@NotNull final String entryText) {
-    final int secondLineBegin = findNextLineBegin(entryText, 0);
-    final int secondLineEnd = findCurrentLineEnd(entryText, secondLineBegin);
-
-    return entryText.substring(
-      secondLineBegin + "[1] \"".length() + "enter ".length(),
-      secondLineEnd - "\"".length()
-    );
   }
 
   @Nullable

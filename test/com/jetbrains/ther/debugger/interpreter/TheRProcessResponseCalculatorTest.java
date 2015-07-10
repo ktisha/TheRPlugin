@@ -127,7 +127,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateStartTrace() {
+  public void calculateStartTraceBrace() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       TRACING + " x() on entry \n" +
@@ -137,6 +137,19 @@ public class TheRProcessResponseCalculatorTest {
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       START_TRACE_BRACE,
+      ""
+    );
+  }
+
+  @Test
+  public void calculateStartTraceUnbrace() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TRACING + " x() on entry \n" +
+      "[1] \"enter x\"\n" +
+      "debug: print(\"x\")",
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      START_TRACE_UNBRACE,
       ""
     );
   }
