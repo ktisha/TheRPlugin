@@ -278,7 +278,7 @@ final class TheRProcessResponseCalculator {
   private static TypeAndOutputLineBounds tryStartTrace(@NotNull final String[] lines) {
     for (int i = 1; i < lines.length - 1; i++) {
       if (START_TRACE_PATTERN.matcher(lines[i]).find()) {
-        return new TypeAndOutputLineBounds(START_TRACE, 1, i);
+        return new TypeAndOutputLineBounds(START_TRACE_BRACE, 1, i);
       }
     }
 

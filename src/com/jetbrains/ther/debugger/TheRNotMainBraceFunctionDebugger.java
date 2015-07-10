@@ -13,11 +13,10 @@ import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
-class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
+class TheRNotMainBraceFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   private final TheRProcess myProcess;
@@ -45,12 +44,12 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   private String myResult;
 
-  public TheRNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                     @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                     @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                     @NotNull final TheRFunctionResolver functionResolver,
-                                     @NotNull final TheRLoadableVarHandler varHandler,
-                                     @NotNull final TheRFunction function) throws IOException, InterruptedException {
+  public TheRNotMainBraceFunctionDebugger(@NotNull final TheRProcess process,
+                                          @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
+                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                          @NotNull final TheRFunctionResolver functionResolver,
+                                          @NotNull final TheRLoadableVarHandler varHandler,
+                                          @NotNull final TheRFunction function) throws IOException, InterruptedException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
@@ -140,7 +139,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
     myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE);
+    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE);
 
     myCurrentLineNumber = loadLineNumber();
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
@@ -160,8 +159,6 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void handleDebuggingIn() throws IOException, InterruptedException {
-    final String nextFunction = loadFunctionName(myProcess);
-
     myDebuggerHandler.appendDebugger(
       myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,
@@ -169,10 +166,7 @@ class TheRNotMainFunctionDebugger implements TheRFunctionDebugger {
         myDebuggerHandler,
         myFunctionResolver,
         myVarHandler,
-        myFunctionResolver.resolve(
-          getLocation(),
-          nextFunction
-        )
+        getLocation()
       )
     );
   }

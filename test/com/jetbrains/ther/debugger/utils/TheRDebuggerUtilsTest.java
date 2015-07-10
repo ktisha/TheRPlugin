@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.*;
 import static org.junit.Assert.*;
 
@@ -318,7 +318,7 @@ public class TheRDebuggerUtilsTest {
           "debug: {\n" +
           "    x^2\n" +
           "}",
-          START_TRACE,
+          START_TRACE_BRACE,
           TextRange.EMPTY_RANGE
         );
       }

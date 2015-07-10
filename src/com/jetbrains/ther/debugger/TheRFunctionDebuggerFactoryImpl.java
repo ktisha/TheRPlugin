@@ -1,7 +1,8 @@
 package com.jetbrains.ther.debugger;
 
-import com.jetbrains.ther.debugger.data.TheRFunction;
+import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,9 +17,17 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheRFunctionResolver functionResolver,
                                                          @NotNull final TheRLoadableVarHandler varHandler,
-                                                         @NotNull final TheRFunction function) throws IOException, InterruptedException {
-    return new TheRNotMainFunctionDebugger(
-      process, debuggerFactory, debuggerHandler, functionResolver, varHandler, function
+                                                         @NotNull final TheRLocation prevLocation)
+    throws IOException, InterruptedException {
+    final String functionName = TheRDebuggerUtils.loadFunctionName(process);
+
+    return new TheRNotMainBraceFunctionDebugger(
+      process,
+      debuggerFactory,
+      debuggerHandler,
+      functionResolver,
+      varHandler,
+      functionResolver.resolve(prevLocation, functionName)
     );
   }
 

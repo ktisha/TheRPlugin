@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.*;
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
@@ -145,10 +146,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
             myDebuggerHandler,
             myFunctionResolver,
             myVarHandler,
-            myFunctionResolver.resolve(
-              getLocation(),
-              loadFunctionName(myProcess)
-            )
+            getLocation()
           )
         );
 

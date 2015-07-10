@@ -136,7 +136,7 @@ public class TheRProcessResponseCalculatorTest {
       "    print(\"x\")\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-      START_TRACE,
+      START_TRACE_BRACE,
       ""
     );
   }

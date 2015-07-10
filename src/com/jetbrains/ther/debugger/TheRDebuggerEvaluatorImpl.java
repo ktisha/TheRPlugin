@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadFunctionName;
-
 // TODO [dbg][test]
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
@@ -89,7 +87,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       case RESPONSE:
         return response.getText();
       default:
-        throw new IOException("Unexpected response");
+        throw new IOException("Unexpected response from interpreter");
     }
   }
 
@@ -101,15 +99,13 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
   private String evaluateFunction() throws IOException, InterruptedException {
-    final String nextFunction = loadFunctionName(myProcess);
-
     final TheRFunctionDebugger debugger = myDebuggerFactory.getNotMainFunctionDebugger(
       myProcess,
       myDebuggerFactory,
       myDebuggerHandler,
       myFunctionResolver,
       myVarHandler,
-      myFunctionResolver.resolve(myLocation, nextFunction)
+      myLocation
     );
 
     while (debugger.hasNext()) {
