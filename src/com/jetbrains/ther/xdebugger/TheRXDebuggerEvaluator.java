@@ -6,6 +6,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,24 +24,11 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   // This method is overridden because XDebugSessionImpl.breakpointReached(XBreakpoint<?>, String, XSuspendContext) calls it anyway
   @Override
   public boolean evaluateCondition(@NotNull final String expression) {
-    final boolean[] justResult = {false};
+    final ConditionReceiverImpl receiver = new ConditionReceiverImpl();
 
-    myEvaluator.evalCondition(
-      expression,
-      new TheRDebuggerEvaluator.ConditionReceiver() {
-        @Override
-        public void receiveResult(final boolean result) {
-          justResult[0] = result;
-        }
+    myEvaluator.evalCondition(expression, receiver);
 
-        @Override
-        public void receiveError(@NotNull final Exception e) {
-          // TODO [xdbg][update]
-        }
-      }
-    );
-
-    return justResult[0];
+    return receiver.myResult;
   }
 
   @Override
@@ -49,24 +37,76 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
                        @Nullable final XSourcePosition expressionPosition) {
     myEvaluator.evalExpression(
       expression,
-      new TheRDebuggerEvaluator.ExpressionReceiver() {
-        @Override
-        public void receiveResult(@NotNull final String result) {
-          callback.evaluated(
-            new XValue() {
-              @Override
-              public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
-                node.setPresentation(AllIcons.Debugger.Value, "type", result, false); // TODO [xdbg][update]
-              }
-            }
-          );
+      new ExpressionReceiverImpl(callback)
+    );
+  }
+
+  private static class ConditionReceiverImpl implements TheRDebuggerEvaluator.ConditionReceiver {
+
+    private boolean myResult = false;
+
+    @Override
+    public void receiveResult(final boolean result) {
+      myResult = result;
+    }
+
+    @Override
+    public void receiveError(@NotNull final Exception e) {
+      // TODO [xdbg][update]
+    }
+  }
+
+  private static class ExpressionReceiverImpl implements TheRDebuggerEvaluator.ExpressionReceiver {
+
+    @NotNull
+    private final XEvaluationCallback myCallback;
+
+    public ExpressionReceiverImpl(@NotNull final XEvaluationCallback callback) {
+      myCallback = callback;
+    }
+
+    @Override
+    public void receiveResult(@NotNull final String result) {
+      myCallback.evaluated(new EvaluatedXValue(result));
+    }
+
+    @Override
+    public void receiveError(@NotNull final Exception e) {
+      // TODO [xdbg][update]
+    }
+
+    private static class EvaluatedXValue extends XValue {
+
+      @NotNull
+      private final String myValue;
+
+      public EvaluatedXValue(@NotNull final String value) {
+        myValue = value;
+      }
+
+      @Override
+      public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
+        node.setPresentation(
+          AllIcons.Debugger.Value,
+          new EvaluatedXValuePresentation(myValue),
+          false
+        );
+      }
+
+      private static class EvaluatedXValuePresentation extends XValuePresentation {
+
+        @NotNull
+        private final String myValue;
+
+        public EvaluatedXValuePresentation(@NotNull final String value) {
+          myValue = value;
         }
 
         @Override
-        public void receiveError(@NotNull final Exception e) {
-          callback.errorOccurred(e.getMessage());
+        public void renderValue(@NotNull final XValueTextRenderer renderer) {
+          renderer.renderValue(myValue);
         }
       }
-    );
+    }
   }
 }
