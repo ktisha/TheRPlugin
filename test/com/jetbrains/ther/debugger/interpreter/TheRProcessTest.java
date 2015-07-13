@@ -1,9 +1,8 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
-import org.jetbrains.annotations.NotNull;
+import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,7 +14,9 @@ public class TheRProcessTest {
 
   @Test(expected = IOException.class)
   public void invalidCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE);
+    final String text = "abc";
+
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
 
     process.execute(
       "def",
@@ -25,38 +26,16 @@ public class TheRProcessTest {
 
   @Test
   public void correctCommandExecuting() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("abc", RESPONSE);
+    final String text = "abc";
+
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
 
     assertEquals(
-      "abc",
+      text,
       process.execute(
         "def",
         RESPONSE
       )
     );
-  }
-
-  private static class MockTheRProcess extends TheRProcess {
-
-    @NotNull
-    private final String myText;
-
-    @NotNull
-    private final TheRProcessResponseType myType;
-
-    public MockTheRProcess(@NotNull final String text, @NotNull final TheRProcessResponseType type) {
-      myText = text;
-      myType = type;
-    }
-
-    @NotNull
-    @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      return new TheRProcessResponse(myText, myType, TextRange.EMPTY_RANGE);
-    }
-
-    @Override
-    public void stop() {
-    }
   }
 }

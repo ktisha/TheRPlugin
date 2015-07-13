@@ -3,9 +3,10 @@ package com.jetbrains.ther.debugger.utils;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
+import com.jetbrains.ther.debugger.mock.IllegalTheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -22,8 +23,10 @@ public class TheRDebuggerUtilsTest {
 
   @Test
   public void noVarsLoading() throws IOException, InterruptedException {
-    final TheRProcess process = new MockTheRProcess("character(0)", RESPONSE);
-    final TheRLoadableVarHandler handler = new NoVarsTheRLoadableVarHandler();
+    final String text = "character(0)";
+
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+    final TheRLoadableVarHandler handler = new IllegalTheRLoadableVarHandler();
 
     assertTrue(
       TheRDebuggerUtils.loadVars(
@@ -138,48 +141,6 @@ public class TheRDebuggerUtilsTest {
     final String text = "abc\ndef";
 
     assertEquals(3, findCurrentLineEnd(text, 0));
-  }
-
-  private static class MockTheRProcess extends TheRProcess {
-
-    @NotNull
-    private final String myText;
-
-    @NotNull
-    private final TheRProcessResponseType myType;
-
-    public MockTheRProcess(@NotNull final String text, @NotNull final TheRProcessResponseType type) {
-      myText = text;
-      myType = type;
-    }
-
-    @NotNull
-    @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      return new TheRProcessResponse(myText, myType, TextRange.EMPTY_RANGE);
-    }
-
-    @Override
-    public void stop() {
-    }
-  }
-
-  private static class NoVarsTheRLoadableVarHandler implements TheRLoadableVarHandler {
-
-    @Nullable
-    @Override
-    public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
-      throws IOException, InterruptedException {
-      throw new IllegalStateException("HandleType shouldn't be called");
-    }
-
-    @NotNull
-    @Override
-    public String handleValue(@NotNull final String var,
-                              @NotNull final String type,
-                              @NotNull final String value) {
-      throw new IllegalStateException("HandleValue shouldn't be called");
-    }
   }
 
   private static class VarsTheRProcess extends TheRProcess {

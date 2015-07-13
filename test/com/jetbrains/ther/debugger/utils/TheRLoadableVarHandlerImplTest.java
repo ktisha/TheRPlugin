@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.mock.IllegalTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class TheRLoadableVarHandlerImplTest {
   public void serviceFunctionType() throws IOException, InterruptedException {
     assertNull(
       new TheRLoadableVarHandlerImpl().handleType(
-        new NoCommandTheRProcess(),
+        new IllegalTheRProcess(),
         TheRDebugConstants.SERVICE_FUNCTION_PREFIX + "abc",
         TheRDebugConstants.FUNCTION_TYPE
       )
@@ -43,7 +44,7 @@ public class TheRLoadableVarHandlerImplTest {
     assertEquals(
       "typeAbc",
       new TheRLoadableVarHandlerImpl().handleType(
-        new NoCommandTheRProcess(),
+        new IllegalTheRProcess(),
         "abc",
         "typeAbc"
       )
@@ -80,19 +81,6 @@ public class TheRLoadableVarHandlerImplTest {
         "valueAbc"
       )
     );
-  }
-
-  private static class NoCommandTheRProcess extends TheRProcess {
-
-    @NotNull
-    @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      throw new IllegalStateException("Execute shouldn't be called");
-    }
-
-    @Override
-    public void stop() {
-    }
   }
 
   private static class TraceAndDebugTheRProcess extends TheRProcess {

@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger.data;
 
-import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
+import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class TheRStackFrameTest {
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
       vars,
-      new MockTheRDebuggerEvaluator()
+      new IllegalTheRDebuggerEvaluator()
     );
 
     stackFrame.getVars().add(new TheRVar("name3", "type3", "value3"));
@@ -41,7 +41,7 @@ public class TheRStackFrameTest {
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
       vars,
-      new MockTheRDebuggerEvaluator()
+      new IllegalTheRDebuggerEvaluator()
     );
 
     vars.add(new TheRVar("name3", "type3", "value3"));
@@ -65,7 +65,7 @@ public class TheRStackFrameTest {
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
       vars,
-      new MockTheRDebuggerEvaluator()
+      new IllegalTheRDebuggerEvaluator()
     );
 
     assertEquals(varsCopy, stackFrame.getVars());
@@ -80,18 +80,5 @@ public class TheRStackFrameTest {
     result.add(new TheRVar("name2", "type2", "value2"));
 
     return result;
-  }
-
-  private static class MockTheRDebuggerEvaluator implements TheRDebuggerEvaluator {
-
-    @Override
-    public void evalCondition(@NotNull final String condition, @NotNull final ConditionReceiver receiver) {
-      throw new IllegalStateException("EvalCondition shouldn't be called");
-    }
-
-    @Override
-    public void evalExpression(@NotNull final String expression, @NotNull final ExpressionReceiver receiver) {
-      throw new IllegalStateException("EvalExpression shouldn't be called");
-    }
   }
 }
