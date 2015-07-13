@@ -10,16 +10,16 @@ public class MockExpressionReceiver implements TheRDebuggerEvaluator.ExpressionR
   @NotNull
   private final String myText;
 
-  private boolean myResultReceived;
+  private int myResultReceived;
 
   public MockExpressionReceiver(@NotNull final String text) {
     myText = text;
-    myResultReceived = false;
+    myResultReceived = 0;
   }
 
   @Override
   public void receiveResult(@NotNull final String result) {
-    myResultReceived = true;
+    myResultReceived++;
 
     assertEquals(myText, result);
   }
@@ -29,7 +29,7 @@ public class MockExpressionReceiver implements TheRDebuggerEvaluator.ExpressionR
     throw new IllegalStateException("ReceiveError shouldn't be called");
   }
 
-  public boolean isResultReceived() {
+  public int getResultReceived() {
     return myResultReceived;
   }
 }

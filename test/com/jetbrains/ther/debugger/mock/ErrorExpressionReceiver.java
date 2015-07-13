@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ErrorExpressionReceiver implements TheRDebuggerEvaluator.ExpressionReceiver {
 
-  private boolean myErrorReceived = false;
+  private int myErrorReceived = 0;
 
   @Override
   public void receiveResult(@NotNull final String result) {
@@ -14,10 +14,10 @@ public class ErrorExpressionReceiver implements TheRDebuggerEvaluator.Expression
 
   @Override
   public void receiveError(@NotNull final Exception e) {
-    myErrorReceived = true;
+    myErrorReceived++;
   }
 
-  public boolean isErrorReceived() {
+  public int getErrorReceived() {
     return myErrorReceived;
   }
 }

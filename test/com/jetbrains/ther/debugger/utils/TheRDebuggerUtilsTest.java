@@ -25,7 +25,7 @@ public class TheRDebuggerUtilsTest {
   public void noVarsLoading() throws IOException, InterruptedException {
     final String text = "character(0)";
 
-    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
     final TheRLoadableVarHandler handler = new IllegalTheRLoadableVarHandler();
 
     assertTrue(
@@ -34,12 +34,14 @@ public class TheRDebuggerUtilsTest {
         handler
       ).isEmpty()
     );
+
+    assertEquals(1, process.getExecuteCalled());
   }
 
   @Test
   public void varsLoading() throws IOException, InterruptedException {
-    final TheRProcess process = new VarsTheRProcess();
-    final TheRLoadableVarHandler handler = new VarsTheRLoadableVarHandler();
+    final VarsTheRProcess process = new VarsTheRProcess();
+    final VarsTheRLoadableVarHandler handler = new VarsTheRLoadableVarHandler();
 
     final List<TheRVar> actual = TheRDebuggerUtils.loadVars(
       process,
@@ -51,6 +53,15 @@ public class TheRDebuggerUtilsTest {
     );
 
     assertEquals(expected, actual);
+
+    assertTrue(process.isLsAsked());
+    assertTrue(process.isXTypeAsked());
+    assertTrue(process.isYTypeAsked());
+    assertTrue(process.isXValueAsked());
+
+    assertTrue(handler.isXTypeAsked());
+    assertTrue(handler.isYTypeAsked());
+    assertTrue(handler.isXValueAsked());
   }
 
   @Test
@@ -145,13 +156,19 @@ public class TheRDebuggerUtilsTest {
 
   private static class VarsTheRProcess extends TheRProcess {
 
-    private boolean myIsXTypeAsked = false;
-    private boolean myIsYTypeAsked = false;
+    private boolean myLsAsked = false;
+
+    private boolean myXTypeAsked = false;
+    private boolean myYTypeAsked = false;
+
+    private boolean myXValueAsked = false;
 
     @NotNull
     @Override
     public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
       if (command.equals(TheRDebugConstants.LS_COMMAND)) {
+        myLsAsked = true;
+
         return new TheRProcessResponse(
           "[1] \"x\"\n[2] \"y\"",
           RESPONSE,
@@ -160,7 +177,7 @@ public class TheRDebuggerUtilsTest {
       }
 
       if (command.equals(TheRDebugConstants.TYPEOF_COMMAND + "(x)")) {
-        myIsXTypeAsked = true;
+        myXTypeAsked = true;
 
         return new TheRProcessResponse(
           "typeX",
@@ -170,7 +187,7 @@ public class TheRDebuggerUtilsTest {
       }
 
       if (command.equals(TheRDebugConstants.TYPEOF_COMMAND + "(y)")) {
-        myIsYTypeAsked = true;
+        myYTypeAsked = true;
 
         return new TheRProcessResponse(
           "typeY",
@@ -180,9 +197,11 @@ public class TheRDebuggerUtilsTest {
       }
 
       if (command.equals("x")) {
-        if (!myIsXTypeAsked) {
-          fail("Type should be asked before value");
+        if (!myXTypeAsked) {
+          throw new IllegalStateException("Type should be asked before value");
         }
+
+        myXValueAsked = true;
 
         return new TheRProcessResponse(
           "valueX",
@@ -192,43 +211,61 @@ public class TheRDebuggerUtilsTest {
       }
 
       if (command.equals("y")) {
-        if (!myIsYTypeAsked) {
-          fail("Type should be asked before value");
+        if (!myYTypeAsked) {
+          throw new IllegalStateException("Type should be asked before value");
         }
 
-        fail("Type of \"y\" shouldn't be asked");
+        throw new IllegalStateException("Type of \"y\" shouldn't be asked");
       }
 
-      throw new IllegalArgumentException("Unexpected command");
+      throw new IllegalStateException("Unexpected command");
     }
 
     @Override
     public void stop() {
     }
+
+    public boolean isLsAsked() {
+      return myLsAsked;
+    }
+
+    public boolean isXTypeAsked() {
+      return myXTypeAsked;
+    }
+
+    public boolean isYTypeAsked() {
+      return myYTypeAsked;
+    }
+
+    public boolean isXValueAsked() {
+      return myXValueAsked;
+    }
   }
 
   private static class VarsTheRLoadableVarHandler implements TheRLoadableVarHandler {
 
-    private boolean myIsXTypeAsked = false;
-    private boolean myIsYTypeAsked = false;
+    private boolean myXTypeAsked = false;
+    private boolean myYTypeAsked = false;
+
+    private boolean myXValueAsked = false;
 
     @Nullable
     @Override
     public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
       throws IOException, InterruptedException {
       if (var.equals("x")) {
-        myIsXTypeAsked = true;
+        myXTypeAsked = true;
 
         return "newTypeX";
       }
 
       if (var.equals("y")) {
-        myIsYTypeAsked = true;
+        myYTypeAsked = true;
 
         return null;
       }
 
-      throw new IllegalArgumentException("Unexpected var");
+      throw new IllegalStateException("Unexpected var");
     }
 
     @NotNull
@@ -237,22 +274,36 @@ public class TheRDebuggerUtilsTest {
                               @NotNull final String type,
                               @NotNull final String value) {
       if (var.equals("x")) {
-        if (!myIsXTypeAsked) {
-          fail("Type should be handled before value");
+        if (!myXTypeAsked) {
+          throw new IllegalStateException("Type should be handled before value");
         }
+
+        myXValueAsked = true;
 
         return "newValueX";
       }
 
       if (var.equals("y")) {
-        if (!myIsYTypeAsked) {
-          fail("Type should be handled before value");
+        if (!myYTypeAsked) {
+          throw new IllegalStateException("Type should be handled before value");
         }
 
-        fail("Type of \"y\" shouldn't be handled");
+        throw new IllegalStateException("Type of \"y\" shouldn't be handled");
       }
 
-      throw new IllegalArgumentException("Unexpected var");
+      throw new IllegalStateException("Unexpected var");
+    }
+
+    public boolean isXTypeAsked() {
+      return myXTypeAsked;
+    }
+
+    public boolean isYTypeAsked() {
+      return myYTypeAsked;
+    }
+
+    public boolean isXValueAsked() {
+      return myXValueAsked;
     }
   }
 }

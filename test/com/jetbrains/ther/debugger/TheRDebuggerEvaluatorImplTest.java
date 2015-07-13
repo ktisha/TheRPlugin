@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRDebuggerEvaluatorImplTest {
 
@@ -21,12 +20,14 @@ public class TheRDebuggerEvaluatorImplTest {
   public void evalTrueCondition() {
     final String text = "[1] TRUE";
 
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      text,
+      TheRProcessResponseType.RESPONSE,
+      TextRange.allOf(text)
+    );
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        text,
-        TheRProcessResponseType.RESPONSE,
-        TextRange.allOf(text)
-      ),
+      process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -43,19 +44,22 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalCondition("5 > 4", receiver);
 
-    assertTrue(receiver.isResultReceived());
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getResultReceived());
   }
 
   @Test
   public void evalFalseCondition() {
     final String text = "[1] FALSE";
 
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      text,
+      TheRProcessResponseType.RESPONSE,
+      TextRange.allOf(text)
+    );
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        text,
-        TheRProcessResponseType.RESPONSE,
-        TextRange.allOf(text)
-      ),
+      process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -72,19 +76,22 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalCondition("5 < 4", receiver);
 
-    assertTrue(receiver.isResultReceived());
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getResultReceived());
   }
 
   @Test
   public void evalInvalidResponseFormatCondition() {
     final String text = "ghi";
 
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      text,
+      TheRProcessResponseType.RESPONSE,
+      TextRange.allOf(text)
+    );
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        text,
-        TheRProcessResponseType.RESPONSE,
-        TextRange.allOf(text)
-      ),
+      process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -101,17 +108,20 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalCondition("def", receiver);
 
-    assertTrue(receiver.isResultReceived());
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getResultReceived());
   }
 
   @Test
   public void evalUnexpectedResponseType() {
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      "",
+      TheRProcessResponseType.PLUS,
+      TextRange.EMPTY_RANGE
+    );
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        "",
-        TheRProcessResponseType.PLUS,
-        TextRange.EMPTY_RANGE
-      ),
+      process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -128,7 +138,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("def <- function() {", receiver);
 
-    assertTrue(receiver.isErrorReceived());
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getErrorReceived());
   }
 
   @Test
@@ -154,19 +165,21 @@ public class TheRDebuggerEvaluatorImplTest {
     evaluator.evalExpression("def", receiver);
 
     assertEquals(1, process.getExecuteCalled());
-    assertTrue(receiver.isErrorReceived());
+    assertEquals(1, receiver.getErrorReceived());
   }
 
   @Test
   public void evalFunction() {
     final String text = "[1] 1 2 3";
 
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      text,
+      TheRProcessResponseType.RESPONSE,
+      TextRange.allOf(text)
+    );
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        text,
-        TheRProcessResponseType.RESPONSE,
-        TextRange.allOf(text)
-      ),
+      process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -183,21 +196,23 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("def(c(1:5))", receiver);
 
-    assertTrue(receiver.isResultReceived());
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getResultReceived());
   }
 
   @Test
   public void evalDebuggedFunction() {
     final String command = "def(c(1:5))";
 
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      "debugging in: " + command,
+      TheRProcessResponseType.DEBUGGING_IN,
+      TextRange.EMPTY_RANGE
+    );
     final DebuggedTheRFunctionDebuggerFactory debuggerFactory = new DebuggedTheRFunctionDebuggerFactory();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      new AlwaysSameResponseTheRProcess(
-        "debugging in: " + command,
-        TheRProcessResponseType.DEBUGGING_IN,
-        TextRange.EMPTY_RANGE
-      ),
+      process,
       debuggerFactory,
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheRFunctionResolver(),
@@ -214,8 +229,9 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression(command, receiver);
 
+    assertEquals(1, process.getExecuteCalled());
     assertEquals(1, debuggerFactory.getNotMainCalled());
-    assertTrue(receiver.isResultReceived());
+    assertEquals(1, receiver.getResultReceived());
   }
 
   private static class IOExceptionTheRProcess extends TheRProcess {
@@ -296,7 +312,6 @@ public class TheRDebuggerEvaluatorImplTest {
                                                         @NotNull final TheRScriptReader scriptReader) {
       throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
     }
-
 
     public int getNotMainCalled() {
       return myNotMainCalled;

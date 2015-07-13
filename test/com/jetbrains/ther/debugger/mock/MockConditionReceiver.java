@@ -9,16 +9,16 @@ public class MockConditionReceiver implements TheRDebuggerEvaluator.ConditionRec
 
   private final boolean myExpectedResult;
 
-  private boolean myResultReceived;
+  private int myResultReceived;
 
   public MockConditionReceiver(final boolean result) {
     myExpectedResult = result;
-    myResultReceived = false;
+    myResultReceived = 0;
   }
 
   @Override
   public void receiveResult(final boolean result) {
-    myResultReceived = true;
+    myResultReceived++;
 
     assertEquals(myExpectedResult, result);
   }
@@ -28,7 +28,7 @@ public class MockConditionReceiver implements TheRDebuggerEvaluator.ConditionRec
     throw new IllegalStateException("ReceiveError shouldn't be called");
   }
 
-  public boolean isResultReceived() {
+  public int getResultReceived() {
     return myResultReceived;
   }
 }

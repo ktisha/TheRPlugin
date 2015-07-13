@@ -19,21 +19,29 @@ public class AlwaysSameResponseTheRProcess extends TheRProcess {
   @NotNull
   private final TextRange myOutputRange;
 
+  private int myExecuteCalled;
+
   public AlwaysSameResponseTheRProcess(@NotNull final String text,
                                        @NotNull final TheRProcessResponseType type,
                                        @NotNull final TextRange outputRange) {
     myText = text;
     myType = type;
     myOutputRange = outputRange;
+    myExecuteCalled = 0;
   }
 
   @NotNull
   @Override
   public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
+    myExecuteCalled++;
     return new TheRProcessResponse(myText, myType, myOutputRange);
   }
 
   @Override
   public void stop() {
+  }
+
+  public int getExecuteCalled() {
+    return myExecuteCalled;
   }
 }

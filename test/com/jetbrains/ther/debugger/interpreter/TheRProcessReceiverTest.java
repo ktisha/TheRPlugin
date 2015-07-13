@@ -16,26 +16,35 @@ public class TheRProcessReceiverTest {
 
   @Test
   public void sleepIncreasing() throws IOException, InterruptedException {
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(new IncreasingMockReader());
+    final IncreasingMockReader reader = new IncreasingMockReader();
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
 
     receiver.receive();
+
+    assertEquals(9, reader.getCounter());
   }
 
   @Test
   public void sleepResetting() throws IOException, InterruptedException {
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(new ResettingMockReader());
+    final ResettingMockReader reader = new ResettingMockReader();
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
 
     receiver.receive();
+
+    assertEquals(6, reader.getCounter());
   }
 
   @Test
   public void responseHandling() throws IOException, InterruptedException {
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(new MockReader());
+    final MockReader reader = new MockReader();
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
 
     final TheRProcessResponse response = receiver.receive();
 
     assertEquals(TheRProcessResponseType.RESPONSE, response.getType());
     assertEquals("[1] \"x\"", response.getText());
+
+    assertEquals(1, reader.getCounter());
   }
 
   private static class IncreasingMockReader extends Reader {
@@ -43,7 +52,6 @@ public class TheRProcessReceiverTest {
     private int myCounter = 0;
 
     private long myTime = 0;
-
     private long myPrevPause = 1;
 
     @Override
@@ -56,11 +64,21 @@ public class TheRProcessReceiverTest {
         return 0;
       }
 
-      return doRead(cbuf);
+      if (myCounter == 8) {
+        myCounter++;
+
+        return doRead(cbuf);
+      }
+
+      throw new IllegalStateException("Unexpected read");
     }
 
     @Override
     public void close() throws IOException {
+    }
+
+    public int getCounter() {
+      return myCounter;
     }
 
     private void checkPause() {
@@ -97,7 +115,6 @@ public class TheRProcessReceiverTest {
     private int myCounter = 0;
 
     private long myTime = 0;
-
     private long myPrevPause = 1;
 
     @Override
@@ -124,11 +141,21 @@ public class TheRProcessReceiverTest {
         return 0;
       }
 
-      return doSecondRead(cbuf, off);
+      if (myCounter == 5) {
+        myCounter++;
+
+        return doSecondRead(cbuf, off);
+      }
+
+      throw new IllegalStateException("Unexpected read");
     }
 
     @Override
     public void close() throws IOException {
+    }
+
+    public int getCounter() {
+      return myCounter;
     }
 
     private int doFirstRead(@NotNull final char[] cbuf) {
@@ -172,6 +199,8 @@ public class TheRProcessReceiverTest {
 
   private static class MockReader extends Reader {
 
+    private int myCounter = 0;
+
     @Override
     public int read(@NotNull final char[] cbuf, final int off, final int len) throws IOException {
       final String response = "ls()\n[1] \"x\"\nBrowse[3]> ";
@@ -180,12 +209,17 @@ public class TheRProcessReceiverTest {
         cbuf[index] = response.charAt(index);
       }
 
+      myCounter++;
+
       return response.length();
     }
 
     @Override
     public void close() throws IOException {
+    }
 
+    public int getCounter() {
+      return myCounter;
     }
   }
 }
