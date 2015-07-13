@@ -7,8 +7,9 @@ import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-// TODO [dbg][test]
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
@@ -99,7 +100,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
   private String evaluateFunction() throws IOException, InterruptedException {
-    final TheRFunctionDebugger debugger = myDebuggerFactory.getNotMainFunctionDebugger(
+    final TheREvaluatedFunctionDebuggerHandler debuggerHandler = new TheREvaluatedFunctionDebuggerHandler(
       myProcess,
       myDebuggerFactory,
       myDebuggerHandler,
@@ -108,10 +109,82 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       myLocation
     );
 
-    while (debugger.hasNext()) {
-      debugger.advance();
+    while (debuggerHandler.advance()) {
     }
 
-    return debugger.getResult();
+    return debuggerHandler.getResult();
+  }
+
+  private static class TheREvaluatedFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {
+
+    @NotNull
+    private final List<TheRFunctionDebugger> myDebuggers;
+
+    @NotNull
+    private final TheRFunctionDebuggerHandler myPrimaryHandler;
+
+    public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
+                                                @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
+                                                @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                                @NotNull final TheRFunctionResolver functionResolver,
+                                                @NotNull final TheRLoadableVarHandler varHandler,
+                                                @NotNull final TheRLocation prevLocation) throws IOException, InterruptedException {
+      myDebuggers = new ArrayList<TheRFunctionDebugger>();
+      myPrimaryHandler = debuggerHandler;
+
+      appendDebugger(
+        debuggerFactory.getNotMainFunctionDebugger(
+          process,
+          debuggerFactory,
+          this,
+          functionResolver,
+          varHandler,
+          prevLocation
+        )
+      );
+    }
+
+    public boolean advance() throws IOException, InterruptedException {
+      topDebugger().advance(); // Don't forget that advance could append new debugger
+
+      while (!topDebugger().hasNext()) {
+        if (myDebuggers.size() == 1) {
+          return false;
+        }
+
+        popDebugger();
+      }
+
+      return true;
+    }
+
+    @NotNull
+    public String getResult() {
+      return topDebugger().getResult();
+    }
+
+    @Override
+    public void appendOutput(@NotNull final String text) {
+      myPrimaryHandler.appendOutput(text);
+    }
+
+    @Override
+    public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+      myDebuggers.add(debugger);
+    }
+
+    @Override
+    public void setReturnLineNumber(final int lineNumber) {
+      // TODO [dbg][impl]
+    }
+
+    @NotNull
+    private TheRFunctionDebugger topDebugger() {
+      return myDebuggers.get(myDebuggers.size() - 1);
+    }
+
+    private void popDebugger() {
+      myDebuggers.remove(myDebuggers.size() - 1);
+    }
   }
 }
