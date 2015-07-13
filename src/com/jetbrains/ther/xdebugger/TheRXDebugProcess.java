@@ -86,15 +86,12 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void startStepOver() {
     try {
-      final boolean executed = myDebugger.advance();
+      final int targetDepth = myDebugger.getStack().size();
 
-      printInterpreterOutput();
-
-      if (!executed) {
-        getSession().stop();
-
-        return;
+      do {
+        if (!advance()) return;
       }
+      while (!isBreakpoint() && myDebugger.getStack().size() != targetDepth);
 
       updateDebugInformation();
     }
@@ -108,27 +105,44 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepInto() {
-    // TODO [xdbg][impl]
+    try {
+      if (!advance()) return;
+
+      updateDebugInformation();
+    }
+    catch (final IOException e) {
+      LOGGER.error(e);
+    }
+    catch (final InterruptedException e) {
+      LOGGER.error(e);
+    }
   }
 
   @Override
   public void startStepOut() {
-    // TODO [xdbg][impl]
+    try {
+      final int targetDepth = myDebugger.getStack().size() - 1;
+
+      do {
+        if (!advance()) return;
+      }
+      while (!isBreakpoint() && myDebugger.getStack().size() != targetDepth);
+
+      updateDebugInformation();
+    }
+    catch (final IOException e) {
+      LOGGER.error(e);
+    }
+    catch (final InterruptedException e) {
+      LOGGER.error(e);
+    }
   }
 
   @Override
   public void resume() {
     try {
       do {
-        final boolean executed = myDebugger.advance();
-
-        printInterpreterOutput();
-
-        if (!executed) {
-          getSession().stop();
-
-          return;
-        }
+        if (!advance()) return;
       }
       while (!isBreakpoint());
 
@@ -167,20 +181,16 @@ class TheRXDebugProcess extends XDebugProcess {
     );
   }
 
-  private void printInterpreterOutput() {
-    final Queue<String> messages = myOutputBuffer.getMessages();
+  private boolean advance() throws IOException, InterruptedException {
+    final boolean executed = myDebugger.advance();
 
-    while (!messages.isEmpty()) {
-      final String message = messages.poll();
+    printInterpreterOutput();
 
-      if (message != null) {
-        myConsole.print(message, ConsoleViewContentType.NORMAL_OUTPUT);
-        myConsole.print(
-          TheRDebugConstants.LINE_SEPARATOR,
-          ConsoleViewContentType.NORMAL_OUTPUT
-        );
-      }
+    if (!executed) {
+      getSession().stop();
     }
+
+    return executed;
   }
 
   private void updateDebugInformation() {
@@ -207,6 +217,22 @@ class TheRXDebugProcess extends XDebugProcess {
     final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
 
     return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
+  }
+
+  private void printInterpreterOutput() {
+    final Queue<String> messages = myOutputBuffer.getMessages();
+
+    while (!messages.isEmpty()) {
+      final String message = messages.poll();
+
+      if (message != null) {
+        myConsole.print(message, ConsoleViewContentType.NORMAL_OUTPUT);
+        myConsole.print(
+          TheRDebugConstants.LINE_SEPARATOR,
+          ConsoleViewContentType.NORMAL_OUTPUT
+        );
+      }
+    }
   }
 
   @NotNull
