@@ -91,7 +91,7 @@ class TheRXDebugProcess extends XDebugProcess {
       do {
         if (!advance()) return;
       }
-      while (!isBreakpoint() && myDebugger.getStack().size() != targetDepth);
+      while (!isBreakpoint() && myDebugger.getStack().size() > targetDepth);
 
       updateDebugInformation();
     }
