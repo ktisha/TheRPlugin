@@ -1,12 +1,10 @@
 package com.jetbrains.ther.xdebugger;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
-import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,46 +65,19 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void receiveResult(@NotNull final String result) {
-      myCallback.evaluated(new EvaluatedXValue(result));
+      final XValue xvalue = new XValue() {
+        @Override
+        public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
+          TheRXPresentationUtils.computePresentation(result, node);
+        }
+      };
+
+      myCallback.evaluated(xvalue);
     }
 
     @Override
     public void receiveError(@NotNull final Exception e) {
       // TODO [xdbg][update]
-    }
-
-    private static class EvaluatedXValue extends XValue {
-
-      @NotNull
-      private final String myValue;
-
-      public EvaluatedXValue(@NotNull final String value) {
-        myValue = value;
-      }
-
-      @Override
-      public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
-        node.setPresentation(
-          AllIcons.Debugger.Value,
-          new EvaluatedXValuePresentation(myValue),
-          false
-        );
-      }
-
-      private static class EvaluatedXValuePresentation extends XValuePresentation {
-
-        @NotNull
-        private final String myValue;
-
-        public EvaluatedXValuePresentation(@NotNull final String value) {
-          myValue = value;
-        }
-
-        @Override
-        public void renderValue(@NotNull final XValueTextRenderer renderer) {
-          renderer.renderValue(myValue);
-        }
-      }
     }
   }
 }

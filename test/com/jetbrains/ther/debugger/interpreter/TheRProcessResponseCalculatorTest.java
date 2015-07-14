@@ -312,10 +312,30 @@ public class TheRProcessResponseCalculatorTest {
                      @NotNull final String tail,
                      @NotNull final TheRProcessResponseType expectedType,
                      @NotNull final String expectedOutput) {
-    final TheRProcessResponse response = calculate(command + "\n" + expectedResponse + "\n" + tail);
+    final TheRProcessResponse response = calculate(
+      calculateFinalCommand(command, expectedResponse, tail)
+    );
 
     assertEquals(expectedResponse, response.getText());
     assertEquals(expectedType, response.getType());
     assertEquals(expectedOutput, response.getOutputRange().substring(response.getText()));
+  }
+
+  private String calculateFinalCommand(@NotNull final String command,
+                                       @NotNull final String expectedResponse,
+                                       @NotNull final String tail) {
+    final StringBuilder sb = new StringBuilder();
+
+    sb.append(command);
+    sb.append(TheRDebugConstants.LINE_SEPARATOR);
+
+    if (!expectedResponse.isEmpty()) {
+      sb.append(expectedResponse);
+      sb.append(TheRDebugConstants.LINE_SEPARATOR);
+    }
+
+    sb.append(tail);
+
+    return sb.toString();
   }
 }

@@ -24,7 +24,7 @@ final class TheRProcessResponseCalculator {
   private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit( )*$");
 
   @NotNull
-  private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)+");
+  private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)");
 
   public static boolean isComplete(@NotNull final CharSequence response) {
     return endsLineBreakAndPlusAndSpace(response) || endsLineBreakAndBrowseAndSpace(response);
@@ -32,7 +32,8 @@ final class TheRProcessResponseCalculator {
 
   @NotNull
   public static TheRProcessResponse calculate(@NotNull final CharSequence response) {
-    final String[] lines = LINE_BREAK_PATTERN.split(response); // Don't forget that first line is command
+    final String[] lines =
+      LINE_BREAK_PATTERN.split(response); // Don't forget that first line is command and the last is invitation for the next one
 
     return calculateResult(
       lines,
