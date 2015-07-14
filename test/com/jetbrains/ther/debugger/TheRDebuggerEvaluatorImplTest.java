@@ -231,6 +231,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(1, process.getExecuteCalled());
     assertEquals(1, debuggerFactory.getNotMainCalled());
+    assertEquals(1, debuggerFactory.getAdvanceCalled());
     assertEquals(1, receiver.getResultReceived());
   }
 
@@ -257,6 +258,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
   private static class DebuggedTheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
 
+    private final int[] myAdvanceCalled = new int[]{0};
     private int myNotMainCalled = 0;
 
     @NotNull
@@ -291,7 +293,11 @@ public class TheRDebuggerEvaluatorImplTest {
 
         @Override
         public void advance() throws IOException, InterruptedException {
-          throw new IllegalStateException("Advance shouldn't be called");
+          myAdvanceCalled[0]++;
+
+          if (myAdvanceCalled[0] > 1) {
+            throw new IllegalStateException("Advance shouldn't be called");
+          }
         }
 
         @NotNull
@@ -315,6 +321,10 @@ public class TheRDebuggerEvaluatorImplTest {
 
     public int getNotMainCalled() {
       return myNotMainCalled;
+    }
+
+    public int getAdvanceCalled() {
+      return myAdvanceCalled[0];
     }
   }
 }
