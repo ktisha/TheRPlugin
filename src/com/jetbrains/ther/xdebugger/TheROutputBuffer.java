@@ -9,7 +9,7 @@ import java.util.Queue;
 class TheROutputBuffer implements TheROutputReceiver {
 
   @NotNull
-  private final LinkedList<String> myMessages = new LinkedList<String>();
+  private final Queue<String> myMessages = new LinkedList<String>();
 
   @NotNull
   public Queue<String> getMessages() {

@@ -44,20 +44,20 @@ final class TheRProcessResponseCalculator {
   private static boolean endsLineBreakAndPlusAndSpace(@NotNull final CharSequence sequence) {
     final int length = sequence.length();
 
-    return isSubsequence(PLUS_AND_SPACE, sequence, length - PLUS_AND_SPACE.length()) &&
-           StringUtil.isLineBreak(sequence.charAt(length - PLUS_AND_SPACE.length() - 1));
+    return isSubsequence(PLUS_AND_SPACE, sequence, length - PLUS_AND_SPACE.length()) && // ends with PLUS_AND_SPACE
+           StringUtil.isLineBreak(sequence.charAt(length - PLUS_AND_SPACE.length() - 1)); // line break before PLUS_AND_SPACE
   }
 
   private static boolean endsLineBreakAndBrowseAndSpace(@NotNull final CharSequence sequence) {
     final int length = sequence.length();
 
-    if (isSubsequence(BROWSE_SUFFIX, sequence, length - BROWSE_SUFFIX.length())) {
-      final int index = readDigitsBackward(sequence, length - BROWSE_SUFFIX.length() - 1);
+    if (isSubsequence(BROWSE_SUFFIX, sequence, length - BROWSE_SUFFIX.length())) { // ends with BROWSE_SUFFIX
+      final int index = readDigitsBackward(sequence, length - BROWSE_SUFFIX.length() - 1); // read digits before BROWSE_SUFFIX
 
-      return index != -1 &&
-             index != length - BROWSE_SUFFIX.length() - 1 &&
-             isSubsequence(BROWSE_PREFIX, sequence, index - BROWSE_PREFIX.length() + 1) &&
-             StringUtil.isLineBreak(sequence.charAt(index - BROWSE_PREFIX.length()));
+      return index != -1 && // there are symbols before digits
+             index != length - BROWSE_SUFFIX.length() - 1 && // there are any digits before BROWSE_SUFFIX
+             isSubsequence(BROWSE_PREFIX, sequence, index - BROWSE_PREFIX.length() + 1) && // there is BROWSE_PREFIX before digits
+             StringUtil.isLineBreak(sequence.charAt(index - BROWSE_PREFIX.length())); // line break before all mentioned above
     }
     else {
       return false;
@@ -230,14 +230,21 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
-    for (int i = 1; i < lines.length - 5; i++) {
+    final int endOffset = -1  // "[1] \"exit ...\"" line
+                          - 1 // "exiting from FUN..." line
+                          - 1 // "debugging in..." line
+                          - 1; // "debug: {..." line
+
+    for (int i = 1; i < lines.length + endOffset - 1; i++) {
       if (lines[i + 2].startsWith(EXITING_FROM) && END_TRACE_PATTERN.matcher(lines[i]).find()) {
         for (int j = i + 3; j < lines.length; j++) {
           if (lines[j].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
             if (i == 1) {
+              // output could be located inside trace information between "exiting from FUN..." and "debugging in..." lines
               return new TypeAndOutputLineBounds(CONTINUE_TRACE, i + 3, j);
             }
             else {
+              // output could be located before trace information
               return new TypeAndOutputLineBounds(CONTINUE_TRACE, 1, i);
             }
           }
@@ -255,12 +262,15 @@ final class TheRProcessResponseCalculator {
     for (int i = 1; i < lines.length - 1; i++) {
       if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
         if (i == 1) {
+          // output could be located inside trace information between "exiting from FUN..." and "debug at #..." lines
+          // or just after "exiting from FUN..." line if there is no "debug at #..." line
           final int outputLineBegin = findExitingFrom(lines, i + 1) + 1;
           final int outputLineEnd = findDebugAt(lines, outputLineBegin);
 
           return new TypeAndOutputLineBounds(END_TRACE, outputLineBegin, outputLineEnd);
         }
         else {
+          // output could be located before trace information
           return new TypeAndOutputLineBounds(END_TRACE, 1, i);
         }
       }
@@ -273,8 +283,9 @@ final class TheRProcessResponseCalculator {
   private static TypeAndOutputLineBounds tryDebugAt(@NotNull final String[] lines) {
     if (lines.length > 2) {
       final int debugAtLine = findDebugAt(lines, 0);
+      final boolean debugAtExists = debugAtLine < lines.length - 1;
 
-      if (debugAtLine < lines.length - 1) {
+      if (debugAtExists) {
         return new TypeAndOutputLineBounds(DEBUG_AT, 1, debugAtLine);
       }
       else {
@@ -289,7 +300,13 @@ final class TheRProcessResponseCalculator {
   @Nullable
   private static TypeAndOutputLineBounds tryStartTrace(@NotNull final String[] lines) {
     if (START_TRACE_PATTERN.matcher(lines[1]).find()) {
-      if (lines.length == 5) {
+      final int unbraceFunctionStartTraceLength = 1 // previous command
+                                                  + 1 // "Tracing on ... entry"
+                                                  + 1 // "[1] \"enter ...\""
+                                                  + 1 // "debug: ..,"
+                                                  + 1; // invitation for the next command
+
+      if (lines.length == unbraceFunctionStartTraceLength) {
         return new TypeAndOutputLineBounds(START_TRACE_UNBRACE, 1, 1);
       }
       else {
@@ -323,7 +340,7 @@ final class TheRProcessResponseCalculator {
   private static int findExitingFrom(@NotNull final String[] lines, final int index) {
     int result = index;
 
-    while (!lines[result].startsWith(EXITING_FROM)) {
+    while (result < lines.length - 1 && !lines[result].startsWith(EXITING_FROM)) {
       result++;
     }
 
@@ -333,7 +350,7 @@ final class TheRProcessResponseCalculator {
   private static int findDebugAt(@NotNull final String[] lines, final int index) {
     int result = index;
 
-    while (result < lines.length && !lines[result].startsWith(TheRDebugConstants.DEBUG_AT)) {
+    while (result < lines.length - 1 && !lines[result].startsWith(TheRDebugConstants.DEBUG_AT)) {
       result++;
     }
 
