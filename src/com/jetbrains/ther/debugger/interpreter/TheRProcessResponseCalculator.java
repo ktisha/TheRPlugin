@@ -8,6 +8,8 @@ import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
@@ -231,7 +233,7 @@ final class TheRProcessResponseCalculator {
   @Nullable
   private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
     final int endOffset = -1  // "[1] \"exit ...\"" line
-                          - 1 // "exiting from FUN..." line
+                          - 1 // "exiting from ..." line
                           - 1 // "debugging in..." line
                           - 1; // "debug: {..." line
 
@@ -240,7 +242,7 @@ final class TheRProcessResponseCalculator {
         for (int j = i + 3; j < lines.length; j++) {
           if (lines[j].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
             if (i == 1) {
-              // output could be located inside trace information between "exiting from FUN..." and "debugging in..." lines
+              // output could be located inside trace information between "exiting from ..." and "debugging in..." lines
               return new TypeAndOutputLineBounds(CONTINUE_TRACE, i + 3, j);
             }
             else {
@@ -259,24 +261,38 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
-    for (int i = 1; i < lines.length - 1; i++) {
-      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
-        if (i == 1) {
-          // output could be located inside trace information between "exiting from FUN..." and "debug at #..." lines
-          // or just after "exiting from FUN..." line if there is no "debug at #..." line
-          final int outputLineBegin = findExitingFrom(lines, i + 1) + 1;
-          final int outputLineEnd = findDebugAt(lines, outputLineBegin);
+    final int endOffset = -2; // "[1] \"exit ...\" and "exiting from ..." lines
+    final List<Integer> endTraceIndices = new ArrayList<Integer>();
 
-          return new TypeAndOutputLineBounds(END_TRACE, outputLineBegin, outputLineEnd);
-        }
-        else {
-          // output could be located before trace information
-          return new TypeAndOutputLineBounds(END_TRACE, 1, i);
-        }
+    for (int i = 1; i < lines.length + endOffset - 1; i++) {
+      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
+        endTraceIndices.add(i);
       }
     }
 
-    return null;
+    if (endTraceIndices.isEmpty()) {
+      return null;
+    }
+
+    final TheRProcessResponseType type = (endTraceIndices.size() == 1) ? END_TRACE : RECURSIVE_END_TRACE;
+
+    final Integer firstEndTrace = endTraceIndices.get(0);
+    final Integer lastEndTrace = endTraceIndices.get(endTraceIndices.size() - 1);
+
+    if (firstEndTrace == 1) {
+      // output could be located inside trace information between last "exiting from ..." and "debug at #..." lines
+      // or just after last "exiting from ..." line if there is no "debug at #..." line
+
+      final int exitingFromOffset = lastEndTrace + 2; // "[1] \"exit ...\" and "exiting from ..." lines
+      final int outputLineBegin = findExitingFrom(lines, exitingFromOffset) + 1;
+      final int outputLineEnd = findDebugAt(lines, outputLineBegin);
+
+      return new TypeAndOutputLineBounds(type, outputLineBegin, outputLineEnd);
+    }
+    else {
+      // output could be located before trace information
+      return new TypeAndOutputLineBounds(type, 1, firstEndTrace);
+    }
   }
 
   @Nullable

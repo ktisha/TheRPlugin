@@ -297,6 +297,107 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
+  public void calculateRecursiveEndTrace() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_END_TRACE,
+      ""
+    );
+  }
+
+  @Test
+  public void calculateRecursiveEndTraceWithResponseBefore() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      "[1] 1 2 3\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_END_TRACE,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
+  public void calculateRecursiveEndTraceWithResponseAfter() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      "[1] 1 2 3",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_END_TRACE,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
+  public void calculateRecursiveEndTraceWithResponseBeforeAndDebugAt() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      "[1] 1 2 3\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_END_TRACE,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
+  public void calculateRecursiveEndTraceWithResponseAfterAndDebugAt() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
+      "[1] \"exit x\"\n" +
+      EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      "[1] 1 2 3\n" +
+      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_END_TRACE,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
   public void calculateResponseAndBrowse() {
     check(
       "ls()",
