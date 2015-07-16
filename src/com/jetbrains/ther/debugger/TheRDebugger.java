@@ -48,6 +48,10 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   private final List<TheRStackFrame> myUnmodifiableStack;
 
+  private int myReturnLineNumber;
+
+  private int myDropFrames;
+
   public TheRDebugger(@NotNull final TheRProcess process,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                       @NotNull final TheRFunctionResolver functionResolver,
@@ -67,6 +71,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myDebuggers = new ArrayList<TheRFunctionDebugger>();
     myStack = new ArrayList<TheRStackFrame>();
     myUnmodifiableStack = Collections.unmodifiableList(myStack);
+
+    myReturnLineNumber = -1;
+    myDropFrames = 1;
 
     appendDebugger(
       myDebuggerFactory.getMainFunctionDebugger(
@@ -88,11 +95,14 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
         return false;
       }
 
-      popDebugger();
+      for (int i = 0; i < myDropFrames; i++) {
+        popDebugger();
+      }
+
+      myDropFrames = 1;
     }
 
-    final TheRFunctionDebugger topDebugger = topDebugger();
-    final TheRLocation topLocation = topDebugger.getLocation();
+    final TheRLocation topLocation = getTopLocation();
 
     final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
       myProcess,
@@ -107,12 +117,30 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       myStack.size() - 1,
       new TheRStackFrame(
         topLocation,
-        topDebugger.getVars(),
+        topDebugger().getVars(),
         evaluator
       )
     );
 
     return true;
+  }
+
+  @NotNull
+  private TheRLocation getTopLocation() {
+    final TheRFunctionDebugger topDebugger = topDebugger();
+
+    if (myReturnLineNumber != -1) {
+      final TheRLocation result = new TheRLocation(
+        topDebugger.getLocation().getFunction(),
+        myReturnLineNumber
+      );
+
+      myReturnLineNumber = -1;
+
+      return result;
+    }
+
+    return topDebugger.getLocation();
   }
 
   @NotNull
@@ -144,16 +172,21 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @Override
   public void setReturnLineNumber(final int lineNumber) {
-    // TODO [dbg][impl]
+    myReturnLineNumber = lineNumber;
   }
 
-  private void popDebugger() {
-    myDebuggers.remove(myDebuggers.size() - 1);
-    myStack.remove(myStack.size() - 1);
+  @Override
+  public void setDropFrames(final int number) {
+    myDropFrames = number;
   }
 
   @NotNull
   private TheRFunctionDebugger topDebugger() {
     return myDebuggers.get(myDebuggers.size() - 1);
+  }
+
+  private void popDebugger() {
+    myDebuggers.remove(myDebuggers.size() - 1);
+    myStack.remove(myStack.size() - 1);
   }
 }

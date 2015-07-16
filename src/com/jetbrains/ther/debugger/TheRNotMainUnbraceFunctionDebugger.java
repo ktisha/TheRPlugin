@@ -29,6 +29,9 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case DEBUGGING_IN:
         handleDebuggingIn();
         break;
+      case RECURSIVE_END_TRACE:
+        handleRecursiveEndTrace(response);
+        break;
       default:
         throw new IllegalStateException("Unexpected response from interpreter");
     }

@@ -12,9 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.findNextLineBegin;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
@@ -118,7 +116,11 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   protected void handleDebugAt(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
     appendOutput(response);
 
-    myCurrentLineNumber = extractLineNumber(response);
+    myCurrentLineNumber = extractLineNumber(
+      response.getText(),
+      findNextLineAfterOutputBegin(response)
+    );
+
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
@@ -135,21 +137,15 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
-    final TextRange outputRange = response.getOutputRange();
-    myResult = outputRange.substring(response.getText());
+    handleEndTraceOutput(response);
 
-    if (outputRange.getStartOffset() == 0) {
-      appendOutput(response);
-    }
+    final int lastExitingFromEntry = response.getText().lastIndexOf(TheRDebugConstants.EXITING_FROM);
 
-    final int returnLineNumber = extractLineNumberIfPossible(response);
+    handleEndTraceReturnLineNumber(response, lastExitingFromEntry);
 
-    if (returnLineNumber != -1) {
-      myDebuggerHandler.setReturnLineNumber(returnLineNumber);
-    }
+    myDebuggerHandler.setDropFrames(1);
 
-    myCurrentLineNumber = -1;
-    myVars = Collections.emptyList();
+    resetDebugInformation();
   }
 
   protected void handleDebuggingIn() throws IOException, InterruptedException {
@@ -165,6 +161,25 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     );
   }
 
+  protected void handleRecursiveEndTrace(@NotNull final TheRProcessResponse response) {
+    handleEndTraceOutput(response);
+
+    final RecursiveEndTraceData data = calculateRecursiveEndTraceData(response);
+
+    handleEndTraceReturnLineNumber(response, data.myLastExitingFrom);
+
+    myDebuggerHandler.setDropFrames(data.myExitingFromCount);
+
+    resetDebugInformation();
+  }
+
+  private int extractLineNumber(@NotNull final String text, final int index) {
+    final int lineNumberBegin = index + DEBUG_AT.length();
+    final int lineNumberEnd = text.indexOf(':', lineNumberBegin + 1);
+
+    return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1;
+  }
+
   private void appendOutput(@NotNull final TheRProcessResponse response) {
     final TextRange outputRange = response.getOutputRange();
 
@@ -175,31 +190,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         )
       );
     }
-  }
-
-  private int extractLineNumber(@NotNull final TheRProcessResponse response) {
-    return extractLineNumber(
-      response.getText(),
-      findNextLineAfterOutputBegin(response)
-    );
-  }
-
-  private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response) {
-    final int debugAtIndex = findSupposedlyDebugAtIndex(response);
-    final String text = response.getText();
-
-    if (debugAtIndex == text.length() || !text.startsWith(DEBUG_AT, debugAtIndex)) {
-      return -1;
-    }
-
-    return extractLineNumber(text, debugAtIndex);
-  }
-
-  private int extractLineNumber(@NotNull final String text, final int index) {
-    final int lineNumberBegin = index + DEBUG_AT.length();
-    final int lineNumberEnd = text.indexOf(':', lineNumberBegin + 1);
-
-    return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1;
   }
 
   private int findNextLineAfterOutputBegin(@NotNull final TheRProcessResponse response) {
@@ -214,23 +204,80 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return result;
   }
 
-  private int findSupposedlyDebugAtIndex(@NotNull final TheRProcessResponse response) {
-    if (response.getOutputRange().getStartOffset() == 0) {
-      final String text = response.getText();
+  private void handleEndTraceOutput(@NotNull final TheRProcessResponse response) {
+    final TextRange outputRange = response.getOutputRange();
 
-      return findNextLineBegin(
-        text,
-        findNextLineBegin(
-          text,
-          findNextLineBegin(
-            text,
-            response.getOutputRange().getEndOffset()
-          )
-        )
+    if (outputRange.getStartOffset() == 0) {
+      appendOutput(response);
+    }
+
+    myResult = outputRange.substring(response.getText());
+  }
+
+  @NotNull
+  private RecursiveEndTraceData calculateRecursiveEndTraceData(@NotNull final TheRProcessResponse response) {
+    final String text = response.getText();
+
+    int lastEntry = -1;
+    int currentIndex = 0;
+    int count = 0;
+
+    while ((currentIndex = text.indexOf(EXITING_FROM, currentIndex)) != -1) {
+      lastEntry = currentIndex;
+
+      count++;
+      currentIndex += EXITING_FROM.length();
+    }
+
+    return new RecursiveEndTraceData(lastEntry, count);
+  }
+
+  private void handleEndTraceReturnLineNumber(@NotNull final TheRProcessResponse response, final int lastExitingFrom) {
+    final int returnLineNumber = extractLineNumberIfPossible(
+      response,
+      findDebugAtIndexInEndTrace(response, lastExitingFrom)
+    );
+
+    if (returnLineNumber != -1) {
+      myDebuggerHandler.setReturnLineNumber(returnLineNumber);
+    }
+  }
+
+  private void resetDebugInformation() {
+    myCurrentLineNumber = -1;
+    myVars = Collections.emptyList();
+  }
+
+  private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response, final int debugAtIndex) {
+    final String text = response.getText();
+
+    if (debugAtIndex == text.length() || !text.startsWith(DEBUG_AT, debugAtIndex)) {
+      return -1;
+    }
+
+    return extractLineNumber(text, debugAtIndex);
+  }
+
+  private int findDebugAtIndexInEndTrace(@NotNull final TheRProcessResponse response, final int lastExitingFrom) {
+    if (response.getOutputRange().getStartOffset() == 0) {
+      return TheRDebuggerUtils.findNextLineBegin(
+        response.getText(),
+        lastExitingFrom + EXITING_FROM.length()
       );
     }
     else {
       return findNextLineAfterOutputBegin(response);
+    }
+  }
+
+  private static class RecursiveEndTraceData {
+
+    private final int myLastExitingFrom;
+    private final int myExitingFromCount;
+
+    private RecursiveEndTraceData(final int lastExitingFrom, final int exitingFromCount) {
+      myLastExitingFrom = lastExitingFrom;
+      myExitingFromCount = exitingFromCount;
     }
   }
 }

@@ -20,4 +20,9 @@ public class IllegalTheRFunctionDebuggerHandler implements TheRFunctionDebuggerH
   public void setReturnLineNumber(final int lineNumber) {
     throw new IllegalStateException("SetReturnLineNumber shouldn't be called");
   }
+
+  @Override
+  public void setDropFrames(final int number) {
+    throw new IllegalStateException("SetDropFrames shouldn't be called");
+  }
 }

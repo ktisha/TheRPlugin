@@ -123,6 +123,8 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     @NotNull
     private final TheRFunctionDebuggerHandler myPrimaryHandler;
 
+    private int myDropFrames;
+
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                 @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
@@ -131,6 +133,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
                                                 @NotNull final TheRLocation prevLocation) throws IOException, InterruptedException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
       myPrimaryHandler = debuggerHandler;
+      myDropFrames = 1;
 
       appendDebugger(
         debuggerFactory.getNotMainFunctionDebugger(
@@ -152,7 +155,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           return false;
         }
 
-        popDebugger();
+        for (int i = 0; i < myDropFrames; i++) {
+          popDebugger();
+        }
+
+        myDropFrames = 1;
       }
 
       return true;
@@ -175,7 +182,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
     @Override
     public void setReturnLineNumber(final int lineNumber) {
-      // TODO [dbg][impl]
+    }
+
+    @Override
+    public void setDropFrames(final int number) {
+      myDropFrames = number;
     }
 
     @NotNull
