@@ -3,6 +3,7 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +17,7 @@ class TheRXExecutionStack extends XExecutionStack {
   @NotNull
   private final List<TheRXStackFrame> myStack;
 
-  public TheRXExecutionStack(@NotNull final List<TheRStackFrame> stack, @NotNull final TheRLocationResolver locationResolver) {
+  public TheRXExecutionStack(@NotNull final List<TheRStackFrame> stack, @NotNull final TheRXResolver resolver) {
     super(""); // argument used as a description for current thread
 
     myStack = new ArrayList<TheRXStackFrame>(stack.size());
@@ -29,7 +30,7 @@ class TheRXExecutionStack extends XExecutionStack {
       myStack.add(
         new TheRXStackFrame(
           frame,
-          locationResolver.resolve(frame.getLocation())
+          resolver.resolve(frame.getLocation())
         )
       );
     }

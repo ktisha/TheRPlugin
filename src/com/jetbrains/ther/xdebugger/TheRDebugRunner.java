@@ -13,18 +13,16 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.*;
-import com.jetbrains.ther.debugger.data.TheRFunction;
-import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collections;
 
 public class TheRDebugRunner extends GenericProgramRunner {
 
@@ -48,13 +46,14 @@ public class TheRDebugRunner extends GenericProgramRunner {
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
+    final TheRXResolver resolver = createResolver(environment);
     final TheROutputBuffer outputBuffer = new TheROutputBuffer();
 
     final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(environment, outputBuffer),
-        createLocationResolver(environment),
+        createDebugger(environment, resolver, outputBuffer),
+        resolver,
         outputBuffer
       )
     );
@@ -64,19 +63,21 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger,
-                                                         @NotNull final TheRLocationResolver locationResolver,
+                                                         @NotNull final TheRXResolver resolver,
                                                          @NotNull final TheROutputBuffer outputBuffer) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        return new TheRXDebugProcess(session, debugger, locationResolver, outputBuffer);
+        return new TheRXDebugProcess(session, debugger, resolver, outputBuffer);
       }
     };
   }
 
   @NotNull
-  private TheRDebugger createDebugger(@NotNull final ExecutionEnvironment environment, @NotNull final TheROutputReceiver outputReceiver)
+  private TheRDebugger createDebugger(@NotNull final ExecutionEnvironment environment,
+                                      @NotNull final TheRFunctionResolver functionResolver,
+                                      @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
@@ -87,7 +88,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
       return new TheRDebugger(
         process,
         new TheRFunctionDebuggerFactoryImpl(),
-        createFunctionResolver(environment),
+        functionResolver,
         new TheRLoadableVarHandlerImpl(),
         new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReader(runConfiguration.getScriptName()),
@@ -103,20 +104,9 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRLocationResolver createLocationResolver(@NotNull final ExecutionEnvironment environment) {
+  private TheRXResolver createResolver(@NotNull final ExecutionEnvironment environment) {
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
 
-    return new TheRLocationResolver(runConfiguration.getProject(), runConfiguration.getScriptName());
-  }
-
-  @NotNull
-  private TheRFunctionResolver createFunctionResolver(@NotNull final ExecutionEnvironment environment) {
-    return new TheRFunctionResolver() {
-      @NotNull
-      @Override
-      public TheRFunction resolve(@NotNull final TheRLocation currentLocation, @NotNull final String nextFunctionName) {
-        return new TheRFunction(Collections.singletonList(nextFunctionName)); // TODO [xdbg][impl]
-      }
-    };
+    return new TheRXResolver(runConfiguration.getProject(), runConfiguration.getScriptName());
   }
 }

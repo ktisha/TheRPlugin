@@ -14,6 +14,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final TheRLocationResolver myLocationResolver;
+  private final TheRXResolver myResolver;
 
   @NotNull
   private final TheROutputBuffer myOutputBuffer;
@@ -46,12 +47,12 @@ class TheRXDebugProcess extends XDebugProcess {
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRLocationResolver locationResolver,
+                           @NotNull final TheRXResolver resolver,
                            @NotNull final TheROutputBuffer outputBuffer) {
     super(session);
 
     myDebugger = debugger;
-    myLocationResolver = locationResolver;
+    myResolver = resolver;
     myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
@@ -198,7 +199,7 @@ class TheRXDebugProcess extends XDebugProcess {
     final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(wrapper);
 
     final XDebugSession session = getSession();
-    final TheRXSuspendContext suspendContext = new TheRXSuspendContext(myDebugger.getStack(), myLocationResolver);
+    final TheRXSuspendContext suspendContext = new TheRXSuspendContext(myDebugger.getStack(), myResolver);
 
     if (breakpoint != null) {
       if (!session
@@ -239,7 +240,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private XSourcePosition getCurrentDebuggerLocation() {
     final List<TheRStackFrame> stack = myDebugger.getStack();
 
-    return myLocationResolver.resolve(stack.get(stack.size() - 1).getLocation());
+    return myResolver.resolve(stack.get(stack.size() - 1).getLocation());
   }
 
   private static class XSourcePositionWrapper {
