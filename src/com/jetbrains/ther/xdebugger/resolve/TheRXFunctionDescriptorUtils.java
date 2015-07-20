@@ -32,10 +32,17 @@ final class TheRXFunctionDescriptorUtils {
   @Nullable
   public static TheRXFunctionDescriptor resolveCurrent(@NotNull final TheRXFunctionDescriptor root,
                                                        @NotNull final TheRLocation currentLocation) {
+    final ListIterator<String> nameIterator = currentLocation.getFunction().getDefinition().listIterator();
+    nameIterator.next(); // skip `MAIN_FUNCTION`.getName()
+
+    if (!nameIterator.hasNext()) {
+      return root;
+    }
+
     return resolveCurrentFrom(
       root,
       currentLocation.getLine(),
-      currentLocation.getFunction().getDefinition().listIterator()
+      nameIterator
     );
   }
 
@@ -51,7 +58,7 @@ final class TheRXFunctionDescriptorUtils {
                                                          final int currentLine,
                                                          @NotNull final String nextFunctionName) {
     for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
-      if (currentDescriptor.getStartLine() + currentLine > candidate.getEndLine()) {
+      if (currentDescriptor.getStartLine() + currentLine > candidate.getEndLine()) { // candidate is declared before the current line
         return candidate;
       }
     }
@@ -76,7 +83,7 @@ final class TheRXFunctionDescriptorUtils {
       for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(currentName)) {
         final int currentDistance = currentLine - candidate.getEndLine();
 
-        if (currentDistance >= 0 && currentDistance < distance) {
+        if (currentDistance > 0 && currentDistance < distance) {
           result = candidate;
           distance = currentDistance;
         }
@@ -96,22 +103,38 @@ final class TheRXFunctionDescriptorUtils {
                               @NotNull final String name,
                               final int startLine,
                               final int endLine) {
-    final Map<String, List<TheRXFunctionDescriptor>> children = currentDescriptor.getChildren();
+    if (!trySiftDown(currentDescriptor, name, startLine, endLine)) {
+      addAsChild(currentDescriptor, name, startLine, endLine);
+    }
+  }
 
-    for (final List<TheRXFunctionDescriptor> sameNameChildren : children.values()) {
+  private static boolean trySiftDown(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                                     @NotNull final String name,
+                                     final int startLine,
+                                     final int endLine) {
+    for (final List<TheRXFunctionDescriptor> sameNameChildren : currentDescriptor.getChildren().values()) {
       for (final TheRXFunctionDescriptor child : sameNameChildren) {
         if (child.getStartLine() <= startLine && endLine <= child.getEndLine()) {
-          add(
+          addFrom(
             child,
             name,
             startLine,
             endLine
           );
 
-          return;
+          return true;
         }
       }
     }
+
+    return false;
+  }
+
+  private static void addAsChild(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                                 @NotNull final String name,
+                                 final int startLine,
+                                 final int endLine) {
+    final Map<String, List<TheRXFunctionDescriptor>> children = currentDescriptor.getChildren();
 
     if (!children.containsKey(name)) {
       children.put(
