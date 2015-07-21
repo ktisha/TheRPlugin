@@ -4,6 +4,7 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -159,6 +160,18 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void runToPosition(@NotNull final XSourcePosition position) {
+    if (!new TheRXLineBreakpointType().canPutAt(position.getFile(), position.getLine(), getSession().getProject())) {
+      Messages.showWarningDialog(
+        getSession().getProject(),
+        "It isn't possible to suspend debug at the specified position.",
+        "INVALID BREAKPOINT POSITION"
+      );
+
+      getSession().positionReached(new TheRXSuspendContext(myDebugger.getStack(), myResolver));
+
+      return;
+    }
+
     myTempBreakpoints.add(new XSourcePositionWrapper(position));
 
     resume();
