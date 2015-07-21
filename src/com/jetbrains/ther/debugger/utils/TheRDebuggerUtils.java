@@ -52,7 +52,7 @@ public final class TheRDebuggerUtils {
     final int secondLineEnd = findCurrentLineEnd(startTraceText, secondLineBegin);
 
     return startTraceText.substring(
-      secondLineBegin + "[1] \"".length() + "enter ".length(),
+      secondLineBegin + "[1] \"".length(),
       secondLineEnd - "\"".length()
     );
   }

@@ -19,12 +19,12 @@ final class TheRLoadableVarHandlerUtils {
 
   @NotNull
   public static String enterFunction(@NotNull final String var) {
-    return enterFunctionName(var) + " <- function() { print(\"enter " + var + "\") }";
+    return enterFunctionName(var) + " <- function() { print(\"" + var + "\") }";
   }
 
   @NotNull
   public static String exitFunction(@NotNull final String var) {
-    return exitFunctionName(var) + " <- function() { print(\"exit " + var + "\") }";
+    return exitFunctionName(var) + " <- function() { print(\"" + var + "\") }";
   }
 
   @NotNull

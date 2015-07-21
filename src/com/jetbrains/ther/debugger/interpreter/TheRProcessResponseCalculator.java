@@ -232,7 +232,7 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
-    final int endOffset = -1  // "[1] \"exit ...\"" line
+    final int endOffset = -1  // "[1] \"...\"" line
                           - 1 // "exiting from ..." line
                           - 1 // "debugging in..." line
                           - 1; // "debug: {..." line
@@ -261,7 +261,7 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
-    final int endOffset = -2; // "[1] \"exit ...\" and "exiting from ..." lines
+    final int endOffset = -2; // "[1] \"...\" and "exiting from ..." lines
     final List<Integer> endTraceIndices = new ArrayList<Integer>();
 
     for (int i = 1; i < lines.length + endOffset - 1; i++) {
@@ -283,7 +283,7 @@ final class TheRProcessResponseCalculator {
       // output could be located inside trace information between last "exiting from ..." and "debug at #..." lines
       // or just after last "exiting from ..." line if there is no "debug at #..." line
 
-      final int exitingFromOffset = lastEndTrace + 2; // "[1] \"exit ...\" and "exiting from ..." lines
+      final int exitingFromOffset = lastEndTrace + 2; // "[1] \"...\" and "exiting from ..." lines
       final int outputLineBegin = findExitingFrom(lines, exitingFromOffset) + 1;
       final int outputLineEnd = findDebugAt(lines, outputLineBegin);
 
@@ -318,7 +318,7 @@ final class TheRProcessResponseCalculator {
     if (START_TRACE_PATTERN.matcher(lines[1]).find()) {
       final int unbraceFunctionStartTraceLength = 1 // previous command
                                                   + 1 // "Tracing on ... entry"
-                                                  + 1 // "[1] \"enter ...\""
+                                                  + 1 // "[1] \"...\""
                                                   + 1 // "debug: ..,"
                                                   + 1; // invitation for the next command
 
