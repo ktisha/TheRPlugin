@@ -2,7 +2,6 @@ package com.jetbrains.ther;
 
 import com.jetbrains.ther.debugger.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderTest;
-import com.jetbrains.ther.debugger.data.TheRFunctionTest;
 import com.jetbrains.ther.debugger.data.TheRStackFrameTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculatorTest;
@@ -51,7 +50,6 @@ public class TheRTestSuite extends TestCase {
 
   private static void addDebuggerTests(@NotNull final TestSuite suite) {
     // data package
-    addJUnit4Test(suite, TheRFunctionTest.class);
     addJUnit4Test(suite, TheRStackFrameTest.class);
 
     // interpreter package

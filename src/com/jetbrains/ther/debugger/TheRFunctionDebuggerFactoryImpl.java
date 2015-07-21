@@ -19,7 +19,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                          @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                         @NotNull final TheRFunctionResolver functionResolver,
                                                          @NotNull final TheRLoadableVarHandler varHandler,
                                                          @NotNull final TheRLocation prevLocation)
     throws IOException, InterruptedException {
@@ -35,12 +34,8 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           process,
           debuggerFactory,
           debuggerHandler,
-          functionResolver,
           varHandler,
-          functionResolver.resolve(
-            prevLocation,
-            TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
-          )
+          TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
         );
 
       case START_TRACE_UNBRACE:
@@ -48,12 +43,8 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           process,
           debuggerFactory,
           debuggerHandler,
-          functionResolver,
           varHandler,
-          functionResolver.resolve(
-            prevLocation,
-            TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
-          )
+          TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
         );
       default:
         throw new IOException("Unexpected response from interpreter");
@@ -65,11 +56,10 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
                                                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                      @NotNull final TheRFunctionResolver functionResolver,
                                                       @NotNull final TheRLoadableVarHandler varHandler,
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
-      process, debuggerFactory, debuggerHandler, functionResolver, varHandler, scriptReader
+      process, debuggerFactory, debuggerHandler, varHandler, scriptReader
     );
   }
 }

@@ -22,9 +22,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
-  private final TheRFunctionResolver myFunctionResolver;
-
-  @NotNull
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
@@ -33,14 +30,12 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
                                    @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                    @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                   @NotNull final TheRFunctionResolver functionResolver,
                                    @NotNull final TheRLoadableVarHandler varHandler,
                                    @NotNull final TheRLocation location) {
 
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
-    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
     myLocation = location;
   }
@@ -104,7 +99,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       myProcess,
       myDebuggerFactory,
       myDebuggerHandler,
-      myFunctionResolver,
       myVarHandler,
       myLocation
     );
@@ -128,7 +122,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                 @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                @NotNull final TheRFunctionResolver functionResolver,
                                                 @NotNull final TheRLoadableVarHandler varHandler,
                                                 @NotNull final TheRLocation prevLocation) throws IOException, InterruptedException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
@@ -140,7 +133,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           process,
           debuggerFactory,
           this,
-          functionResolver,
           varHandler,
           prevLocation
         )

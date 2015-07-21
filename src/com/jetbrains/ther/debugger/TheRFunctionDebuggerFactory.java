@@ -13,7 +13,6 @@ public interface TheRFunctionDebuggerFactory {
   TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                  @NotNull final TheRFunctionResolver functionResolver,
                                                   @NotNull final TheRLoadableVarHandler varHandler,
                                                   @NotNull final TheRLocation prevLocation) throws IOException, InterruptedException;
 
@@ -21,7 +20,6 @@ public interface TheRFunctionDebuggerFactory {
   TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
                                                @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                               @NotNull final TheRFunctionResolver functionResolver,
                                                @NotNull final TheRLoadableVarHandler varHandler,
                                                @NotNull final TheRScriptReader scriptReader);
 }

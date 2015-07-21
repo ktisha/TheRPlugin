@@ -12,9 +12,8 @@ public class TheRDebuggerEvaluatorFactoryImpl implements TheRDebuggerEvaluatorFa
   public TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
                                             @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                             @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                            @NotNull final TheRFunctionResolver functionResolver,
                                             @NotNull final TheRLoadableVarHandler varHandler,
                                             @NotNull final TheRLocation location) {
-    return new TheRDebuggerEvaluatorImpl(process, debuggerFactory, debuggerHandler, functionResolver, varHandler, location);
+    return new TheRDebuggerEvaluatorImpl(process, debuggerFactory, debuggerHandler, varHandler, location);
   }
 }

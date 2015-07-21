@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger;
 
-import com.jetbrains.ther.debugger.data.TheRFunction;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
@@ -14,10 +13,9 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   public TheRNotMainUnbraceFunctionDebugger(@NotNull final TheRProcess process,
                                             @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                             @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                            @NotNull final TheRFunctionResolver functionResolver,
                                             @NotNull final TheRLoadableVarHandler varHandler,
-                                            @NotNull final TheRFunction function) throws IOException, InterruptedException {
-    super(process, debuggerFactory, debuggerHandler, functionResolver, varHandler, function);
+                                            @NotNull final String functionName) throws IOException, InterruptedException {
+    super(process, debuggerFactory, debuggerHandler, varHandler, functionName);
   }
 
   @Override

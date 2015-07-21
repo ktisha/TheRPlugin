@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -16,9 +15,7 @@ public class TheRStackFrameTest {
   public void modifyInner() {
     final List<TheRVar> vars = getMutableVars();
 
-    final TheRLocation location = new TheRLocation(
-      new TheRFunction(Collections.singletonList("abc")), 1
-    );
+    final TheRLocation location = new TheRLocation("abc", 10);
 
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
@@ -34,9 +31,7 @@ public class TheRStackFrameTest {
     final List<TheRVar> vars = getMutableVars();
     final List<TheRVar> varsCopy = new ArrayList<TheRVar>(vars);
 
-    final TheRLocation location = new TheRLocation(
-      new TheRFunction(Collections.singletonList("abc")), 1
-    );
+    final TheRLocation location = new TheRLocation("abc", 10);
 
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
@@ -54,13 +49,8 @@ public class TheRStackFrameTest {
     final List<TheRVar> vars = getMutableVars();
     final List<TheRVar> varsCopy = new ArrayList<TheRVar>(vars);
 
-    final TheRLocation location = new TheRLocation(
-      new TheRFunction(Collections.singletonList("abc")), 1
-    );
-
-    final TheRLocation locationCopy = new TheRLocation(
-      new TheRFunction(Collections.singletonList("abc")), 1
-    );
+    final TheRLocation location = new TheRLocation("abc", 10);
+    final TheRLocation locationCopy = new TheRLocation("abc", 10);
 
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,

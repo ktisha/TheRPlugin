@@ -25,9 +25,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRFunctionDebuggerFactory myDebuggerFactory;
 
   @NotNull
-  private final TheRFunctionResolver myFunctionResolver;
-
-  @NotNull
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
@@ -54,14 +51,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   public TheRDebugger(@NotNull final TheRProcess process,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                      @NotNull final TheRFunctionResolver functionResolver,
                       @NotNull final TheRLoadableVarHandler varHandler,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver) {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
-    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
 
     myEvaluatorFactory = evaluatorFactory;
@@ -80,7 +75,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
         myProcess,
         myDebuggerFactory,
         this,
-        functionResolver,
         myVarHandler,
         myScriptReader
       )
@@ -108,7 +102,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       myProcess,
       myDebuggerFactory,
       this,
-      myFunctionResolver,
       myVarHandler,
       topLocation
     );
@@ -131,7 +124,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     if (myReturnLineNumber != -1) {
       final TheRLocation result = new TheRLocation(
-        topDebugger.getLocation().getFunction(),
+        topDebugger.getLocation().getFunctionName(),
         myReturnLineNumber
       );
 

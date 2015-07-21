@@ -25,9 +25,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
-  private final TheRFunctionResolver myFunctionResolver;
-
-  @NotNull
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
@@ -42,13 +39,11 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                  @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheRScriptReader scriptReader) {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
-    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
     myScriptReader = scriptReader;
 
@@ -62,7 +57,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   @Override
   public TheRLocation getLocation() {
     return new TheRLocation(
-      TheRDebugConstants.MAIN_FUNCTION,
+      TheRDebugConstants.MAIN_FUNCTION_NAME,
       getCurrentLineNumber()
     );
   }
@@ -144,7 +139,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
             myProcess,
             myDebuggerFactory,
             myDebuggerHandler,
-            myFunctionResolver,
             myVarHandler,
             getLocation()
           )

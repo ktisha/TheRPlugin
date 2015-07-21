@@ -28,13 +28,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
-  private final TheRFunctionResolver myFunctionResolver;
-
-  @NotNull
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
-  private final TheRFunction myFunction;
+  private final String myFunctionName;
 
   private int myCurrentLineNumber;
 
@@ -47,15 +44,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   public TheRFunctionDebuggerBase(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                  @NotNull final TheRFunctionResolver functionResolver,
                                   @NotNull final TheRLoadableVarHandler varHandler,
-                                  @NotNull final TheRFunction function) throws IOException, InterruptedException {
+                                  @NotNull final String functionName) throws IOException, InterruptedException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
-    myFunctionResolver = functionResolver;
     myVarHandler = varHandler;
-    myFunction = function;
+    myFunctionName = functionName;
 
     myCurrentLineNumber = initCurrentLine();
     myVars = TheRDebuggerUtils.loadUnmodifiableVars(myProcess, myVarHandler);
@@ -66,7 +61,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   @NotNull
   @Override
   public TheRLocation getLocation() {
-    return new TheRLocation(myFunction, myCurrentLineNumber);
+    return new TheRLocation(myFunctionName, myCurrentLineNumber);
   }
 
   @NotNull
@@ -154,7 +149,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         myProcess,
         myDebuggerFactory,
         myDebuggerHandler,
-        myFunctionResolver,
         myVarHandler,
         getLocation()
       )

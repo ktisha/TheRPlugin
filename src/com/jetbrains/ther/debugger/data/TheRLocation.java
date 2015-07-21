@@ -6,18 +6,18 @@ import org.jetbrains.annotations.Nullable;
 public class TheRLocation {
 
   @NotNull
-  private final TheRFunction myFunction;
+  private final String myFunctionName;
 
   private final int myLine;
 
-  public TheRLocation(@NotNull final TheRFunction function, final int line) {
-    myFunction = function;
+  public TheRLocation(@NotNull final String functionName, final int line) {
+    myFunctionName = functionName;
     myLine = line;
   }
 
   @NotNull
-  public TheRFunction getFunction() {
-    return myFunction;
+  public String getFunctionName() {
+    return myFunctionName;
   }
 
   public int getLine() {
@@ -31,11 +31,11 @@ public class TheRLocation {
 
     final TheRLocation location = (TheRLocation)o;
 
-    return myLine == location.myLine && myFunction.equals(location.myFunction);
+    return myLine == location.myLine && myFunctionName.equals(location.myFunctionName);
   }
 
   @Override
   public int hashCode() {
-    return 31 * myFunction.hashCode() + myLine;
+    return 31 * myFunctionName.hashCode() + myLine;
   }
 }

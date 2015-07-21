@@ -1,7 +1,10 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.mock.*;
 import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
@@ -9,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -30,14 +32,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(true);
@@ -62,14 +58,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(false);
@@ -94,14 +84,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(false);
@@ -124,14 +108,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
@@ -150,14 +128,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
@@ -182,14 +154,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final MockExpressionReceiver receiver = new MockExpressionReceiver(text);
@@ -215,14 +181,8 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       debuggerFactory,
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRFunctionResolver(),
       new IllegalTheRLoadableVarHandler(),
-      new TheRLocation(
-        new TheRFunction(
-          Collections.singletonList("abc")
-        ),
-        10
-      )
+      new TheRLocation("abc", 10)
     );
 
     final MockExpressionReceiver receiver = new MockExpressionReceiver("[1] 1 2 3");
@@ -266,7 +226,6 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheRFunctionResolver functionResolver,
                                                            @NotNull final TheRLoadableVarHandler varHandler,
                                                            @NotNull final TheRLocation prevLocation)
       throws IOException, InterruptedException {
@@ -313,7 +272,6 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
                                                         @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                         @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                        @NotNull final TheRFunctionResolver functionResolver,
                                                         @NotNull final TheRLoadableVarHandler varHandler,
                                                         @NotNull final TheRScriptReader scriptReader) {
       throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
