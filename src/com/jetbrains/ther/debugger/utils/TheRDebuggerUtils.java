@@ -156,7 +156,20 @@ public final class TheRDebuggerUtils {
     return handler.handleValue(
       var,
       type,
-      process.execute(var, RESPONSE)
+      process.execute(
+        getLoadValueCommand(var, type),
+        RESPONSE
+      )
     );
+  }
+
+  @NotNull
+  private static String getLoadValueCommand(@NotNull final String var, @NotNull final String type) {
+    if (type.equals(FUNCTION_TYPE)) {
+      return ATTR_COMMAND + "(" + var + ", \"original\")";
+    }
+    else {
+      return PRINT_COMMAND + "(" + var + ")";
+    }
   }
 }

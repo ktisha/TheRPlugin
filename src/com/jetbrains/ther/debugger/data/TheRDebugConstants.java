@@ -55,6 +55,12 @@ public final class TheRDebugConstants {
   public static final String DEBUG_COMMAND = "debug";
 
   @NotNull
+  public static final String PRINT_COMMAND = "print";
+
+  @NotNull
+  public static final String ATTR_COMMAND = "attr";
+
+  @NotNull
   public static final String EXECUTE_AND_STEP_COMMAND = "n";
 
   // responses
@@ -79,6 +85,9 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String EXITING_FROM = "exiting from:";
+
+  @NotNull
+  public static final String ENVIRONMENT = "environment";
 
   // language
 
