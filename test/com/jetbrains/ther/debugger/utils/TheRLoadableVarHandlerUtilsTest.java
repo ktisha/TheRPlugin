@@ -66,7 +66,7 @@ public class TheRLoadableVarHandlerUtilsTest {
 
   @NotNull
   private static String expectedTraceCommand() {
-    return "trace(abc, " + enterFunctionName() + ", exit = " + exitFunctionName() + ")";
+    return "trace(abc, " + enterFunctionName() + ", exit = " + exitFunctionName() + ", where = environment())";
   }
 
   @NotNull

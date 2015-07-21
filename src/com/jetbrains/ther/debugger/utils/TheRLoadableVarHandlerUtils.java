@@ -36,6 +36,7 @@ final class TheRLoadableVarHandlerUtils {
            enterFunctionName(var) +
            ", exit = " +
            exitFunctionName(var) +
+           ", where = environment()" +
            ")";
   }
 
