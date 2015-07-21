@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -21,13 +22,13 @@ class TheRProcessReceiver {
   }
 
   @NotNull
-  public TheRProcessResponse receive() throws IOException, InterruptedException {
+  public TheRProcessResponse receive() throws TheRDebuggerException {
     final StringBuilder sb = new StringBuilder();
     long millis = TheRDebugConstants.INITIAL_SLEEP;
 
     while (true) {
       if (!appendResponse(sb)) {
-        Thread.sleep(millis);
+        sleep(millis);
 
         millis *= 2;
       }
@@ -41,11 +42,29 @@ class TheRProcessReceiver {
     }
   }
 
-  private boolean appendResponse(@NotNull final StringBuilder sb) throws IOException {
-    final int length = myReader.read(myBuffer);
+  private boolean appendResponse(@NotNull final StringBuilder sb) throws TheRDebuggerException {
+    final int length = read();
 
     sb.append(myBuffer, 0, length);
 
     return length != 0;
+  }
+
+  private void sleep(final long millis) throws TheRDebuggerException {
+    try {
+      Thread.sleep(millis);
+    }
+    catch (final InterruptedException e) {
+      throw new TheRDebuggerException(e);
+    }
+  }
+
+  private int read() throws TheRDebuggerException {
+    try {
+      return myReader.read(myBuffer);
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
+    }
   }
 }

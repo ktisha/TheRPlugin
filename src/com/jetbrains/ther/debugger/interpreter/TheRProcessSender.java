@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -15,9 +16,14 @@ class TheRProcessSender {
     myWriter = writer;
   }
 
-  public void send(@NotNull final String command) throws IOException {
-    myWriter.write(command);
-    myWriter.write(TheRDebugConstants.LINE_SEPARATOR);
-    myWriter.flush();
+  public void send(@NotNull final String command) throws TheRDebuggerException {
+    try {
+      myWriter.write(command);
+      myWriter.write(TheRDebugConstants.LINE_SEPARATOR);
+      myWriter.flush();
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
+    }
   }
 }
