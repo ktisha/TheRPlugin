@@ -58,8 +58,8 @@ public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProp
   }
 
   private boolean isStoppable(@NotNull final VirtualFile file, final int line, @NotNull final Project project) {
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-    final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file); // TODO [xdbg][null]
+    final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile); // TODO [xdbg][null]
     final boolean[] justResult = new boolean[]{false};
 
     XDebuggerUtil.getInstance().iterateLine(

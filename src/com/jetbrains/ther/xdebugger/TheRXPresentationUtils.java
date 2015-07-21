@@ -9,7 +9,7 @@ import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import org.jetbrains.annotations.NotNull;
 
 // TODO [xdbg][test]
-public class TheRXPresentationUtils {
+class TheRXPresentationUtils {
 
   public static void computePresentation(@NotNull final TheRVar var,
                                          @NotNull final XValueNode node) {

@@ -1,6 +1,5 @@
 package com.jetbrains.ther;
 
-import com.jetbrains.ther.debugger.TheRDebuggedFunctionsTest;
 import com.jetbrains.ther.debugger.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderTest;
 import com.jetbrains.ther.debugger.data.TheRFunctionTest;
@@ -66,7 +65,6 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRLoadableVarHandlerUtilsTest.class);
 
     // `main` package
-    addJUnit4Test(suite, TheRDebuggedFunctionsTest.class);
     addJUnit4Test(suite, TheRDebuggerEvaluatorImplTest.class);
     addJUnit4Test(suite, TheRScriptReaderTest.class);
   }

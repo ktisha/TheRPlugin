@@ -171,14 +171,14 @@ class TheRXDebugProcess extends XDebugProcess {
 
   public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
     myBreakpoints.put(
-      new XSourcePositionWrapper(breakpoint.getSourcePosition()),
+      new XSourcePositionWrapper(breakpoint.getSourcePosition()), // TODO [xdbg][null]
       breakpoint
     );
   }
 
   public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
     myBreakpoints.remove(
-      new XSourcePositionWrapper(breakpoint.getSourcePosition())
+      new XSourcePositionWrapper(breakpoint.getSourcePosition()) // TODO [xdbg][null]
     );
   }
 

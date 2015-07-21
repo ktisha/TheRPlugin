@@ -31,6 +31,6 @@ class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProvider {
                                  @NotNull final EvaluationMode mode) {
     final PsiFile psiFile = new TheRCodeFragment(project, FRAGMENT_NAME, text);
 
-    return PsiDocumentManager.getInstance(project).getDocument(psiFile);
+    return PsiDocumentManager.getInstance(project).getDocument(psiFile); // TODO [xdbg][null]
   }
 }
