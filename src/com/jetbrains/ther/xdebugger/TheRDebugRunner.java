@@ -46,14 +46,13 @@ public class TheRDebugRunner extends GenericProgramRunner {
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
-    final TheRXResolver resolver = createResolver(environment);
     final TheROutputBuffer outputBuffer = new TheROutputBuffer();
 
     final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(environment, resolver, outputBuffer),
-        resolver,
+        createDebugger(environment, outputBuffer),
+        createResolver(environment),
         outputBuffer
       )
     );
@@ -76,7 +75,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private TheRDebugger createDebugger(@NotNull final ExecutionEnvironment environment,
-                                      @NotNull final TheRFunctionResolver functionResolver,
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
@@ -88,7 +86,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
       return new TheRDebugger(
         process,
         new TheRFunctionDebuggerFactoryImpl(),
-        functionResolver,
         new TheRLoadableVarHandlerImpl(),
         new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReader(runConfiguration.getScriptName()),

@@ -3,6 +3,7 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.xdebugger.resolve.TheRXFunctionDescriptor;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,13 +25,17 @@ class TheRXExecutionStack extends XExecutionStack {
 
     final ListIterator<TheRStackFrame> stackIterator = stack.listIterator(stack.size());
 
+    final List<TheRXFunctionDescriptor> history = resolver.resolveFully(stack);
+    final ListIterator<TheRXFunctionDescriptor> descriptorListIterator = history.listIterator(history.size());
+
     while (stackIterator.hasPrevious()) {
       final TheRStackFrame frame = stackIterator.previous();
+      final TheRXFunctionDescriptor descriptor = descriptorListIterator.previous();
 
       myStack.add(
         new TheRXStackFrame(
           frame,
-          resolver.resolve(frame.getLocation())
+          resolver.resolve(descriptor, frame.getLocation().getLine())
         )
       );
     }

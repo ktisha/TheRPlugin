@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class TheRXFunctionDescriptor {
+public class TheRXFunctionDescriptor {
 
   @NotNull
   private final String myName;

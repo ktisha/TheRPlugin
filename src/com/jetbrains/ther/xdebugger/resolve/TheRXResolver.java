@@ -10,18 +10,15 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
-import com.jetbrains.ther.debugger.TheRFunctionResolver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRFunction;
-import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 // TODO [xdbg][test]
-public class TheRXResolver implements TheRFunctionResolver {
+public class TheRXResolver {
 
   @NotNull
   private final VirtualFile myVirtualFile;
@@ -43,29 +40,59 @@ public class TheRXResolver implements TheRFunctionResolver {
   }
 
   @NotNull
-  public XSourcePosition resolve(@NotNull final TheRLocation location) {
-    final int line = calculateLineOffset(location) + location.getLine();
+  public XSourcePosition resolve(@NotNull final TheRXFunctionDescriptor descriptor, final int line) {
+    final int result = calculateLineOffset(descriptor) + line;
 
-    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, line); // TODO [xdbg][null]
+    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, result); // TODO [xdbg][null]
   }
 
-  @NotNull
-  @Override
-  public TheRFunction resolve(@NotNull final TheRLocation currentLocation, @NotNull final String nextFunctionName) {
-    final TheRXFunctionDescriptor nextDescriptor =
-      TheRXFunctionDescriptorUtils.resolveNext(myRoot, currentLocation, nextFunctionName); // TODO [xdbg][null]
+  @Nullable
+  public TheRXFunctionDescriptor resolve(@NotNull final List<TheRStackFrame> stack) {
+    int currentLine = stack.get(0).getLocation().getLine();
+    TheRXFunctionDescriptor current = myRoot;
 
-    return new TheRFunction(calculateDefinition(nextDescriptor));
+    for (final TheRStackFrame frame : stack.subList(1, stack.size())) {
+      current = TheRXFunctionDescriptorUtils.resolve(current, currentLine, frame.getLocation().getFunctionName());
+
+      if (current == null) {
+        return null;
+      }
+
+      currentLine = frame.getLocation().getLine();
+    }
+
+    return current;
   }
 
-  private int calculateLineOffset(@NotNull final TheRLocation location) {
-    if (location.getFunction().equals(TheRDebugConstants.MAIN_FUNCTION)) {
+  @Nullable
+  public List<TheRXFunctionDescriptor> resolveFully(@NotNull final List<TheRStackFrame> stack) {
+    final List<TheRXFunctionDescriptor> history = new ArrayList<TheRXFunctionDescriptor>();
+
+    int currentLine = stack.get(0).getLocation().getLine();
+    TheRXFunctionDescriptor current = myRoot;
+
+    history.add(current);
+
+    for (final TheRStackFrame frame : stack.subList(1, stack.size())) {
+      current = TheRXFunctionDescriptorUtils.resolve(current, currentLine, frame.getLocation().getFunctionName());
+      history.add(current);
+
+      if (current == null) {
+        break;
+      }
+
+      currentLine = frame.getLocation().getLine();
+    }
+
+    return history;
+  }
+
+  private int calculateLineOffset(@NotNull final TheRXFunctionDescriptor descriptor) {
+    if (descriptor.getParent() == null) {
       return 0;
     }
 
-    final TheRXFunctionDescriptor current = TheRXFunctionDescriptorUtils.resolveCurrent(myRoot, location);  // TODO [xdbg][null]
-
-    return getEldestNotMainParent(current).getStartLine();
+    return getEldestNotMainParent(descriptor).getStartLine();
   }
 
   @NotNull
@@ -74,30 +101,13 @@ public class TheRXResolver implements TheRFunctionResolver {
 
     // 1. Method is called with descriptor which holds any function except `MAIN_FUNCTION`.
     // 2. There is only one descriptor which has `null` parent. This descriptor is root and it holds `MAIN_FUNCTION`.
-    // Conclusion: getParent() can't return `null` here.
+    // Conclusion: current.getParent() can't return `null` here.
 
     //noinspection ConstantConditions
-    while (!current.getParent().getName().equals(TheRDebugConstants.MAIN_FUNCTION.getName())) {
+    while (current.getParent().getParent() != null) {
       current = current.getParent();
     }
 
     return current;
-  }
-
-  @NotNull
-  private List<String> calculateDefinition(@NotNull final TheRXFunctionDescriptor descriptor) {
-    final List<String> result = new ArrayList<String>();
-
-    TheRXFunctionDescriptor current = descriptor;
-
-    while (current != null) {
-      result.add(current.getName());
-
-      current = current.getParent();
-    }
-
-    Collections.reverse(result);
-
-    return result;
   }
 }

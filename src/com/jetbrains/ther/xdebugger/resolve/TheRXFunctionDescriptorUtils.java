@@ -1,65 +1,37 @@
 package com.jetbrains.ther.xdebugger.resolve;
 
-import com.jetbrains.ther.debugger.data.TheRLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 // TODO [xdbg][test]
 final class TheRXFunctionDescriptorUtils {
 
   @Nullable
-  public static TheRXFunctionDescriptor resolveNext(@NotNull final TheRXFunctionDescriptor root,
-                                                    @NotNull final TheRLocation currentLocation,
-                                                    @NotNull final String nextFunctionName) {
-    final TheRXFunctionDescriptor currentDescriptor = resolveCurrent(root, currentLocation);
+  public static TheRXFunctionDescriptor resolve(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                                                final int currentLine,
+                                                @NotNull final String nextFunctionName) {
+    if (currentDescriptor.getChildren().containsKey(nextFunctionName)) {
+      TheRXFunctionDescriptor result = null;
+      int distance = Integer.MAX_VALUE;
 
-    if (currentDescriptor == null) {
-      return null;
-    }
+      for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
 
-    return resolveNextFrom(
-      currentDescriptor,
-      currentLocation.getLine(),
-      nextFunctionName
-    );
-  }
+        if (currentDescriptor.getStartLine() + currentLine > candidate.getStartLine()) { // candidate is declared before the current line
+          final int currentDistance = currentDescriptor.getStartLine() + currentLine - candidate.getStartLine();
 
-  @Nullable
-  public static TheRXFunctionDescriptor resolveCurrent(@NotNull final TheRXFunctionDescriptor root,
-                                                       @NotNull final TheRLocation currentLocation) {
-    final ListIterator<String> nameIterator = currentLocation.getFunction().getDefinition().listIterator();
-    nameIterator.next(); // skip `MAIN_FUNCTION`.getName()
+          if (currentDistance < distance) {
+            result = candidate;
+            distance = currentDistance;
+          }
+        }
+      }
 
-    if (!nameIterator.hasNext()) {
-      return root;
-    }
-
-    return resolveCurrentFrom(
-      root,
-      currentLocation.getLine(),
-      nameIterator
-    );
-  }
-
-  public static void add(@NotNull final TheRXFunctionDescriptor root,
-                         @NotNull final String name,
-                         final int startLine,
-                         final int endLine) {
-    addFrom(root, name, startLine, endLine);
-  }
-
-  @Nullable
-  private static TheRXFunctionDescriptor resolveNextFrom(@NotNull final TheRXFunctionDescriptor currentDescriptor,
-                                                         final int currentLine,
-                                                         @NotNull final String nextFunctionName) {
-    for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
-      if (currentDescriptor.getStartLine() + currentLine > candidate.getEndLine()) { // candidate is declared before the current line
-        return candidate;
+      if (result != null) {
+        return result;
       }
     }
 
@@ -67,36 +39,14 @@ final class TheRXFunctionDescriptorUtils {
       return null;
     }
 
-    return resolveNextFrom(currentDescriptor.getParent(), currentLine, nextFunctionName);
+    return resolve(currentDescriptor.getParent(), currentLine + currentDescriptor.getStartLine(), nextFunctionName);
   }
 
-  @Nullable
-  private static TheRXFunctionDescriptor resolveCurrentFrom(@NotNull final TheRXFunctionDescriptor currentDescriptor,
-                                                            final int currentLine,
-                                                            @NotNull final ListIterator<String> nameIterator) {
-    final String currentName = nameIterator.next();
-
-    if (currentDescriptor.getChildren().containsKey(currentName)) {
-      TheRXFunctionDescriptor result = null;
-      int distance = Integer.MAX_VALUE;
-
-      for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(currentName)) {
-        final int currentDistance = currentLine - candidate.getEndLine();
-
-        if (currentDistance > 0 && currentDistance < distance) {
-          result = candidate;
-          distance = currentDistance;
-        }
-      }
-
-      if (result == null || !nameIterator.hasNext()) {
-        return result;
-      }
-
-      return resolveCurrentFrom(result, currentLine - result.getStartLine(), nameIterator);
-    }
-
-    return null;
+  public static void add(@NotNull final TheRXFunctionDescriptor root,
+                         @NotNull final String name,
+                         final int startLine,
+                         final int endLine) {
+    addFrom(root, name, startLine, endLine);
   }
 
   private static void addFrom(@NotNull final TheRXFunctionDescriptor currentDescriptor,

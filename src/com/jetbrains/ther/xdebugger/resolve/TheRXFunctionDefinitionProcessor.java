@@ -21,7 +21,7 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
     myDocument = document;
 
     myRoot = new TheRXFunctionDescriptor(
-      TheRDebugConstants.MAIN_FUNCTION.getName(),
+      TheRDebugConstants.MAIN_FUNCTION_NAME,
       null,
       0,
       Integer.MAX_VALUE

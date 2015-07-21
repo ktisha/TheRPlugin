@@ -240,7 +240,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private XSourcePosition getCurrentDebuggerLocation() {
     final List<TheRStackFrame> stack = myDebugger.getStack();
 
-    return myResolver.resolve(stack.get(stack.size() - 1).getLocation());
+    return myResolver.resolve(myResolver.resolve(stack), stack.get(stack.size() - 1).getLocation().getLine());
   }
 
   private static class XSourcePositionWrapper {
