@@ -1,16 +1,16 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.isCommentOrSpaces;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {

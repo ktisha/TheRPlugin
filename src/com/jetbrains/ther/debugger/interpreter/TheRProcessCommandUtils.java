@@ -1,21 +1,11 @@
-package com.jetbrains.ther.debugger.utils;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 
-final class TheRLoadableVarHandlerUtils {
-
-  public static void traceAndDebug(@NotNull final TheRProcess process, @NotNull final String var)
-    throws IOException, InterruptedException {
-    process.execute(enterFunction(var), TheRProcessResponseType.EMPTY);
-    process.execute(exitFunction(var), TheRProcessResponseType.EMPTY);
-    process.execute(traceCommand(var), TheRProcessResponseType.RESPONSE);
-    process.execute(debugCommand(var), TheRProcessResponseType.EMPTY);
-  }
+final class TheRProcessCommandUtils {
 
   @NotNull
   public static String enterFunction(@NotNull final String var) {
@@ -43,6 +33,16 @@ final class TheRLoadableVarHandlerUtils {
   @NotNull
   public static String debugCommand(@NotNull final String var) {
     return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
+  }
+
+  @NotNull
+  public static String valueCommand(@NotNull final String var, @NotNull final String type) {
+    if (type.equals(FUNCTION_TYPE)) {
+      return ATTR_COMMAND + "(" + var + ", \"original\")";
+    }
+    else {
+      return PRINT_COMMAND + "(" + var + ")";
+    }
   }
 
   @NotNull

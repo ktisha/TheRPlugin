@@ -8,6 +8,7 @@ public class TheRDebuggerException extends Exception {
     super(cause);
   }
 
-  protected TheRDebuggerException() {
+  protected TheRDebuggerException(@NotNull final String message) {
+    super(message);
   }
 }

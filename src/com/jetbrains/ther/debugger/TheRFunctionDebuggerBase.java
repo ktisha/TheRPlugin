@@ -3,17 +3,16 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.loadUnmodifiableVars;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
@@ -53,7 +52,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myFunctionName = functionName;
 
     myCurrentLineNumber = initCurrentLine();
-    myVars = TheRDebuggerUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+    myVars = TheRDebuggerStringUtils.loadUnmodifiableVars(myProcess, myVarHandler);
 
     myResult = "";
   }
@@ -254,7 +253,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   private int findDebugAtIndexInEndTrace(@NotNull final TheRProcessResponse response, final int lastExitingFrom) {
     if (response.getOutputRange().getStartOffset() == 0) {
-      return TheRDebuggerUtils.findNextLineBegin(
+      return TheRDebuggerStringUtils.findNextLineBegin(
         response.getText(),
         lastExitingFrom + EXITING_FROM.length()
       );

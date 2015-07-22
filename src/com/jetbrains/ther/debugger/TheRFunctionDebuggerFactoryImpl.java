@@ -2,9 +2,8 @@ package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -35,7 +34,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
-          TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
+          extractFunctionName(startTraceResponse.getText())
         );
 
       case START_TRACE_UNBRACE:
@@ -44,7 +43,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
-          TheRDebuggerUtils.extractFunctionName(startTraceResponse.getText())
+          extractFunctionName(startTraceResponse.getText())
         );
       default:
         throw new IOException("Unexpected response from interpreter");
@@ -60,6 +59,17 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
       process, debuggerFactory, debuggerHandler, varHandler, scriptReader
+    );
+  }
+
+  @NotNull
+  private static String extractFunctionName(@NotNull final String startTraceText) {
+    final int secondLineBegin = TheRDebuggerStringUtils.findNextLineBegin(startTraceText, 0);
+    final int secondLineEnd = TheRDebuggerStringUtils.findCurrentLineEnd(startTraceText, secondLineBegin);
+
+    return startTraceText.substring(
+      secondLineBegin + "[1] \"".length(),
+      secondLineEnd - "\"".length()
     );
   }
 }

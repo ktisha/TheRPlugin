@@ -4,8 +4,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
+import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.data.TheRVar;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtils;
 import org.jetbrains.annotations.NotNull;
 
 // TODO [xdbg][test]
@@ -31,7 +31,7 @@ class TheRXPresentationUtils {
   }
 
   private static boolean isOneLine(@NotNull final String value) {
-    return TheRDebuggerUtils.findNextLineBegin(value, 0) == value.length();
+    return TheRDebuggerStringUtils.findNextLineBegin(value, 0) == value.length();
   }
 
   private static void setPresentation(@NotNull final XValueNode node, @NotNull final TheRVar var) {
@@ -71,7 +71,7 @@ class TheRXPresentationUtils {
   private static String calculateShortPresentation(@NotNull final String value) {
     return value.substring(
       0,
-      TheRDebuggerUtils.findCurrentLineEnd(value, 0)
+      TheRDebuggerStringUtils.findCurrentLineEnd(value, 0)
     );
   }
 
