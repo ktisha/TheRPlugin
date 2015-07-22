@@ -1,17 +1,21 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.mock.*;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,8 +36,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(true);
@@ -58,8 +61,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(false);
@@ -84,8 +86,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final MockConditionReceiver receiver = new MockConditionReceiver(false);
@@ -108,8 +109,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
@@ -122,14 +122,13 @@ public class TheRDebuggerEvaluatorImplTest {
 
   @Test
   public void evalExceptionDuringExecution() {
-    final IOExceptionTheRProcess process = new IOExceptionTheRProcess();
+    final ExceptionDuringExecutionTheRProcess process = new ExceptionDuringExecutionTheRProcess();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
@@ -154,8 +153,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final MockExpressionReceiver receiver = new MockExpressionReceiver(text);
@@ -181,8 +179,7 @@ public class TheRDebuggerEvaluatorImplTest {
       process,
       debuggerFactory,
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler(),
-      new TheRLocation("abc", 10)
+      new IllegalTheRLoadableVarHandler()
     );
 
     final MockExpressionReceiver receiver = new MockExpressionReceiver("[1] 1 2 3");
@@ -195,16 +192,16 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, receiver.getResultReceived());
   }
 
-  private static class IOExceptionTheRProcess extends TheRProcess {
+  private static class ExceptionDuringExecutionTheRProcess implements TheRProcess {
 
     private int myExecuteCalled = 0;
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
+    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
       myExecuteCalled++;
 
-      throw new IOException();
+      throw new TheRDebuggerException("");
     }
 
     @Override
@@ -226,9 +223,8 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheRLoadableVarHandler varHandler,
-                                                           @NotNull final TheRLocation prevLocation)
-      throws IOException, InterruptedException {
+                                                           @NotNull final TheRLoadableVarHandler varHandler)
+      throws TheRDebuggerException {
       myNotMainCalled++;
 
       return new TheRFunctionDebugger() {
@@ -251,7 +247,7 @@ public class TheRDebuggerEvaluatorImplTest {
         }
 
         @Override
-        public void advance() throws IOException, InterruptedException {
+        public void advance() throws TheRDebuggerException {
           myAdvanceCalled[0]++;
 
           if (myAdvanceCalled[0] > 1) {

@@ -1,14 +1,13 @@
 package com.jetbrains.ther;
 
-import com.jetbrains.ther.debugger.TheRDebuggerEvaluatorImplTest;
+import com.jetbrains.ther.debugger.TheRDebuggerStringUtilsTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderTest;
 import com.jetbrains.ther.debugger.data.TheRStackFrameTest;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
+import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandlerImplTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculatorTest;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessTest;
-import com.jetbrains.ther.debugger.utils.TheRDebuggerUtilsTest;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerImplTest;
-import com.jetbrains.ther.debugger.utils.TheRLoadableVarHandlerUtilsTest;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessUtilsTest;
 import com.jetbrains.ther.inspections.TheRTypeCheckerInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
@@ -52,18 +51,17 @@ public class TheRTestSuite extends TestCase {
     // data package
     addJUnit4Test(suite, TheRStackFrameTest.class);
 
+    // evaluator
+    addJUnit4Test(suite, TheRDebuggerEvaluatorImplTest.class);
+
     // interpreter package
+    addJUnit4Test(suite, TheRLoadableVarHandlerImplTest.class);
     addJUnit4Test(suite, TheRProcessReceiverTest.class);
     addJUnit4Test(suite, TheRProcessResponseCalculatorTest.class);
-    addJUnit4Test(suite, TheRProcessTest.class);
-
-    // utils package
-    addJUnit4Test(suite, TheRDebuggerUtilsTest.class);
-    addJUnit4Test(suite, TheRLoadableVarHandlerImplTest.class);
-    addJUnit4Test(suite, TheRLoadableVarHandlerUtilsTest.class);
+    addJUnit4Test(suite, TheRProcessUtilsTest.class);
 
     // `main` package
-    addJUnit4Test(suite, TheRDebuggerEvaluatorImplTest.class);
+    addJUnit4Test(suite, TheRDebuggerStringUtilsTest.class);
     addJUnit4Test(suite, TheRScriptReaderTest.class);
   }
 

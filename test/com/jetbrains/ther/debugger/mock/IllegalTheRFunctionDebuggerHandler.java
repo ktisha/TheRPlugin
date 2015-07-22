@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.mock;
 
-import com.jetbrains.ther.debugger.TheRFunctionDebugger;
-import com.jetbrains.ther.debugger.TheRFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class IllegalTheRFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {

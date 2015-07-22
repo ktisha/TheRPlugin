@@ -1,35 +1,64 @@
-package com.jetbrains.ther.debugger.utils;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
 import com.jetbrains.ther.debugger.mock.IllegalTheRLoadableVarHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.utils.TheRDebuggerUtils.*;
-import static org.junit.Assert.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadVars;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class TheRDebuggerUtilsTest {
+public class TheRProcessUtilsTest {
+
+  @Test(expected = TheRDebuggerException.class)
+  public void invalidCommandExecuting() throws TheRDebuggerException {
+    final String text = "abc";
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+
+    execute(
+      process,
+      "def",
+      TheRProcessResponseType.PLUS
+    );
+  }
 
   @Test
-  public void noVarsLoading() throws IOException, InterruptedException {
-    final String text = "character(0)";
+  public void correctCommandExecuting() throws TheRDebuggerException {
+    final String text = "abc";
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
 
+    assertEquals(
+      text,
+      execute(
+        process,
+        "def",
+        RESPONSE
+      )
+    );
+  }
+
+  @Test
+  public void noVarsLoading() throws TheRDebuggerException {
+    final String text = "character(0)";
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+
     final TheRLoadableVarHandler handler = new IllegalTheRLoadableVarHandler();
 
     assertTrue(
-      TheRDebuggerUtils.loadVars(
+      loadVars(
         process,
         handler
       ).isEmpty()
@@ -39,11 +68,11 @@ public class TheRDebuggerUtilsTest {
   }
 
   @Test
-  public void varsLoading() throws IOException, InterruptedException {
+  public void varsLoading() throws TheRDebuggerException {
     final VarsTheRProcess process = new VarsTheRProcess();
     final VarsTheRLoadableVarHandler handler = new VarsTheRLoadableVarHandler();
 
-    final List<TheRVar> actual = TheRDebuggerUtils.loadVars(
+    final List<TheRVar> actual = loadVars(
       process,
       handler
     );
@@ -54,107 +83,11 @@ public class TheRDebuggerUtilsTest {
 
     assertEquals(expected, actual);
 
-    assertTrue(process.isLsAsked());
-    assertTrue(process.isXTypeAsked());
-    assertTrue(process.isYTypeAsked());
-    assertTrue(process.isXValueAsked());
-
-    assertTrue(handler.isXTypeAsked());
-    assertTrue(handler.isYTypeAsked());
-    assertTrue(handler.isXValueAsked());
+    assertTrue(process.isComplete());
+    assertTrue(handler.isComplete());
   }
 
-  @Test
-  public void functionNameExtracting() throws IOException, InterruptedException {
-    assertEquals(
-      "abc",
-      extractFunctionName(
-        "Tracing abc(c(1:3)) on entry\n" +
-        "[1] \"enter abc\"\n" +
-        "debug: {\n" +
-        "    x^2\n" +
-        "}"
-      )
-    );
-  }
-
-  @Test
-  public void commentChecking() {
-    assertTrue(isCommentOrSpaces(" # abc "));
-  }
-
-  @Test
-  public void spacesChecking() {
-    assertTrue(isCommentOrSpaces("  "));
-  }
-
-  @Test
-  public void nullChecking() {
-    assertFalse(isCommentOrSpaces(null));
-  }
-
-  @Test
-  public void ordinaryChecking() {
-    assertFalse(isCommentOrSpaces(" abc "));
-  }
-
-  @Test
-  public void oneLineNextLineBegin() {
-    final String line = "abc";
-
-    assertEquals(line.length(), findNextLineBegin(line, 0));
-  }
-
-  @Test
-  public void justLineBreaksNextLineBegin() {
-    final String text = "\n\n\n\n\n";
-
-    assertEquals(text.length(), findNextLineBegin(text, 0));
-  }
-
-  @Test
-  public void lineBreakPointerNextLineBegin() {
-    final String text = "abc\n\ndef";
-
-    assertEquals(5, findNextLineBegin(text, 3));
-  }
-
-  @Test
-  public void ordinaryNextLineBegin() {
-    final String text = "abc\ndef";
-
-    assertEquals(4, findNextLineBegin(text, 0));
-  }
-
-  @Test
-  public void oneLineCurrentLineEnd() {
-    final String line = "abc";
-
-    assertEquals(line.length(), findCurrentLineEnd(line, 0));
-  }
-
-  @Test
-  public void justLineBreaksCurrentLineEnd() {
-    final String text = "\n\n\n\n";
-
-    assertEquals(0, findCurrentLineEnd(text, 0));
-  }
-
-  @Test
-  public void lineBreakPointerCurrentLineEnd() {
-    final String text = "abc\n\ndef";
-
-    assertEquals(3, findCurrentLineEnd(text, 3));
-  }
-
-  @Test
-  public void ordinaryCurrentLineEnd() {
-    final String text = "abc\ndef";
-
-    assertEquals(3, findCurrentLineEnd(text, 0));
-  }
-
-  private static class VarsTheRProcess extends TheRProcess {
+  private static class VarsTheRProcess implements TheRProcess {
 
     private boolean myLsAsked = false;
 
@@ -165,8 +98,8 @@ public class TheRDebuggerUtilsTest {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
-      if (command.equals(TheRDebugConstants.LS_COMMAND)) {
+    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(LS_COMMAND)) {
         myLsAsked = true;
 
         return new TheRProcessResponse(
@@ -176,7 +109,7 @@ public class TheRDebuggerUtilsTest {
         );
       }
 
-      if (command.equals(TheRDebugConstants.TYPEOF_COMMAND + "(x)")) {
+      if (command.equals(TYPEOF_COMMAND + "(x)")) {
         myXTypeAsked = true;
 
         return new TheRProcessResponse(
@@ -186,7 +119,7 @@ public class TheRDebuggerUtilsTest {
         );
       }
 
-      if (command.equals(TheRDebugConstants.TYPEOF_COMMAND + "(y)")) {
+      if (command.equals(TYPEOF_COMMAND + "(y)")) {
         myYTypeAsked = true;
 
         return new TheRProcessResponse(
@@ -196,7 +129,7 @@ public class TheRDebuggerUtilsTest {
         );
       }
 
-      if (command.equals("x")) {
+      if (command.equals(PRINT_COMMAND + "(x)")) {
         if (!myXTypeAsked) {
           throw new IllegalStateException("Type should be asked before value");
         }
@@ -210,7 +143,7 @@ public class TheRDebuggerUtilsTest {
         );
       }
 
-      if (command.equals("y")) {
+      if (command.equals(PRINT_COMMAND + "(y)")) {
         if (!myYTypeAsked) {
           throw new IllegalStateException("Type should be asked before value");
         }
@@ -225,20 +158,8 @@ public class TheRDebuggerUtilsTest {
     public void stop() {
     }
 
-    public boolean isLsAsked() {
-      return myLsAsked;
-    }
-
-    public boolean isXTypeAsked() {
-      return myXTypeAsked;
-    }
-
-    public boolean isYTypeAsked() {
-      return myYTypeAsked;
-    }
-
-    public boolean isXValueAsked() {
-      return myXValueAsked;
+    public boolean isComplete() {
+      return myLsAsked && myXTypeAsked && myYTypeAsked && myXValueAsked;
     }
   }
 
@@ -252,7 +173,7 @@ public class TheRDebuggerUtilsTest {
     @Nullable
     @Override
     public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
-      throws IOException, InterruptedException {
+      throws TheRDebuggerException {
       if (var.equals("x")) {
         myXTypeAsked = true;
 
@@ -294,16 +215,8 @@ public class TheRDebuggerUtilsTest {
       throw new IllegalStateException("Unexpected var");
     }
 
-    public boolean isXTypeAsked() {
-      return myXTypeAsked;
-    }
-
-    public boolean isYTypeAsked() {
-      return myYTypeAsked;
-    }
-
-    public boolean isXValueAsked() {
-      return myXValueAsked;
+    public boolean isComplete() {
+      return myXTypeAsked && myYTypeAsked && myXValueAsked;
     }
   }
 }

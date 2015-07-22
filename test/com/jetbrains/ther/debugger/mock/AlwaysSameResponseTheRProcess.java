@@ -3,12 +3,11 @@ package com.jetbrains.ther.debugger.mock;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
-public class AlwaysSameResponseTheRProcess extends TheRProcess {
+public class AlwaysSameResponseTheRProcess implements TheRProcess {
 
   @NotNull
   private final String myText;
@@ -32,8 +31,9 @@ public class AlwaysSameResponseTheRProcess extends TheRProcess {
 
   @NotNull
   @Override
-  public TheRProcessResponse execute(@NotNull final String command) throws IOException, InterruptedException {
+  public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
     myExecuteCalled++;
+
     return new TheRProcessResponse(myText, myType, myOutputRange);
   }
 

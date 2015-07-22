@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger.mock;
 
-import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 
 public class IllegalTheRDebuggerEvaluator implements TheRDebuggerEvaluator {

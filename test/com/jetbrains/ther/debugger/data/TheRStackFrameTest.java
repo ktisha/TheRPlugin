@@ -13,17 +13,13 @@ public class TheRStackFrameTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void modifyInner() {
-    final List<TheRVar> vars = getMutableVars();
-
-    final TheRLocation location = new TheRLocation("abc", 10);
-
     final TheRStackFrame stackFrame = new TheRStackFrame(
-      location,
-      vars,
+      getLocation(),
+      getMutableVars(),
       new IllegalTheRDebuggerEvaluator()
     );
 
-    stackFrame.getVars().add(new TheRVar("name3", "type3", "value3"));
+    stackFrame.getVars().add(getNewVar());
   }
 
   @Test
@@ -31,15 +27,13 @@ public class TheRStackFrameTest {
     final List<TheRVar> vars = getMutableVars();
     final List<TheRVar> varsCopy = new ArrayList<TheRVar>(vars);
 
-    final TheRLocation location = new TheRLocation("abc", 10);
-
     final TheRStackFrame stackFrame = new TheRStackFrame(
-      location,
+      getLocation(),
       vars,
       new IllegalTheRDebuggerEvaluator()
     );
 
-    vars.add(new TheRVar("name3", "type3", "value3"));
+    vars.add(getNewVar());
 
     assertEquals(varsCopy, stackFrame.getVars());
   }
@@ -49,8 +43,8 @@ public class TheRStackFrameTest {
     final List<TheRVar> vars = getMutableVars();
     final List<TheRVar> varsCopy = new ArrayList<TheRVar>(vars);
 
-    final TheRLocation location = new TheRLocation("abc", 10);
-    final TheRLocation locationCopy = new TheRLocation("abc", 10);
+    final TheRLocation location = getLocation();
+    final TheRLocation locationCopy = new TheRLocation(location.getFunctionName(), location.getLine());
 
     final TheRStackFrame stackFrame = new TheRStackFrame(
       location,
@@ -70,5 +64,15 @@ public class TheRStackFrameTest {
     result.add(new TheRVar("name2", "type2", "value2"));
 
     return result;
+  }
+
+  @NotNull
+  private TheRLocation getLocation() {
+    return new TheRLocation("abc", 10);
+  }
+
+  @NotNull
+  private TheRVar getNewVar() {
+    return new TheRVar("name3", "type3", "value3");
   }
 }
