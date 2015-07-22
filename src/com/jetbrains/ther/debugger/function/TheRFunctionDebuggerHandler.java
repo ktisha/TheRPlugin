@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.function;
 
 import org.jetbrains.annotations.NotNull;
 

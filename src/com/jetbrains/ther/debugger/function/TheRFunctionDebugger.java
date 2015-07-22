@@ -1,10 +1,10 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface TheRFunctionDebugger {
@@ -17,7 +17,7 @@ public interface TheRFunctionDebugger {
 
   boolean hasNext();
 
-  void advance() throws IOException, InterruptedException;
+  void advance() throws TheRDebuggerException;
 
   @NotNull
   String getResult();

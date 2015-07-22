@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger.data;
 
-import com.jetbrains.ther.debugger.TheRDebuggerEvaluator;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

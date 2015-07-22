@@ -3,6 +3,12 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +87,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     );
   }
 
-  public boolean advance() throws IOException, InterruptedException {
+  public boolean advance() throws TheRDebuggerException {
     topDebugger().advance(); // Don't forget that advance could append new debugger
 
     while (!topDebugger().hasNext()) {

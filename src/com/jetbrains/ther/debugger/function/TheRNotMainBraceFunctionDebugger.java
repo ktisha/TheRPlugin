@@ -1,11 +1,10 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 
 // TODO [dbg][test]
 class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
@@ -14,12 +13,12 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
                                           @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                           @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                           @NotNull final TheRLoadableVarHandler varHandler,
-                                          @NotNull final String functionName) throws IOException, InterruptedException {
+                                          @NotNull final String functionName) throws TheRDebuggerException {
     super(process, debuggerFactory, debuggerHandler, varHandler, functionName);
   }
 
   @Override
-  protected void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+  protected void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     switch (response.getType()) {
       case DEBUG_AT:
         handleDebugAt(response);
@@ -42,7 +41,7 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
   }
 
   @Override
-  protected int initCurrentLine() throws IOException, InterruptedException {
+  protected int initCurrentLine() throws TheRDebuggerException {
     return loadLineNumber();
   }
 }

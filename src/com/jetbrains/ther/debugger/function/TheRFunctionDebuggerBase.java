@@ -1,18 +1,20 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.loadUnmodifiableVars;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
@@ -44,7 +46,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheRLoadableVarHandler varHandler,
-                                  @NotNull final String functionName) throws IOException, InterruptedException {
+                                  @NotNull final String functionName) throws TheRDebuggerException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
@@ -52,7 +54,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myFunctionName = functionName;
 
     myCurrentLineNumber = initCurrentLine();
-    myVars = TheRDebuggerStringUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+    myVars = loadUnmodifiableVars(myProcess, myVarHandler);
 
     myResult = "";
   }
@@ -75,7 +77,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   @Override
-  public void advance() throws IOException, InterruptedException {
+  public void advance() throws TheRDebuggerException {
     if (!hasNext()) {
       throw new IllegalStateException("Advance should be called only if hasNext returns true");
     }
@@ -93,13 +95,14 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return myResult;
   }
 
-  protected abstract int initCurrentLine() throws IOException, InterruptedException;
+  protected abstract int initCurrentLine() throws TheRDebuggerException;
 
-  protected abstract void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException;
+  protected abstract void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException;
 
-  protected int loadLineNumber() throws IOException, InterruptedException {
+  protected int loadLineNumber() throws TheRDebuggerException {
     return extractLineNumber(
-      myProcess.execute(
+      execute(
+        myProcess,
         EXECUTE_AND_STEP_COMMAND,
         TheRProcessResponseType.DEBUG_AT
       ),
@@ -107,7 +110,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     );
   }
 
-  protected void handleDebugAt(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+  protected void handleDebugAt(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     appendOutput(response);
 
     myCurrentLineNumber = extractLineNumber(
@@ -118,13 +121,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
-  protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+  protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     appendOutput(response);
 
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    myProcess.execute(EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE);
 
     myCurrentLineNumber = loadLineNumber();
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
@@ -142,7 +145,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     resetDebugInformation();
   }
 
-  protected void handleDebuggingIn() throws IOException, InterruptedException {
+  protected void handleDebuggingIn() throws TheRDebuggerException {
     myDebuggerHandler.appendDebugger(
       myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,

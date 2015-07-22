@@ -1,12 +1,16 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.evaluator;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +53,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         )
       );
     }
-    catch (final IOException e) {
-      receiver.receiveError(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       receiver.receiveError(e);
     }
   }
@@ -64,16 +65,13 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         evaluate(expression)
       );
     }
-    catch (final IOException e) {
-      receiver.receiveError(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       receiver.receiveError(e);
     }
   }
 
   @NotNull
-  private String evaluate(@NotNull final String expression) throws IOException, InterruptedException {
+  private String evaluate(@NotNull final String expression) throws TheRDebuggerException {
     final TheRProcessResponse response = myProcess.execute(expression);
 
     switch (response.getType()) {
@@ -83,7 +81,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       case RESPONSE:
         return response.getText();
       default:
-        throw new IOException("Unexpected response from interpreter");
+        throw new UnexpectedResponseException("Unexpected response from interpreter");
     }
   }
 
@@ -94,7 +92,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @NotNull
-  private String evaluateFunction() throws IOException, InterruptedException {
+  private String evaluateFunction() throws TheRDebuggerException {
     final TheREvaluatedFunctionDebuggerHandler debuggerHandler = new TheREvaluatedFunctionDebuggerHandler(
       myProcess,
       myDebuggerFactory,
@@ -123,7 +121,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                 @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                 @NotNull final TheRLoadableVarHandler varHandler,
-                                                @NotNull final TheRLocation prevLocation) throws IOException, InterruptedException {
+                                                @NotNull final TheRLocation prevLocation) throws TheRDebuggerException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
       myPrimaryHandler = debuggerHandler;
       myDropFrames = 1;
@@ -139,7 +137,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       );
     }
 
-    public boolean advance() throws IOException, InterruptedException {
+    public boolean advance() throws TheRDebuggerException {
       topDebugger().advance(); // Don't forget that advance could append new debugger
 
       while (!topDebugger().hasNext()) {

@@ -1,8 +1,12 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.function;
 
+import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -10,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
@@ -72,7 +75,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     return !myIsRunning || getCurrentLineNumber() != -1;
   }
 
-  public void advance() throws IOException, InterruptedException {
+  public void advance() throws TheRDebuggerException {
     if (!hasNext()) {
       throw new IllegalStateException("Advance should be called only if hasNext returns true");
     }
@@ -99,13 +102,18 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       accepted = response.getType() != TheRProcessResponseType.PLUS;
       isFirstLine = false;
 
-      myScriptReader.advance();
+      try {
+        myScriptReader.advance();
+      }
+      catch (final IOException e) {
+        throw new TheRDebuggerException(e);
+      }
     }
 
     forwardCommentsAndEmptyLines();
 
     if (!myIsNewDebuggerAppended) {
-      myVars = loadUnmodifiableVars(myProcess, myVarHandler);
+      myVars = TheRProcessUtils.loadUnmodifiableVars(myProcess, myVarHandler);
     }
   }
 
@@ -123,13 +131,18 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     return myScriptReader.getCurrentLine().getNumber();
   }
 
-  private void forwardCommentsAndEmptyLines() throws IOException {
-    while (isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
-      myScriptReader.advance();
+  private void forwardCommentsAndEmptyLines() throws TheRDebuggerException {
+    try {
+      while (isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
+        myScriptReader.advance();
+      }
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
     }
   }
 
-  private void handleResponse(@NotNull final TheRProcessResponse response) throws IOException, InterruptedException {
+  private void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     switch (response.getType()) {
       case DEBUGGING_IN:
         myIsNewDebuggerAppended = true;
@@ -153,7 +166,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       case EMPTY:
         break;
       default:
-        throw new IllegalStateException("Unexpected response from interpreter");
+        throw new UnexpectedResponseException("Unexpected response from interpreter");
     }
   }
 }

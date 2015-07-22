@@ -1,6 +1,8 @@
-package com.jetbrains.ther.debugger;
+package com.jetbrains.ther.debugger.evaluator;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
