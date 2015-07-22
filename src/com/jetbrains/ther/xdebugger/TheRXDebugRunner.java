@@ -8,13 +8,18 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.GenericProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.jetbrains.ther.debugger.*;
+import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.TheRScriptReader;
+import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandlerImpl;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
@@ -24,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class TheRDebugRunner extends GenericProgramRunner {
+public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
@@ -46,13 +51,18 @@ public class TheRDebugRunner extends GenericProgramRunner {
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
-    final TheROutputBuffer outputBuffer = new TheROutputBuffer();
+    final Project project = environment.getProject();
 
-    final XDebugSession session = XDebuggerManager.getInstance(environment.getProject()).startSession(
+    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
+    final String scriptPath = ((TheRRunConfiguration)environment.getRunProfile()).getScriptName();
+
+    final TheRXOutputBuffer outputBuffer = new TheRXOutputBuffer();
+
+    final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(environment, outputBuffer),
-        createResolver(environment),
+        createDebugger(interpreterPath, scriptPath, outputBuffer),
+        new TheRXResolver(project, scriptPath),
         outputBuffer
       )
     );
@@ -63,7 +73,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger,
                                                          @NotNull final TheRXResolver resolver,
-                                                         @NotNull final TheROutputBuffer outputBuffer) {
+                                                         @NotNull final TheRXOutputBuffer outputBuffer) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
@@ -74,36 +84,25 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRDebugger createDebugger(@NotNull final ExecutionEnvironment environment,
+  private TheRDebugger createDebugger(@NotNull final String interpreterPath,
+                                      @NotNull final String scriptPath,
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
-    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
-
     try {
-      final TheRProcess process = new TheRProcessImpl(interpreterPath);
-
       return new TheRDebugger(
-        process,
+        new TheRProcessImpl(interpreterPath),
         new TheRFunctionDebuggerFactoryImpl(),
         new TheRLoadableVarHandlerImpl(),
         new TheRDebuggerEvaluatorFactoryImpl(),
-        new TheRScriptReader(runConfiguration.getScriptName()),
+        new TheRScriptReader(scriptPath),
         outputReceiver
       );
+    }
+    catch (final TheRDebuggerException e) {
+      throw new ExecutionException(e);
     }
     catch (final IOException e) {
       throw new ExecutionException(e);
     }
-    catch (final InterruptedException e) {
-      throw new ExecutionException(e);
-    }
-  }
-
-  @NotNull
-  private TheRXResolver createResolver(@NotNull final ExecutionEnvironment environment) {
-    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
-
-    return new TheRXResolver(runConfiguration.getProject(), runConfiguration.getScriptName());
   }
 }

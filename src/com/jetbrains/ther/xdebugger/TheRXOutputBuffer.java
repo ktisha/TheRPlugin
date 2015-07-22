@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.Queue;
 
-class TheROutputBuffer implements TheROutputReceiver {
+class TheRXOutputBuffer implements TheROutputReceiver {
 
   @NotNull
   private final Queue<String> myMessages = new LinkedList<String>();

@@ -14,7 +14,7 @@ import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
 import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
-import com.jetbrains.ther.xdebugger.TheROutputBufferTest;
+import com.jetbrains.ther.xdebugger.TheRXOutputBufferTest;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -67,7 +67,7 @@ public class TheRTestSuite extends TestCase {
 
   private static void addXDebuggerTests(@NotNull final TestSuite suite) {
     // `main` package
-    addJUnit4Test(suite, TheROutputBufferTest.class);
+    addJUnit4Test(suite, TheRXOutputBufferTest.class);
   }
 
   private static void addJUnit4Test(@NotNull final TestSuite suite, @NotNull final Class<?> cls) {

@@ -4,7 +4,9 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -15,11 +17,11 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 
 // TODO [xdbg][test]
@@ -35,7 +37,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private final TheRXResolver myResolver;
 
   @NotNull
-  private final TheROutputBuffer myOutputBuffer;
+  private final TheRXOutputBuffer myOutputBuffer;
 
   @NotNull
   private final Map<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
@@ -49,7 +51,7 @@ class TheRXDebugProcess extends XDebugProcess {
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXResolver resolver,
-                           @NotNull final TheROutputBuffer outputBuffer) {
+                           @NotNull final TheRXOutputBuffer outputBuffer) {
     super(session);
 
     myDebugger = debugger;
@@ -77,7 +79,7 @@ class TheRXDebugProcess extends XDebugProcess {
   @NotNull
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    return new XBreakpointHandler[]{new TheRXLineBreakpointHandler(this)};
+    return new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
   }
 
   @Override
@@ -97,10 +99,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
       updateDebugInformation();
     }
-    catch (final IOException e) {
-      LOGGER.error(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       LOGGER.error(e);
     }
   }
@@ -112,10 +111,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
       updateDebugInformation();
     }
-    catch (final IOException e) {
-      LOGGER.error(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       LOGGER.error(e);
     }
   }
@@ -128,14 +124,11 @@ class TheRXDebugProcess extends XDebugProcess {
       do {
         if (!advance()) return;
       }
-      while (!isBreakpoint() && myDebugger.getStack().size() != targetDepth);
+      while (!isBreakpoint() && myDebugger.getStack().size() > targetDepth);
 
       updateDebugInformation();
     }
-    catch (final IOException e) {
-      LOGGER.error(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       LOGGER.error(e);
     }
   }
@@ -150,24 +143,25 @@ class TheRXDebugProcess extends XDebugProcess {
 
       updateDebugInformation();
     }
-    catch (final IOException e) {
-      LOGGER.error(e);
-    }
-    catch (final InterruptedException e) {
+    catch (final TheRDebuggerException e) {
       LOGGER.error(e);
     }
   }
 
   @Override
   public void runToPosition(@NotNull final XSourcePosition position) {
-    if (!new TheRXLineBreakpointType().canPutAt(position.getFile(), position.getLine(), getSession().getProject())) {
-      Messages.showWarningDialog(
-        getSession().getProject(),
-        "It isn't possible to suspend debug at the specified position.",
-        "INVALID BREAKPOINT POSITION"
+    final Project project = getSession().getProject();
+    final VirtualFile file = position.getFile();
+    final int line = position.getLine();
+
+    if (!TheRXBreakpointUtils.canPutAt(project, file, line)) {
+      Messages.showErrorDialog(
+        project,
+        "There is no executable code at " + file.getName() + ":" + (line + 1),
+        "RUN TO CURSOR"
       );
 
-      getSession().positionReached(new TheRXSuspendContext(myDebugger.getStack(), myResolver));
+      getSession().positionReached(new TheRXSuspendContext(myDebugger.getStack(), myResolver)); // TODO [xdbg][update]
 
       return;
     }
@@ -182,20 +176,7 @@ class TheRXDebugProcess extends XDebugProcess {
     myDebugger.stop();
   }
 
-  public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpoints.put(
-      new XSourcePositionWrapper(breakpoint.getSourcePosition()), // TODO [xdbg][null]
-      breakpoint
-    );
-  }
-
-  public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
-    myBreakpoints.remove(
-      new XSourcePositionWrapper(breakpoint.getSourcePosition()) // TODO [xdbg][null]
-    );
-  }
-
-  private boolean advance() throws IOException, InterruptedException {
+  private boolean advance() throws TheRDebuggerException {
     final boolean executed = myDebugger.advance();
 
     printInterpreterOutput();
@@ -207,7 +188,7 @@ class TheRXDebugProcess extends XDebugProcess {
     return executed;
   }
 
-  private void updateDebugInformation() {
+  private void updateDebugInformation() { // TODO [xdbg][rename]
     final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
     final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(wrapper);
 
@@ -233,7 +214,7 @@ class TheRXDebugProcess extends XDebugProcess {
     return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
   }
 
-  private void printInterpreterOutput() {
+  private void printInterpreterOutput() { // TODO [xdbg][rename?]
     final Queue<String> messages = myOutputBuffer.getMessages();
 
     while (!messages.isEmpty()) {
@@ -253,7 +234,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private XSourcePosition getCurrentDebuggerLocation() {
     final List<TheRStackFrame> stack = myDebugger.getStack();
 
-    return myResolver.resolve(myResolver.resolve(stack), stack.get(stack.size() - 1).getLocation().getLine());
+    return myResolver.resolve(myResolver.resolve(stack), stack.get(stack.size() - 1).getLocation().getLine()); // TODO [xdbg][null]
   }
 
   private static class XSourcePositionWrapper {
@@ -279,6 +260,28 @@ class TheRXDebugProcess extends XDebugProcess {
     @Override
     public int hashCode() {
       return 31 * myPosition.getLine() + myPosition.getFile().getPath().hashCode();
+    }
+  }
+
+  private class TheRXLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
+
+    public TheRXLineBreakpointHandler() {
+      super(TheRXLineBreakpointType.class);
+    }
+
+    @Override
+    public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
+      myBreakpoints.put(
+        new XSourcePositionWrapper(breakpoint.getSourcePosition()), // TODO [xdbg][null]
+        breakpoint
+      );
+    }
+
+    @Override
+    public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint, final boolean temporary) {
+      myBreakpoints.remove(
+        new XSourcePositionWrapper(breakpoint.getSourcePosition()) // TODO [xdbg][null]
+      );
     }
   }
 }

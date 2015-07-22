@@ -12,9 +12,9 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.ther.psi.TheRFileImpl;
 import org.jetbrains.annotations.NotNull;
 
-class TheRCodeFragment extends TheRFileImpl {
+class TheRXCodeFragment extends TheRFileImpl {
 
-  public TheRCodeFragment(@NotNull final Project project, @NotNull final String name, @NotNull final String text) {
+  public TheRXCodeFragment(@NotNull final Project project, @NotNull final String name, @NotNull final String text) {
     super(createLightVirtualFileViewProvider(project, name, text));
 
     ((SingleRootFileViewProvider)getViewProvider()).forceCachedPsi(this);

@@ -6,11 +6,11 @@ import java.util.Queue;
 
 import static org.junit.Assert.assertEquals;
 
-public class TheROutputBufferTest {
+public class TheRXOutputBufferTest {
 
   @Test
   public void ordinary() {
-    final TheROutputBuffer outputBuffer = new TheROutputBuffer();
+    final TheRXOutputBuffer outputBuffer = new TheRXOutputBuffer();
 
     outputBuffer.receive("abc");
     outputBuffer.receive("def");
