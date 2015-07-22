@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.evaluator;
 
-import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
@@ -13,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
 
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
@@ -28,20 +29,15 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   @NotNull
   private final TheRLoadableVarHandler myVarHandler;
 
-  @NotNull
-  private final TheRLocation myLocation;
-
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
                                    @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                    @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                   @NotNull final TheRLoadableVarHandler varHandler,
-                                   @NotNull final TheRLocation location) {
+                                   @NotNull final TheRLoadableVarHandler varHandler) {
 
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myVarHandler = varHandler;
-    myLocation = location;
   }
 
   @Override
@@ -81,7 +77,14 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       case RESPONSE:
         return response.getText();
       default:
-        throw new UnexpectedResponseException("Unexpected response from interpreter");
+        throw new UnexpectedResponseException(
+          "Actual response type is not the same as expected: " +
+          "[" +
+          "actual: " + response.getType() + ", " +
+          "expected: " +
+          "[" + DEBUGGING_IN + ", " + EMPTY + ", " + RESPONSE + "]" +
+          "]"
+        );
     }
   }
 
@@ -97,8 +100,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       myProcess,
       myDebuggerFactory,
       myDebuggerHandler,
-      myVarHandler,
-      myLocation
+      myVarHandler
     );
 
     while (debuggerHandler.advance()) {
@@ -120,8 +122,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                 @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                @NotNull final TheRLoadableVarHandler varHandler,
-                                                @NotNull final TheRLocation prevLocation) throws TheRDebuggerException {
+                                                @NotNull final TheRLoadableVarHandler varHandler) throws TheRDebuggerException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
       myPrimaryHandler = debuggerHandler;
       myDropFrames = 1;
@@ -131,8 +132,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           process,
           debuggerFactory,
           this,
-          varHandler,
-          prevLocation
+          varHandler
         )
       );
     }

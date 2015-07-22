@@ -6,7 +6,6 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -14,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
@@ -102,18 +103,13 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       accepted = response.getType() != TheRProcessResponseType.PLUS;
       isFirstLine = false;
 
-      try {
-        myScriptReader.advance();
-      }
-      catch (final IOException e) {
-        throw new TheRDebuggerException(e);
-      }
+      advanceScriptReader();
     }
 
     forwardCommentsAndEmptyLines();
 
     if (!myIsNewDebuggerAppended) {
-      myVars = TheRProcessUtils.loadUnmodifiableVars(myProcess, myVarHandler);
+      myVars = loadUnmodifiableVars(myProcess, myVarHandler);
     }
   }
 
@@ -132,13 +128,8 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void forwardCommentsAndEmptyLines() throws TheRDebuggerException {
-    try {
-      while (isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
-        myScriptReader.advance();
-      }
-    }
-    catch (final IOException e) {
-      throw new TheRDebuggerException(e);
+    while (isCommentOrSpaces(myScriptReader.getCurrentLine().getText())) {
+      advanceScriptReader();
     }
   }
 
@@ -152,8 +143,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
             myProcess,
             myDebuggerFactory,
             myDebuggerHandler,
-            myVarHandler,
-            getLocation()
+            myVarHandler
           )
         );
 
@@ -166,7 +156,23 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       case EMPTY:
         break;
       default:
-        throw new UnexpectedResponseException("Unexpected response from interpreter");
+        throw new UnexpectedResponseException(
+          "Actual response type is not the same as expected: " +
+          "[" +
+          "actual: " + response.getType() + ", " +
+          "expected: " +
+          "[" + DEBUGGING_IN + ", " + RESPONSE + ", " + PLUS + ", " + EMPTY + "]" +
+          "]"
+        );
+    }
+  }
+
+  private void advanceScriptReader() throws TheRDebuggerException {
+    try {
+      myScriptReader.advance();
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
     }
   }
 }

@@ -108,8 +108,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       myProcess,
       myDebuggerFactory,
       this,
-      myVarHandler,
-      topLocation
+      myVarHandler
     );
 
     myStack.set(

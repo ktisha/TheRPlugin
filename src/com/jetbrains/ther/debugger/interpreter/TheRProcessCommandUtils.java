@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.interpreter;
 
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
@@ -19,7 +18,7 @@ final class TheRProcessCommandUtils {
 
   @NotNull
   public static String traceCommand(@NotNull final String var) {
-    return TheRDebugConstants.TRACE_COMMAND +
+    return TRACE_COMMAND +
            "(" +
            var +
            ", " +
@@ -32,7 +31,7 @@ final class TheRProcessCommandUtils {
 
   @NotNull
   public static String debugCommand(@NotNull final String var) {
-    return TheRDebugConstants.DEBUG_COMMAND + "(" + var + ")";
+    return DEBUG_COMMAND + "(" + var + ")";
   }
 
   @NotNull
@@ -47,11 +46,11 @@ final class TheRProcessCommandUtils {
 
   @NotNull
   private static String enterFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+    return SERVICE_FUNCTION_PREFIX + var + SERVICE_ENTER_FUNCTION_SUFFIX;
   }
 
   @NotNull
   private static String exitFunctionName(@NotNull final String var) {
-    return TheRDebugConstants.SERVICE_FUNCTION_PREFIX + var + TheRDebugConstants.SERVICE_EXIT_FUNCTION_SUFFIX;
+    return SERVICE_FUNCTION_PREFIX + var + SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 }

@@ -2,9 +2,12 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
+
+import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
 
 // TODO [dbg][test]
 class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
@@ -30,7 +33,14 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
         handleRecursiveEndTrace(response);
         break;
       default:
-        throw new IllegalStateException("Unexpected response from interpreter");
+        throw new UnexpectedResponseException(
+          "Actual response type is not the same as expected: " +
+          "[" +
+          "actual: " + response.getType() + ", " +
+          "expected: " +
+          "[" + END_TRACE + ", " + DEBUGGING_IN + ", " + RECURSIVE_END_TRACE + "]" +
+          "]"
+        );
     }
   }
 

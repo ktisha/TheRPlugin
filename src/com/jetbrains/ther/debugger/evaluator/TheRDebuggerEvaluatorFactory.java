@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.evaluator;
 
-import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
@@ -13,6 +12,5 @@ public interface TheRDebuggerEvaluatorFactory {
   TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
                                      @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                      @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                     @NotNull final TheRLoadableVarHandler varHandler,
-                                     @NotNull final TheRLocation location);
+                                     @NotNull final TheRLoadableVarHandler varHandler);
 }
