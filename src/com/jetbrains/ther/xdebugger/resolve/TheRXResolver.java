@@ -10,10 +10,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
-import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 // TODO [xdbg][test]
 public class TheRXResolver {
@@ -38,12 +35,17 @@ public class TheRXResolver {
   }
 
   @NotNull
-  public Session getSession() {
-    return new Session();
+  public TheRXResolvingSession getSession() {
+    return new TheRXResolvingSession(this);
   }
 
   @NotNull
-  private XSourcePosition resolve(@NotNull final TheRXFunctionDescriptor descriptor, final int line) {
+  TheRXFunctionDescriptor getRoot() {
+    return myRoot;
+  }
+
+  @NotNull
+  XSourcePosition resolve(@NotNull final TheRXFunctionDescriptor descriptor, final int line) {
     final int result = calculateLineOffset(descriptor) + line;
 
     return XDebuggerUtil.getInstance().createPosition(myVirtualFile, result); // TODO [xdbg][null]
@@ -71,48 +73,5 @@ public class TheRXResolver {
     }
 
     return current;
-  }
-
-  public class Session {
-
-    @Nullable
-    private TheRXFunctionDescriptor myCurrentDescriptor = null;
-
-    private int myCurrentLine;
-    private boolean myResolveStopped = false;
-
-    @Nullable
-    public XSourcePosition resolveNext(@NotNull final TheRStackFrame frame) {
-      if (myResolveStopped) {
-        return null;
-      }
-
-      updateDescriptorAndLine(frame);
-
-      if (myCurrentDescriptor == null) {
-        myResolveStopped = true;
-
-        return null;
-      }
-
-      return resolve(myCurrentDescriptor, myCurrentLine);
-    }
-
-    private void updateDescriptorAndLine(@NotNull final TheRStackFrame frame) {
-      final TheRLocation location = frame.getLocation();
-
-      if (myCurrentDescriptor == null) {
-        myCurrentDescriptor = myRoot;
-      }
-      else {
-        myCurrentDescriptor = TheRXFunctionDescriptorUtils.resolve(
-          myCurrentDescriptor,
-          myCurrentLine,
-          location.getFunctionName()
-        );
-      }
-
-      myCurrentLine = location.getLine();
-    }
   }
 }

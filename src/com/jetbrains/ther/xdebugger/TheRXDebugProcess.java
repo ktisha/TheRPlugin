@@ -17,6 +17,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
 import com.jetbrains.ther.xdebugger.stack.TheRXStack;
@@ -35,7 +36,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final TheRXResolver myResolver;
+  private final TheRXStack myStack;
 
   @NotNull
   private final TheRXOutputBuffer myOutputBuffer;
@@ -49,9 +50,6 @@ class TheRXDebugProcess extends XDebugProcess {
   @NotNull
   private final ConsoleView myConsole;
 
-  @NotNull
-  private final TheRXStack myStack;
-
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXResolver resolver,
@@ -59,15 +57,13 @@ class TheRXDebugProcess extends XDebugProcess {
     super(session);
 
     myDebugger = debugger;
-    myResolver = resolver;
+    myStack = new TheRXStack(resolver.getSession()); // TODO [xdbg][update]
     myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
 
     myConsole = (ConsoleView)super.createConsole();
-
-    myStack = new TheRXStack(debugger.getStack(), resolver);
   }
 
   @NotNull
@@ -96,14 +92,17 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void startStepOver() {
     try {
-      final int targetDepth = myDebugger.getStack().size();
+      final List<TheRStackFrame> stack = myDebugger.getStack();
+      final int targetDepth = stack.size();
 
       do {
         if (!advance()) return;
-      }
-      while (!isBreakpoint() && myDebugger.getStack().size() > targetDepth);
 
-      updateDebugInformation();
+        myStack.update(stack);
+      }
+      while (!isBreakpoint() && stack.size() > targetDepth);
+
+      showDebugInformation();
     }
     catch (final TheRDebuggerException e) {
       LOGGER.error(e);
@@ -115,7 +114,9 @@ class TheRXDebugProcess extends XDebugProcess {
     try {
       if (!advance()) return;
 
-      updateDebugInformation();
+      myStack.update(myDebugger.getStack());
+
+      showDebugInformation();
     }
     catch (final TheRDebuggerException e) {
       LOGGER.error(e);
@@ -125,14 +126,17 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void startStepOut() {
     try {
-      final int targetDepth = myDebugger.getStack().size() - 1;
+      final List<TheRStackFrame> stack = myDebugger.getStack();
+      final int targetDepth = stack.size() - 1;
 
       do {
         if (!advance()) return;
-      }
-      while (!isBreakpoint() && myDebugger.getStack().size() > targetDepth);
 
-      updateDebugInformation();
+        myStack.update(stack);
+      }
+      while (!isBreakpoint() && stack.size() > targetDepth);
+
+      showDebugInformation();
     }
     catch (final TheRDebuggerException e) {
       LOGGER.error(e);
@@ -144,10 +148,12 @@ class TheRXDebugProcess extends XDebugProcess {
     try {
       do {
         if (!advance()) return;
+
+        myStack.update(myDebugger.getStack());
       }
       while (!isBreakpoint());
 
-      updateDebugInformation();
+      showDebugInformation();
     }
     catch (final TheRDebuggerException e) {
       LOGGER.error(e);
@@ -194,10 +200,8 @@ class TheRXDebugProcess extends XDebugProcess {
     return executed;
   }
 
-  private void updateDebugInformation() { // TODO [xdbg][rename]
-    myStack.update();
-
-    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
+  private void showDebugInformation() {
+    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentPosition());
     final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(wrapper);
 
     final XDebugSession session = getSession();
@@ -217,12 +221,12 @@ class TheRXDebugProcess extends XDebugProcess {
   }
 
   private boolean isBreakpoint() {
-    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
+    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentPosition());
 
     return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
   }
 
-  private void printInterpreterOutput() { // TODO [xdbg][rename?]
+  private void printInterpreterOutput() {
     final Queue<String> messages = myOutputBuffer.getMessages();
 
     while (!messages.isEmpty()) {
@@ -239,15 +243,8 @@ class TheRXDebugProcess extends XDebugProcess {
   }
 
   @NotNull
-  private XSourcePosition getCurrentDebuggerLocation() {
-    /*
-    final List<TheRStackFrame> stack = myDebugger.getStack();
-
-    return myResolver.resolve(myResolver.resolve(stack), stack.get(stack.size() - 1).getLocation().getLine()); // TODO [xdbg][null]
-    */
-    myStack.update();
-
-    return myStack.getSuspendContext().getActiveExecutionStack().getTopFrame().getSourcePosition();
+  private XSourcePosition getCurrentPosition() {
+    return myStack.getSuspendContext().getActiveExecutionStack().getTopFrame().getSourcePosition();  // TODO [xdbg][null]
   }
 
   private static class XSourcePositionWrapper {
