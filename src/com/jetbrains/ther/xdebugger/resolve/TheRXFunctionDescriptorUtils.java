@@ -19,14 +19,11 @@ final class TheRXFunctionDescriptorUtils {
       int distance = Integer.MAX_VALUE;
 
       for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
+        final int currentDistance = currentDescriptor.getStartLine() + currentLine - candidate.getStartLine();
 
-        if (currentDescriptor.getStartLine() + currentLine > candidate.getStartLine()) { // candidate is declared before the current line
-          final int currentDistance = currentDescriptor.getStartLine() + currentLine - candidate.getStartLine();
-
-          if (currentDistance < distance) {
-            result = candidate;
-            distance = currentDistance;
-          }
+        if (currentDistance > 0 && currentDistance < distance) { // candidate is declared before the current line
+          result = candidate;
+          distance = currentDistance;
         }
       }
 
@@ -39,20 +36,17 @@ final class TheRXFunctionDescriptorUtils {
       return null;
     }
 
-    return resolve(currentDescriptor.getParent(), currentLine + currentDescriptor.getStartLine(), nextFunctionName);
+    return resolve(
+      currentDescriptor.getParent(),
+      currentLine + currentDescriptor.getStartLine(),
+      nextFunctionName
+    );
   }
 
-  public static void add(@NotNull final TheRXFunctionDescriptor root,
+  public static void add(@NotNull final TheRXFunctionDescriptor currentDescriptor,
                          @NotNull final String name,
                          final int startLine,
                          final int endLine) {
-    addFrom(root, name, startLine, endLine);
-  }
-
-  private static void addFrom(@NotNull final TheRXFunctionDescriptor currentDescriptor,
-                              @NotNull final String name,
-                              final int startLine,
-                              final int endLine) {
     if (!trySiftDown(currentDescriptor, name, startLine, endLine)) {
       addAsChild(currentDescriptor, name, startLine, endLine);
     }
@@ -65,7 +59,7 @@ final class TheRXFunctionDescriptorUtils {
     for (final List<TheRXFunctionDescriptor> sameNameChildren : currentDescriptor.getChildren().values()) {
       for (final TheRXFunctionDescriptor child : sameNameChildren) {
         if (child.getStartLine() <= startLine && endLine <= child.getEndLine()) {
-          addFrom(
+          add(
             child,
             name,
             startLine,

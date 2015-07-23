@@ -14,11 +14,12 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
+import com.jetbrains.ther.xdebugger.stack.TheRXStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,6 +49,9 @@ class TheRXDebugProcess extends XDebugProcess {
   @NotNull
   private final ConsoleView myConsole;
 
+  @NotNull
+  private final TheRXStack myStack;
+
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXResolver resolver,
@@ -62,6 +66,8 @@ class TheRXDebugProcess extends XDebugProcess {
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
 
     myConsole = (ConsoleView)super.createConsole();
+
+    myStack = new TheRXStack(debugger.getStack(), resolver);
   }
 
   @NotNull
@@ -161,7 +167,7 @@ class TheRXDebugProcess extends XDebugProcess {
         "RUN TO CURSOR"
       );
 
-      getSession().positionReached(new TheRXSuspendContext(myDebugger.getStack(), myResolver)); // TODO [xdbg][update]
+      getSession().positionReached(myStack.getSuspendContext());
 
       return;
     }
@@ -189,11 +195,13 @@ class TheRXDebugProcess extends XDebugProcess {
   }
 
   private void updateDebugInformation() { // TODO [xdbg][rename]
+    myStack.update();
+
     final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentDebuggerLocation());
     final XLineBreakpoint<XBreakpointProperties> breakpoint = myBreakpoints.get(wrapper);
 
     final XDebugSession session = getSession();
-    final TheRXSuspendContext suspendContext = new TheRXSuspendContext(myDebugger.getStack(), myResolver);
+    final XSuspendContext suspendContext = myStack.getSuspendContext();
 
     if (breakpoint != null) {
       if (!session
@@ -232,9 +240,14 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private XSourcePosition getCurrentDebuggerLocation() {
+    /*
     final List<TheRStackFrame> stack = myDebugger.getStack();
 
     return myResolver.resolve(myResolver.resolve(stack), stack.get(stack.size() - 1).getLocation().getLine()); // TODO [xdbg][null]
+    */
+    myStack.update();
+
+    return myStack.getSuspendContext().getActiveExecutionStack().getTopFrame().getSourcePosition();
   }
 
   private static class XSourcePositionWrapper {

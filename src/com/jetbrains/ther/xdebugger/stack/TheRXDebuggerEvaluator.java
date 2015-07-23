@@ -1,4 +1,4 @@
-package com.jetbrains.ther.xdebugger;
+package com.jetbrains.ther.xdebugger.stack;
 
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;

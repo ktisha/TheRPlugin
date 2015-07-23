@@ -1,16 +1,14 @@
-package com.jetbrains.ther.xdebugger;
+package com.jetbrains.ther.xdebugger.stack;
 
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
-import com.intellij.xdebugger.frame.XCompositeNode;
-import com.intellij.xdebugger.frame.XStackFrame;
-import com.intellij.xdebugger.frame.XValueChildrenList;
+import com.intellij.xdebugger.frame.*;
 import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO [xdbg][test]
+// TODO [xdbg][test-compute-children]
 class TheRXStackFrame extends XStackFrame {
 
   @NotNull
@@ -58,5 +56,22 @@ class TheRXStackFrame extends XStackFrame {
     }
 
     return result;
+  }
+
+  private static class TheRXVar extends XNamedValue {
+
+    @NotNull
+    private final TheRVar myVar;
+
+    public TheRXVar(@NotNull final TheRVar var) {
+      super(var.getName());
+
+      myVar = var;
+    }
+
+    @Override
+    public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
+      TheRXPresentationUtils.computePresentation(myVar, node);
+    }
   }
 }
