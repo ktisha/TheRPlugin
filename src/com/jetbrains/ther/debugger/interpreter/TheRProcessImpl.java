@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +23,7 @@ public class TheRProcessImpl implements TheRProcess {
     myProcess = initProcess(interpreterPath);
 
     mySender = new TheRProcessSender(new OutputStreamWriter(myProcess.getOutputStream()));
+
     myReceiver = new TheRProcessReceiver(
       new InputStreamReader(myProcess.getInputStream()),
       new InputStreamReader(myProcess.getErrorStream())

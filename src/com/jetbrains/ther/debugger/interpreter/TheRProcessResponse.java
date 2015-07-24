@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.data;
+package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;

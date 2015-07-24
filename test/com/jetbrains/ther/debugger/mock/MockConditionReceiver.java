@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
-public class MockConditionReceiver implements TheRDebuggerEvaluator.ConditionReceiver {
+public class MockConditionReceiver implements TheRDebuggerEvaluator.Receiver<Boolean> {
 
   private final boolean myExpectedResult;
 
@@ -17,7 +17,7 @@ public class MockConditionReceiver implements TheRDebuggerEvaluator.ConditionRec
   }
 
   @Override
-  public void receiveResult(final boolean result) {
+  public void receiveResult(@NotNull final Boolean result) {
     myResultReceived++;
 
     assertEquals(myExpectedResult, result);
@@ -25,6 +25,11 @@ public class MockConditionReceiver implements TheRDebuggerEvaluator.ConditionRec
 
   @Override
   public void receiveError(@NotNull final Exception e) {
+    throw new IllegalStateException("ReceiveError shouldn't be called");
+  }
+
+  @Override
+  public void receiveError(@NotNull final String error) {
     throw new IllegalStateException("ReceiveError shouldn't be called");
   }
 

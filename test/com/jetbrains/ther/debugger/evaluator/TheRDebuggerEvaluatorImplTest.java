@@ -3,8 +3,6 @@ package com.jetbrains.ther.debugger.evaluator;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -12,6 +10,8 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -116,9 +116,33 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheRLoadableVarHandler()
     );
 
-    final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
+    final ErrorReceiver receiver = new ErrorReceiver();
 
     evaluator.evalExpression("def <- function() {", receiver);
+
+    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, receiver.getErrorReceived());
+  }
+
+  @Test
+  public void evalErrorDuringExecution() {
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      "",
+      TheRProcessResponseType.EMPTY,
+      TextRange.EMPTY_RANGE,
+      "error"
+    );
+
+    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
+      process,
+      new IllegalTheRFunctionDebuggerFactory(),
+      null,
+      new IllegalTheRLoadableVarHandler()
+    );
+
+    final ErrorReceiver receiver = new ErrorReceiver();
+
+    evaluator.evalExpression("abc", receiver);
 
     assertEquals(1, process.getExecuteCalled());
     assertEquals(1, receiver.getErrorReceived());
@@ -135,7 +159,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheRLoadableVarHandler()
     );
 
-    final ErrorExpressionReceiver receiver = new ErrorExpressionReceiver();
+    final ErrorReceiver receiver = new ErrorReceiver();
 
     evaluator.evalExpression("def", receiver);
 
@@ -161,7 +185,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheRLoadableVarHandler()
     );
 
-    final MockExpressionReceiver receiver = new MockExpressionReceiver(text);
+    final MockReceiver receiver = new MockReceiver(text);
 
     evaluator.evalExpression("def(c(1:5))", receiver);
 
@@ -189,7 +213,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheRLoadableVarHandler()
     );
 
-    final MockExpressionReceiver receiver = new MockExpressionReceiver("[1] 1 2 3");
+    final MockReceiver receiver = new MockReceiver("[1] 1 2 3");
 
     evaluator.evalExpression(command, receiver);
 

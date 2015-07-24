@@ -1,8 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
@@ -16,7 +14,7 @@ import java.util.StringTokenizer;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LS_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.TYPEOF_COMMAND;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 
 public final class TheRProcessUtils {
 
@@ -44,7 +42,7 @@ public final class TheRProcessUtils {
   }
 
   @NotNull
-  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
+  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler) // TODO [dbg][update]
     throws TheRDebuggerException {
     final String text = execute(
       process,

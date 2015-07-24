@@ -1,19 +1,25 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheRScriptReader;
-import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRScriptLine;
+import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
@@ -134,6 +140,8 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
+    appendError(response.getError(), myDebuggerHandler);
+
     switch (response.getType()) {
       case DEBUGGING_IN:
         myIsNewDebuggerAppended = true;

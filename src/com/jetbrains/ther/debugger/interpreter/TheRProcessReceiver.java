@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.interpreter;
 
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,12 +1,33 @@
 package com.jetbrains.ther.debugger;
 
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.COMMENT_SYMBOL;
 
 public final class TheRDebuggerStringUtils {
+
+  public static void appendError(@NotNull final String error, @NotNull final TheRFunctionDebuggerHandler handler) { // TODO [dbg][update]
+    if (!error.isEmpty()) {
+      handler.appendError(error);
+    }
+  }
+
+  public static void appendResult(@NotNull final TheRProcessResponse response, @NotNull final TheRFunctionDebuggerHandler handler) {
+    final TextRange range = response.getResultRange();
+
+    if (!range.isEmpty()) {
+      handler.appendOutput(
+        range.substring(
+          response.getOutput()
+        )
+      );
+    }
+  }
 
   public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {
     if (line == null) {

@@ -3,8 +3,6 @@ package com.jetbrains.ther.debugger.interpreter;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,9 +11,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 
 final class TheRProcessResponseCalculator {
 
@@ -39,7 +37,7 @@ final class TheRProcessResponseCalculator {
 
     return calculateResult(
       lines,
-      calculateTypeAndOutputLineBounds(lines),
+      calculateTypeAndResultLineBounds(lines),
       error
     );
   }
@@ -69,15 +67,15 @@ final class TheRProcessResponseCalculator {
 
   @NotNull
   private static TheRProcessResponse calculateResult(@NotNull final String[] lines,
-                                                     @NotNull final TypeAndOutputLineBounds typeAndOutputLineBounds,
+                                                     @NotNull final TypeAndResultLineBounds typeAndResultLineBounds,
                                                      @NotNull final String error) {
     final StringBuilder sb = new StringBuilder();
 
     final TextRange preCalculatedRange =
-      (typeAndOutputLineBounds.myOutputEnd <= typeAndOutputLineBounds.myOutputBegin) ? TextRange.EMPTY_RANGE : null;
+      (typeAndResultLineBounds.myResultEnd <= typeAndResultLineBounds.myResultBegin) ? TextRange.EMPTY_RANGE : null;
 
-    int outputBegin = 0;
-    int outputEnd = 0;
+    int resultBegin = 0;
+    int resultEnd = 0;
 
     for (int i = 1; i < lines.length - 1; i++) {
       sb.append(lines[i]);
@@ -87,22 +85,22 @@ final class TheRProcessResponseCalculator {
       }
 
       if (preCalculatedRange == null) {
-        outputBegin += calculateOutputBeginAddition(lines, typeAndOutputLineBounds.myOutputBegin, i);
-        outputEnd += calculateOutputEndAddition(lines, typeAndOutputLineBounds.myOutputEnd, i);
+        resultBegin += calculateResultBeginAddition(lines, typeAndResultLineBounds.myResultBegin, i);
+        resultEnd += calculateResultEndAddition(lines, typeAndResultLineBounds.myResultEnd, i);
       }
     }
 
     return new TheRProcessResponse(
       sb.toString(),
-      typeAndOutputLineBounds.myType,
-      preCalculatedRange == null ? new TextRange(outputBegin, outputEnd) : preCalculatedRange,
+      typeAndResultLineBounds.myType,
+      preCalculatedRange == null ? new TextRange(resultBegin, resultEnd) : preCalculatedRange,
       error
     );
   }
 
   @NotNull
-  private static TypeAndOutputLineBounds calculateTypeAndOutputLineBounds(@NotNull final String[] lines) {
-    TypeAndOutputLineBounds candidate = tryJustPlusAndSpace(lines);
+  private static TypeAndResultLineBounds calculateTypeAndResultLineBounds(@NotNull final String[] lines) {
+    TypeAndResultLineBounds candidate = tryJustPlusAndSpace(lines);
 
     if (candidate != null) {
       return candidate;
@@ -148,7 +146,7 @@ final class TheRProcessResponseCalculator {
       return candidate;
     }
 
-    return new TypeAndOutputLineBounds(RESPONSE, 0, lines.length);
+    return new TypeAndResultLineBounds(RESPONSE, 0, lines.length);
   }
 
   private static boolean isSubsequence(@NotNull final CharSequence sequence,
@@ -167,12 +165,12 @@ final class TheRProcessResponseCalculator {
     return true;
   }
 
-  private static int calculateOutputBeginAddition(@NotNull final String[] lines,
-                                                  final int outputLineBegin,
+  private static int calculateResultBeginAddition(@NotNull final String[] lines,
+                                                  final int resultLineBegin,
                                                   final int i) {
     int result = 0;
 
-    if (i < outputLineBegin) {
+    if (i < resultLineBegin) {
       result += lines[i].length();
 
       if (i != lines.length - 2) {
@@ -183,15 +181,15 @@ final class TheRProcessResponseCalculator {
     return result;
   }
 
-  private static int calculateOutputEndAddition(@NotNull final String[] lines,
-                                                final int outputLineEnd,
+  private static int calculateResultEndAddition(@NotNull final String[] lines,
+                                                final int resultLineEnd,
                                                 final int i) {
     int result = 0;
 
-    if (i < outputLineEnd) {
+    if (i < resultLineEnd) {
       result += lines[i].length();
 
-      if (i != lines.length - 2 && i != outputLineEnd - 1) {
+      if (i != lines.length - 2 && i != resultLineEnd - 1) {
         result += TheRDebugConstants.LINE_SEPARATOR.length();
       }
     }
@@ -200,9 +198,9 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryJustPlusAndSpace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryJustPlusAndSpace(@NotNull final String[] lines) {
     if (lines.length == 2 && lines[1].equals(PLUS_AND_SPACE)) {
-      return new TypeAndOutputLineBounds(PLUS, 1, 1);
+      return new TypeAndResultLineBounds(PLUS, 1, 1);
     }
     else {
       return null;
@@ -210,9 +208,9 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryJustBrowseAndSpace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryJustBrowseAndSpace(@NotNull final String[] lines) {
     if (lines.length == 2 && justBrowseAndSpace(lines[1])) {
-      return new TypeAndOutputLineBounds(EMPTY, 1, 1);
+      return new TypeAndResultLineBounds(EMPTY, 1, 1);
     }
     else {
       return null;
@@ -224,9 +222,9 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryDebugging(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryDebugging(@NotNull final String[] lines) {
     if (lines.length > 1 && lines[1].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
-      return new TypeAndOutputLineBounds(DEBUGGING_IN, 1, 1);
+      return new TypeAndResultLineBounds(DEBUGGING_IN, 1, 1);
     }
     else {
       return null;
@@ -234,7 +232,7 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryContinueTrace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryContinueTrace(@NotNull final String[] lines) {
     final int endOffset = -1  // "[1] \"...\"" line
                           - 1 // "exiting from ..." line
                           - 1 // "debugging in..." line
@@ -245,12 +243,12 @@ final class TheRProcessResponseCalculator {
         for (int j = i + 3; j < lines.length; j++) {
           if (lines[j].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
             if (i == 1) {
-              // output could be located inside trace information between "exiting from ..." and "debugging in..." lines
-              return new TypeAndOutputLineBounds(CONTINUE_TRACE, i + 3, j);
+              // result could be located inside trace information between "exiting from ..." and "debugging in..." lines
+              return new TypeAndResultLineBounds(CONTINUE_TRACE, i + 3, j);
             }
             else {
-              // output could be located before trace information
-              return new TypeAndOutputLineBounds(CONTINUE_TRACE, 1, i);
+              // result could be located before trace information
+              return new TypeAndResultLineBounds(CONTINUE_TRACE, 1, i);
             }
           }
         }
@@ -263,7 +261,7 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryEndTrace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryEndTrace(@NotNull final String[] lines) {
     final int endOffset = -2; // "[1] \"...\" and "exiting from ..." lines
     final List<Integer> endTraceIndices = new ArrayList<Integer>();
 
@@ -283,29 +281,29 @@ final class TheRProcessResponseCalculator {
     final Integer lastEndTrace = endTraceIndices.get(endTraceIndices.size() - 1);
 
     if (firstEndTrace == 1) {
-      // output could be located inside trace information between last "exiting from ..." and "debug at #..." lines
+      // result could be located inside trace information between last "exiting from ..." and "debug at #..." lines
       // or just after last "exiting from ..." line if there is no "debug at #..." line
 
       final int exitingFromOffset = lastEndTrace + 2; // "[1] \"...\" and "exiting from ..." lines
-      final int outputLineBegin = findExitingFrom(lines, exitingFromOffset) + 1;
-      final int outputLineEnd = findDebugAt(lines, outputLineBegin);
+      final int resultLineBegin = findExitingFrom(lines, exitingFromOffset) + 1;
+      final int resultLineEnd = findDebugAt(lines, resultLineBegin);
 
-      return new TypeAndOutputLineBounds(type, outputLineBegin, outputLineEnd);
+      return new TypeAndResultLineBounds(type, resultLineBegin, resultLineEnd);
     }
     else {
-      // output could be located before trace information
-      return new TypeAndOutputLineBounds(type, 1, firstEndTrace);
+      // result could be located before trace information
+      return new TypeAndResultLineBounds(type, 1, firstEndTrace);
     }
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryDebugAt(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryDebugAt(@NotNull final String[] lines) {
     if (lines.length > 2) {
       final int debugAtLine = findDebugAt(lines, 0);
       final boolean debugAtExists = debugAtLine < lines.length - 1;
 
       if (debugAtExists) {
-        return new TypeAndOutputLineBounds(DEBUG_AT, 1, debugAtLine);
+        return new TypeAndResultLineBounds(DEBUG_AT, 1, debugAtLine);
       }
       else {
         return null;
@@ -317,7 +315,7 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndOutputLineBounds tryStartTrace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryStartTrace(@NotNull final String[] lines) {
     if (START_TRACE_PATTERN.matcher(lines[1]).find()) {
       final int unbraceFunctionStartTraceLength = 1 // previous command
                                                   + 1 // "Tracing on ... entry"
@@ -326,10 +324,10 @@ final class TheRProcessResponseCalculator {
                                                   + 1; // invitation for the next command
 
       if (lines.length == unbraceFunctionStartTraceLength) {
-        return new TypeAndOutputLineBounds(START_TRACE_UNBRACE, 1, 1);
+        return new TypeAndResultLineBounds(START_TRACE_UNBRACE, 1, 1);
       }
       else {
-        return new TypeAndOutputLineBounds(START_TRACE_BRACE, 1, 1);
+        return new TypeAndResultLineBounds(START_TRACE_BRACE, 1, 1);
       }
     }
 
@@ -383,19 +381,19 @@ final class TheRProcessResponseCalculator {
            readDigitsBackward(sequence, endIndex) == beginIndex - 1;
   }
 
-  private static class TypeAndOutputLineBounds {
+  private static class TypeAndResultLineBounds {
 
     @NotNull
     private final TheRProcessResponseType myType;
 
-    private final int myOutputBegin;
+    private final int myResultBegin;
 
-    private final int myOutputEnd;
+    private final int myResultEnd;
 
-    public TypeAndOutputLineBounds(@NotNull final TheRProcessResponseType type, final int outputBegin, final int outputEnd) {
+    public TypeAndResultLineBounds(@NotNull final TheRProcessResponseType type, final int resultBegin, final int resultEnd) {
       myType = type;
-      myOutputBegin = outputBegin;
-      myOutputEnd = outputEnd;
+      myResultBegin = resultBegin;
+      myResultEnd = resultEnd;
     }
   }
 }

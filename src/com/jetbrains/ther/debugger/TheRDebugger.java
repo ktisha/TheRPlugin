@@ -163,6 +163,11 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   @Override
+  public void appendError(@NotNull final String text) {
+    myOutputReceiver.receive(text); // TODO [dbg][update]
+  }
+
+  @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
     myDebuggers.add(debugger);
     myStack.add(null);

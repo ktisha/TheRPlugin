@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,10 +20,10 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
         return null;
       }
       else {
-        execute(process, enterFunction(var), TheRProcessResponseType.EMPTY);
-        execute(process, exitFunction(var), TheRProcessResponseType.EMPTY);
-        execute(process, traceCommand(var), TheRProcessResponseType.RESPONSE);
-        execute(process, debugCommand(var), TheRProcessResponseType.EMPTY);
+        execute(process, enterFunction(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
+        execute(process, exitFunction(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
+        execute(process, traceCommand(var), TheRProcessResponseType.RESPONSE); // TODO [dbg][update]
+        execute(process, debugCommand(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
       }
     }
 

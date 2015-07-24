@@ -1,8 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
@@ -15,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadVars;
 import static org.junit.Assert.assertEquals;

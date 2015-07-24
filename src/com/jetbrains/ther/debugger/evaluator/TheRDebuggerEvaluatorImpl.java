@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.evaluator;
 
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -8,12 +7,14 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
@@ -41,12 +42,12 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @Override
-  public void evalCondition(@NotNull final String condition, @NotNull final ConditionReceiver receiver) {
+  public void evalCondition(@NotNull final String condition, @NotNull final Receiver<Boolean> receiver) {
     try {
-      receiver.receiveResult(
-        parseTheRBoolean(
-          evaluate(condition)
-        )
+      evaluate(
+        condition,
+        new BooleanResultHandler(),
+        receiver
       );
     }
     catch (final TheRDebuggerException e) {
@@ -55,10 +56,12 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @Override
-  public void evalExpression(@NotNull final String expression, @NotNull final ExpressionReceiver receiver) {
+  public void evalExpression(@NotNull final String expression, @NotNull final Receiver<String> receiver) {
     try {
-      receiver.receiveResult(
-        evaluate(expression)
+      evaluate(
+        expression,
+        new StringResultHandler(),
+        receiver
       );
     }
     catch (final TheRDebuggerException e) {
@@ -66,16 +69,26 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
   }
 
-  @NotNull
-  private String evaluate(@NotNull final String expression) throws TheRDebuggerException {
+  private <T> void evaluate(@NotNull final String expression,
+                            @NotNull final ResultHandler<T> handler,
+                            @NotNull final Receiver<T> receiver) throws TheRDebuggerException {
     final TheRProcessResponse response = myProcess.execute(expression);
+
+    appendError(response.getError(), myDebuggerHandler);
 
     switch (response.getType()) {
       case DEBUGGING_IN:
-        return evaluateFunction();
+        receiver.receiveResult(
+          handler.handle(evaluateFunction())
+        );
+
+        break;
       case EMPTY:
+        receiver.receiveError(response.getError());
+        break;
       case RESPONSE:
-        return response.getOutput();
+        receiver.receiveResult(handler.handle(response.getOutput()));
+        break;
       default:
         throw new UnexpectedResponseException(
           "Actual response type is not the same as expected: " +
@@ -88,25 +101,45 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
   }
 
-  private boolean parseTheRBoolean(@NotNull final String text) {
-    final int prefixLength = "[1] ".length();
-
-    return text.length() > prefixLength && Boolean.parseBoolean(text.substring(prefixLength));
-  }
-
   @NotNull
   private String evaluateFunction() throws TheRDebuggerException {
-    final TheREvaluatedFunctionDebuggerHandler debuggerHandler = new TheREvaluatedFunctionDebuggerHandler(
+    final TheREvaluatedFunctionDebuggerHandler handler = new TheREvaluatedFunctionDebuggerHandler(
       myProcess,
       myDebuggerFactory,
       myDebuggerHandler,
       myVarHandler
     );
 
-    while (debuggerHandler.advance()) {
+    while (handler.advance()) {
     }
 
-    return debuggerHandler.getResult();
+    return handler.getResult();
+  }
+
+  private interface ResultHandler<T> {
+
+    @NotNull
+    T handle(@NotNull final String result);
+  }
+
+  private static class BooleanResultHandler implements ResultHandler<Boolean> {
+
+    @NotNull
+    @Override
+    public Boolean handle(@NotNull final String result) {
+      final int prefixLength = "[1] ".length();
+
+      return result.length() > prefixLength && Boolean.parseBoolean(result.substring(prefixLength));
+    }
+  }
+
+  private static class StringResultHandler implements ResultHandler<String> {
+
+    @NotNull
+    @Override
+    public String handle(@NotNull final String result) {
+      return result;
+    }
   }
 
   private static class TheREvaluatedFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {
@@ -163,6 +196,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     @Override
     public void appendOutput(@NotNull final String text) {
       myPrimaryHandler.appendOutput(text);
+    }
+
+    @Override
+    public void appendError(@NotNull final String text) {
+      myPrimaryHandler.appendError(text);
     }
 
     @Override

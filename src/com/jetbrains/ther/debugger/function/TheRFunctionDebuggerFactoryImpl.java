@@ -1,17 +1,16 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheRScriptReader;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 // TODO [dbg][test]
@@ -24,11 +23,13 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheRLoadableVarHandler varHandler)
     throws TheRDebuggerException {
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE);
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE);
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE);
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
 
     final TheRProcessResponse startTraceResponse = process.execute(EXECUTE_AND_STEP_COMMAND);
+
+    appendError(startTraceResponse.getError(), debuggerHandler);
 
     switch (startTraceResponse.getType()) {
       case START_TRACE_BRACE:

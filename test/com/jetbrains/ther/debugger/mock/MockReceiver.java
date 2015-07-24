@@ -5,27 +5,32 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
-public class MockExpressionReceiver implements TheRDebuggerEvaluator.ExpressionReceiver {
+public class MockReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> { // TODO [dbg][usages]
 
   @NotNull
-  private final String myText;
+  private final T myExpectedResult;
 
   private int myResultReceived;
 
-  public MockExpressionReceiver(@NotNull final String text) {
-    myText = text;
+  public MockReceiver(@NotNull final T expectedResult) {
+    myExpectedResult = expectedResult;
     myResultReceived = 0;
   }
 
   @Override
-  public void receiveResult(@NotNull final String result) {
+  public void receiveResult(@NotNull final T result) {
     myResultReceived++;
 
-    assertEquals(myText, result);
+    assertEquals(myExpectedResult, result);
   }
 
   @Override
   public void receiveError(@NotNull final Exception e) {
+    throw new IllegalStateException("ReceiveError shouldn't be called");
+  }
+
+  @Override
+  public void receiveError(@NotNull final String error) {
     throw new IllegalStateException("ReceiveError shouldn't be called");
   }
 

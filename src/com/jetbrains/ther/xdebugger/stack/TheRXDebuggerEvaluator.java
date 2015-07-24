@@ -39,12 +39,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
     );
   }
 
-  private static class ConditionReceiverImpl implements TheRDebuggerEvaluator.ConditionReceiver {
+  private static class ConditionReceiverImpl implements TheRDebuggerEvaluator.Receiver<Boolean> {
 
     private boolean myResult = false;
 
     @Override
-    public void receiveResult(final boolean result) {
+    public void receiveResult(@NotNull final Boolean result) {
       myResult = result;
     }
 
@@ -52,9 +52,14 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
     public void receiveError(@NotNull final Exception e) {
       // TODO [xdbg][update]
     }
+
+    @Override
+    public void receiveError(@NotNull final String error) {
+      // TODO [xdbg][update]
+    }
   }
 
-  private static class ExpressionReceiverImpl implements TheRDebuggerEvaluator.ExpressionReceiver {
+  private static class ExpressionReceiverImpl implements TheRDebuggerEvaluator.Receiver<String> {
 
     @NotNull
     private final XEvaluationCallback myCallback;
@@ -77,6 +82,11 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void receiveError(@NotNull final Exception e) {
+      // TODO [xdbg][update]
+    }
+
+    @Override
+    public void receiveError(@NotNull final String error) {
       // TODO [xdbg][update]
     }
   }

@@ -1,13 +1,13 @@
 package com.jetbrains.ther.debugger.function;
 
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
 // TODO [dbg][test]
 class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
@@ -33,7 +33,7 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
         handleEndTrace(response);
         break;
       case DEBUGGING_IN:
-        handleDebuggingIn();
+        handleDebuggingIn(response);
         break;
       case RECURSIVE_END_TRACE:
         handleRecursiveEndTrace(response);

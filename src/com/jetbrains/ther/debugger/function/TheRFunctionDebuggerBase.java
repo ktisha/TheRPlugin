@@ -3,15 +3,21 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
-import com.jetbrains.ther.debugger.data.*;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendResult;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
@@ -100,41 +106,45 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   protected abstract void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException;
 
   protected int loadLineNumber() throws TheRDebuggerException {
-    return extractLineNumber(
-      execute(
-        myProcess,
-        EXECUTE_AND_STEP_COMMAND,
-        TheRProcessResponseType.DEBUG_AT
-      ).getOutput(),
-      0
+    final TheRProcessResponse response = execute(
+      myProcess,
+      EXECUTE_AND_STEP_COMMAND,
+      TheRProcessResponseType.DEBUG_AT
     );
+
+    appendError(response.getError(), myDebuggerHandler);
+
+    return extractLineNumber(response.getOutput(), 0);
   }
 
   protected void handleDebugAt(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    appendOutput(response);
+    appendResult(response, myDebuggerHandler);
+    appendError(response.getError(), myDebuggerHandler);
 
     myCurrentLineNumber = extractLineNumber(
       response.getOutput(),
-      findNextLineAfterOutputBegin(response)
+      findNextLineAfterResultBegin(response)
     );
 
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
   protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    appendOutput(response);
+    appendResult(response, myDebuggerHandler);
+    appendError(response.getError(), myDebuggerHandler);
 
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE); // TODO [dbg][update]
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE); // TODO [dbg][update]
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE); // TODO [dbg][update]
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE); // TODO [dbg][update]
 
     myCurrentLineNumber = loadLineNumber();
     myVars = loadUnmodifiableVars(myProcess, myVarHandler);
   }
 
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
-    handleEndTraceOutput(response);
+    handleEndTraceResult(response);
+    appendError(response.getError(), myDebuggerHandler);
 
     final int lastExitingFromEntry = response.getOutput().lastIndexOf(TheRDebugConstants.EXITING_FROM);
 
@@ -145,7 +155,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     resetDebugInformation();
   }
 
-  protected void handleDebuggingIn() throws TheRDebuggerException {
+  protected void handleDebuggingIn(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
+    appendError(response.getError(), myDebuggerHandler);
+
     myDebuggerHandler.appendDebugger(
       myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,
@@ -157,7 +169,8 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleRecursiveEndTrace(@NotNull final TheRProcessResponse response) {
-    handleEndTraceOutput(response);
+    handleEndTraceResult(response);
+    appendError(response.getError(), myDebuggerHandler);
 
     final RecursiveEndTraceData data = calculateRecursiveEndTraceData(response);
 
@@ -175,49 +188,37 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1;
   }
 
-  private void appendOutput(@NotNull final TheRProcessResponse response) {
-    final TextRange outputRange = response.getResultRange();
-
-    if (!outputRange.isEmpty()) {
-      myDebuggerHandler.appendOutput(
-        outputRange.substring(
-          response.getOutput()
-        )
-      );
-    }
-  }
-
-  private int findNextLineAfterOutputBegin(@NotNull final TheRProcessResponse response) {
+  private int findNextLineAfterResultBegin(@NotNull final TheRProcessResponse response) {
     int result = response.getResultRange().getEndOffset();
 
-    final String text = response.getOutput();
+    final String output = response.getOutput();
 
-    while (result < text.length() && StringUtil.isLineBreak(text.charAt(result))) {
+    while (result < output.length() && StringUtil.isLineBreak(output.charAt(result))) {
       result++;
     }
 
     return result;
   }
 
-  private void handleEndTraceOutput(@NotNull final TheRProcessResponse response) {
-    final TextRange outputRange = response.getResultRange();
+  private void handleEndTraceResult(@NotNull final TheRProcessResponse response) {
+    final TextRange resultRange = response.getResultRange();
 
-    if (outputRange.getStartOffset() == 0) {
-      appendOutput(response);
+    if (resultRange.getStartOffset() == 0) {
+      appendResult(response, myDebuggerHandler);
     }
 
-    myResult = outputRange.substring(response.getOutput());
+    myResult = resultRange.substring(response.getOutput());
   }
 
   @NotNull
   private RecursiveEndTraceData calculateRecursiveEndTraceData(@NotNull final TheRProcessResponse response) {
-    final String text = response.getOutput();
+    final String output = response.getOutput();
 
     int lastEntry = -1;
     int currentIndex = 0;
     int count = 0;
 
-    while ((currentIndex = text.indexOf(EXITING_FROM, currentIndex)) != -1) {
+    while ((currentIndex = output.indexOf(EXITING_FROM, currentIndex)) != -1) {
       lastEntry = currentIndex;
 
       count++;
@@ -244,13 +245,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response, final int debugAtIndex) {
-    final String text = response.getOutput();
+    final String output = response.getOutput();
 
-    if (debugAtIndex == text.length() || !text.startsWith(DEBUG_AT, debugAtIndex)) {
+    if (debugAtIndex == output.length() || !output.startsWith(DEBUG_AT, debugAtIndex)) {
       return -1;
     }
 
-    return extractLineNumber(text, debugAtIndex);
+    return extractLineNumber(output, debugAtIndex);
   }
 
   private int findDebugAtIndexInEndTrace(@NotNull final TheRProcessResponse response, final int lastExitingFrom) {
@@ -261,7 +262,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       );
     }
     else {
-      return findNextLineAfterOutputBegin(response);
+      return findNextLineAfterResultBegin(response);
     }
   }
 

@@ -1,17 +1,15 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
-import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 import static org.junit.Assert.*;
 
 public class TheRProcessResponseCalculatorTest {

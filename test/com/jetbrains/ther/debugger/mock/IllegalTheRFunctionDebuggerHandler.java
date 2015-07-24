@@ -12,6 +12,11 @@ public class IllegalTheRFunctionDebuggerHandler implements TheRFunctionDebuggerH
   }
 
   @Override
+  public void appendError(@NotNull final String text) {
+    throw new IllegalStateException("AppendError shouldn't be called");
+  }
+
+  @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
     throw new IllegalStateException("AppendDebugger shouldn't be called");
   }

@@ -4,21 +4,16 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TheRDebuggerEvaluator {
 
-  void evalCondition(@NotNull final String condition, @NotNull final ConditionReceiver receiver);
+  void evalCondition(@NotNull final String condition, @NotNull final Receiver<Boolean> receiver);
 
-  void evalExpression(@NotNull final String expression, @NotNull final ExpressionReceiver receiver);
+  void evalExpression(@NotNull final String expression, @NotNull final Receiver<String> receiver);
 
-  interface ConditionReceiver {
+  interface Receiver<T> {
 
-    void receiveResult(final boolean result);
-
-    void receiveError(@NotNull final Exception e);
-  }
-
-  interface ExpressionReceiver {
-
-    void receiveResult(@NotNull final String result);
+    void receiveResult(@NotNull final T result);
 
     void receiveError(@NotNull final Exception e);
+
+    void receiveError(@NotNull final String error);
   }
 }

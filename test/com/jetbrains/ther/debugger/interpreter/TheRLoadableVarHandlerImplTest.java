@@ -1,15 +1,14 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.mock.IllegalTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.EMPTY;
-import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.EMPTY;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static org.junit.Assert.*;
 
 public class TheRLoadableVarHandlerImplTest {
