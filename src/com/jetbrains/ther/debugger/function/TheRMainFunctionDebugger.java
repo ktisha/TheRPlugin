@@ -149,7 +149,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
         break;
       case RESPONSE:
-        myDebuggerHandler.appendOutput(response.getText());
+        myDebuggerHandler.appendOutput(response.getOutput());
 
         break;
       case PLUS:

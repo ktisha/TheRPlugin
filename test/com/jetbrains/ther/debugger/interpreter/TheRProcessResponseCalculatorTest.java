@@ -409,18 +409,19 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   private void check(@NotNull final String command,
-                     @NotNull final String expectedResponse,
+                     @NotNull final String expectedOutput,
                      @NotNull final String tail,
                      @NotNull final TheRProcessResponseType expectedType,
-                     @NotNull final String expectedOutput) {
+                     @NotNull final String expectedResult) {
     final TheRProcessResponse response = calculate(
-      calculateFinalCommand(command, expectedResponse, tail),
+      calculateFinalCommand(command, expectedOutput, tail),
       ""
     );
 
-    assertEquals(expectedResponse, response.getText());
+    assertEquals(expectedOutput, response.getOutput());
     assertEquals(expectedType, response.getType());
-    assertEquals(expectedOutput, response.getOutputRange().substring(response.getText()));
+    assertEquals(expectedResult, response.getResultRange().substring(response.getOutput()));
+    assertEquals("", response.getError());
   }
 
   private String calculateFinalCommand(@NotNull final String command,

@@ -34,7 +34,7 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
   public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
     myExecuteCalled++;
 
-    return new TheRProcessResponse(myText, myType, myOutputRange);
+    return new TheRProcessResponse(myText, myType, myOutputRange, ""); // TODO [dbg][update]
   }
 
   @Override

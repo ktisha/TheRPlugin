@@ -75,7 +75,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         return evaluateFunction();
       case EMPTY:
       case RESPONSE:
-        return response.getText();
+        return response.getOutput();
       default:
         throw new UnexpectedResponseException(
           "Actual response type is not the same as expected: " +

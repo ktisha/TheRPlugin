@@ -114,7 +114,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     appendOutput(response);
 
     myCurrentLineNumber = extractLineNumber(
-      response.getText(),
+      response.getOutput(),
       findNextLineAfterOutputBegin(response)
     );
 
@@ -136,7 +136,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
     handleEndTraceOutput(response);
 
-    final int lastExitingFromEntry = response.getText().lastIndexOf(TheRDebugConstants.EXITING_FROM);
+    final int lastExitingFromEntry = response.getOutput().lastIndexOf(TheRDebugConstants.EXITING_FROM);
 
     handleEndTraceReturnLineNumber(response, lastExitingFromEntry);
 
@@ -176,21 +176,21 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private void appendOutput(@NotNull final TheRProcessResponse response) {
-    final TextRange outputRange = response.getOutputRange();
+    final TextRange outputRange = response.getResultRange();
 
     if (!outputRange.isEmpty()) {
       myDebuggerHandler.appendOutput(
         outputRange.substring(
-          response.getText()
+          response.getOutput()
         )
       );
     }
   }
 
   private int findNextLineAfterOutputBegin(@NotNull final TheRProcessResponse response) {
-    int result = response.getOutputRange().getEndOffset();
+    int result = response.getResultRange().getEndOffset();
 
-    final String text = response.getText();
+    final String text = response.getOutput();
 
     while (result < text.length() && StringUtil.isLineBreak(text.charAt(result))) {
       result++;
@@ -200,18 +200,18 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private void handleEndTraceOutput(@NotNull final TheRProcessResponse response) {
-    final TextRange outputRange = response.getOutputRange();
+    final TextRange outputRange = response.getResultRange();
 
     if (outputRange.getStartOffset() == 0) {
       appendOutput(response);
     }
 
-    myResult = outputRange.substring(response.getText());
+    myResult = outputRange.substring(response.getOutput());
   }
 
   @NotNull
   private RecursiveEndTraceData calculateRecursiveEndTraceData(@NotNull final TheRProcessResponse response) {
-    final String text = response.getText();
+    final String text = response.getOutput();
 
     int lastEntry = -1;
     int currentIndex = 0;
@@ -244,7 +244,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response, final int debugAtIndex) {
-    final String text = response.getText();
+    final String text = response.getOutput();
 
     if (debugAtIndex == text.length() || !text.startsWith(DEBUG_AT, debugAtIndex)) {
       return -1;
@@ -254,9 +254,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int findDebugAtIndexInEndTrace(@NotNull final TheRProcessResponse response, final int lastExitingFrom) {
-    if (response.getOutputRange().getStartOffset() == 0) {
+    if (response.getResultRange().getStartOffset() == 0) {
       return TheRDebuggerStringUtils.findNextLineBegin(
-        response.getText(),
+        response.getOutput(),
         lastExitingFrom + EXITING_FROM.length()
       );
     }

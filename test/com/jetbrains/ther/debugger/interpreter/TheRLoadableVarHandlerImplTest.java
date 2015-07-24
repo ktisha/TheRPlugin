@@ -161,7 +161,8 @@ public class TheRLoadableVarHandlerImplTest {
         return new TheRProcessResponse(
           "text",
           EMPTY,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -171,7 +172,8 @@ public class TheRLoadableVarHandlerImplTest {
         return new TheRProcessResponse(
           "text",
           EMPTY,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -185,7 +187,8 @@ public class TheRLoadableVarHandlerImplTest {
         return new TheRProcessResponse(
           "text",
           RESPONSE,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -199,7 +202,8 @@ public class TheRLoadableVarHandlerImplTest {
         return new TheRProcessResponse(
           "text",
           EMPTY,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 

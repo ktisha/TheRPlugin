@@ -44,7 +44,7 @@ public class TheRProcessReceiverTest {
     final TheRProcessResponse response = receiver.receive();
 
     assertEquals(TheRProcessResponseType.RESPONSE, response.getType());
-    assertEquals("[1] \"x\"", response.getText());
+    assertEquals("[1] \"x\"", response.getOutput());
 
     assertEquals(1, reader.getCounter());
   }

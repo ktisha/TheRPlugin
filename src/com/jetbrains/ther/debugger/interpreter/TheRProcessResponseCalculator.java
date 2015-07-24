@@ -39,7 +39,8 @@ final class TheRProcessResponseCalculator {
 
     return calculateResult(
       lines,
-      calculateTypeAndOutputLineBounds(lines)
+      calculateTypeAndOutputLineBounds(lines),
+      error
     );
   }
 
@@ -68,7 +69,8 @@ final class TheRProcessResponseCalculator {
 
   @NotNull
   private static TheRProcessResponse calculateResult(@NotNull final String[] lines,
-                                                     @NotNull final TypeAndOutputLineBounds typeAndOutputLineBounds) {
+                                                     @NotNull final TypeAndOutputLineBounds typeAndOutputLineBounds,
+                                                     @NotNull final String error) {
     final StringBuilder sb = new StringBuilder();
 
     final TextRange preCalculatedRange =
@@ -93,7 +95,8 @@ final class TheRProcessResponseCalculator {
     return new TheRProcessResponse(
       sb.toString(),
       typeAndOutputLineBounds.myType,
-      preCalculatedRange == null ? new TextRange(outputBegin, outputEnd) : preCalculatedRange
+      preCalculatedRange == null ? new TextRange(outputBegin, outputEnd) : preCalculatedRange,
+      error
     );
   }
 

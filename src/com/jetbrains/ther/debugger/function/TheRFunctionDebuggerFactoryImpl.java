@@ -37,7 +37,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
-          extractFunctionName(startTraceResponse.getText())
+          extractFunctionName(startTraceResponse.getOutput())
         );
 
       case START_TRACE_UNBRACE:
@@ -46,7 +46,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
-          extractFunctionName(startTraceResponse.getText())
+          extractFunctionName(startTraceResponse.getOutput())
         );
       default:
         throw new UnexpectedResponseException(

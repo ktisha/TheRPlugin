@@ -105,7 +105,8 @@ public class TheRProcessUtilsTest {
         return new TheRProcessResponse(
           "[1] \"x\"\n[2] \"y\"",
           RESPONSE,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -115,7 +116,8 @@ public class TheRProcessUtilsTest {
         return new TheRProcessResponse(
           "typeX",
           RESPONSE,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -125,7 +127,8 @@ public class TheRProcessUtilsTest {
         return new TheRProcessResponse(
           "typeY",
           RESPONSE,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 
@@ -139,7 +142,8 @@ public class TheRProcessUtilsTest {
         return new TheRProcessResponse(
           "valueX",
           RESPONSE,
-          TextRange.EMPTY_RANGE
+          TextRange.EMPTY_RANGE,
+          ""
         );
       }
 

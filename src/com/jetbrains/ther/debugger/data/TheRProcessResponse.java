@@ -2,31 +2,34 @@ package com.jetbrains.ther.debugger.data;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class TheRProcessResponse {
 
   @NotNull
-  private final String myText;
+  private final String myOutput;
 
   @NotNull
   private final TheRProcessResponseType myType;
 
   @NotNull
-  private final TextRange myOutputRange;
+  private final TextRange myResultRange;
 
+  @NotNull
+  private final String myError;
 
-  public TheRProcessResponse(@NotNull final String text,
+  public TheRProcessResponse(@NotNull final String output,
                              @NotNull final TheRProcessResponseType type,
-                             @NotNull final TextRange outputRange) {
-    myText = text;
+                             @NotNull final TextRange resultRange,
+                             @NotNull final String error) {
+    myOutput = output;
     myType = type;
-    myOutputRange = outputRange;
+    myResultRange = resultRange;
+    myError = error;
   }
 
   @NotNull
-  public String getText() {
-    return myText;
+  public String getOutput() {
+    return myOutput;
   }
 
   @NotNull
@@ -35,22 +38,12 @@ public class TheRProcessResponse {
   }
 
   @NotNull
-  public TextRange getOutputRange() {
-    return myOutputRange;
+  public TextRange getResultRange() {
+    return myResultRange;
   }
 
-  @Override
-  public boolean equals(@Nullable final Object o) {
-    if (o == this) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    final TheRProcessResponse response = (TheRProcessResponse)o;
-
-    return myType == response.myType && myText.equals(response.myText) && myOutputRange.equals(response.myOutputRange);
-  }
-
-  @Override
-  public int hashCode() {
-    return 31 * (31 * myText.hashCode() + myType.hashCode()) + myOutputRange.hashCode();
+  @NotNull
+  public String getError() {
+    return myError;
   }
 }

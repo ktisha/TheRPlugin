@@ -32,7 +32,7 @@ public final class TheRProcessUtils {
       );
     }
 
-    return response.getText();
+    return response.getOutput(); // TODO [dbg][update]
   }
 
   @NotNull
