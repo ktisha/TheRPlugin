@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
@@ -17,8 +18,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
@@ -38,6 +38,9 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private final TheRLoadableVarHandler myVarHandler;
 
   @NotNull
+  private final TheROutputReceiver myOutputReceiver;
+
+  @NotNull
   private final TheRScriptReader myScriptReader;
 
   @NotNull
@@ -50,11 +53,13 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheRLoadableVarHandler varHandler,
+                                  @NotNull final TheROutputReceiver outputReceiver,
                                   @NotNull final TheRScriptReader scriptReader) {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myVarHandler = varHandler;
+    myOutputReceiver = outputReceiver;
     myScriptReader = scriptReader;
 
     myVars = Collections.emptyList();
@@ -115,7 +120,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     forwardCommentsAndEmptyLines();
 
     if (!myIsNewDebuggerAppended) {
-      myVars = loadUnmodifiableVars(myProcess, myVarHandler);
+      myVars = loadUnmodifiableVars(myProcess, myVarHandler, myOutputReceiver);
     }
   }
 
@@ -140,7 +145,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    appendError(response.getError(), myDebuggerHandler);
+    appendError(response, myOutputReceiver);
 
     switch (response.getType()) {
       case DEBUGGING_IN:
@@ -151,13 +156,14 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
             myProcess,
             myDebuggerFactory,
             myDebuggerHandler,
-            myVarHandler
+            myVarHandler,
+            myOutputReceiver
           )
         );
 
         break;
       case RESPONSE:
-        myDebuggerHandler.appendOutput(response.getOutput());
+        appendOutput(response, myOutputReceiver);
 
         break;
       case PLUS:

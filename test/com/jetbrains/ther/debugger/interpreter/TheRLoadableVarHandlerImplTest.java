@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.IllegalTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -22,7 +23,8 @@ public class TheRLoadableVarHandlerImplTest {
       new TheRLoadableVarHandlerImpl().handleType(
         process,
         "abc",
-        FUNCTION_TYPE
+        FUNCTION_TYPE,
+        new IllegalTheROutputReceiver()
       )
     );
 
@@ -35,7 +37,8 @@ public class TheRLoadableVarHandlerImplTest {
       new TheRLoadableVarHandlerImpl().handleType(
         new IllegalTheRProcess(),
         enterFunctionName(),
-        FUNCTION_TYPE
+        FUNCTION_TYPE,
+        new IllegalTheROutputReceiver()
       )
     );
   }
@@ -46,7 +49,8 @@ public class TheRLoadableVarHandlerImplTest {
       new TheRLoadableVarHandlerImpl().handleType(
         new IllegalTheRProcess(),
         exitFunctionName(),
-        FUNCTION_TYPE
+        FUNCTION_TYPE,
+        new IllegalTheROutputReceiver()
       )
     );
   }
@@ -58,7 +62,8 @@ public class TheRLoadableVarHandlerImplTest {
       new TheRLoadableVarHandlerImpl().handleType(
         new IllegalTheRProcess(),
         "abc",
-        "typeAbc"
+        "typeAbc",
+        new IllegalTheROutputReceiver()
       )
     );
   }

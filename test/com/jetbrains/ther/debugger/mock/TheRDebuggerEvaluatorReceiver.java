@@ -5,14 +5,14 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
-public class MockReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> { // TODO [dbg][usages]
+public class TheRDebuggerEvaluatorReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> {
 
   @NotNull
   private final T myExpectedResult;
 
   private int myResultReceived;
 
-  public MockReceiver(@NotNull final T expectedResult) {
+  public TheRDebuggerEvaluatorReceiver(@NotNull final T expectedResult) {
     myExpectedResult = expectedResult;
     myResultReceived = 0;
   }

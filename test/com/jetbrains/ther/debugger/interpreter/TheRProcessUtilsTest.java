@@ -1,10 +1,12 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
 import com.jetbrains.ther.debugger.mock.IllegalTheRLoadableVarHandler;
+import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -58,7 +60,8 @@ public class TheRProcessUtilsTest {
     assertTrue(
       loadVars(
         process,
-        handler
+        handler,
+        new IllegalTheROutputReceiver()
       ).isEmpty()
     );
 
@@ -72,7 +75,8 @@ public class TheRProcessUtilsTest {
 
     final List<TheRVar> actual = loadVars(
       process,
-      handler
+      handler,
+      new IllegalTheROutputReceiver()
     );
 
     final List<TheRVar> expected = Collections.singletonList(
@@ -174,7 +178,10 @@ public class TheRProcessUtilsTest {
 
     @Nullable
     @Override
-    public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
+    public String handleType(@NotNull final TheRProcess process,
+                             @NotNull final String var,
+                             @NotNull final String type,
+                             @NotNull final TheROutputReceiver receiver)
       throws TheRDebuggerException {
       if (var.equals("x")) {
         myXTypeAsked = true;

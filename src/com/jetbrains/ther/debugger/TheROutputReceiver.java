@@ -4,5 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TheROutputReceiver {
 
-  void receive(@NotNull final String message);
+  void receiveOutput(@NotNull final String output);
+
+  void receiveError(@NotNull final String error);
 }

@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,17 +14,20 @@ public class TheRLoadableVarHandlerImpl implements TheRLoadableVarHandler {
 
   @Override
   @Nullable
-  public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
+  public String handleType(@NotNull final TheRProcess process,
+                           @NotNull final String var,
+                           @NotNull final String type,
+                           @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     if (type.equals(FUNCTION_TYPE)) {
       if (isService(var)) {
         return null;
       }
       else {
-        execute(process, enterFunction(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
-        execute(process, exitFunction(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
-        execute(process, traceCommand(var), TheRProcessResponseType.RESPONSE); // TODO [dbg][update]
-        execute(process, debugCommand(var), TheRProcessResponseType.EMPTY); // TODO [dbg][update]
+        execute(process, enterFunction(var), TheRProcessResponseType.EMPTY, receiver);
+        execute(process, exitFunction(var), TheRProcessResponseType.EMPTY, receiver);
+        execute(process, traceCommand(var), TheRProcessResponseType.RESPONSE, receiver);
+        execute(process, debugCommand(var), TheRProcessResponseType.EMPTY, receiver);
       }
     }
 

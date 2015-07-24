@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.mock;
 
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -16,7 +17,8 @@ public class IllegalTheRFunctionDebuggerFactory implements TheRFunctionDebuggerF
   public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                          @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                         @NotNull final TheRLoadableVarHandler varHandler)
+                                                         @NotNull final TheRLoadableVarHandler varHandler,
+                                                         @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
     throw new IllegalStateException("GetNotMainFunctionDebugger shouldn't be called");
   }
@@ -27,6 +29,7 @@ public class IllegalTheRFunctionDebuggerFactory implements TheRFunctionDebuggerF
                                                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                       @NotNull final TheRLoadableVarHandler varHandler,
+                                                      @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {
     throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
   }

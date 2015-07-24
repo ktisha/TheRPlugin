@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.mock;
 
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -10,7 +11,10 @@ public class IllegalTheRLoadableVarHandler implements TheRLoadableVarHandler {
 
   @Nullable
   @Override
-  public String handleType(@NotNull final TheRProcess process, @NotNull final String var, @NotNull final String type)
+  public String handleType(@NotNull final TheRProcess process,
+                           @NotNull final String var,
+                           @NotNull final String type,
+                           @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     throw new IllegalStateException("HandleType shouldn't be called");
   }

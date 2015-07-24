@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
@@ -21,15 +22,16 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                          @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                         @NotNull final TheRLoadableVarHandler varHandler)
+                                                         @NotNull final TheRLoadableVarHandler varHandler,
+                                                         @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE); // TODO [dbg][update]
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
+    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
 
     final TheRProcessResponse startTraceResponse = process.execute(EXECUTE_AND_STEP_COMMAND);
 
-    appendError(startTraceResponse.getError(), debuggerHandler);
+    appendError(startTraceResponse, outputReceiver);
 
     switch (startTraceResponse.getType()) {
       case START_TRACE_BRACE:
@@ -38,6 +40,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
+          outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
         );
 
@@ -47,6 +50,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           debuggerFactory,
           debuggerHandler,
           varHandler,
+          outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
         );
       default:
@@ -67,9 +71,10 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                       @NotNull final TheRLoadableVarHandler varHandler,
+                                                      @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
-      process, debuggerFactory, debuggerHandler, varHandler, scriptReader
+      process, debuggerFactory, debuggerHandler, varHandler, outputReceiver, scriptReader
     );
   }
 

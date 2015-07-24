@@ -82,6 +82,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
         myDebuggerFactory,
         this,
         myVarHandler,
+        myOutputReceiver,
         myScriptReader
       )
     );
@@ -107,8 +108,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
       myProcess,
       myDebuggerFactory,
-      this,
-      myVarHandler
+      myVarHandler,
+      myOutputReceiver
     );
 
     myStack.set(
@@ -155,16 +156,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     }
 
     myProcess.stop();
-  }
-
-  @Override
-  public void appendOutput(@NotNull final String text) {
-    myOutputReceiver.receive(text);
-  }
-
-  @Override
-  public void appendError(@NotNull final String text) {
-    myOutputReceiver.receive(text); // TODO [dbg][update]
   }
 
   @Override

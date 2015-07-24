@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRVar;
@@ -36,11 +37,11 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      new IllegalTheROutputReceiver()
     );
 
-    final MockConditionReceiver receiver = new MockConditionReceiver(true);
+    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(true);
 
     evaluator.evalCondition("5 > 4", receiver);
 
@@ -62,11 +63,11 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      new IllegalTheROutputReceiver()
     );
 
-    final MockConditionReceiver receiver = new MockConditionReceiver(false);
+    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(false);
 
     evaluator.evalCondition("5 < 4", receiver);
 
@@ -88,11 +89,11 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      new IllegalTheROutputReceiver()
     );
 
-    final MockConditionReceiver receiver = new MockConditionReceiver(false);
+    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(false);
 
     evaluator.evalCondition("def", receiver);
 
@@ -112,11 +113,11 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      new IllegalTheROutputReceiver()
     );
 
-    final ErrorReceiver receiver = new ErrorReceiver();
+    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
 
     evaluator.evalExpression("def <- function() {", receiver);
 
@@ -133,19 +134,22 @@ public class TheRDebuggerEvaluatorImplTest {
       "error"
     );
 
+    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("error");
+
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      null,
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      outputReceiver
     );
 
-    final ErrorReceiver receiver = new ErrorReceiver();
+    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
 
     evaluator.evalExpression("abc", receiver);
 
     assertEquals(1, process.getExecuteCalled());
     assertEquals(1, receiver.getErrorReceived());
+    assertEquals(0, outputReceiver.getErrorReceived());
   }
 
   @Test
@@ -155,11 +159,11 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      new IllegalTheROutputReceiver()
     );
 
-    final ErrorReceiver receiver = new ErrorReceiver();
+    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
 
     evaluator.evalExpression("def", receiver);
 
@@ -175,22 +179,25 @@ public class TheRDebuggerEvaluatorImplTest {
       text,
       TheRProcessResponseType.RESPONSE,
       TextRange.allOf(text),
-      ""
+      "abc"
     );
+
+    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("abc");
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      outputReceiver
     );
 
-    final MockReceiver receiver = new MockReceiver(text);
+    final TheRDebuggerEvaluatorReceiver<String> receiver = new TheRDebuggerEvaluatorReceiver<String>(text);
 
     evaluator.evalExpression("def(c(1:5))", receiver);
 
     assertEquals(1, process.getExecuteCalled());
     assertEquals(1, receiver.getResultReceived());
+    assertEquals(1, outputReceiver.getErrorReceived());
   }
 
   @Test
@@ -201,19 +208,20 @@ public class TheRDebuggerEvaluatorImplTest {
       "debugging in: " + command,
       TheRProcessResponseType.DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
-      ""
+      "abc"
     );
 
     final DebuggedTheRFunctionDebuggerFactory debuggerFactory = new DebuggedTheRFunctionDebuggerFactory();
+    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("abc");
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       debuggerFactory,
-      new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheRLoadableVarHandler()
+      new IllegalTheRLoadableVarHandler(),
+      outputReceiver
     );
 
-    final MockReceiver receiver = new MockReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver<String> receiver = new TheRDebuggerEvaluatorReceiver<String>("[1] 1 2 3");
 
     evaluator.evalExpression(command, receiver);
 
@@ -221,6 +229,36 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, debuggerFactory.getNotMainCalled());
     assertEquals(1, debuggerFactory.getAdvanceCalled());
     assertEquals(1, receiver.getResultReceived());
+    assertEquals(1, outputReceiver.getErrorReceived());
+  }
+
+  private static class ErrorOutputReceiver implements TheROutputReceiver {
+
+    @NotNull
+    private final String myExpectedError;
+
+    private int myErrorReceived;
+
+    public ErrorOutputReceiver(@NotNull final String expectedError) {
+      myExpectedError = expectedError;
+      myErrorReceived = 0;
+    }
+
+    @Override
+    public void receiveOutput(@NotNull final String output) {
+      throw new IllegalStateException("ReceiveOutput shouldn't be called");
+    }
+
+    @Override
+    public void receiveError(@NotNull final String error) {
+      myErrorReceived++;
+
+      assertEquals(myExpectedError, error);
+    }
+
+    public int getErrorReceived() {
+      return myErrorReceived;
+    }
   }
 
   private static class ExceptionDuringExecutionTheRProcess implements TheRProcess {
@@ -254,7 +292,8 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheRLoadableVarHandler varHandler)
+                                                           @NotNull final TheRLoadableVarHandler varHandler,
+                                                           @NotNull final TheROutputReceiver outputReceiver)
       throws TheRDebuggerException {
       myNotMainCalled++;
 
@@ -300,6 +339,7 @@ public class TheRDebuggerEvaluatorImplTest {
                                                         @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                         @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                         @NotNull final TheRLoadableVarHandler varHandler,
+                                                        @NotNull final TheROutputReceiver outputReceiver,
                                                         @NotNull final TheRScriptReader scriptReader) {
       throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
     }

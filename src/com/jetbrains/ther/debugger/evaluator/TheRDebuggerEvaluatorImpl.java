@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.evaluator;
 
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -22,23 +23,22 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private final TheRProcess myProcess;
 
   @NotNull
-  private final TheRFunctionDebuggerFactory myDebuggerFactory;
+  private final TheRFunctionDebuggerFactory myFactory;
 
   @NotNull
-  private final TheRFunctionDebuggerHandler myDebuggerHandler;
+  private final TheRLoadableVarHandler myHandler;
 
   @NotNull
-  private final TheRLoadableVarHandler myVarHandler;
+  private final TheROutputReceiver myReceiver;
 
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
-                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                   @NotNull final TheRLoadableVarHandler varHandler) {
-
+                                   @NotNull final TheRFunctionDebuggerFactory factory,
+                                   @NotNull final TheRLoadableVarHandler handler,
+                                   @NotNull final TheROutputReceiver receiver) {
     myProcess = process;
-    myDebuggerFactory = debuggerFactory;
-    myDebuggerHandler = debuggerHandler;
-    myVarHandler = varHandler;
+    myFactory = factory;
+    myHandler = handler;
+    myReceiver = receiver;
   }
 
   @Override
@@ -74,20 +74,30 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
                             @NotNull final Receiver<T> receiver) throws TheRDebuggerException {
     final TheRProcessResponse response = myProcess.execute(expression);
 
-    appendError(response.getError(), myDebuggerHandler);
-
     switch (response.getType()) {
       case DEBUGGING_IN:
+        appendError(response, myReceiver);
+
         receiver.receiveResult(
           handler.handle(evaluateFunction())
         );
 
         break;
       case EMPTY:
-        receiver.receiveError(response.getError());
+        final String error = response.getError();
+
+        if (!error.isEmpty()) {
+          receiver.receiveError(error);
+        }
+
         break;
       case RESPONSE:
-        receiver.receiveResult(handler.handle(response.getOutput()));
+        appendError(response, myReceiver);
+
+        receiver.receiveResult(
+          handler.handle(response.getOutput())
+        );
+
         break;
       default:
         throw new UnexpectedResponseException(
@@ -105,9 +115,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private String evaluateFunction() throws TheRDebuggerException {
     final TheREvaluatedFunctionDebuggerHandler handler = new TheREvaluatedFunctionDebuggerHandler(
       myProcess,
-      myDebuggerFactory,
-      myDebuggerHandler,
-      myVarHandler
+      myFactory,
+      myHandler,
+      myReceiver
     );
 
     while (handler.advance()) {
@@ -147,17 +157,13 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     @NotNull
     private final List<TheRFunctionDebugger> myDebuggers;
 
-    @NotNull
-    private final TheRFunctionDebuggerHandler myPrimaryHandler;
-
     private int myDropFrames;
 
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                                @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                @NotNull final TheRLoadableVarHandler varHandler) throws TheRDebuggerException {
+                                                @NotNull final TheRLoadableVarHandler varHandler,
+                                                @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
-      myPrimaryHandler = debuggerHandler;
       myDropFrames = 1;
 
       appendDebugger(
@@ -165,7 +171,8 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           process,
           debuggerFactory,
           this,
-          varHandler
+          varHandler,
+          outputReceiver
         )
       );
     }
@@ -191,16 +198,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     @NotNull
     public String getResult() {
       return topDebugger().getResult();
-    }
-
-    @Override
-    public void appendOutput(@NotNull final String text) {
-      myPrimaryHandler.appendOutput(text);
-    }
-
-    @Override
-    public void appendError(@NotNull final String text) {
-      myPrimaryHandler.appendError(text);
     }
 
     @Override

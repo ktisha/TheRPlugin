@@ -82,12 +82,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void receiveError(@NotNull final Exception e) {
-      // TODO [xdbg][update]
+      receiveError(e.getMessage());
     }
 
     @Override
     public void receiveError(@NotNull final String error) {
-      // TODO [xdbg][update]
+      myCallback.errorOccurred(error);
     }
   }
 }

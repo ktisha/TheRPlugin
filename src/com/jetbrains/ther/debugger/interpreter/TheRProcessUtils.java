@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LS_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.TYPEOF_COMMAND;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
@@ -34,26 +36,43 @@ public final class TheRProcessUtils {
   }
 
   @NotNull
-  public static List<TheRVar> loadUnmodifiableVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler)
+  public static String execute(@NotNull final TheRProcess process,
+                               @NotNull final String command,
+                               @NotNull final TheRProcessResponseType expectedType,
+                               @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
+    final TheRProcessResponse response = execute(process, command, expectedType);
+
+    appendError(response, receiver);
+
+    return response.getOutput();
+  }
+
+  @NotNull
+  public static List<TheRVar> loadUnmodifiableVars(@NotNull final TheRProcess process,
+                                                   @NotNull final TheRLoadableVarHandler handler,
+                                                   @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     return Collections.unmodifiableList(
-      loadVars(process, handler)
+      loadVars(process, handler, receiver)
     );
   }
 
   @NotNull
-  public static List<TheRVar> loadVars(@NotNull final TheRProcess process, @NotNull final TheRLoadableVarHandler handler) // TODO [dbg][update]
+  public static List<TheRVar> loadVars(@NotNull final TheRProcess process,
+                                       @NotNull final TheRLoadableVarHandler handler,
+                                       @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     final String text = execute(
       process,
       LS_COMMAND,
-      RESPONSE
-    ).getOutput();
+      RESPONSE,
+      receiver
+    );
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
 
     for (final String variableName : calculateVariableNames(text)) {
-      final TheRVar var = loadVar(process, handler, variableName);
+      final TheRVar var = loadVar(process, handler, variableName, receiver);
 
       if (var != null) {
         vars.add(var);
@@ -83,22 +102,29 @@ public final class TheRProcessUtils {
   @Nullable
   private static TheRVar loadVar(@NotNull final TheRProcess process,
                                  @NotNull final TheRLoadableVarHandler handler,
-                                 @NotNull final String var) throws TheRDebuggerException {
+                                 @NotNull final String var,
+                                 @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
     final String type = handler.handleType(
       process,
       var,
       execute(
         process,
         TYPEOF_COMMAND + "(" + var + ")",
-        RESPONSE
-      ).getOutput()
+        RESPONSE,
+        receiver
+      ),
+      receiver
     );
 
     if (type == null) {
       return null;
     }
 
-    return new TheRVar(var, type, loadValue(process, handler, var, type));
+    return new TheRVar(
+      var,
+      type,
+      loadValue(process, handler, var, type, receiver)
+    );
   }
 
   @Nullable
@@ -117,15 +143,17 @@ public final class TheRProcessUtils {
   private static String loadValue(@NotNull final TheRProcess process,
                                   @NotNull final TheRLoadableVarHandler handler,
                                   @NotNull final String var,
-                                  @NotNull final String type) throws TheRDebuggerException {
+                                  @NotNull final String type,
+                                  @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
     return handler.handleValue(
       var,
       type,
       execute(
         process,
         TheRProcessCommandUtils.valueCommand(var, type),
-        RESPONSE
-      ).getOutput()
+        RESPONSE,
+        receiver
+      )
     );
   }
 }

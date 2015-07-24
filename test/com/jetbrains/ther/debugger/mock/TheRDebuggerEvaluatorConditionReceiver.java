@@ -5,13 +5,13 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
-public class MockConditionReceiver implements TheRDebuggerEvaluator.Receiver<Boolean> {
+public class TheRDebuggerEvaluatorConditionReceiver implements TheRDebuggerEvaluator.Receiver<Boolean> {
 
   private final boolean myExpectedResult;
 
   private int myResultReceived;
 
-  public MockConditionReceiver(final boolean result) {
+  public TheRDebuggerEvaluatorConditionReceiver(final boolean result) {
     myExpectedResult = result;
     myResultReceived = 0;
   }

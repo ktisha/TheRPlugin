@@ -3,7 +3,7 @@ package com.jetbrains.ther.debugger.mock;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 
-public class ErrorReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> { // TODO [dbg][usages]
+public class TheRDebuggerEvaluatorErrorReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> {
 
   private int myErrorReceived = 0;
 

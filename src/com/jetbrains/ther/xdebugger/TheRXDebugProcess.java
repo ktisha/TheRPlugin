@@ -6,6 +6,7 @@ import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -227,17 +228,23 @@ class TheRXDebugProcess extends XDebugProcess {
   }
 
   private void printInterpreterOutput() {
-    final Queue<String> messages = myOutputBuffer.getMessages();
+    final Queue<TheRXOutputBuffer.Entry> messages = myOutputBuffer.getMessages();
 
     while (!messages.isEmpty()) {
-      final String message = messages.poll();
+      final TheRXOutputBuffer.Entry message = messages.poll();
 
       if (message != null) {
-        myConsole.print(message, ConsoleViewContentType.NORMAL_OUTPUT);
-        myConsole.print(
-          TheRDebugConstants.LINE_SEPARATOR,
-          ConsoleViewContentType.NORMAL_OUTPUT
-        );
+        final String text = message.getText();
+        final ConsoleViewContentType type = message.getType();
+
+        myConsole.print(text, type);
+
+        if (!StringUtil.endsWithLineBreak(text)) {
+          myConsole.print(
+            TheRDebugConstants.LINE_SEPARATOR,
+            type
+          );
+        }
       }
     }
   }
