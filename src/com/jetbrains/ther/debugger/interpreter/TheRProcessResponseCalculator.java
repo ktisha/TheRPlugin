@@ -33,7 +33,7 @@ final class TheRProcessResponseCalculator {
   }
 
   @NotNull
-  public static TheRProcessResponse calculate(@NotNull final CharSequence response) {
+  public static TheRProcessResponse calculate(@NotNull final CharSequence response, @NotNull final String error) {
     final String[] lines =
       LINE_BREAK_PATTERN.split(response); // Don't forget that first line is command and the last is invitation for the next one
 

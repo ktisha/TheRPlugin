@@ -414,7 +414,8 @@ public class TheRProcessResponseCalculatorTest {
                      @NotNull final TheRProcessResponseType expectedType,
                      @NotNull final String expectedOutput) {
     final TheRProcessResponse response = calculate(
-      calculateFinalCommand(command, expectedResponse, tail)
+      calculateFinalCommand(command, expectedResponse, tail),
+      ""
     );
 
     assertEquals(expectedResponse, response.getText());

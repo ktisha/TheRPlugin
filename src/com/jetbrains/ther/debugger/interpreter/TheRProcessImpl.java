@@ -24,7 +24,10 @@ public class TheRProcessImpl implements TheRProcess {
     myProcess = initProcess(interpreterPath);
 
     mySender = new TheRProcessSender(new OutputStreamWriter(myProcess.getOutputStream()));
-    myReceiver = new TheRProcessReceiver(new InputStreamReader(myProcess.getInputStream()));
+    myReceiver = new TheRProcessReceiver(
+      new InputStreamReader(myProcess.getInputStream()),
+      new InputStreamReader(myProcess.getErrorStream())
+    );
 
     initInterpreter();
   }

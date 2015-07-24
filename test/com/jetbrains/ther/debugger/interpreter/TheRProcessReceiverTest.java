@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger.interpreter;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.data.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.mock.EmptyReader;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class TheRProcessReceiverTest {
   @Test
   public void sleepIncreasing() throws TheRDebuggerException {
     final IncreasingMockReader reader = new IncreasingMockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader());
 
     receiver.receive();
 
@@ -28,7 +29,7 @@ public class TheRProcessReceiverTest {
   @Test
   public void sleepResetting() throws TheRDebuggerException {
     final ResettingMockReader reader = new ResettingMockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader());
 
     receiver.receive();
 
@@ -38,7 +39,7 @@ public class TheRProcessReceiverTest {
   @Test
   public void responseHandling() throws TheRDebuggerException {
     final MockReader reader = new MockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader);
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader()); // TODO [dbg][update]
 
     final TheRProcessResponse response = receiver.receive();
 

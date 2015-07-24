@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.interpreter;
 
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRProcessResponse;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import org.jetbrains.annotations.NotNull;
@@ -8,63 +7,76 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.Reader;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEFAULT_BUFFER;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.INITIAL_SLEEP;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
+
 class TheRProcessReceiver {
 
   @NotNull
-  private final Reader myReader;
+  private final Reader myOutputReader;
+
+  @NotNull
+  private final Reader myErrorReader;
 
   @NotNull
   private final char[] myBuffer;
 
-  public TheRProcessReceiver(@NotNull final Reader reader) {
-    myReader = reader;
-    myBuffer = new char[TheRDebugConstants.DEFAULT_BUFFER];
+  public TheRProcessReceiver(@NotNull final Reader outputReader, @NotNull final Reader errorReader) {
+    myOutputReader = outputReader;
+    myErrorReader = errorReader;
+
+    myBuffer = new char[DEFAULT_BUFFER];
   }
 
   @NotNull
   public TheRProcessResponse receive() throws TheRDebuggerException {
     final StringBuilder sb = new StringBuilder();
-    long millis = TheRDebugConstants.INITIAL_SLEEP;
+    long millis = INITIAL_SLEEP;
 
-    while (true) {
-      if (!appendResponse(sb)) {
-        sleep(millis);
+    try {
+      while (true) {
+        if (!appendOutput(sb)) {
+          Thread.sleep(millis);
 
-        millis *= 2;
-      }
-      else {
-        if (TheRProcessResponseCalculator.isComplete(sb)) {
-          return TheRProcessResponseCalculator.calculate(sb);
+          millis *= 2;
         }
+        else {
+          if (isComplete(sb)) {
+            return calculate(sb, readError());
+          }
 
-        millis = TheRDebugConstants.INITIAL_SLEEP;
+          millis = INITIAL_SLEEP;
+        }
       }
     }
-  }
-
-  private boolean appendResponse(@NotNull final StringBuilder sb) throws TheRDebuggerException {
-    final int length = read();
-
-    sb.append(myBuffer, 0, length);
-
-    return length != 0;
-  }
-
-  private void sleep(final long millis) throws TheRDebuggerException {
-    try {
-      Thread.sleep(millis);
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
     }
     catch (final InterruptedException e) {
       throw new TheRDebuggerException(e);
     }
   }
 
-  private int read() throws TheRDebuggerException {
-    try {
-      return myReader.read(myBuffer);
+  private boolean appendOutput(@NotNull final StringBuilder sb) throws IOException {
+    final int length = myOutputReader.read(myBuffer);
+
+    sb.append(myBuffer, 0, length);
+
+    return length != 0;
+  }
+
+  @NotNull
+  private String readError() throws IOException {
+    final StringBuilder sb = new StringBuilder();
+
+    while (myErrorReader.ready()) {
+      final int length = myErrorReader.read(myBuffer);
+
+      sb.append(myBuffer, 0, length);
     }
-    catch (final IOException e) {
-      throw new TheRDebuggerException(e);
-    }
+
+    return sb.toString();
   }
 }
