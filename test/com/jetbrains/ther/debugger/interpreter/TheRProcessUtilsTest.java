@@ -26,7 +26,7 @@ public class TheRProcessUtilsTest {
   @Test(expected = TheRDebuggerException.class)
   public void invalidCommandExecuting() throws TheRDebuggerException {
     final String text = "abc";
-    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text), "");
 
     execute(
       process,
@@ -38,7 +38,7 @@ public class TheRProcessUtilsTest {
   @Test
   public void correctCommandExecuting() throws TheRDebuggerException {
     final String text = "abc";
-    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text), "");
 
     assertEquals(
       text,
@@ -53,7 +53,7 @@ public class TheRProcessUtilsTest {
   @Test
   public void noVarsLoading() throws TheRDebuggerException {
     final String text = "character(0)";
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text));
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(text, RESPONSE, TextRange.allOf(text), "");
 
     final TheRLoadableVarHandler handler = new IllegalTheRLoadableVarHandler();
 

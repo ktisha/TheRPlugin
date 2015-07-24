@@ -18,14 +18,19 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
   @NotNull
   private final TextRange myOutputRange;
 
+  @NotNull
+  private final String myError;
+
   private int myExecuteCalled;
 
   public AlwaysSameResponseTheRProcess(@NotNull final String text,
                                        @NotNull final TheRProcessResponseType type,
-                                       @NotNull final TextRange outputRange) {
+                                       @NotNull final TextRange outputRange,
+                                       @NotNull final String error) {
     myText = text;
     myType = type;
     myOutputRange = outputRange;
+    myError = error;
     myExecuteCalled = 0;
   }
 
@@ -34,7 +39,7 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
   public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
     myExecuteCalled++;
 
-    return new TheRProcessResponse(myText, myType, myOutputRange, ""); // TODO [dbg][update]
+    return new TheRProcessResponse(myText, myType, myOutputRange, myError);
   }
 
   @Override

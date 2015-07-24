@@ -105,7 +105,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         myProcess,
         EXECUTE_AND_STEP_COMMAND,
         TheRProcessResponseType.DEBUG_AT
-      ),
+      ).getOutput(),
       0
     );
   }

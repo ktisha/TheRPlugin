@@ -21,9 +21,9 @@ import static com.jetbrains.ther.debugger.data.TheRProcessResponseType.RESPONSE;
 public final class TheRProcessUtils {
 
   @NotNull
-  public static String execute(@NotNull final TheRProcess process,
-                               @NotNull final String command,
-                               @NotNull final TheRProcessResponseType expectedType) throws TheRDebuggerException {
+  public static TheRProcessResponse execute(@NotNull final TheRProcess process,
+                                            @NotNull final String command,
+                                            @NotNull final TheRProcessResponseType expectedType) throws TheRDebuggerException {
     final TheRProcessResponse response = process.execute(command);
 
     if (response.getType() != expectedType) {
@@ -32,7 +32,7 @@ public final class TheRProcessUtils {
       );
     }
 
-    return response.getOutput(); // TODO [dbg][update]
+    return response;
   }
 
   @NotNull
@@ -50,7 +50,7 @@ public final class TheRProcessUtils {
       process,
       LS_COMMAND,
       RESPONSE
-    );
+    ).getOutput();
 
     final List<TheRVar> vars = new ArrayList<TheRVar>();
 
@@ -93,7 +93,7 @@ public final class TheRProcessUtils {
         process,
         TYPEOF_COMMAND + "(" + var + ")",
         RESPONSE
-      )
+      ).getOutput()
     );
 
     if (type == null) {
@@ -127,7 +127,7 @@ public final class TheRProcessUtils {
         process,
         TheRProcessCommandUtils.valueCommand(var, type),
         RESPONSE
-      )
+      ).getOutput()
     );
   }
 }

@@ -29,7 +29,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       text,
       TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text)
+      TextRange.allOf(text),
+      ""
     );
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -54,7 +55,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       text,
       TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text)
+      TextRange.allOf(text),
+      ""
     );
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -79,7 +81,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       text,
       TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text)
+      TextRange.allOf(text),
+      ""
     );
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -102,7 +105,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "",
       TheRProcessResponseType.PLUS,
-      TextRange.EMPTY_RANGE
+      TextRange.EMPTY_RANGE,
+      ""
     );
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -146,7 +150,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       text,
       TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text)
+      TextRange.allOf(text),
+      ""
     );
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -171,8 +176,10 @@ public class TheRDebuggerEvaluatorImplTest {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "debugging in: " + command,
       TheRProcessResponseType.DEBUGGING_IN,
-      TextRange.EMPTY_RANGE
+      TextRange.EMPTY_RANGE,
+      ""
     );
+
     final DebuggedTheRFunctionDebuggerFactory debuggerFactory = new DebuggedTheRFunctionDebuggerFactory();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(

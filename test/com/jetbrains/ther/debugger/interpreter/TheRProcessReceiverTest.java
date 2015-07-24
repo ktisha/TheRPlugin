@@ -38,15 +38,18 @@ public class TheRProcessReceiverTest {
 
   @Test
   public void responseHandling() throws TheRDebuggerException {
-    final MockReader reader = new MockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader()); // TODO [dbg][update]
+    final MockOutputReader outputReader = new MockOutputReader();
+    final MockErrorReader errorReader = new MockErrorReader();
 
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(outputReader, errorReader);
     final TheRProcessResponse response = receiver.receive();
 
     assertEquals(TheRProcessResponseType.RESPONSE, response.getType());
     assertEquals("[1] \"x\"", response.getOutput());
+    assertEquals("error", response.getError());
 
-    assertEquals(1, reader.getCounter());
+    assertEquals(1, outputReader.getCounter());
+    assertEquals(1, errorReader.getCounter());
   }
 
   private static class IncreasingMockReader extends Reader {
@@ -199,13 +202,44 @@ public class TheRProcessReceiverTest {
     }
   }
 
-  private static class MockReader extends Reader {
+  private static class MockOutputReader extends Reader {
 
     private int myCounter = 0;
 
     @Override
     public int read(@NotNull final char[] cbuf, final int off, final int len) throws IOException {
       final String response = "ls()\n[1] \"x\"\nBrowse[3]> ";
+
+      for (int index = 0; index < response.length(); index++) {
+        cbuf[index] = response.charAt(index);
+      }
+
+      myCounter++;
+
+      return response.length();
+    }
+
+    @Override
+    public void close() throws IOException {
+    }
+
+    public int getCounter() {
+      return myCounter;
+    }
+  }
+
+  private static class MockErrorReader extends Reader {
+
+    private int myCounter = 0;
+
+    @Override
+    public boolean ready() throws IOException {
+      return myCounter == 0;
+    }
+
+    @Override
+    public int read(@NotNull final char[] cbuf, final int off, final int len) throws IOException {
+      final String response = "error";
 
       for (int index = 0; index < response.length(); index++) {
         cbuf[index] = response.charAt(index);
