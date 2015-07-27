@@ -5,22 +5,17 @@ import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
@@ -35,37 +30,25 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
-  private final TheRLoadableVarHandler myVarHandler;
-
-  @NotNull
   private final TheROutputReceiver myOutputReceiver;
 
   @NotNull
   private final TheRScriptReader myScriptReader;
 
-  @NotNull
-  private List<TheRVar> myVars;
-
   private boolean myIsRunning;
-  private boolean myIsNewDebuggerAppended;
 
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                  @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheROutputReceiver outputReceiver,
                                   @NotNull final TheRScriptReader scriptReader) {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
-    myVarHandler = varHandler;
     myOutputReceiver = outputReceiver;
     myScriptReader = scriptReader;
 
-    myVars = Collections.emptyList();
-
     myIsRunning = false;
-    myIsNewDebuggerAppended = false;
   }
 
   @NotNull
@@ -75,11 +58,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       TheRDebugConstants.MAIN_FUNCTION_NAME,
       getCurrentLineNumber()
     );
-  }
-
-  @NotNull
-  public List<TheRVar> getVars() {
-    return myVars;
   }
 
   @Override
@@ -93,7 +71,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
 
     myIsRunning = true;
-    myIsNewDebuggerAppended = false;
 
     boolean accepted = false;
     boolean isFirstLine = true;
@@ -118,10 +95,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
 
     forwardCommentsAndEmptyLines();
-
-    if (!myIsNewDebuggerAppended) {
-      myVars = loadUnmodifiableVars(myProcess, myVarHandler, myOutputReceiver);
-    }
   }
 
   @NotNull
@@ -149,14 +122,11 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
     switch (response.getType()) {
       case DEBUGGING_IN:
-        myIsNewDebuggerAppended = true;
-
         myDebuggerHandler.appendDebugger(
           myDebuggerFactory.getNotMainFunctionDebugger(
             myProcess,
             myDebuggerFactory,
             myDebuggerHandler,
-            myVarHandler,
             myOutputReceiver
           )
         );

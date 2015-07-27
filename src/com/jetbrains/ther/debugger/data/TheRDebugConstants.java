@@ -43,7 +43,7 @@ public final class TheRDebugConstants {
   public static final String NOP_COMMAND = "#";
 
   @NotNull
-  public static final String LS_COMMAND = "ls()";
+  public static final String LS_COMMAND = "ls";
 
   @NotNull
   public static final String TYPEOF_COMMAND = "typeof";
@@ -62,6 +62,9 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String EXECUTE_AND_STEP_COMMAND = "n";
+
+  @NotNull
+  public static final String SYS_FRAME_COMMAND = "sys.frame";
 
   // responses
 

@@ -1,7 +1,7 @@
 package com.jetbrains.ther.xdebugger.stack;
 
 import com.intellij.xdebugger.frame.XSuspendContext;
-import com.jetbrains.ther.debugger.data.TheRStackFrame;
+import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

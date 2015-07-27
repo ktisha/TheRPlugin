@@ -2,14 +2,13 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRStackFrame;
-import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +30,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRFunctionDebuggerFactory myDebuggerFactory;
 
   @NotNull
-  private final TheRLoadableVarHandler myVarHandler;
+  private final TheRVarsLoaderFactory myLoaderFactory;
 
   @NotNull
   private final TheRDebuggerEvaluatorFactory myEvaluatorFactory;
@@ -57,13 +56,13 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   public TheRDebugger(@NotNull final TheRProcess process,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                      @NotNull final TheRLoadableVarHandler varHandler,
+                      @NotNull final TheRVarsLoaderFactory loaderFactory,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver) {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
-    myVarHandler = varHandler;
+    myLoaderFactory = loaderFactory;
 
     myEvaluatorFactory = evaluatorFactory;
     myScriptReader = scriptReader;
@@ -81,7 +80,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
         myProcess,
         myDebuggerFactory,
         this,
-        myVarHandler,
         myOutputReceiver,
         myScriptReader
       )
@@ -104,20 +102,15 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     }
 
     final TheRLocation topLocation = getTopLocation();
-
-    final TheRDebuggerEvaluator evaluator = myEvaluatorFactory.getEvaluator(
-      myProcess,
-      myDebuggerFactory,
-      myVarHandler,
-      myOutputReceiver
-    );
+    final TheRStackFrame lastFrame = myStack.get(myStack.size() - 1);
 
     myStack.set(
       myStack.size() - 1,
       new TheRStackFrame(
         topLocation,
-        topDebugger().getVars(),
-        evaluator
+        lastFrame.getLoader(),
+        lastFrame.getEvaluator(),
+        true
       )
     );
 
@@ -160,8 +153,19 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+    if (!myStack.isEmpty()) {
+      myStack.get(myStack.size() - 1).markAsNotLast();
+    }
+
     myDebuggers.add(debugger);
-    myStack.add(null);
+    myStack.add(
+      new TheRStackFrame(
+        debugger.getLocation(),
+        myLoaderFactory.getLoader(myStack.size(), true),
+        myEvaluatorFactory.getEvaluator(myProcess, myDebuggerFactory, myOutputReceiver),
+        true
+      )
+    );
   }
 
   @Override
@@ -182,5 +186,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private void popDebugger() {
     myDebuggers.remove(myDebuggers.size() - 1);
     myStack.remove(myStack.size() - 1);
+
+    myStack.get(myStack.size() - 1).markAsLast();
   }
 }

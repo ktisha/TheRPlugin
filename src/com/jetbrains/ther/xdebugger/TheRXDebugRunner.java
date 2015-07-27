@@ -18,8 +18,8 @@ import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandlerImpl;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
@@ -89,10 +89,12 @@ public class TheRXDebugRunner extends GenericProgramRunner {
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     try {
+      final TheRProcessImpl process = new TheRProcessImpl(interpreterPath);
+
       return new TheRDebugger(
-        new TheRProcessImpl(interpreterPath),
+        process,
         new TheRFunctionDebuggerFactoryImpl(),
-        new TheRLoadableVarHandlerImpl(),
+        new TheRVarsLoaderFactoryImpl(process, outputReceiver),
         new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReader(scriptPath),
         outputReceiver

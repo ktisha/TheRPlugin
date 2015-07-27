@@ -6,7 +6,6 @@ import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
@@ -26,18 +25,13 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   private final TheRFunctionDebuggerFactory myFactory;
 
   @NotNull
-  private final TheRLoadableVarHandler myHandler;
-
-  @NotNull
   private final TheROutputReceiver myReceiver;
 
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
                                    @NotNull final TheRFunctionDebuggerFactory factory,
-                                   @NotNull final TheRLoadableVarHandler handler,
                                    @NotNull final TheROutputReceiver receiver) {
     myProcess = process;
     myFactory = factory;
-    myHandler = handler;
     myReceiver = receiver;
   }
 
@@ -116,7 +110,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     final TheREvaluatedFunctionDebuggerHandler handler = new TheREvaluatedFunctionDebuggerHandler(
       myProcess,
       myFactory,
-      myHandler,
       myReceiver
     );
 
@@ -161,7 +154,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
                                                 @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                                @NotNull final TheRLoadableVarHandler varHandler,
                                                 @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
       myDropFrames = 1;
@@ -171,7 +163,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           process,
           debuggerFactory,
           this,
-          varHandler,
           outputReceiver
         )
       );

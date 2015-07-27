@@ -6,22 +6,16 @@ import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.List;
-
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendResult;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.loadUnmodifiableVars;
 
 // TODO [dbg][test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
@@ -36,9 +30,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private final TheRFunctionDebuggerHandler myDebuggerHandler;
 
   @NotNull
-  private final TheRLoadableVarHandler myVarHandler;
-
-  @NotNull
   private final TheROutputReceiver myOutputReceiver;
 
   @NotNull
@@ -47,26 +38,20 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private int myCurrentLineNumber;
 
   @NotNull
-  private List<TheRVar> myVars;
-
-  @NotNull
   private String myResult;
 
   public TheRFunctionDebuggerBase(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                  @NotNull final TheRLoadableVarHandler varHandler,
                                   @NotNull final TheROutputReceiver outputReceiver,
                                   @NotNull final String functionName) throws TheRDebuggerException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
-    myVarHandler = varHandler;
     myOutputReceiver = outputReceiver;
     myFunctionName = functionName;
 
     myCurrentLineNumber = initCurrentLine();
-    myVars = loadUnmodifiableVars(myProcess, myVarHandler, myOutputReceiver);
 
     myResult = "";
   }
@@ -75,12 +60,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   @Override
   public TheRLocation getLocation() {
     return new TheRLocation(myFunctionName, myCurrentLineNumber);
-  }
-
-  @NotNull
-  @Override
-  public List<TheRVar> getVars() {
-    return myVars;
   }
 
   @Override
@@ -131,8 +110,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       response.getOutput(),
       findNextLineAfterResultBegin(response)
     );
-
-    myVars = loadUnmodifiableVars(myProcess, myVarHandler, myOutputReceiver);
   }
 
   protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
@@ -145,7 +122,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE, myOutputReceiver);
 
     myCurrentLineNumber = loadLineNumber();
-    myVars = loadUnmodifiableVars(myProcess, myVarHandler, myOutputReceiver);
   }
 
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
@@ -158,7 +134,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
     myDebuggerHandler.setDropFrames(1);
 
-    resetDebugInformation();
+    myCurrentLineNumber = -1;
   }
 
   protected void handleDebuggingIn(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
@@ -169,7 +145,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         myProcess,
         myDebuggerFactory,
         myDebuggerHandler,
-        myVarHandler,
         myOutputReceiver
       )
     );
@@ -185,7 +160,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
     myDebuggerHandler.setDropFrames(data.myExitingFromCount);
 
-    resetDebugInformation();
+    myCurrentLineNumber = -1;
   }
 
   private int extractLineNumber(@NotNull final String text, final int index) {
@@ -244,11 +219,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     if (returnLineNumber != -1) {
       myDebuggerHandler.setReturnLineNumber(returnLineNumber);
     }
-  }
-
-  private void resetDebugInformation() {
-    myCurrentLineNumber = -1;
-    myVars = Collections.emptyList();
   }
 
   private int extractLineNumberIfPossible(@NotNull final TheRProcessResponse response, final int debugAtIndex) {

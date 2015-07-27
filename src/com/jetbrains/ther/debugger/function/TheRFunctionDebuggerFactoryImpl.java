@@ -4,7 +4,6 @@ import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                          @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                         @NotNull final TheRLoadableVarHandler varHandler,
                                                          @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
     execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
@@ -39,7 +37,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           process,
           debuggerFactory,
           debuggerHandler,
-          varHandler,
           outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
         );
@@ -49,7 +46,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           process,
           debuggerFactory,
           debuggerHandler,
-          varHandler,
           outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
         );
@@ -70,11 +66,10 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
                                                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                      @NotNull final TheRLoadableVarHandler varHandler,
                                                       @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
-      process, debuggerFactory, debuggerHandler, varHandler, outputReceiver, scriptReader
+      process, debuggerFactory, debuggerHandler, outputReceiver, scriptReader
     );
   }
 

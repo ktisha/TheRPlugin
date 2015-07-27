@@ -3,10 +3,13 @@ package com.jetbrains.ther.xdebugger.stack;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
-import com.jetbrains.ther.debugger.data.TheRStackFrame;
 import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 // TODO [xdbg][test-compute-children]
 class TheRXStackFrame extends XStackFrame {
@@ -34,7 +37,17 @@ class TheRXStackFrame extends XStackFrame {
 
   @Override
   public void computeChildren(@NotNull final XCompositeNode node) {
-    node.addChildren(calculateVars(), true);
+    try {
+      node.addChildren(
+        transform(
+          myFrame.getLoader().load()
+        ),
+        true
+      );
+    }
+    catch (final TheRDebuggerException e) {
+      node.setErrorMessage(e.getMessage());
+    }
   }
 
   @NotNull
@@ -48,10 +61,10 @@ class TheRXStackFrame extends XStackFrame {
   }
 
   @NotNull
-  private XValueChildrenList calculateVars() {
+  private XValueChildrenList transform(@NotNull final List<TheRVar> vars) {
     final XValueChildrenList result = new XValueChildrenList();
 
-    for (final TheRVar var : myFrame.getVars()) {
+    for (final TheRVar var : vars) {
       result.add(new TheRXVar(var));
     }
 
