@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 
-// TODO [dbg][test]
 public final class TheRProcessUtils {
 
   @NotNull
