@@ -169,7 +169,7 @@ public class TheRDebuggerEvaluatorImplTest {
       "abc"
     );
 
-    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("abc");
+    final TheROutputErrorReceiver outputReceiver = new TheROutputErrorReceiver("abc");
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
@@ -198,7 +198,7 @@ public class TheRDebuggerEvaluatorImplTest {
     );
 
     final DebuggedTheRFunctionDebuggerFactory debuggerFactory = new DebuggedTheRFunctionDebuggerFactory();
-    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("abc");
+    final TheROutputErrorReceiver outputReceiver = new TheROutputErrorReceiver("abc");
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
@@ -215,35 +215,6 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, debuggerFactory.getAdvanceCalled());
     assertEquals(1, receiver.getResultReceived());
     assertEquals(1, outputReceiver.getErrorReceived());
-  }
-
-  private static class ErrorOutputReceiver implements TheROutputReceiver {
-
-    @NotNull
-    private final String myExpectedError;
-
-    private int myErrorReceived;
-
-    public ErrorOutputReceiver(@NotNull final String expectedError) {
-      myExpectedError = expectedError;
-      myErrorReceived = 0;
-    }
-
-    @Override
-    public void receiveOutput(@NotNull final String output) {
-      throw new IllegalStateException("ReceiveOutput shouldn't be called");
-    }
-
-    @Override
-    public void receiveError(@NotNull final String error) {
-      myErrorReceived++;
-
-      assertEquals(myExpectedError, error);
-    }
-
-    public int getErrorReceived() {
-      return myErrorReceived;
-    }
   }
 
   private static class ExceptionDuringExecutionTheRProcess implements TheRProcess {

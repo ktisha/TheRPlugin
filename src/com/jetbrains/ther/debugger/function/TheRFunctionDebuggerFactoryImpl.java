@@ -13,7 +13,6 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_ST
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
-// TODO [dbg][test]
 public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFactory {
 
   @NotNull
