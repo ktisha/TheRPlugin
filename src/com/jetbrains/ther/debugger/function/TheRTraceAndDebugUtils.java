@@ -12,6 +12,7 @@ import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.EM
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
+// TODO [dbg][test]
 final class TheRTraceAndDebugUtils {
 
   public static void traceAndDebugFunctions(@NotNull final TheRProcess process, @NotNull final TheROutputReceiver receiver)

@@ -16,6 +16,7 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
+// TODO [dbg][test]
 class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @NotNull

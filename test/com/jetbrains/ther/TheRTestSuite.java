@@ -2,12 +2,9 @@ package com.jetbrains.ther;
 
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtilsTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderTest;
-import com.jetbrains.ther.debugger.data.TheRStackFrameTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandlerImplTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculatorTest;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessUtilsTest;
 import com.jetbrains.ther.inspections.TheRTypeCheckerInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
@@ -48,17 +45,12 @@ public class TheRTestSuite extends TestCase {
   }
 
   private static void addDebuggerTests(@NotNull final TestSuite suite) {
-    // data package
-    addJUnit4Test(suite, TheRStackFrameTest.class);
-
     // evaluator
     addJUnit4Test(suite, TheRDebuggerEvaluatorImplTest.class);
 
     // interpreter package
-    addJUnit4Test(suite, TheRLoadableVarHandlerImplTest.class);
     addJUnit4Test(suite, TheRProcessReceiverTest.class);
     addJUnit4Test(suite, TheRProcessResponseCalculatorTest.class);
-    addJUnit4Test(suite, TheRProcessUtilsTest.class);
 
     // `main` package
     addJUnit4Test(suite, TheRDebuggerStringUtilsTest.class);

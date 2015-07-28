@@ -4,20 +4,16 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRLoadableVarHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,7 +33,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       new IllegalTheROutputReceiver()
     );
 
@@ -63,7 +58,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       new IllegalTheROutputReceiver()
     );
 
@@ -89,7 +83,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       new IllegalTheROutputReceiver()
     );
 
@@ -113,7 +106,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       new IllegalTheROutputReceiver()
     );
 
@@ -134,13 +126,10 @@ public class TheRDebuggerEvaluatorImplTest {
       "error"
     );
 
-    final ErrorOutputReceiver outputReceiver = new ErrorOutputReceiver("error");
-
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
-      outputReceiver
+      new IllegalTheROutputReceiver()
     );
 
     final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
@@ -149,7 +138,6 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(1, process.getExecuteCalled());
     assertEquals(1, receiver.getErrorReceived());
-    assertEquals(0, outputReceiver.getErrorReceived());
   }
 
   @Test
@@ -159,7 +147,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       new IllegalTheROutputReceiver()
     );
 
@@ -187,7 +174,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheRLoadableVarHandler(),
       outputReceiver
     );
 
@@ -217,7 +203,6 @@ public class TheRDebuggerEvaluatorImplTest {
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       debuggerFactory,
-      new IllegalTheRLoadableVarHandler(),
       outputReceiver
     );
 
@@ -292,7 +277,6 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
                                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheRLoadableVarHandler varHandler,
                                                            @NotNull final TheROutputReceiver outputReceiver)
       throws TheRDebuggerException {
       myNotMainCalled++;
@@ -303,12 +287,6 @@ public class TheRDebuggerEvaluatorImplTest {
         @Override
         public TheRLocation getLocation() {
           throw new IllegalStateException("GetLocation shouldn't be called");
-        }
-
-        @NotNull
-        @Override
-        public List<TheRVar> getVars() {
-          throw new IllegalStateException("GetVars shouldn't be called");
         }
 
         @Override
@@ -338,7 +316,6 @@ public class TheRDebuggerEvaluatorImplTest {
     public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
                                                         @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                         @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                        @NotNull final TheRLoadableVarHandler varHandler,
                                                         @NotNull final TheROutputReceiver outputReceiver,
                                                         @NotNull final TheRScriptReader scriptReader) {
       throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
