@@ -4,7 +4,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -15,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendResult;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 // TODO [dbg][test]
@@ -52,6 +54,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myFunctionName = functionName;
 
     myCurrentLineNumber = initCurrentLine();
+    traceAndDebugFunctions(myProcess, myOutputReceiver);
 
     myResult = "";
   }
@@ -110,25 +113,28 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       response.getOutput(),
       findNextLineAfterResultBegin(response)
     );
+
+    traceAndDebugFunctions(myProcess, myOutputReceiver);
   }
 
   protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     appendResult(response, myOutputReceiver);
     appendError(response, myOutputReceiver);
 
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.START_TRACE_BRACE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, START_TRACE_BRACE, myOutputReceiver);
 
     myCurrentLineNumber = loadLineNumber();
+    traceAndDebugFunctions(myProcess, myOutputReceiver);
   }
 
   protected void handleEndTrace(@NotNull final TheRProcessResponse response) {
     handleEndTraceResult(response);
     appendError(response, myOutputReceiver);
 
-    final int lastExitingFromEntry = response.getOutput().lastIndexOf(TheRDebugConstants.EXITING_FROM);
+    final int lastExitingFromEntry = response.getOutput().lastIndexOf(EXITING_FROM);
 
     handleEndTraceReturnLineNumber(response, lastExitingFromEntry);
 

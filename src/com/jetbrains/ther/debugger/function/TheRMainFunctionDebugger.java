@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
 // TODO [dbg][test]
@@ -36,6 +37,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private final TheRScriptReader myScriptReader;
 
   private boolean myIsRunning;
+  private boolean myIsNewDebuggerAppended;
 
   public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
@@ -49,6 +51,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     myScriptReader = scriptReader;
 
     myIsRunning = false;
+    myIsNewDebuggerAppended = false;
   }
 
   @NotNull
@@ -71,6 +74,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
 
     myIsRunning = true;
+    myIsNewDebuggerAppended = false;
 
     boolean accepted = false;
     boolean isFirstLine = true;
@@ -95,6 +99,10 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
 
     forwardCommentsAndEmptyLines();
+
+    if (!myIsNewDebuggerAppended) {
+      traceAndDebugFunctions(myProcess, myOutputReceiver);
+    }
   }
 
   @NotNull
@@ -122,6 +130,8 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
     switch (response.getType()) {
       case DEBUGGING_IN:
+        myIsNewDebuggerAppended = true;
+
         myDebuggerHandler.appendDebugger(
           myDebuggerFactory.getNotMainFunctionDebugger(
             myProcess,

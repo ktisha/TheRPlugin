@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.EMPTY;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
@@ -28,7 +27,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private final String myFrame;
 
-  private boolean myIsLast;
+  private boolean myIsLast; // TODO [dbg][remove]
 
   public TheRVarsLoaderImpl(@NotNull final TheRProcess process,
                             @NotNull final TheROutputReceiver receiver,
@@ -129,16 +128,8 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   private String handleType(@NotNull final String var,
                             @NotNull final String type)
     throws TheRDebuggerException {
-    if (type.equals(FUNCTION_TYPE)) {
-      if (isService(var)) {
-        return null;
-      }
-      else if (myIsLast) {
-        execute(myProcess, enterFunction(var), EMPTY, myReceiver);
-        execute(myProcess, exitFunction(var), EMPTY, myReceiver);
-        execute(myProcess, traceCommand(var), RESPONSE, myReceiver);
-        execute(myProcess, debugCommand(var), EMPTY, myReceiver);
-      }
+    if (type.equals(FUNCTION_TYPE) && isService(var)) {
+      return null;
     }
 
     return type;
@@ -161,34 +152,6 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   private boolean isService(@NotNull final String var) {
     return var.startsWith(SERVICE_FUNCTION_PREFIX) &&
            (var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX) || var.endsWith(SERVICE_EXIT_FUNCTION_SUFFIX));
-  }
-
-  @NotNull
-  private String enterFunction(@NotNull final String var) {
-    return enterFunctionName(var) + " <- function() { print(\"" + var + "\") }";
-  }
-
-  @NotNull
-  private String exitFunction(@NotNull final String var) {
-    return exitFunctionName(var) + " <- function() { print(\"" + var + "\") }";
-  }
-
-  @NotNull
-  private String traceCommand(@NotNull final String var) {
-    return TRACE_COMMAND +
-           "(" +
-           var +
-           ", " +
-           enterFunctionName(var) +
-           ", exit = " +
-           exitFunctionName(var) +
-           ", where = environment()" +
-           ")";
-  }
-
-  @NotNull
-  private String debugCommand(@NotNull final String var) {
-    return DEBUG_COMMAND + "(" + var + ")";
   }
 
   @NotNull
@@ -240,15 +203,5 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     }
 
     return current + 1;
-  }
-
-  @NotNull
-  private String enterFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_ENTER_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private String exitFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 }
