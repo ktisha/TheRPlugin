@@ -27,16 +27,12 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private final String myFrame;
 
-  private boolean myIsLast; // TODO [dbg][remove]
-
   public TheRVarsLoaderImpl(@NotNull final TheRProcess process,
                             @NotNull final TheROutputReceiver receiver,
-                            final int frameNumber,
-                            final boolean last) {
+                            final int frameNumber) {
     myProcess = process;
     myReceiver = receiver;
     myFrame = SYS_FRAME_COMMAND + "(" + frameNumber + ")";
-    myIsLast = last;
   }
 
   @NotNull
@@ -60,16 +56,6 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     }
 
     return vars;
-  }
-
-  @Override
-  public void markAsLast() {
-    myIsLast = true;
-  }
-
-  @Override
-  public void markAsNotLast() {
-    myIsLast = false;
   }
 
   @NotNull
@@ -126,8 +112,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @Nullable
   private String handleType(@NotNull final String var,
-                            @NotNull final String type)
-    throws TheRDebuggerException {
+                            @NotNull final String type) {
     if (type.equals(FUNCTION_TYPE) && isService(var)) {
       return null;
     }

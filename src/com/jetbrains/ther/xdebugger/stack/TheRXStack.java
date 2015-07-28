@@ -39,7 +39,7 @@ public class TheRXStack {
   @NotNull
   public XSuspendContext getSuspendContext() {
     if (mySuspendContext == null || myStack == null) {
-      throw new IllegalStateException("GetSuspendContext should be called only after update");
+      throw new IllegalStateException("GetSuspendContext could be called only after update");
     }
 
     return mySuspendContext;

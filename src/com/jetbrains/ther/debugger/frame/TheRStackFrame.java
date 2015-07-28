@@ -17,18 +17,10 @@ public class TheRStackFrame {
 
   public TheRStackFrame(@NotNull final TheRLocation location,
                         @NotNull final TheRVarsLoader loader,
-                        @NotNull final TheRDebuggerEvaluator evaluator,
-                        final boolean last) {
+                        @NotNull final TheRDebuggerEvaluator evaluator) {
     myLocation = location;
     myLoader = loader;
     myEvaluator = evaluator;
-
-    if (last) {
-      myLoader.markAsLast();
-    }
-    else {
-      myLoader.markAsNotLast();
-    }
   }
 
   @NotNull
@@ -44,13 +36,5 @@ public class TheRStackFrame {
   @NotNull
   public TheRDebuggerEvaluator getEvaluator() {
     return myEvaluator;
-  }
-
-  public void markAsLast() {
-    myLoader.markAsLast();
-  }
-
-  public void markAsNotLast() {
-    myLoader.markAsNotLast();
   }
 }

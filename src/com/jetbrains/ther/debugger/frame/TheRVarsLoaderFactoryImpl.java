@@ -19,7 +19,7 @@ public class TheRVarsLoaderFactoryImpl implements TheRVarsLoaderFactory {
 
   @NotNull
   @Override
-  public TheRVarsLoader getLoader(final int frameNumber, final boolean last) {
-    return new TheRVarsLoaderImpl(myProcess, myReceiver, frameNumber, last);
+  public TheRVarsLoader getLoader(final int frameNumber) {
+    return new TheRVarsLoaderImpl(myProcess, myReceiver, frameNumber);
   }
 }

@@ -73,7 +73,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   @Override
   public void advance() throws TheRDebuggerException {
     if (!hasNext()) {
-      throw new IllegalStateException("Advance should be called only if hasNext returns true");
+      throw new IllegalStateException("Advance could be called only if hasNext returns true");
     }
 
     handleResponse(myProcess.execute(EXECUTE_AND_STEP_COMMAND));
@@ -83,7 +83,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   @Override
   public String getResult() {
     if (hasNext()) {
-      throw new IllegalStateException("GetResult should be called only if hasNext returns false");
+      throw new IllegalStateException("GetResult could be called only if hasNext returns false");
     }
 
     return myResult;

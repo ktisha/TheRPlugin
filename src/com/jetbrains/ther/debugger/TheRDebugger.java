@@ -109,8 +109,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       new TheRStackFrame(
         topLocation,
         lastFrame.getLoader(),
-        lastFrame.getEvaluator(),
-        true
+        lastFrame.getEvaluator()
       )
     );
 
@@ -153,17 +152,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
-    if (!myStack.isEmpty()) {
-      myStack.get(myStack.size() - 1).markAsNotLast();
-    }
-
     myDebuggers.add(debugger);
     myStack.add(
       new TheRStackFrame(
         debugger.getLocation(),
-        myLoaderFactory.getLoader(myStack.size(), true),
-        myEvaluatorFactory.getEvaluator(myProcess, myDebuggerFactory, myOutputReceiver),
-        true
+        myLoaderFactory.getLoader(myStack.size()),
+        myEvaluatorFactory.getEvaluator(myProcess, myDebuggerFactory, myOutputReceiver)
       )
     );
   }
@@ -186,7 +180,5 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private void popDebugger() {
     myDebuggers.remove(myDebuggers.size() - 1);
     myStack.remove(myStack.size() - 1);
-
-    myStack.get(myStack.size() - 1).markAsLast();
   }
 }

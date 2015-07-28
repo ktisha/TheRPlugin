@@ -10,8 +10,4 @@ public interface TheRVarsLoader {
 
   @NotNull
   List<TheRVar> load() throws TheRDebuggerException;
-
-  void markAsLast();
-
-  void markAsNotLast();
 }
