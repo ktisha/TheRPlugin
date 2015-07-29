@@ -197,9 +197,161 @@ public class TheRDebuggerTest {
   }
 
   @Test
-  public void stack31() {
+  public void stack31() throws TheRDebuggerException {
     // `main`, function `a`, function `b` with `debug at` at the end
-    fail();
+
+    final MockTheRProcess process = new MockTheRProcess();
+    final Stack313TheRFunctionDebugger thirdFunctionDebugger = new Stack313TheRFunctionDebugger();
+    final Stack312TheRFunctionDebugger secondFunctionDebugger = new Stack312TheRFunctionDebugger(thirdFunctionDebugger);
+    final Stack311TheRFunctionDebugger firstFunctionDebugger = new Stack311TheRFunctionDebugger(secondFunctionDebugger);
+    final Stack3TheRFunctionDebuggerFactory debuggerFactory = new Stack3TheRFunctionDebuggerFactory(firstFunctionDebugger);
+    final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
+    final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
+    final MockTheRScriptReader reader = new MockTheRScriptReader();
+
+    final TheRDebugger debugger = new TheRDebugger(
+      process,
+      debuggerFactory,
+      loaderFactory,
+      evaluatorFactory,
+      reader,
+      new IllegalTheROutputReceiver()
+    );
+
+    assertFalse(process.myIsClosed);
+    assertEquals(0, thirdFunctionDebugger.myCounter);
+    assertEquals(0, secondFunctionDebugger.myCounter);
+    assertEquals(0, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(1, loaderFactory.myCounter);
+    assertEquals(1, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(1, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(0, thirdFunctionDebugger.myCounter);
+    assertEquals(0, secondFunctionDebugger.myCounter);
+    assertEquals(1, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(1, loaderFactory.myCounter);
+    assertEquals(1, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(1, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(0, thirdFunctionDebugger.myCounter);
+    assertEquals(0, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(2, loaderFactory.myCounter);
+    assertEquals(2, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(2, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+    assertEquals(new TheRLocation("abc", 0), debugger.getStack().get(1).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(0, thirdFunctionDebugger.myCounter);
+    assertEquals(1, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(2, loaderFactory.myCounter);
+    assertEquals(2, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(2, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+    assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(0, thirdFunctionDebugger.myCounter);
+    assertEquals(2, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(3, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+    assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
+    assertEquals(new TheRLocation("def", 0), debugger.getStack().get(2).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(1, thirdFunctionDebugger.myCounter);
+    assertEquals(2, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(3, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+    assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
+    assertEquals(new TheRLocation("def", 1), debugger.getStack().get(2).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(2, thirdFunctionDebugger.myCounter);
+    assertEquals(2, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(2, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
+    assertEquals(new TheRLocation("abc", 5), debugger.getStack().get(1).getLocation());
+
+    assertTrue(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(2, thirdFunctionDebugger.myCounter);
+    assertEquals(3, secondFunctionDebugger.myCounter);
+    assertEquals(2, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(1, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
+
+    assertFalse(debugger.advance());
+
+    assertFalse(process.myIsClosed);
+    assertEquals(2, thirdFunctionDebugger.myCounter);
+    assertEquals(3, secondFunctionDebugger.myCounter);
+    assertEquals(3, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertFalse(reader.myIsClosed);
+    assertEquals(1, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
+
+    debugger.stop();
+
+    assertTrue(process.myIsClosed);
+    assertEquals(2, thirdFunctionDebugger.myCounter);
+    assertEquals(3, secondFunctionDebugger.myCounter);
+    assertEquals(3, firstFunctionDebugger.myCounter);
+    assertEquals(1, debuggerFactory.myCounter);
+    assertEquals(3, loaderFactory.myCounter);
+    assertEquals(3, evaluatorFactory.myCounter);
+    assertTrue(reader.myIsClosed);
+    assertEquals(1, debugger.getStack().size());
+    assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
 
   @Test
@@ -282,12 +434,12 @@ public class TheRDebuggerTest {
   private static class Stack1TheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
 
     @NotNull
-    private final TheRFunctionDebugger myDebugger;
+    private final TheRFunctionDebugger myFirstFunctionDebugger;
 
     private int myCounter = 0;
 
-    public Stack1TheRFunctionDebuggerFactory(@NotNull final TheRFunctionDebugger debugger) {
-      myDebugger = debugger;
+    public Stack1TheRFunctionDebuggerFactory(@NotNull final TheRFunctionDebugger firstFunctionDebugger) {
+      myFirstFunctionDebugger = firstFunctionDebugger;
     }
 
     @NotNull
@@ -306,7 +458,7 @@ public class TheRDebuggerTest {
                                                         @NotNull final TheRScriptReader scriptReader) {
       myCounter++;
 
-      return myDebugger;
+      return myFirstFunctionDebugger;
     }
   }
 
@@ -340,12 +492,12 @@ public class TheRDebuggerTest {
   private static class Stack2TheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
 
     @NotNull
-    private final Stack21TheRFunctionDebugger myMainDebugger;
+    private final Stack21TheRFunctionDebugger myFirstFunctionDebugger;
 
     private int myCounter = 0;
 
-    public Stack2TheRFunctionDebuggerFactory(@NotNull final Stack21TheRFunctionDebugger mainDebugger) {
-      myMainDebugger = mainDebugger;
+    public Stack2TheRFunctionDebuggerFactory(@NotNull final Stack21TheRFunctionDebugger firstFunctionDebugger) {
+      myFirstFunctionDebugger = firstFunctionDebugger;
     }
 
     @NotNull
@@ -364,24 +516,24 @@ public class TheRDebuggerTest {
                                                         @NotNull final TheRScriptReader scriptReader) {
       myCounter++;
 
-      myMainDebugger.setHandler(debuggerHandler);
+      myFirstFunctionDebugger.setHandler(debuggerHandler);
 
-      return myMainDebugger;
+      return myFirstFunctionDebugger;
     }
   }
 
   private static class Stack21TheRFunctionDebugger implements TheRFunctionDebugger {
 
     @NotNull
-    private final TheRFunctionDebugger myNotMainFunctionDebugger;
+    private final TheRFunctionDebugger myNextFunctionDebugger;
 
     private int myCounter = 0;
 
     @Nullable
     private TheRFunctionDebuggerHandler myHandler;
 
-    private Stack21TheRFunctionDebugger(@NotNull final TheRFunctionDebugger debugger) {
-      myNotMainFunctionDebugger = debugger;
+    public Stack21TheRFunctionDebugger(@NotNull final TheRFunctionDebugger nextFunctionDebugger) {
+      myNextFunctionDebugger = nextFunctionDebugger;
     }
 
     @NotNull
@@ -402,7 +554,7 @@ public class TheRDebuggerTest {
       if (myCounter == 2) {
         assert myHandler != null;
 
-        myHandler.appendDebugger(myNotMainFunctionDebugger);
+        myHandler.appendDebugger(myNextFunctionDebugger);
       }
     }
 
@@ -441,6 +593,175 @@ public class TheRDebuggerTest {
     @Override
     public String getResult() {
       throw new IllegalStateException("GetResult shouldn't be called");
+    }
+  }
+
+  private static class Stack3TheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
+
+    @NotNull
+    private final Stack311TheRFunctionDebugger myFirstFunctionDebugger;
+
+    private int myCounter = 0;
+
+    public Stack3TheRFunctionDebuggerFactory(@NotNull final Stack311TheRFunctionDebugger firstFunctionDebugger) {
+      myFirstFunctionDebugger = firstFunctionDebugger;
+    }
+
+    @NotNull
+    @Override
+    public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
+                                                           @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                                           @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
+      throw new IllegalStateException("GetNotMainFunctionDebugger shouldn't be called");
+    }
+
+    @NotNull
+    @Override
+    public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
+                                                        @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                                        @NotNull final TheROutputReceiver outputReceiver,
+                                                        @NotNull final TheRScriptReader scriptReader) {
+      myCounter++;
+
+      myFirstFunctionDebugger.setHandler(debuggerHandler);
+
+      return myFirstFunctionDebugger;
+    }
+  }
+
+  private static class Stack311TheRFunctionDebugger implements TheRFunctionDebugger {
+
+    @NotNull
+    private final Stack312TheRFunctionDebugger myNextFunctionDebugger;
+
+    private int myCounter = 0;
+
+    @Nullable
+    private TheRFunctionDebuggerHandler myHandler;
+
+    public Stack311TheRFunctionDebugger(@NotNull final Stack312TheRFunctionDebugger nextFunctionDebugger) {
+      myNextFunctionDebugger = nextFunctionDebugger;
+    }
+
+    @NotNull
+    @Override
+    public TheRLocation getLocation() {
+      return new TheRLocation(MAIN_FUNCTION_NAME, myCounter);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return myCounter < 3;
+    }
+
+    @Override
+    public void advance() throws TheRDebuggerException {
+      myCounter++;
+
+      if (myCounter == 2) {
+        assert myHandler != null;
+
+        myNextFunctionDebugger.setHandler(myHandler);
+        myHandler.appendDebugger(myNextFunctionDebugger);
+      }
+    }
+
+    @NotNull
+    @Override
+    public String getResult() {
+      throw new IllegalStateException("GetResult shouldn't be called");
+    }
+
+    public void setHandler(@NotNull final TheRFunctionDebuggerHandler handler) {
+      myHandler = handler;
+    }
+  }
+
+  private static class Stack312TheRFunctionDebugger implements TheRFunctionDebugger {
+
+    @NotNull
+    private final Stack313TheRFunctionDebugger myNextFunctionDebugger;
+
+    private int myCounter = 0;
+
+    @Nullable
+    private TheRFunctionDebuggerHandler myHandler;
+
+    public Stack312TheRFunctionDebugger(@NotNull final Stack313TheRFunctionDebugger nextFunctionDebugger) {
+      myNextFunctionDebugger = nextFunctionDebugger;
+    }
+
+    @NotNull
+    @Override
+    public TheRLocation getLocation() {
+      return new TheRLocation("abc", myCounter);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return myCounter < 3;
+    }
+
+    @Override
+    public void advance() throws TheRDebuggerException {
+      myCounter++;
+
+      if (myCounter == 2) {
+        assert myHandler != null;
+
+        myNextFunctionDebugger.setHandler(myHandler);
+        myHandler.appendDebugger(myNextFunctionDebugger);
+      }
+    }
+
+    @NotNull
+    @Override
+    public String getResult() {
+      throw new IllegalStateException("GetResult shouldn't be called");
+    }
+
+    public void setHandler(@NotNull final TheRFunctionDebuggerHandler handler) {
+      myHandler = handler;
+    }
+  }
+
+  private static class Stack313TheRFunctionDebugger implements TheRFunctionDebugger {
+
+    private int myCounter = 0;
+
+    @Nullable
+    private TheRFunctionDebuggerHandler myHandler;
+
+    @NotNull
+    @Override
+    public TheRLocation getLocation() {
+      return new TheRLocation("def", myCounter);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return myCounter < 2;
+    }
+
+    @Override
+    public void advance() throws TheRDebuggerException {
+      myCounter++;
+
+      if (myCounter == 2) {
+        assert myHandler != null;
+
+        myHandler.setReturnLineNumber(5);
+      }
+    }
+
+    @NotNull
+    @Override
+    public String getResult() {
+      throw new IllegalStateException("GetResult shouldn't be called");
+    }
+
+    public void setHandler(@Nullable final TheRFunctionDebuggerHandler handler) {
+      myHandler = handler;
     }
   }
 }
