@@ -18,7 +18,6 @@ import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
-// TODO [dbg][test]
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
