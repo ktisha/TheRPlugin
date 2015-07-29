@@ -15,7 +15,7 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.TheRScriptReader;
+import com.jetbrains.ther.debugger.TheRScriptReaderImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
@@ -96,7 +96,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         new TheRFunctionDebuggerFactoryImpl(),
         new TheRVarsLoaderFactoryImpl(process, outputReceiver),
         new TheRDebuggerEvaluatorFactoryImpl(),
-        new TheRScriptReader(scriptPath),
+        new TheRScriptReaderImpl(scriptPath),
         outputReceiver
       );
     }

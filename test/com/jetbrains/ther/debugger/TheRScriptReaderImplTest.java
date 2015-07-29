@@ -11,7 +11,7 @@ import java.io.IOException;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.NOP_COMMAND;
 import static org.junit.Assert.assertEquals;
 
-public class TheRScriptReaderTest {
+public class TheRScriptReaderImplTest {
 
   @NotNull
   private static final File DEBUGGER_TEST_DATA_DIR = new File("testData/debugger");
@@ -19,7 +19,7 @@ public class TheRScriptReaderTest {
   @Test
   public void read01() throws IOException {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "01.r").getAbsolutePath();
-    final TheRScriptReader reader = new TheRScriptReader(scriptPath);
+    final TheRScriptReader reader = new TheRScriptReaderImpl(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
 
@@ -53,7 +53,7 @@ public class TheRScriptReaderTest {
   @Test
   public void read02() throws IOException {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "02.r").getAbsolutePath();
-    final TheRScriptReader reader = new TheRScriptReader(scriptPath);
+    final TheRScriptReader reader = new TheRScriptReaderImpl(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
 
@@ -83,7 +83,7 @@ public class TheRScriptReaderTest {
   @Test
   public void read03() throws IOException {
     final String scriptPath = new File(DEBUGGER_TEST_DATA_DIR, "03.r").getAbsolutePath();
-    final TheRScriptReader reader = new TheRScriptReader(scriptPath);
+    final TheRScriptReader reader = new TheRScriptReaderImpl(scriptPath);
 
     checkLine(NOP_COMMAND, -1, reader.getCurrentLine());
 
