@@ -16,6 +16,8 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.NO_FUNCTIONS_RESPONSE;
 import static org.junit.Assert.*;
 
 public class TheRMainFunctionDebuggerTest {
@@ -180,13 +182,13 @@ public class TheRMainFunctionDebuggerTest {
         );
       }
 
-      if (command.equals("Filter(function(x) x == \"closure\", eapply(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + "))")) {
+      if (command.equals(LS_FUNCTIONS_COMMAND)) {
         myTraceAndDebugExecuted++;
 
         return new TheRProcessResponse(
-          "named list()",
+          NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
-          TextRange.allOf("named list()"),
+          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
           ""
         );
       }
@@ -246,7 +248,7 @@ public class TheRMainFunctionDebuggerTest {
         );
       }
 
-      if (command.equals("ls()")) {
+      if (command.equals(LS_COMMAND + "()")) {
         my3Executed = true;
 
         return new TheRProcessResponse(
@@ -261,7 +263,7 @@ public class TheRMainFunctionDebuggerTest {
         my4Executed = true;
 
         return new TheRProcessResponse(
-          "debugging in: f(x)\n" +
+          DEBUGGING_IN + ": f(x)\n" +
           "debug: {\n" +
           "    # comment in function\n" +
           "     \n" +

@@ -12,14 +12,19 @@ import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.EM
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
-// TODO [dbg][test]
 final class TheRTraceAndDebugUtils {
+
+  @NotNull
+  static final String LS_FUNCTIONS_COMMAND = "Filter(function(x) x == \"closure\", eapply(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + "))";
+
+  @NotNull
+  static final String NO_FUNCTIONS_RESPONSE = "named list()";
 
   public static void traceAndDebugFunctions(@NotNull final TheRProcess process, @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     final String output = execute(
       process,
-      "Filter(function(x) x == \"closure\", eapply(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + "))",
+      LS_FUNCTIONS_COMMAND,
       RESPONSE,
       receiver
     );
@@ -75,7 +80,7 @@ final class TheRTraceAndDebugUtils {
            enterFunctionName(var) +
            ", exit = " +
            exitFunctionName(var) +
-           ", where = environment()" +
+           ", where = " + ENVIRONMENT + "()" +
            ")";
   }
 
