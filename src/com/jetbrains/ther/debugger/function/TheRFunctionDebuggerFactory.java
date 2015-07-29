@@ -10,13 +10,11 @@ public interface TheRFunctionDebuggerFactory {
 
   @NotNull
   TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                  @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                   @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException;
 
   @NotNull
   TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
-                                               @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                @NotNull final TheROutputReceiver outputReceiver,
                                                @NotNull final TheRScriptReader scriptReader);

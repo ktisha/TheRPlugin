@@ -6,7 +6,6 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.TheROutputErrorReceiver;
@@ -24,7 +23,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
     final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new BraceTheRProcess(),
-      new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       outputReceiver
     );
@@ -39,7 +37,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
   public void unbraceFunction() throws TheRDebuggerException {
     final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new UnbraceTheRProcess(),
-      new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheROutputReceiver()
     );
@@ -53,7 +50,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
   public void unexpectedResponse() throws TheRDebuggerException {
     new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new UnexpectedResponseTheRProcess(),
-      new IllegalTheRFunctionDebuggerFactory(),
       new IllegalTheRFunctionDebuggerHandler(),
       new IllegalTheROutputReceiver()
     );

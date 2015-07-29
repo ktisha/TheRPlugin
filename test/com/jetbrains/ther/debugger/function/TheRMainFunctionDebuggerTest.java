@@ -288,7 +288,6 @@ public class TheRMainFunctionDebuggerTest {
     @NotNull
     @Override
     public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                           @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                            @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
       myCounter++;
@@ -299,7 +298,6 @@ public class TheRMainFunctionDebuggerTest {
     @NotNull
     @Override
     public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                        @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                         @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                         @NotNull final TheROutputReceiver outputReceiver,
                                                         @NotNull final TheRScriptReader scriptReader) {

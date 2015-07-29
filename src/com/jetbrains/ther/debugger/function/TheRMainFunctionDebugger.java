@@ -134,7 +134,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
         myDebuggerHandler.appendDebugger(
           myDebuggerFactory.getNotMainFunctionDebugger(
             myProcess,
-            myDebuggerFactory,
             myDebuggerHandler,
             myOutputReceiver
           )

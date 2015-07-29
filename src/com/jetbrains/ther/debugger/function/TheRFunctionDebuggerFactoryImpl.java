@@ -18,7 +18,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   @NotNull
   @Override
   public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                         @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
@@ -34,7 +33,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
       case START_TRACE_BRACE:
         return new TheRNotMainBraceFunctionDebugger(
           process,
-          debuggerFactory,
+          this,
           debuggerHandler,
           outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
@@ -43,7 +42,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
       case START_TRACE_UNBRACE:
         return new TheRNotMainUnbraceFunctionDebugger(
           process,
-          debuggerFactory,
+          this,
           debuggerHandler,
           outputReceiver,
           extractFunctionName(startTraceResponse.getOutput())
@@ -63,12 +62,11 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
   @NotNull
   @Override
   public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                      @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                       @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
-      process, debuggerFactory, debuggerHandler, outputReceiver, scriptReader
+      process, this, debuggerHandler, outputReceiver, scriptReader
     );
   }
 

@@ -78,7 +78,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     appendDebugger(
       myDebuggerFactory.getMainFunctionDebugger(
         myProcess,
-        myDebuggerFactory,
         this,
         myOutputReceiver,
         myScriptReader

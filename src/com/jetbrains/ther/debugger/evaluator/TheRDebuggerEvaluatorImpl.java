@@ -161,7 +161,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       appendDebugger(
         debuggerFactory.getNotMainFunctionDebugger(
           process,
-          debuggerFactory,
           this,
           outputReceiver
         )

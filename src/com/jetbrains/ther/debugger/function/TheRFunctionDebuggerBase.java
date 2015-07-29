@@ -149,7 +149,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myDebuggerHandler.appendDebugger(
       myDebuggerFactory.getNotMainFunctionDebugger(
         myProcess,
-        myDebuggerFactory,
         myDebuggerHandler,
         myOutputReceiver
       )
