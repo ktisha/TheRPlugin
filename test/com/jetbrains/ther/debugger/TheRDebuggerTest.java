@@ -30,6 +30,11 @@ public class TheRDebuggerTest {
   public void stack1() throws TheRDebuggerException {
     // just `main`
 
+    /*
+    instruction1
+    instruction2
+    */
+
     final MockTheRProcess process = new MockTheRProcess();
     final Stack1TheRFunctionDebugger functionDebugger = new Stack1TheRFunctionDebugger();
     final Stack1TheRFunctionDebuggerFactory debuggerFactory = new Stack1TheRFunctionDebuggerFactory(functionDebugger);
@@ -92,6 +97,15 @@ public class TheRDebuggerTest {
   @Test
   public void stack2() throws TheRDebuggerException {
     // `main` and function
+
+    /*
+    instruction1
+    abc() {
+      instruction1
+      instruction2
+    }
+    instruction2
+    */
 
     final MockTheRProcess process = new MockTheRProcess();
     final Stack22TheRFunctionDebugger notMainFunctionDebugger = new Stack22TheRFunctionDebugger();
@@ -199,6 +213,19 @@ public class TheRDebuggerTest {
   @Test
   public void stack31() throws TheRDebuggerException {
     // `main`, function `a`, function `b` with `debug at` at the end
+
+    /*
+    instruction1
+    abc() {
+      instruction1
+      def() {
+        instruction1
+        instruction2
+      }
+      instruction2
+     }
+     instruction2
+     */
 
     final MockTheRProcess process = new MockTheRProcess();
     final Stack313TheRFunctionDebugger thirdFunctionDebugger = new Stack313TheRFunctionDebugger();
@@ -358,6 +385,18 @@ public class TheRDebuggerTest {
   public void stack32() throws TheRDebuggerException {
     // `main`, function `a` and function `b` with recursive return
 
+    /*
+    instruction1
+    abc() {
+      instruction1
+      def() {
+        instruction1
+        instruction2
+      }
+    }
+    instruction2
+    */
+
     final MockTheRProcess process = new MockTheRProcess();
     final Stack323TheRFunctionDebugger thirdFunctionDebugger = new Stack323TheRFunctionDebugger();
     final Stack322TheRFunctionDebugger secondFunctionDebugger = new Stack322TheRFunctionDebugger(thirdFunctionDebugger);
@@ -501,6 +540,22 @@ public class TheRDebuggerTest {
   @Test
   public void stack4() throws TheRDebuggerException {
     // `main`, function `a`, function `b`, function `c` - recursive return from `c` and `b` with `debug at` at the end
+
+    /*
+    instruction1
+    abc() {
+      instruction1
+      def() {
+        instruction1
+        ghi() {
+          instruction1
+          instruction2
+        }
+      }
+      instruction2
+    }
+    instruction2
+    */
 
     final MockTheRProcess process = new MockTheRProcess();
     final Stack44TheRFunctionDebugger fourthFunctionDebugger = new Stack44TheRFunctionDebugger();
