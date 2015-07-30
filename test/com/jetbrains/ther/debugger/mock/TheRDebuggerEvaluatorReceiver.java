@@ -5,20 +5,20 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
-public class TheRDebuggerEvaluatorReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> {
+public class TheRDebuggerEvaluatorReceiver implements TheRDebuggerEvaluator.Receiver {
 
   @NotNull
-  private final T myExpectedResult;
+  private final String myExpectedResult;
 
   private int myResultReceived;
 
-  public TheRDebuggerEvaluatorReceiver(@NotNull final T expectedResult) {
+  public TheRDebuggerEvaluatorReceiver(@NotNull final String expectedResult) {
     myExpectedResult = expectedResult;
     myResultReceived = 0;
   }
 
   @Override
-  public void receiveResult(@NotNull final T result) {
+  public void receiveResult(@NotNull final String result) {
     myResultReceived++;
 
     assertEquals(myExpectedResult, result);

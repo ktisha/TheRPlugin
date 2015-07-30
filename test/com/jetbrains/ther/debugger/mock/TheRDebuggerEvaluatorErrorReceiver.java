@@ -3,12 +3,12 @@ package com.jetbrains.ther.debugger.mock;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRDebuggerEvaluatorErrorReceiver<T> implements TheRDebuggerEvaluator.Receiver<T> {
+public class TheRDebuggerEvaluatorErrorReceiver implements TheRDebuggerEvaluator.Receiver {
 
   private int myErrorReceived = 0;
 
   @Override
-  public void receiveResult(@NotNull final T result) {
+  public void receiveResult(@NotNull final String result) {
     throw new IllegalStateException("ReceiveResult shouldn't be called");
   }
 

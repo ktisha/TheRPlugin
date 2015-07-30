@@ -16,6 +16,7 @@ import java.util.List;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
+// TODO [dbg][test-see-coverage]
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
@@ -36,25 +37,10 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @Override
-  public void evalCondition(@NotNull final String condition, @NotNull final Receiver<Boolean> receiver) {
-    try {
-      evaluate(
-        condition,
-        new BooleanResultHandler(),
-        receiver
-      );
-    }
-    catch (final TheRDebuggerException e) {
-      receiver.receiveError(e);
-    }
-  }
-
-  @Override
-  public void evalExpression(@NotNull final String expression, @NotNull final Receiver<String> receiver) {
+  public void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver) {
     try {
       evaluate(
         expression,
-        new StringResultHandler(),
         receiver
       );
     }
@@ -63,9 +49,8 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
   }
 
-  private <T> void evaluate(@NotNull final String expression,
-                            @NotNull final ResultHandler<T> handler,
-                            @NotNull final Receiver<T> receiver) throws TheRDebuggerException {
+  private void evaluate(@NotNull final String expression,
+                        @NotNull final Receiver receiver) throws TheRDebuggerException {
     final TheRProcessResponse response = myProcess.execute(expression);
 
     switch (response.getType()) {
@@ -73,7 +58,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(response, myReceiver);
 
         receiver.receiveResult(
-          handler.handle(evaluateFunction())
+          evaluateFunction()
         );
 
         break;
@@ -89,7 +74,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(response, myReceiver);
 
         receiver.receiveResult(
-          handler.handle(response.getOutput())
+          response.getOutput()
         );
 
         break;
@@ -117,32 +102,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
 
     return handler.getResult();
-  }
-
-  private interface ResultHandler<T> {
-
-    @NotNull
-    T handle(@NotNull final String result);
-  }
-
-  private static class BooleanResultHandler implements ResultHandler<Boolean> {
-
-    @NotNull
-    @Override
-    public Boolean handle(@NotNull final String result) {
-      final int prefixLength = "[1] ".length();
-
-      return result.length() > prefixLength && Boolean.parseBoolean(result.substring(prefixLength));
-    }
-  }
-
-  private static class StringResultHandler implements ResultHandler<String> {
-
-    @NotNull
-    @Override
-    public String handle(@NotNull final String result) {
-      return result;
-    }
   }
 
   private static class TheREvaluatedFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {

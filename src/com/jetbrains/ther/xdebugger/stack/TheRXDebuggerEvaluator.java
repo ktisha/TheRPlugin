@@ -22,9 +22,9 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   // This method is overridden because XDebugSessionImpl.breakpointReached(XBreakpoint<?>, String, XSuspendContext) calls it anyway
   @Override
   public boolean evaluateCondition(@NotNull final String expression) {
-    final ConditionReceiverImpl receiver = new ConditionReceiverImpl();
+    final ConditionReceiver receiver = new ConditionReceiver();
 
-    myEvaluator.evalCondition(expression, receiver);
+    myEvaluator.evalExpression(expression, receiver);
 
     return receiver.myResult;
   }
@@ -35,17 +35,19 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
                        @Nullable final XSourcePosition expressionPosition) {
     myEvaluator.evalExpression(
       expression,
-      new ExpressionReceiverImpl(callback)
+      new ExpressionReceiver(callback)
     );
   }
 
-  private static class ConditionReceiverImpl implements TheRDebuggerEvaluator.Receiver<Boolean> {
+  private static class ConditionReceiver implements TheRDebuggerEvaluator.Receiver {
 
     private boolean myResult = false;
 
     @Override
-    public void receiveResult(@NotNull final Boolean result) {
-      myResult = result;
+    public void receiveResult(@NotNull final String result) {
+      final int prefixLength = "[1] ".length();
+
+      myResult = result.length() > prefixLength && Boolean.parseBoolean(result.substring(prefixLength));
     }
 
     @Override
@@ -59,12 +61,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
     }
   }
 
-  private static class ExpressionReceiverImpl implements TheRDebuggerEvaluator.Receiver<String> {
+  private static class ExpressionReceiver implements TheRDebuggerEvaluator.Receiver {
 
     @NotNull
     private final XEvaluationCallback myCallback;
 
-    public ExpressionReceiverImpl(@NotNull final XEvaluationCallback callback) {
+    public ExpressionReceiver(@NotNull final XEvaluationCallback callback) {
       myCallback = callback;
     }
 

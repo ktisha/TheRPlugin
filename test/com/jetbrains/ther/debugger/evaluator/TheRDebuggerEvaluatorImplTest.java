@@ -20,82 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class TheRDebuggerEvaluatorImplTest {
 
   @Test
-  public void evalTrueCondition() {
-    final String text = "[1] TRUE";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      text,
-      TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text),
-      ""
-    );
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheROutputReceiver()
-    );
-
-    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(true);
-
-    evaluator.evalCondition("5 > 4", receiver);
-
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getResultReceived());
-  }
-
-  @Test
-  public void evalFalseCondition() {
-    final String text = "[1] FALSE";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      text,
-      TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text),
-      ""
-    );
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheROutputReceiver()
-    );
-
-    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(false);
-
-    evaluator.evalCondition("5 < 4", receiver);
-
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getResultReceived());
-  }
-
-  @Test
-  public void evalInvalidResponseFormatCondition() {
-    final String text = "ghi";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      text,
-      TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(text),
-      ""
-    );
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      new IllegalTheRFunctionDebuggerFactory(),
-      new IllegalTheROutputReceiver()
-    );
-
-    final TheRDebuggerEvaluatorConditionReceiver receiver = new TheRDebuggerEvaluatorConditionReceiver(false);
-
-    evaluator.evalCondition("def", receiver);
-
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getResultReceived());
-  }
-
-  @Test
-  public void evalUnexpectedResponseType() {
+  public void unexpectedResponseType() {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "",
       TheRProcessResponseType.PLUS,
@@ -109,7 +34,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheROutputReceiver()
     );
 
-    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
+    final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
     evaluator.evalExpression("def <- function() {", receiver);
 
@@ -118,7 +43,7 @@ public class TheRDebuggerEvaluatorImplTest {
   }
 
   @Test
-  public void evalErrorDuringExecution() {
+  public void errorDuringExecution() {
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "",
       TheRProcessResponseType.EMPTY,
@@ -132,7 +57,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheROutputReceiver()
     );
 
-    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
+    final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
     evaluator.evalExpression("abc", receiver);
 
@@ -141,7 +66,7 @@ public class TheRDebuggerEvaluatorImplTest {
   }
 
   @Test
-  public void evalExceptionDuringExecution() {
+  public void exceptionDuringExecution() {
     final ExceptionDuringExecutionTheRProcess process = new ExceptionDuringExecutionTheRProcess();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
@@ -150,7 +75,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new IllegalTheROutputReceiver()
     );
 
-    final TheRDebuggerEvaluatorErrorReceiver<String> receiver = new TheRDebuggerEvaluatorErrorReceiver<String>();
+    final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
     evaluator.evalExpression("def", receiver);
 
@@ -159,7 +84,7 @@ public class TheRDebuggerEvaluatorImplTest {
   }
 
   @Test
-  public void evalFunction() {
+  public void function() {
     final String text = "[1] 1 2 3";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
@@ -177,7 +102,7 @@ public class TheRDebuggerEvaluatorImplTest {
       outputReceiver
     );
 
-    final TheRDebuggerEvaluatorReceiver<String> receiver = new TheRDebuggerEvaluatorReceiver<String>(text);
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(text);
 
     evaluator.evalExpression("def(c(1:5))", receiver);
 
@@ -187,7 +112,7 @@ public class TheRDebuggerEvaluatorImplTest {
   }
 
   @Test
-  public void evalDebuggedFunction() {
+  public void debuggedFunction() {
     final String command = "def(c(1:5))";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
@@ -206,7 +131,7 @@ public class TheRDebuggerEvaluatorImplTest {
       outputReceiver
     );
 
-    final TheRDebuggerEvaluatorReceiver<String> receiver = new TheRDebuggerEvaluatorReceiver<String>("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
 
     evaluator.evalExpression(command, receiver);
 
