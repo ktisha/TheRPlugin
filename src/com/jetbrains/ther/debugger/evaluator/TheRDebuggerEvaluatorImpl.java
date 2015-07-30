@@ -9,6 +9,7 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.List;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
-// TODO [dbg][test-see-coverage]
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
@@ -98,6 +98,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       myReceiver
     );
 
+    //noinspection StatementWithEmptyBody
     while (handler.advance()) {
     }
 
@@ -111,17 +112,20 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
     private int myDropFrames;
 
+    @Nullable
+    private String myResult;
+
     public TheREvaluatedFunctionDebuggerHandler(@NotNull final TheRProcess process,
-                                                @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                                @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
+                                                @NotNull final TheRFunctionDebuggerFactory factory,
+                                                @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
       myDebuggers = new ArrayList<TheRFunctionDebugger>();
       myDropFrames = 1;
 
       appendDebugger(
-        debuggerFactory.getNotMainFunctionDebugger(
+        factory.getNotMainFunctionDebugger(
           process,
           this,
-          outputReceiver
+          receiver
         )
       );
     }
@@ -129,7 +133,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     public boolean advance() throws TheRDebuggerException {
       topDebugger().advance(); // Don't forget that advance could append new debugger
 
-      while (!topDebugger().hasNext()) {
+      while (!myDebuggers.isEmpty() && !topDebugger().hasNext()) {
         if (myDebuggers.size() == 1) {
           return false;
         }
@@ -141,12 +145,17 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         myDropFrames = 1;
       }
 
-      return true;
+      return !myDebuggers.isEmpty();
     }
 
     @NotNull
     public String getResult() {
-      return topDebugger().getResult();
+      if (myResult != null) {
+        return myResult;
+      }
+      else {
+        return topDebugger().getResult();
+      }
     }
 
     @Override
@@ -161,6 +170,10 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     @Override
     public void setDropFrames(final int number) {
       myDropFrames = number;
+
+      if (myDropFrames == myDebuggers.size()) {
+        myResult = topDebugger().getResult();
+      }
     }
 
     @NotNull

@@ -138,8 +138,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
     handleEndTraceReturnLineNumber(response, lastExitingFromEntry);
 
-    myDebuggerHandler.setDropFrames(1);
-
     myCurrentLineNumber = -1;
   }
 
@@ -163,9 +161,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
     handleEndTraceReturnLineNumber(response, data.myLastExitingFrom);
 
-    myDebuggerHandler.setDropFrames(data.myExitingFromCount);
-
     myCurrentLineNumber = -1;
+
+    myDebuggerHandler.setDropFrames(data.myExitingFromCount);
   }
 
   private int extractLineNumber(@NotNull final String text, final int index) {
