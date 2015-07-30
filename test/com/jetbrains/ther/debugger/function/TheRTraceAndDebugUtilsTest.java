@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -18,14 +19,19 @@ public class TheRTraceAndDebugUtilsTest {
 
   @Test
   public void empty() throws TheRDebuggerException {
-    final EmptyTheRProcess process = new EmptyTheRProcess();
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      NO_FUNCTIONS_RESPONSE,
+      TheRProcessResponseType.RESPONSE,
+      TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+      ""
+    );
 
     traceAndDebugFunctions(
       process,
       new IllegalTheROutputReceiver()
     );
 
-    assertEquals(1, process.myCounter);
+    assertEquals(1, process.getCounter());
   }
 
   @Test
@@ -38,32 +44,6 @@ public class TheRTraceAndDebugUtilsTest {
     );
 
     assertTrue(process.check());
-  }
-
-  private static class EmptyTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
-
-    @NotNull
-    @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          ""
-        );
-      }
-
-      throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
-    }
   }
 
   private static class MockTheRProcess implements TheRProcess {

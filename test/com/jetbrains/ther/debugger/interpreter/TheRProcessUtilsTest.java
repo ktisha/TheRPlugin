@@ -3,13 +3,16 @@ package com.jetbrains.ther.debugger.interpreter;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
-import com.jetbrains.ther.debugger.mock.TheROutputErrorReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.PLUS;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TheRProcessUtilsTest {
 
@@ -49,10 +52,11 @@ public class TheRProcessUtilsTest {
     final String error = "error";
 
     final TheRProcess process = new AlwaysSameResponseTheRProcess(output, type, resultRange, error);
-    final TheROutputErrorReceiver receiver = new TheROutputErrorReceiver("error");
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     execute(process, "def", RESPONSE, receiver);
 
-    assertEquals(1, receiver.getErrorReceived());
+    assertEquals(Collections.singletonList("error"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 }

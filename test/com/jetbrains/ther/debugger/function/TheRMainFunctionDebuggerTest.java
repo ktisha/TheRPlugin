@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
@@ -10,10 +9,14 @@ import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebugger;
+import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.mock.MockTheRFunctionDebuggerFactory;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND;
@@ -25,7 +28,7 @@ public class TheRMainFunctionDebuggerTest {
   @Test
   public void ordinary() throws TheRDebuggerException {
     final MockTheRProcess process = new MockTheRProcess();
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory();
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger(), null);
     final MockTheRFunctionDebuggerHandler handler = new MockTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
@@ -45,10 +48,11 @@ public class TheRMainFunctionDebuggerTest {
     debugger.advance();
 
     assertTrue(process.check0());
-    assertEquals(0, factory.myCounter);
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(0, receiver.myErrorCount);
-    assertEquals(0, receiver.myOutputCount);
+    assertTrue(receiver.getErrors().isEmpty());
+    assertTrue(receiver.getOutputs().isEmpty());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getLocation());
 
@@ -57,11 +61,11 @@ public class TheRMainFunctionDebuggerTest {
     debugger.advance();
 
     assertTrue(process.check1());
-    assertEquals(0, factory.myCounter);
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(1, receiver.myErrorCount);
-    assertEquals("error1", receiver.myError);
-    assertEquals(0, receiver.myOutputCount);
+    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getLocation());
 
@@ -70,11 +74,11 @@ public class TheRMainFunctionDebuggerTest {
     debugger.advance();
 
     assertTrue(process.check2());
-    assertEquals(0, factory.myCounter);
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(1, receiver.myErrorCount);
-    assertEquals("error2", receiver.myError);
-    assertEquals(0, receiver.myOutputCount);
+    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 7), debugger.getLocation());
 
@@ -83,12 +87,11 @@ public class TheRMainFunctionDebuggerTest {
     debugger.advance();
 
     assertTrue(process.check3());
-    assertEquals(0, factory.myCounter);
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(1, receiver.myErrorCount);
-    assertEquals(1, receiver.myOutputCount);
-    assertEquals("error3", receiver.myError);
-    assertEquals("character(0)", receiver.myOutput);
+    assertEquals(Collections.singletonList("error3"), receiver.getErrors());
+    assertEquals(Collections.singletonList("character(0)"), receiver.getOutputs());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 10), debugger.getLocation());
 
@@ -97,10 +100,11 @@ public class TheRMainFunctionDebuggerTest {
     debugger.advance();
 
     assertTrue(process.check4());
-    assertEquals(1, factory.myCounter);
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(1, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
-    assertEquals(0, receiver.myOutputCount);
-    assertEquals(0, receiver.myErrorCount);
+    assertTrue(receiver.getErrors().isEmpty());
+    assertTrue(receiver.getOutputs().isEmpty());
     assertFalse(debugger.hasNext());
     assertEquals("", debugger.getResult());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, -1), debugger.getLocation());
@@ -283,79 +287,13 @@ public class TheRMainFunctionDebuggerTest {
     }
   }
 
-  private static class MockTheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
-
-    private int myCounter = 0;
-
-    @NotNull
-    @Override
-    public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                           @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
-      myCounter++;
-
-      return new IllegalTheRFunctionDebugger();
-    }
-
-    @NotNull
-    @Override
-    public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                        @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                        @NotNull final TheROutputReceiver outputReceiver,
-                                                        @NotNull final TheRScriptReader scriptReader) {
-      throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
-    }
-  }
-
-  private static class MockTheRFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {
+  private static class MockTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myCounter = 0;
 
     @Override
     public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
       myCounter++;
-    }
-
-    @Override
-    public void setReturnLineNumber(final int lineNumber) {
-      throw new IllegalStateException("SetReturnLineNumber shouldn't be called");
-    }
-
-    @Override
-    public void setDropFrames(final int number) {
-      throw new IllegalStateException("SetDropFrames shouldn't be called");
-    }
-  }
-
-  private static class MockTheROutputReceiver implements TheROutputReceiver {
-
-    @NotNull
-    private String myOutput = "";
-
-    @NotNull
-    private String myError = "";
-
-    private int myOutputCount = 0;
-    private int myErrorCount = 0;
-
-    @Override
-    public void receiveOutput(@NotNull final String output) {
-      myOutput = output;
-      myOutputCount++;
-    }
-
-    @Override
-    public void receiveError(@NotNull final String error) {
-      myError = error;
-      myErrorCount++;
-    }
-
-    public void reset() {
-      myOutput = "";
-      myError = "";
-
-      myOutputCount = 0;
-      myErrorCount = 0;
     }
   }
 

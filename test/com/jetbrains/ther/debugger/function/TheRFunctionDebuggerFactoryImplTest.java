@@ -8,18 +8,21 @@ import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
-import com.jetbrains.ther.debugger.mock.TheROutputErrorReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TheRFunctionDebuggerFactoryImplTest {
 
   @Test
   public void braceFunction() throws TheRDebuggerException {
-    final TheROutputErrorReceiver outputReceiver = new TheROutputErrorReceiver("error");
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
     final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new BraceTheRProcess(),
@@ -30,7 +33,8 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 1);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(1, outputReceiver.getErrorReceived());
+    assertEquals(Collections.singletonList("error"), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
   @Test

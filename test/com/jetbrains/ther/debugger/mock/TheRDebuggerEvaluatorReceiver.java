@@ -10,16 +10,16 @@ public class TheRDebuggerEvaluatorReceiver implements TheRDebuggerEvaluator.Rece
   @NotNull
   private final String myExpectedResult;
 
-  private int myResultReceived;
+  private int myCounter;
 
   public TheRDebuggerEvaluatorReceiver(@NotNull final String expectedResult) {
     myExpectedResult = expectedResult;
-    myResultReceived = 0;
+    myCounter = 0;
   }
 
   @Override
   public void receiveResult(@NotNull final String result) {
-    myResultReceived++;
+    myCounter++;
 
     assertEquals(myExpectedResult, result);
   }
@@ -34,7 +34,7 @@ public class TheRDebuggerEvaluatorReceiver implements TheRDebuggerEvaluator.Rece
     throw new IllegalStateException("ReceiveError shouldn't be called");
   }
 
-  public int getResultReceived() {
-    return myResultReceived;
+  public int getCounter() {
+    return myCounter;
   }
 }

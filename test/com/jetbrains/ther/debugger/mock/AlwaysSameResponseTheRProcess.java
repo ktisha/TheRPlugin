@@ -21,7 +21,7 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
   @NotNull
   private final String myError;
 
-  private int myExecuteCalled;
+  private int myCounter;
 
   public AlwaysSameResponseTheRProcess(@NotNull final String text,
                                        @NotNull final TheRProcessResponseType type,
@@ -31,13 +31,13 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
     myType = type;
     myOutputRange = outputRange;
     myError = error;
-    myExecuteCalled = 0;
+    myCounter = 0;
   }
 
   @NotNull
   @Override
   public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-    myExecuteCalled++;
+    myCounter++;
 
     return new TheRProcessResponse(myText, myType, myOutputRange, myError);
   }
@@ -46,7 +46,7 @@ public class AlwaysSameResponseTheRProcess implements TheRProcess {
   public void stop() {
   }
 
-  public int getExecuteCalled() {
-    return myExecuteCalled;
+  public int getCounter() {
+    return myCounter;
   }
 }

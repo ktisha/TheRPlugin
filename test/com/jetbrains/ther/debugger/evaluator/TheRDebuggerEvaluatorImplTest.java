@@ -1,13 +1,9 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.TheRScriptReader;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
-import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
-import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
@@ -15,7 +11,10 @@ import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TheRDebuggerEvaluatorImplTest {
 
@@ -30,7 +29,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
-      new IllegalTheRFunctionDebuggerFactory(),
+      new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver()
     );
 
@@ -38,8 +37,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("def <- function() {", receiver);
 
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getErrorReceived());
+    assertEquals(1, process.getCounter());
+    assertEquals(1, receiver.getCounter());
   }
 
   @Test
@@ -53,7 +52,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
-      new IllegalTheRFunctionDebuggerFactory(),
+      new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver()
     );
 
@@ -61,8 +60,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("abc", receiver);
 
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getErrorReceived());
+    assertEquals(1, process.getCounter());
+    assertEquals(1, receiver.getCounter());
   }
 
   @Test
@@ -71,7 +70,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
-      new IllegalTheRFunctionDebuggerFactory(),
+      new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver()
     );
 
@@ -79,8 +78,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("def", receiver);
 
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getErrorReceived());
+    assertEquals(1, process.getCounter());
+    assertEquals(1, receiver.getCounter());
   }
 
   @Test
@@ -94,11 +93,11 @@ public class TheRDebuggerEvaluatorImplTest {
       "abc"
     );
 
-    final TheROutputErrorReceiver outputReceiver = new TheROutputErrorReceiver("abc");
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
-      new IllegalTheRFunctionDebuggerFactory(),
+      new MockTheRFunctionDebuggerFactory(null, null),
       outputReceiver
     );
 
@@ -106,9 +105,10 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression("def(c(1:5))", receiver);
 
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, receiver.getResultReceived());
-    assertEquals(1, outputReceiver.getErrorReceived());
+    assertEquals(1, process.getCounter());
+    assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -116,14 +116,15 @@ public class TheRDebuggerEvaluatorImplTest {
     final String command = "def(c(1:5))";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      "debugging in: " + command,
+      TheRDebugConstants.DEBUGGING_IN + ": " + command,
       TheRProcessResponseType.DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
       "abc"
     );
 
-    final DebuggedTheRFunctionDebuggerFactory debuggerFactory = new DebuggedTheRFunctionDebuggerFactory();
-    final TheROutputErrorReceiver outputReceiver = new TheROutputErrorReceiver("abc");
+    final Stack1TheRFunctionDebugger functionDebugger = new Stack1TheRFunctionDebugger();
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(functionDebugger, null);
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
@@ -135,21 +136,23 @@ public class TheRDebuggerEvaluatorImplTest {
 
     evaluator.evalExpression(command, receiver);
 
-    assertEquals(1, process.getExecuteCalled());
-    assertEquals(1, debuggerFactory.getNotMainCalled());
-    assertEquals(1, debuggerFactory.getAdvanceCalled());
-    assertEquals(1, receiver.getResultReceived());
-    assertEquals(1, outputReceiver.getErrorReceived());
+    assertEquals(1, process.getCounter());
+    assertEquals(1, debuggerFactory.getNotMainCounter());
+    assertEquals(0, debuggerFactory.getMainCounter());
+    assertEquals(1, functionDebugger.getCounter());
+    assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
   private static class ExceptionDuringExecutionTheRProcess implements TheRProcess {
 
-    private int myExecuteCalled = 0;
+    private int myCounter = 0;
 
     @NotNull
     @Override
     public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myExecuteCalled++;
+      myCounter++;
 
       throw new TheRDebuggerException("");
     }
@@ -158,69 +161,27 @@ public class TheRDebuggerEvaluatorImplTest {
     public void stop() {
     }
 
-    public int getExecuteCalled() {
-      return myExecuteCalled;
+    public int getCounter() {
+      return myCounter;
     }
   }
 
-  private static class DebuggedTheRFunctionDebuggerFactory implements TheRFunctionDebuggerFactory {
+  private static class Stack1TheRFunctionDebugger extends MockTheRFunctionDebugger {
 
-    private final int[] myAdvanceCalled = new int[]{0};
-    private int myNotMainCalled = 0;
-
-    @NotNull
-    @Override
-    public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                           @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                           @NotNull final TheROutputReceiver outputReceiver)
-      throws TheRDebuggerException {
-      myNotMainCalled++;
-
-      return new TheRFunctionDebugger() {
-
-        @NotNull
-        @Override
-        public TheRLocation getLocation() {
-          throw new IllegalStateException("GetLocation shouldn't be called");
-        }
-
-        @Override
-        public boolean hasNext() {
-          return false;
-        }
-
-        @Override
-        public void advance() throws TheRDebuggerException {
-          myAdvanceCalled[0]++;
-
-          if (myAdvanceCalled[0] > 1) {
-            throw new IllegalStateException("Advance shouldn't be called");
-          }
-        }
-
-        @NotNull
-        @Override
-        public String getResult() {
-          return "[1] 1 2 3";
-        }
-      };
+    public Stack1TheRFunctionDebugger() {
+      super("", 1);
     }
 
     @NotNull
     @Override
-    public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
-                                                        @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                        @NotNull final TheROutputReceiver outputReceiver,
-                                                        @NotNull final TheRScriptReader scriptReader) {
-      throw new IllegalStateException("GetMainFunctionDebugger shouldn't be called");
+    public TheRLocation getLocation() {
+      throw new IllegalStateException("GetLocation shouldn't be called");
     }
 
-    public int getNotMainCalled() {
-      return myNotMainCalled;
-    }
-
-    public int getAdvanceCalled() {
-      return myAdvanceCalled[0];
+    @NotNull
+    @Override
+    public String getResult() {
+      return "[1] 1 2 3";
     }
   }
 }

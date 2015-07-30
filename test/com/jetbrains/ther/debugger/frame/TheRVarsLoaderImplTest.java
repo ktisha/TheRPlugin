@@ -33,7 +33,7 @@ public class TheRVarsLoaderImplTest {
       ).load().size()
     );
 
-    assertEquals(1, process.getExecuteCalled());
+    assertEquals(1, process.getCounter());
   }
 
   @Test

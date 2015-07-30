@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.mock.EmptyReader;
+import com.jetbrains.ther.debugger.mock.MockReader;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -16,28 +16,34 @@ public class TheRProcessReceiverTest {
 
   @Test
   public void sleepIncreasing() throws TheRDebuggerException {
-    final IncreasingMockReader reader = new IncreasingMockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader());
+    final IncreasingMockReader outputReader = new IncreasingMockReader();
+    final MockReader errorReader = new MockReader("");
+
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(outputReader, errorReader);
 
     receiver.receive();
 
-    assertEquals(9, reader.getCounter());
+    assertEquals(9, outputReader.getCounter());
+    assertEquals(0, errorReader.getCounter());
   }
 
   @Test
   public void sleepResetting() throws TheRDebuggerException {
-    final ResettingMockReader reader = new ResettingMockReader();
-    final TheRProcessReceiver receiver = new TheRProcessReceiver(reader, new EmptyReader());
+    final ResettingMockReader outputReader = new ResettingMockReader();
+    final MockReader errorReader = new MockReader("");
+
+    final TheRProcessReceiver receiver = new TheRProcessReceiver(outputReader, errorReader);
 
     receiver.receive();
 
-    assertEquals(6, reader.getCounter());
+    assertEquals(6, outputReader.getCounter());
+    assertEquals(0, errorReader.getCounter());
   }
 
   @Test
   public void responseHandling() throws TheRDebuggerException {
-    final MockOutputReader outputReader = new MockOutputReader();
-    final MockErrorReader errorReader = new MockErrorReader();
+    final MockReader outputReader = new MockReader("ls()\n[1] \"x\"\nBrowse[3]> ");
+    final MockReader errorReader = new MockReader("error");
 
     final TheRProcessReceiver receiver = new TheRProcessReceiver(outputReader, errorReader);
     final TheRProcessResponse response = receiver.receive();
@@ -197,63 +203,6 @@ public class TheRProcessReceiverTest {
         myPrevPause = pause;
         myTime = currentTime;
       }
-    }
-  }
-
-  private static class MockOutputReader extends Reader {
-
-    private int myCounter = 0;
-
-    @Override
-    public int read(@NotNull final char[] cbuf, final int off, final int len) throws IOException {
-      final String response = "ls()\n[1] \"x\"\nBrowse[3]> ";
-
-      for (int index = 0; index < response.length(); index++) {
-        cbuf[index] = response.charAt(index);
-      }
-
-      myCounter++;
-
-      return response.length();
-    }
-
-    @Override
-    public void close() throws IOException {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
-  }
-
-  private static class MockErrorReader extends Reader {
-
-    private int myCounter = 0;
-
-    @Override
-    public boolean ready() throws IOException {
-      return myCounter == 0;
-    }
-
-    @Override
-    public int read(@NotNull final char[] cbuf, final int off, final int len) throws IOException {
-      final String response = "error";
-
-      for (int index = 0; index < response.length(); index++) {
-        cbuf[index] = response.charAt(index);
-      }
-
-      myCounter++;
-
-      return response.length();
-    }
-
-    @Override
-    public void close() throws IOException {
-    }
-
-    public int getCounter() {
-      return myCounter;
     }
   }
 }

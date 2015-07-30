@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TheRDebuggerEvaluatorErrorReceiver implements TheRDebuggerEvaluator.Receiver {
 
-  private int myErrorReceived = 0;
+  private int myCounter = 0;
 
   @Override
   public void receiveResult(@NotNull final String result) {
@@ -14,15 +14,15 @@ public class TheRDebuggerEvaluatorErrorReceiver implements TheRDebuggerEvaluator
 
   @Override
   public void receiveError(@NotNull final Exception e) {
-    myErrorReceived++;
+    myCounter++;
   }
 
   @Override
   public void receiveError(@NotNull final String error) {
-    myErrorReceived++;
+    myCounter++;
   }
 
-  public int getErrorReceived() {
-    return myErrorReceived;
+  public int getCounter() {
+    return myCounter;
   }
 }
