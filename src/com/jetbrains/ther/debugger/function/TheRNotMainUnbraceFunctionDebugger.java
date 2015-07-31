@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
-// TODO [dbg][test]
 class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
 
   public TheRNotMainUnbraceFunctionDebugger(@NotNull final TheRProcess process,
@@ -47,5 +46,12 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected int initCurrentLine() throws TheRDebuggerException {
     return 0;
+  }
+
+  @Override
+  protected void handleDebuggingIn(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
+    super.handleDebuggingIn(response);
+
+    setCurrentLineNumber(-1);
   }
 }

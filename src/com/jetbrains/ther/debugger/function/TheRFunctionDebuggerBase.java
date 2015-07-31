@@ -19,7 +19,6 @@ import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RE
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
-// TODO [dbg][test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   @NotNull
@@ -164,6 +163,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myCurrentLineNumber = -1;
 
     myDebuggerHandler.setDropFrames(data.myExitingFromCount);
+  }
+
+  protected void setCurrentLineNumber(final int currentLineNumber) {
+    myCurrentLineNumber = currentLineNumber;
   }
 
   private int extractLineNumber(@NotNull final String text, final int index) {

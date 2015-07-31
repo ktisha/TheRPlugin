@@ -7,6 +7,7 @@ import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderImplTest;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImplTest;
 import com.jetbrains.ther.debugger.function.TheRMainFunctionDebuggerTest;
+import com.jetbrains.ther.debugger.function.TheRNotMainUnbraceFunctionDebuggerTest;
 import com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculatorTest;
@@ -60,6 +61,7 @@ public class TheRTestSuite extends TestCase {
     // function package
     addJUnit4Test(suite, TheRFunctionDebuggerFactoryImplTest.class);
     addJUnit4Test(suite, TheRMainFunctionDebuggerTest.class);
+    addJUnit4Test(suite, TheRNotMainUnbraceFunctionDebuggerTest.class);
     addJUnit4Test(suite, TheRTraceAndDebugUtilsTest.class);
 
     // interpreter package
