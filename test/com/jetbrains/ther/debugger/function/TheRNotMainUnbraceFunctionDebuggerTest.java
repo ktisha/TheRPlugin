@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
@@ -9,6 +10,7 @@ import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
@@ -238,6 +240,49 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(2, process.getCounter());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
     assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+  }
+
+  @Test
+  public void continueTrace() throws TheRDebuggerException {
+    /*
+    `x + 1` with `continue trace`
+    */
+
+    final ContinueTraceTheRProcess process = new ContinueTraceTheRProcess();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
+      process,
+      new MockTheRFunctionDebuggerFactory(null, null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(1, process.getCounter());
+    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(7, process.getCounter());
+    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Arrays.asList("error2", "error3", "error4", "error5", "error6", "error1"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals("[1] 4 5 6", debugger.getResult());
+    assertEquals(8, process.getCounter());
+    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.singletonList("error8"), receiver.getErrors());
   }
 
   private static class OrdinaryTheRProcess extends MockTheRProcess {
@@ -505,6 +550,81 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           TheRProcessResponseType.END_TRACE,
           new TextRange(0, 9),
           "error2"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class ContinueTraceTheRProcess extends MockTheRProcess {
+
+    @NotNull
+    @Override
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND)) {
+        return new TheRProcessResponse(
+          NO_FUNCTIONS_RESPONSE,
+          TheRProcessResponseType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+          "error1"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRProcessResponse(
+          TRACING + " abc() on exit \n" +
+          "[1] \"abc\"\n" +
+          EXITING_FROM + " abc()\n" +
+          "[1] 1 2 3\n" +
+          TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
+          "debug: {\n" +
+          "    on.exit(.doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_EXIT_FUNCTION_SUFFIX + "(), \"on exit\"))\n" +
+          "    {\n" +
+          "        .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
+          "        {\n" +
+          "            c(1:3)\n" +
+          "        }\n" +
+          "    }\n" +
+          "}\n" +
+          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+          TheRProcessResponseType.CONTINUE_TRACE,
+          new TextRange(53, 62),
+          "error2"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && 3 <= getCounter() && getCounter() <= 5) {
+        return new TheRProcessResponse(
+          "output",
+          TheRProcessResponseType.RESPONSE,
+          TextRange.EMPTY_RANGE,
+          "error" + getCounter()
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 6) {
+        return new TheRProcessResponse(
+          TRACING + " abc() on entry \n" +
+          "[1] \"abc\"\n" +
+          "debug: c(4:6)\n" +
+          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+          TheRProcessResponseType.START_TRACE_UNBRACE,
+          TextRange.EMPTY_RANGE,
+          "error6"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 8) {
+        return new TheRProcessResponse(
+          TRACING + " abc() on exit \n" +
+          "[1] \"abc\"\n" +
+          EXITING_FROM + " abc()\n" +
+          "[1] 4 5 6\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRProcessResponseType.END_TRACE,
+          new TextRange(53, 62),
+          "error8"
         );
       }
 

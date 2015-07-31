@@ -16,7 +16,6 @@ import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendResult;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
@@ -92,6 +91,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   protected abstract void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException;
 
+  @NotNull
+  protected abstract TheRProcessResponseType getStartTraceType();
+
   protected int loadLineNumber() throws TheRDebuggerException {
     final TheRProcessResponse response = execute(
       myProcess,
@@ -117,15 +119,15 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleContinueTrace(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    appendResult(response, myOutputReceiver);
+    handleEndTraceResult(response);
     appendError(response, myOutputReceiver);
 
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, START_TRACE_BRACE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, getStartTraceType(), myOutputReceiver);
 
-    myCurrentLineNumber = loadLineNumber();
+    myCurrentLineNumber = initCurrentLine();
     traceAndDebugFunctions(myProcess, myOutputReceiver);
   }
 

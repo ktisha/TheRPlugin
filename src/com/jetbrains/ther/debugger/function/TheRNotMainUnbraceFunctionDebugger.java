@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
@@ -31,13 +32,16 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case RECURSIVE_END_TRACE:
         handleRecursiveEndTrace(response);
         break;
+      case CONTINUE_TRACE:
+        handleContinueTrace(response);
+        break;
       default:
         throw new UnexpectedResponseException(
           "Actual response type is not the same as expected: " +
           "[" +
           "actual: " + response.getType() + ", " +
           "expected: " +
-          "[" + END_TRACE + ", " + DEBUGGING_IN + ", " + RECURSIVE_END_TRACE + "]" +
+          "[" + END_TRACE + ", " + DEBUGGING_IN + ", " + RECURSIVE_END_TRACE + ", " + CONTINUE_TRACE + "]" +
           "]"
         );
     }
@@ -46,6 +50,12 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected int initCurrentLine() throws TheRDebuggerException {
     return 0;
+  }
+
+  @NotNull
+  @Override
+  protected TheRProcessResponseType getStartTraceType() {
+    return TheRProcessResponseType.START_TRACE_UNBRACE;
   }
 
   @Override

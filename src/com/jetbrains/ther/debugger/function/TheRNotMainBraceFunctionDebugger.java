@@ -5,11 +5,11 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
-// TODO [dbg][test]
 class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
 
   public TheRNotMainBraceFunctionDebugger(@NotNull final TheRProcess process,
@@ -53,5 +53,11 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected int initCurrentLine() throws TheRDebuggerException {
     return loadLineNumber();
+  }
+
+  @NotNull
+  @Override
+  protected TheRProcessResponseType getStartTraceType() {
+    return START_TRACE_BRACE;
   }
 }
