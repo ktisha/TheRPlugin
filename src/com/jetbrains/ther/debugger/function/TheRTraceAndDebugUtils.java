@@ -62,40 +62,40 @@ final class TheRTraceAndDebugUtils {
   }
 
   @NotNull
-  private static String enterFunction(@NotNull final String var) {
-    return enterFunctionName(var) + " <- function() { print(\"" + var + "\") }";
+  private static String enterFunction(@NotNull final String functionName) {
+    return enterFunctionName(functionName) + " <- function() { print(\"" + functionName + "\") }";
   }
 
   @NotNull
-  private static String exitFunction(@NotNull final String var) {
-    return exitFunctionName(var) + " <- function() { print(\"" + var + "\") }";
+  private static String exitFunction(@NotNull final String functionName) {
+    return exitFunctionName(functionName) + " <- function() { print(\"" + functionName + "\") }";
   }
 
   @NotNull
-  private static String traceCommand(@NotNull final String var) {
+  private static String traceCommand(@NotNull final String functionName) {
     return TRACE_COMMAND +
            "(" +
-           var +
+           functionName +
            ", " +
-           enterFunctionName(var) +
+           enterFunctionName(functionName) +
            ", exit = " +
-           exitFunctionName(var) +
+           exitFunctionName(functionName) +
            ", where = " + ENVIRONMENT + "()" +
            ")";
   }
 
   @NotNull
-  private static String debugCommand(@NotNull final String var) {
-    return DEBUG_COMMAND + "(" + var + ")";
+  private static String debugCommand(@NotNull final String functionName) {
+    return DEBUG_COMMAND + "(" + functionName + ")";
   }
 
   @NotNull
-  private static String enterFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_ENTER_FUNCTION_SUFFIX;
+  private static String enterFunctionName(@NotNull final String functionName) {
+    return SERVICE_FUNCTION_PREFIX + functionName + SERVICE_ENTER_FUNCTION_SUFFIX;
   }
 
   @NotNull
-  private static String exitFunctionName(@NotNull final String var) {
-    return SERVICE_FUNCTION_PREFIX + var + SERVICE_EXIT_FUNCTION_SUFFIX;
+  private static String exitFunctionName(@NotNull final String functionName) {
+    return SERVICE_FUNCTION_PREFIX + functionName + SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 }

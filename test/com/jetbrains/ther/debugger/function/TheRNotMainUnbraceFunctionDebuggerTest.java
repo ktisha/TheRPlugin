@@ -19,12 +19,12 @@ import static org.junit.Assert.*;
 public class TheRNotMainUnbraceFunctionDebuggerTest {
 
   @Test
-  public void ordinary1() throws TheRDebuggerException {
+  public void ordinary() throws TheRDebuggerException {
     /*
     `x + 1`
     */
 
-    final Ordinary1TheRProcess process = new Ordinary1TheRProcess();
+    final OrdinaryTheRProcess process = new OrdinaryTheRProcess();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -53,14 +53,14 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void ordinary2() throws TheRDebuggerException {
+  public void function() throws TheRDebuggerException {
     /*
     f()
     */
 
-    final Ordinary2TheRProcess process = new Ordinary2TheRProcess();
+    final FunctionTheRProcess process = new FunctionTheRProcess();
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger(), null);
-    final Ordinary2TheRFunctionDebuggerHandler handler = new Ordinary2TheRFunctionDebuggerHandler();
+    final FunctionTheRFunctionDebuggerHandler handler = new FunctionTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -94,13 +94,13 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void ordinary3() throws TheRDebuggerException {
+  public void recursiveReturn() throws TheRDebuggerException {
     /*
     `x + 1` with recursive return
     */
 
-    final Ordinary3TheRProcess process = new Ordinary3TheRProcess();
-    final Ordinary3TheRFunctionDebuggerHandler handler = new Ordinary3TheRFunctionDebuggerHandler();
+    final RecursiveReturnTheRProcess process = new RecursiveReturnTheRProcess();
+    final RecursiveReturnTheRFunctionDebuggerHandler handler = new RecursiveReturnTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -131,13 +131,13 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void ordinary4() throws TheRDebuggerException {
+  public void debugAt() throws TheRDebuggerException {
     /*
     `x + 1` with `debug at` at the end
     */
 
-    final Ordinary4TheRProcess process = new Ordinary4TheRProcess();
-    final Ordinary4TheRFunctionDebuggerHandler handler = new Ordinary4TheRFunctionDebuggerHandler();
+    final DebugAtTheRProcess process = new DebugAtTheRProcess();
+    final DebugAtTheRFunctionDebuggerHandler handler = new DebugAtTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -168,13 +168,13 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void ordinary5() throws TheRDebuggerException {
+  public void recursiveReturnAndDebugAt() throws TheRDebuggerException {
     /*
     `x + 1` with recursive return and `debug at` at the end
     */
 
-    final Ordinary5TheRProcess process = new Ordinary5TheRProcess();
-    final Ordinary5TheRFunctionDebuggerHandler handler = new Ordinary5TheRFunctionDebuggerHandler();
+    final RecursiveReturnAndDebugAtTheRProcess process = new RecursiveReturnAndDebugAtTheRProcess();
+    final RecursiveReturnAndDebugAtTheRFunctionDebuggerHandler handler = new RecursiveReturnAndDebugAtTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -207,12 +207,12 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void ordinary6() throws TheRDebuggerException {
+  public void print() throws TheRDebuggerException {
     /*
     `print(x + 1)`
     */
 
-    final Ordinary6TheRProcess process = new Ordinary6TheRProcess();
+    final PrintTheRProcess process = new PrintTheRProcess();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainUnbraceFunctionDebugger debugger = new TheRNotMainUnbraceFunctionDebugger(
@@ -240,7 +240,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(Collections.singletonList("error2"), receiver.getErrors());
   }
 
-  private static class Ordinary1TheRProcess extends MockTheRProcess {
+  private static class OrdinaryTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
@@ -271,7 +271,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary2TheRProcess extends MockTheRProcess {
+  private static class FunctionTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
@@ -308,7 +308,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary2TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+  private static class FunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myCounter = 0;
 
@@ -322,7 +322,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary3TheRProcess extends MockTheRProcess {
+  private static class RecursiveReturnTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
@@ -359,7 +359,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary3TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+  private static class RecursiveReturnTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myCounter = 0;
 
@@ -373,7 +373,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary4TheRProcess extends MockTheRProcess {
+  private static class DebugAtTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
@@ -405,7 +405,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary4TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+  private static class DebugAtTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myCounter = 0;
 
@@ -419,7 +419,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary5TheRProcess extends MockTheRProcess {
+  private static class RecursiveReturnAndDebugAtTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
@@ -457,7 +457,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary5TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+  private static class RecursiveReturnAndDebugAtTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myReturnLineNumberCounter = 0;
     private int myDroppedFramesCounter = 0;
@@ -481,7 +481,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary6TheRProcess extends MockTheRProcess {
+  private static class PrintTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
