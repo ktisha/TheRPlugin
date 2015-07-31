@@ -1,19 +1,21 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Collections;
 
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.NO_FUNCTIONS_RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -59,16 +61,12 @@ public class TheRFunctionDebuggerFactoryImplTest {
     );
   }
 
-  private static class BraceTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class BraceTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      if (myCounter < 3) {
-        myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() < 4) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
@@ -77,11 +75,9 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (myCounter == 3) {
-        myCounter++;
-
+      if (getCounter() == 4) {
         return new TheRProcessResponse(
-          "Tracing abc(1) on entry\n" +
+          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    x + 1\n" +
@@ -92,48 +88,34 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (myCounter == 4) {
-        myCounter++;
-
+      if (getCounter() == 5) {
         return new TheRProcessResponse(
-          "debug at #2: x + 1",
+          TheRDebugConstants.DEBUG_AT + "2: x + 1",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           ""
         );
       }
 
-      if (myCounter == 5) {
-        myCounter++;
-
-        final String output = "named list()";
-
+      if (getCounter() == 6) {
         return new TheRProcessResponse(
-          output,
+          NO_FUNCTIONS_RESPONSE,
           RESPONSE,
-          TextRange.allOf(output),
+          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
           ""
         );
       }
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
   }
 
-  private static class UnbraceTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class UnbraceTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      if (myCounter < 3) {
-        myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() < 4) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
@@ -142,11 +124,9 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (myCounter == 3) {
-        myCounter++;
-
+      if (getCounter() == 4) {
         return new TheRProcessResponse(
-          "Tracing abc(1) on entry\n" +
+          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: x + 1",
           START_TRACE_UNBRACE,
@@ -155,37 +135,25 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (myCounter == 4) {
-        myCounter++;
-
-        final String output = "named list()";
-
+      if (getCounter() == 5) {
         return new TheRProcessResponse(
-          output,
+          NO_FUNCTIONS_RESPONSE,
           RESPONSE,
-          TextRange.allOf(output),
+          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
           ""
         );
       }
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
   }
 
-  private static class UnexpectedResponseTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class UnexpectedResponseTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      if (myCounter < 3) {
-        myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() < 4) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
@@ -194,9 +162,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (myCounter == 3) {
-        myCounter++;
-
+      if (getCounter() == 4) {
         return new TheRProcessResponse(
           "",
           PLUS,
@@ -206,10 +172,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
       }
 
       throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
     }
   }
 }

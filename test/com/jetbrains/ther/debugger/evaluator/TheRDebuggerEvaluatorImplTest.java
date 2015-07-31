@@ -4,7 +4,6 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.*;
@@ -284,24 +283,12 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, debuggerFactory.getNotMainCounter());
   }
 
-  private static class ExceptionDuringExecutionTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class ExceptionDuringExecutionTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       throw new TheRDebuggerException("");
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
     }
   }
 

@@ -3,13 +3,9 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
-import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebugger;
-import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.mock.MockTheRFunctionDebuggerFactory;
-import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
+import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -244,15 +240,11 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(Collections.singletonList("error2"), receiver.getErrors());
   }
 
-  private static class Ordinary1TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary1TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -277,25 +269,13 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
   }
 
-  private static class Ordinary2TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary2TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -326,14 +306,6 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
   }
 
   private static class Ordinary2TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
@@ -350,15 +322,11 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary3TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary3TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -389,14 +357,6 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
   }
 
   private static class Ordinary3TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
@@ -413,15 +373,11 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary4TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary4TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -447,14 +403,6 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
   }
 
   private static class Ordinary4TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
@@ -471,15 +419,11 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary5TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary5TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -511,14 +455,6 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
 
       throw new IllegalStateException("Unexpected command");
     }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
   }
 
   private static class Ordinary5TheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
@@ -545,15 +481,11 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class Ordinary6TheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class Ordinary6TheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
@@ -577,14 +509,6 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
       }
 
       throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    public int getCounter() {
-      return myCounter;
     }
   }
 }

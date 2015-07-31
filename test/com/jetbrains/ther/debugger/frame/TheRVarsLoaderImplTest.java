@@ -3,10 +3,10 @@ package com.jetbrains.ther.debugger.frame;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -76,16 +76,12 @@ public class TheRVarsLoaderImplTest {
     assertEquals(expected, actual);
   }
 
-  private static class OrdinaryTheRProcess implements TheRProcess {
-
-    private int myCounter = 0;
+  private static class OrdinaryTheRProcess extends MockTheRProcess {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
-      if (myCounter == 0) {
-        myCounter++;
-
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() == 1) {
         final String output = "[1] \"a\" \"b\" \"c\"\n" +
                               "[4] " +
                               "\"" + SERVICE_FUNCTION_PREFIX + "d" + SERVICE_ENTER_FUNCTION_SUFFIX + "\" " +
@@ -100,9 +96,7 @@ public class TheRVarsLoaderImplTest {
         );
       }
 
-      if (myCounter == 1) { // type of a
-        myCounter++;
-
+      if (getCounter() == 2) { // type of a
         final String output = "[1] \"integer\"";
 
         return new TheRProcessResponse(
@@ -113,9 +107,7 @@ public class TheRVarsLoaderImplTest {
         );
       }
 
-      if (myCounter == 2) { // value of a
-        myCounter++;
-
+      if (getCounter() == 3) { // value of a
         final String output = "[1] 1 2 3";
 
         return new TheRProcessResponse(
@@ -126,9 +118,7 @@ public class TheRVarsLoaderImplTest {
         );
       }
 
-      if (myCounter == 3 || myCounter == 5 || myCounter == 7 || myCounter == 8) { // type of b, c, d, e
-        myCounter++;
-
+      if (getCounter() == 4 || getCounter() == 6 || getCounter() == 8 || getCounter() == 9) { // type of b, c, d, e
         final String output = FUNCTION_TYPE;
 
         return new TheRProcessResponse(
@@ -139,9 +129,7 @@ public class TheRVarsLoaderImplTest {
         );
       }
 
-      if (myCounter == 4) { // value of b
-        myCounter++;
-
+      if (getCounter() == 5) { // value of b
         final String output = "function(x) {\n" +
                               "    x ^ 2\n" +
                               "}";
@@ -154,9 +142,7 @@ public class TheRVarsLoaderImplTest {
         );
       }
 
-      if (myCounter == 6) { // value of c
-        myCounter++;
-
+      if (getCounter() == 7) { // value of c
         final String output = "function(x) {\n" +
                               "    x ^ 2\n" +
                               "}\n" +
@@ -171,10 +157,6 @@ public class TheRVarsLoaderImplTest {
       }
 
       throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
     }
   }
 }
