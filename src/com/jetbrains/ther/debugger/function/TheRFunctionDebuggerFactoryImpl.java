@@ -22,8 +22,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                          @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
     execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
 
     final TheRProcessResponse startTraceResponse = process.execute(EXECUTE_AND_STEP_COMMAND);
 

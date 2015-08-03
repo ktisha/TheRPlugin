@@ -50,13 +50,11 @@ final class TheRTraceAndDebugUtils {
   private static void traceAndDebugFunction(@NotNull final TheRProcess process,
                                             @NotNull final TheROutputReceiver receiver,
                                             @NotNull final String functionName) throws TheRDebuggerException {
-    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX) &&
-        (functionName.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX) || functionName.endsWith(SERVICE_EXIT_FUNCTION_SUFFIX))) {
+    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX) && functionName.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX)) {
       return;
     }
 
     execute(process, enterFunction(functionName), EMPTY, receiver);
-    execute(process, exitFunction(functionName), EMPTY, receiver);
     execute(process, traceCommand(functionName), RESPONSE, receiver);
     execute(process, debugCommand(functionName), EMPTY, receiver);
   }
@@ -67,19 +65,12 @@ final class TheRTraceAndDebugUtils {
   }
 
   @NotNull
-  private static String exitFunction(@NotNull final String functionName) {
-    return exitFunctionName(functionName) + " <- function() { print(\"" + functionName + "\") }";
-  }
-
-  @NotNull
   private static String traceCommand(@NotNull final String functionName) {
     return TRACE_COMMAND +
            "(" +
            functionName +
            ", " +
            enterFunctionName(functionName) +
-           ", exit = " +
-           exitFunctionName(functionName) +
            ", where = " + ENVIRONMENT + "()" +
            ")";
   }
@@ -92,10 +83,5 @@ final class TheRTraceAndDebugUtils {
   @NotNull
   private static String enterFunctionName(@NotNull final String functionName) {
     return SERVICE_FUNCTION_PREFIX + functionName + SERVICE_ENTER_FUNCTION_SUFFIX;
-  }
-
-  @NotNull
-  private static String exitFunctionName(@NotNull final String functionName) {
-    return SERVICE_FUNCTION_PREFIX + functionName + SERVICE_EXIT_FUNCTION_SUFFIX;
   }
 }

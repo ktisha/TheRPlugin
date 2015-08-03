@@ -23,13 +23,13 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
     switch (response.getType()) {
-      case END_TRACE:
+      case EXITING_FROM:
         handleEndTrace(response);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn(response);
         break;
-      case RECURSIVE_END_TRACE:
+      case RECURSIVE_EXITING_FROM:
         handleRecursiveEndTrace(response);
         break;
       case CONTINUE_TRACE:
@@ -41,7 +41,7 @@ class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "[" +
           "actual: " + response.getType() + ", " +
           "expected: " +
-          "[" + END_TRACE + ", " + DEBUGGING_IN + ", " + RECURSIVE_END_TRACE + ", " + CONTINUE_TRACE + "]" +
+          "[" + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + ", " + CONTINUE_TRACE + "]" +
           "]"
         );
     }

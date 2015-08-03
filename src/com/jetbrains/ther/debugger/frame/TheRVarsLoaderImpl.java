@@ -135,8 +135,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   }
 
   private boolean isService(@NotNull final String var) {
-    return var.startsWith(SERVICE_FUNCTION_PREFIX) &&
-           (var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX) || var.endsWith(SERVICE_EXIT_FUNCTION_SUFFIX));
+    return var.startsWith(SERVICE_FUNCTION_PREFIX) && var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX);
   }
 
   @NotNull

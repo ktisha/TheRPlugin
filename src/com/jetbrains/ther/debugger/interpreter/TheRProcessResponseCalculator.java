@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,17 +10,15 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 
 final class TheRProcessResponseCalculator {
 
   @NotNull
   private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");
-
-  @NotNull
-  private static final Pattern END_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on exit( )*$");
 
   @NotNull
   private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)");
@@ -81,7 +78,7 @@ final class TheRProcessResponseCalculator {
       sb.append(lines[i]);
 
       if (i != lines.length - 2) {
-        sb.append(TheRDebugConstants.LINE_SEPARATOR);
+        sb.append(LINE_SEPARATOR);
       }
 
       if (preCalculatedRange == null) {
@@ -128,7 +125,7 @@ final class TheRProcessResponseCalculator {
       return candidate;
     }
 
-    candidate = tryEndTrace(lines);
+    candidate = tryExitingFrom(lines);
 
     if (candidate != null) {
       return candidate;
@@ -174,7 +171,7 @@ final class TheRProcessResponseCalculator {
       result += lines[i].length();
 
       if (i != lines.length - 2) {
-        result += TheRDebugConstants.LINE_SEPARATOR.length();
+        result += LINE_SEPARATOR.length();
       }
     }
 
@@ -190,7 +187,7 @@ final class TheRProcessResponseCalculator {
       result += lines[i].length();
 
       if (i != lines.length - 2 && i != resultLineEnd - 1) {
-        result += TheRDebugConstants.LINE_SEPARATOR.length();
+        result += LINE_SEPARATOR.length();
       }
     }
 
@@ -223,8 +220,8 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndResultLineBounds tryDebugging(@NotNull final String[] lines) {
-    if (lines.length > 1 && lines[1].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
-      return new TypeAndResultLineBounds(DEBUGGING_IN, 1, 1);
+    if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN)) {
+      return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUGGING_IN, 1, 1);
     }
     else {
       return null;
@@ -233,18 +230,15 @@ final class TheRProcessResponseCalculator {
 
   @Nullable
   private static TypeAndResultLineBounds tryContinueTrace(@NotNull final String[] lines) {
-    final int endOffset = -1  // "[1] \"...\"" line
-                          - 1 // "exiting from ..." line
-                          - 1 // "debugging in..." line
-                          - 1; // "debug: {..." line
+    final int endOffset = -2; // "debugging in..." line and "debug: {..." line
 
     for (int i = 1; i < lines.length + endOffset - 1; i++) {
-      if (lines[i + 2].startsWith(EXITING_FROM) && END_TRACE_PATTERN.matcher(lines[i]).find()) {
-        for (int j = i + 3; j < lines.length; j++) {
-          if (lines[j].startsWith(TheRDebugConstants.DEBUGGING_IN)) {
+      if (lines[i].startsWith(EXITING_FROM)) {
+        for (int j = i + 1; j < lines.length; j++) {
+          if (lines[j].startsWith(DEBUGGING_IN)) {
             if (i == 1) {
               // result could be located inside trace information between "exiting from ..." and "debugging in..." lines
-              return new TypeAndResultLineBounds(CONTINUE_TRACE, i + 3, j);
+              return new TypeAndResultLineBounds(CONTINUE_TRACE, i + 1, j);
             }
             else {
               // result could be located before trace information
@@ -261,38 +255,36 @@ final class TheRProcessResponseCalculator {
   }
 
   @Nullable
-  private static TypeAndResultLineBounds tryEndTrace(@NotNull final String[] lines) {
-    final int endOffset = -2; // "[1] \"...\" and "exiting from ..." lines
-    final List<Integer> endTraceIndices = new ArrayList<Integer>();
+  private static TypeAndResultLineBounds tryExitingFrom(@NotNull final String[] lines) {
+    final List<Integer> exitingFromIndices = new ArrayList<Integer>();
 
-    for (int i = 1; i < lines.length + endOffset - 1; i++) {
-      if (END_TRACE_PATTERN.matcher(lines[i]).find()) {
-        endTraceIndices.add(i);
+    for (int i = 1; i < lines.length - 1; i++) {
+      if (lines[i].startsWith(EXITING_FROM)) {
+        exitingFromIndices.add(i);
       }
     }
 
-    if (endTraceIndices.isEmpty()) {
+    if (exitingFromIndices.isEmpty()) {
       return null;
     }
 
-    final TheRProcessResponseType type = (endTraceIndices.size() == 1) ? END_TRACE : RECURSIVE_END_TRACE;
+    final TheRProcessResponseType type = (exitingFromIndices.size() == 1) ? TheRProcessResponseType.EXITING_FROM : RECURSIVE_EXITING_FROM;
 
-    final Integer firstEndTrace = endTraceIndices.get(0);
-    final Integer lastEndTrace = endTraceIndices.get(endTraceIndices.size() - 1);
+    final Integer firstExitingFrom = exitingFromIndices.get(0);
+    final Integer lastExitingFrom = exitingFromIndices.get(exitingFromIndices.size() - 1);
 
-    if (firstEndTrace == 1) {
+    if (firstExitingFrom == 1) {
       // result could be located inside trace information between last "exiting from ..." and "debug at #..." lines
       // or just after last "exiting from ..." line if there is no "debug at #..." line
 
-      final int exitingFromOffset = lastEndTrace + 2; // "[1] \"...\" and "exiting from ..." lines
-      final int resultLineBegin = findExitingFrom(lines, exitingFromOffset) + 1;
+      final int resultLineBegin = lastExitingFrom + 1;
       final int resultLineEnd = findDebugAt(lines, resultLineBegin);
 
       return new TypeAndResultLineBounds(type, resultLineBegin, resultLineEnd);
     }
     else {
       // result could be located before trace information
-      return new TypeAndResultLineBounds(type, 1, firstEndTrace);
+      return new TypeAndResultLineBounds(type, 1, firstExitingFrom);
     }
   }
 
@@ -303,7 +295,7 @@ final class TheRProcessResponseCalculator {
       final boolean debugAtExists = debugAtLine < lines.length - 1;
 
       if (debugAtExists) {
-        return new TypeAndResultLineBounds(DEBUG_AT, 1, debugAtLine);
+        return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUG_AT, 1, debugAtLine);
       }
       else {
         return null;
@@ -354,20 +346,10 @@ final class TheRProcessResponseCalculator {
            isDigits(line, BROWSE_PREFIX.length(), line.length() - BROWSE_SUFFIX.length() - 1);
   }
 
-  private static int findExitingFrom(@NotNull final String[] lines, final int index) {
-    int result = index;
-
-    while (result < lines.length - 1 && !lines[result].startsWith(EXITING_FROM)) {
-      result++;
-    }
-
-    return result;
-  }
-
   private static int findDebugAt(@NotNull final String[] lines, final int index) {
     int result = index;
 
-    while (result < lines.length - 1 && !lines[result].startsWith(TheRDebugConstants.DEBUG_AT)) {
+    while (result < lines.length - 1 && !lines[result].startsWith(DEBUG_AT)) {
       result++;
     }
 

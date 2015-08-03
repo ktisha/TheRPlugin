@@ -123,8 +123,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     appendError(response, myOutputReceiver);
 
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, getStartTraceType(), myOutputReceiver);
 
     myCurrentLineNumber = initCurrentLine();

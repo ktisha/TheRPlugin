@@ -66,7 +66,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     @NotNull
     @Override
     protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (getCounter() < 4) {
+      if (getCounter() < 2) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
@@ -75,7 +75,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 4) {
+      if (getCounter() == 2) {
         return new TheRProcessResponse(
           TheRDebugConstants.TRACING + " abc(1) on entry\n" +
           "[1] \"abc\"\n" +
@@ -88,7 +88,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 5) {
+      if (getCounter() == 3) {
         return new TheRProcessResponse(
           TheRDebugConstants.DEBUG_AT + "2: x + 1",
           DEBUG_AT,
@@ -97,7 +97,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 6) {
+      if (getCounter() == 4) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
           RESPONSE,
@@ -115,7 +115,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     @NotNull
     @Override
     protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (getCounter() < 4) {
+      if (getCounter() < 2) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
@@ -124,7 +124,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 4) {
+      if (getCounter() == 2) {
         return new TheRProcessResponse(
           TheRDebugConstants.TRACING + " abc(1) on entry\n" +
           "[1] \"abc\"\n" +
@@ -135,7 +135,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 5) {
+      if (getCounter() == 3) {
         return new TheRProcessResponse(
           NO_FUNCTIONS_RESPONSE,
           RESPONSE,

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
@@ -13,9 +14,6 @@ import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DE
 import static org.junit.Assert.*;
 
 public class TheRProcessResponseCalculatorTest {
-
-  @NotNull
-  private static final String INTELLIJ_THER_X_EXIT = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_EXIT_FUNCTION_SUFFIX;
 
   @NotNull
   private static final String INTELLIJ_THER_X_ENTER = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_ENTER_FUNCTION_SUFFIX;
@@ -74,12 +72,9 @@ public class TheRProcessResponseCalculatorTest {
       "x()",
       TheRDebugConstants.DEBUGGING_IN + ": x()\n" +
       "debug: {\n" +
-      "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
+      "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
-      "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
-      "        {\n" +
-      "            print(\"x\")\n" +
-      "        }\n" +
+      "        print(\"x\")\n" +
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -156,17 +151,12 @@ public class TheRProcessResponseCalculatorTest {
   public void calculateContinueTrace() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       "debug: {\n" +
-      "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
+      "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
-      "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
-      "        {\n" +
-      "            print(\"x\")\n" +
-      "        }\n" +
+      "        print(\"x\")\n" +
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -180,17 +170,12 @@ public class TheRProcessResponseCalculatorTest {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       "debug: {\n" +
-      "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
+      "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
-      "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
-      "        {\n" +
-      "            print(\"x\")\n" +
-      "        }\n" +
+      "        print(\"x\")\n" +
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -203,18 +188,13 @@ public class TheRProcessResponseCalculatorTest {
   public void calculateContinueTraceWithResponseAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[1L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       "debug: {\n" +
-      "    on.exit(.doTrace(" + INTELLIJ_THER_X_EXIT + "(), \"on exit\"))\n" +
+      "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
-      "        .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
-      "        {\n" +
-      "            print(\"x\")\n" +
-      "        }\n" +
+      "        print(\"x\")\n" +
       "    }\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -224,173 +204,133 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateEndTrace() {
+  public void calculateExitingFrom() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE,
+      TheRProcessResponseType.EXITING_FROM,
       ""
     );
   }
 
   @Test
-  public void calculateEndTraceWithResponseBefore() {
+  public void calculateExitingFromWithResponseBefore() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE,
+      TheRProcessResponseType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateEndTraceWithResponseAfter() {
+  public void calculateExitingFromWithResponseAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE,
+      TheRProcessResponseType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateEndTraceWithResponseBeforeAndDebugAt() {
+  public void calculateExitingFromWithResponseBeforeAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE,
+      TheRProcessResponseType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateEndTraceWithResponseAfterAndDebugAt() {
+  public void calculateExitingFromWithResponseAfterAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      END_TRACE,
+      TheRProcessResponseType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateRecursiveEndTrace() {
+  public void calculateRecursiveExitingFrom() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RECURSIVE_END_TRACE,
+      RECURSIVE_EXITING_FROM,
       ""
     );
   }
 
   @Test
-  public void calculateRecursiveEndTraceWithResponseBefore() {
+  public void calculateRecursiveExitingFromWithResponseBefore() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RECURSIVE_END_TRACE,
+      RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateRecursiveEndTraceWithResponseAfter() {
+  public void calculateRecursiveExitingFromWithResponseAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RECURSIVE_END_TRACE,
+      RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateRecursiveEndTraceWithResponseBeforeAndDebugAt() {
+  public void calculateRecursiveExitingFromWithResponseBeforeAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RECURSIVE_END_TRACE,
+      RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateRecursiveEndTraceWithResponseAfterAndDebugAt() {
+  public void calculateRecursiveExitingFromWithResponseAfterAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TRACING + " FUN(c(-1, 0, 1)[[3L]], ...) on exit \n" +
-      "[1] \"x\"\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      RECURSIVE_END_TRACE,
+      RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
     );
   }

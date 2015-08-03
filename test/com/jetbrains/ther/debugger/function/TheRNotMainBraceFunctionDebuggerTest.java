@@ -307,9 +307,9 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(9, process.getCounter());
+    assertEquals(7, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Arrays.asList("error_continue", "error4", "error5", "error6", "error_entry", "error_dbg_at", "error_ls"),
+    assertEquals(Arrays.asList("error_continue", "error4", "error_entry", "error_dbg_at", "error_ls"),
                  receiver.getErrors());
 
     receiver.reset();
@@ -318,7 +318,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 4 5 6", debugger.getResult());
-    assertEquals(10, process.getCounter());
+    assertEquals(8, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
@@ -360,13 +360,11 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRProcessResponse(
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.END_TRACE,
-          new TextRange(53, 62),
+          TheRProcessResponseType.EXITING_FROM,
+          new TextRange(20, 29),
           "error_exit"
         );
       }
@@ -403,12 +401,9 @@ public class TheRNotMainBraceFunctionDebuggerTest {
         return new TheRProcessResponse(
           TheRDebugConstants.DEBUGGING_IN + ": def()\n" +
           "debug: {\n" +
-          "    on.exit(.doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_EXIT_FUNCTION_SUFFIX + "(), \"on exit\"))\n" +
+          "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
-          "        .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
-          "        {\n" +
-          "            print(\"x\")\n" +
-          "        }\n" +
+          "        print(\"x\")\n" +
           "    }\n" +
           "}\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -420,13 +415,11 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRProcessResponse(
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.END_TRACE,
-          new TextRange(53, 62),
+          TheRProcessResponseType.EXITING_FROM,
+          new TextRange(20, 29),
           "error_exit"
         );
       }
@@ -475,19 +468,13 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
-          TRACING + " ghi() on exit \n" +
-          "[1] \"ghi\"\n" +
           EXITING_FROM + " ghi()\n" +
-          TRACING + " def() on exit \n" +
-          "[1] \"def\"\n" +
           EXITING_FROM + " def()\n" +
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.RECURSIVE_END_TRACE,
-          new TextRange(159, 168),
+          TheRProcessResponseType.RECURSIVE_EXITING_FROM,
+          new TextRange(60, 69),
           "error_exit"
         );
       }
@@ -536,14 +523,12 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.END_TRACE,
-          new TextRange(53, 62),
+          TheRProcessResponseType.EXITING_FROM,
+          new TextRange(20, 29),
           "error_exit"
         );
       }
@@ -592,20 +577,14 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
-          TRACING + " ghi() on exit \n" +
-          "[1] \"ghi\"\n" +
           EXITING_FROM + " ghi()\n" +
-          TRACING + " def() on exit \n" +
-          "[1] \"def\"\n" +
           EXITING_FROM + " def()\n" +
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.RECURSIVE_END_TRACE,
-          new TextRange(159, 168),
+          TheRProcessResponseType.RECURSIVE_EXITING_FROM,
+          new TextRange(60, 69),
           "error_exit"
         );
       }
@@ -665,11 +644,9 @@ public class TheRNotMainBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
           "[1] 1 2 3\n" +
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.END_TRACE,
+          TheRProcessResponseType.EXITING_FROM,
           new TextRange(0, 9),
           "error_exit"
         );
@@ -693,7 +670,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
         );
       }
 
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 1 || getCounter() == 8)) {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 1 || getCounter() == 6)) {
         return new TheRProcessResponse(
           TheRDebugConstants.DEBUG_AT + "1: c(1:3)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -705,37 +682,32 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
           "debug: {\n" +
-          "    on.exit(.doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_EXIT_FUNCTION_SUFFIX + "(), \"on exit\"))\n" +
+          "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
-          "        .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
-          "        {\n" +
-          "            c(1:3)\n" +
-          "        }\n" +
+          "        c(1:3)\n" +
           "    }\n" +
           "}\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRProcessResponseType.CONTINUE_TRACE,
-          new TextRange(53, 62),
+          new TextRange(20, 29),
           "error_continue"
         );
       }
 
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && 4 <= getCounter() && getCounter() <= 6) {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRProcessResponse(
           "output",
           TheRProcessResponseType.RESPONSE,
           TextRange.EMPTY_RANGE,
-          "error" + getCounter()
+          "error4"
         );
       }
 
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 7) {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRProcessResponse(
           TRACING + " abc() on entry \n" +
           "[1] \"abc\"\n" +
@@ -749,15 +721,13 @@ public class TheRNotMainBraceFunctionDebuggerTest {
         );
       }
 
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 8) {
         return new TheRProcessResponse(
-          TRACING + " abc() on exit \n" +
-          "[1] \"abc\"\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 4 5 6\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.END_TRACE,
-          new TextRange(53, 62),
+          TheRProcessResponseType.EXITING_FROM,
+          new TextRange(20, 29),
           "error_exit"
         );
       }

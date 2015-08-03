@@ -84,8 +84,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 1) {
         final String output = "[1] \"a\" \"b\" \"c\"\n" +
                               "[4] " +
-                              "\"" + SERVICE_FUNCTION_PREFIX + "d" + SERVICE_ENTER_FUNCTION_SUFFIX + "\" " +
-                              "\"" + SERVICE_FUNCTION_PREFIX + "e" + SERVICE_EXIT_FUNCTION_SUFFIX + "\"";
+                              "\"" + SERVICE_FUNCTION_PREFIX + "d" + SERVICE_ENTER_FUNCTION_SUFFIX + "\"";
         // list, function, inner function and service functions
 
         return new TheRProcessResponse(

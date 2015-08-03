@@ -51,12 +51,10 @@ public class TheRTraceAndDebugUtilsTest {
     private int myLsExecuted = 0;
 
     private int myXEnterExecuted = 0;
-    private int myXExitExecuted = 0;
     private int myXTraceExecuted = 0;
     private int myXDebugExecuted = 0;
 
     private int myYEnterExecuted = 0;
-    private int myYExitExecuted = 0;
     private int myYTraceExecuted = 0;
     private int myYDebugExecuted = 0;
 
@@ -64,10 +62,7 @@ public class TheRTraceAndDebugUtilsTest {
     @Override
     public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
       final String xEnterFunctionName = "intellij_ther_x_enter";
-      final String xExitFunctionName = "intellij_ther_x_exit";
-
       final String yEnterFunctionName = "intellij_ther_y_enter";
-      final String yExitFunctionName = "intellij_ther_y_exit";
 
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         myLsExecuted++;
@@ -75,8 +70,6 @@ public class TheRTraceAndDebugUtilsTest {
         final String output = "$x\n" +
                               FUNCTION_TYPE + "\n\n" +
                               "$" + xEnterFunctionName + "\n" +
-                              FUNCTION_TYPE + "\n\n" +
-                              "$" + xExitFunctionName + "\n" +
                               FUNCTION_TYPE + "\n\n" +
                               "$y\n" +
                               FUNCTION_TYPE;
@@ -102,22 +95,9 @@ public class TheRTraceAndDebugUtilsTest {
         );
       }
 
-      if (command.equals(xExitFunctionName + " <- function() { print(\"x\") }")) {
-        if (myLsExecuted < 1) throw new IllegalStateException("Exit should be entered after ls");
-
-        myXExitExecuted++;
-
-        return new TheRProcessResponse(
-          "",
-          TheRProcessResponseType.EMPTY,
-          TextRange.EMPTY_RANGE,
-          ""
-        );
-      }
-
       if (command
-        .equals(TRACE_COMMAND + "(x, " + xEnterFunctionName + ", exit = " + xExitFunctionName + ", where = " + ENVIRONMENT + "())")) {
-        if (myXEnterExecuted < 1 || myXExitExecuted < 1) throw new IllegalStateException("Trace should be called after enter and exit");
+        .equals(TRACE_COMMAND + "(x, " + xEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
+        if (myXEnterExecuted < 1) throw new IllegalStateException("Trace should be called after enter");
 
         myXTraceExecuted++;
 
@@ -155,22 +135,9 @@ public class TheRTraceAndDebugUtilsTest {
         );
       }
 
-      if (command.equals(yExitFunctionName + " <- function() { print(\"y\") }")) {
-        if (myLsExecuted < 1) throw new IllegalStateException("Exit should be entered after ls");
-
-        myYExitExecuted++;
-
-        return new TheRProcessResponse(
-          "",
-          TheRProcessResponseType.EMPTY,
-          TextRange.EMPTY_RANGE,
-          ""
-        );
-      }
-
       if (command
-        .equals(TRACE_COMMAND + "(y, " + yEnterFunctionName + ", exit = " + yExitFunctionName + ", where = " + ENVIRONMENT + "())")) {
-        if (myYEnterExecuted < 1 || myYExitExecuted < 1) throw new IllegalStateException("Trace should be called after enter and exit");
+        .equals(TRACE_COMMAND + "(y, " + yEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
+        if (myYEnterExecuted < 1) throw new IllegalStateException("Trace should be called after enter");
 
         myYTraceExecuted++;
 
@@ -205,11 +172,9 @@ public class TheRTraceAndDebugUtilsTest {
     public boolean check() {
       return myLsExecuted == 1 &&
              myXEnterExecuted == 1 &&
-             myXExitExecuted == 1 &&
              myXTraceExecuted == 1 &&
              myXDebugExecuted == 1 &&
              myYEnterExecuted == 1 &&
-             myYExitExecuted == 1 &&
              myYTraceExecuted == 1 &&
              myYDebugExecuted == 1;
     }

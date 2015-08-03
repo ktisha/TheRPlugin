@@ -29,13 +29,13 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case CONTINUE_TRACE:
         handleContinueTrace(response);
         break;
-      case END_TRACE:
+      case EXITING_FROM:
         handleEndTrace(response);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn(response);
         break;
-      case RECURSIVE_END_TRACE:
+      case RECURSIVE_EXITING_FROM:
         handleRecursiveEndTrace(response);
         break;
       default:
@@ -44,7 +44,7 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "[" +
           "actual: " + response.getType() + ", " +
           "expected: " +
-          "[" + DEBUG_AT + ", " + CONTINUE_TRACE + ", " + END_TRACE + ", " + DEBUGGING_IN + ", " + RECURSIVE_END_TRACE + "]" +
+          "[" + DEBUG_AT + ", " + CONTINUE_TRACE + ", " + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + "]" +
           "]"
         );
     }

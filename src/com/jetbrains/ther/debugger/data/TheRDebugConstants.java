@@ -18,9 +18,6 @@ public final class TheRDebugConstants {
   public static final String SERVICE_ENTER_FUNCTION_SUFFIX = "_enter";
 
   @NotNull
-  public static final String SERVICE_EXIT_FUNCTION_SUFFIX = "_exit";
-
-  @NotNull
   public static final String MAIN_FUNCTION_NAME = "intellij_ther_main";
 
   // interpreter parameters
