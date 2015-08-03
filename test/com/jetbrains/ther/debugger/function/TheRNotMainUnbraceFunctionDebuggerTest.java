@@ -41,7 +41,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -51,7 +51,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(2, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -80,7 +80,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -92,7 +92,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(1, factory.getNotMainCounter());
     assertEquals(1, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
   }
 
   @Test
@@ -118,7 +118,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(1, process.getCounter());
     assertEquals(0, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -129,7 +129,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(2, process.getCounter());
     assertEquals(3, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -155,7 +155,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(1, process.getCounter());
     assertEquals(0, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -166,7 +166,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(2, process.getCounter());
     assertEquals(5, handler.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -193,7 +193,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLineNumberCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -205,7 +205,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(3, handler.getDroppedFramesCounter());
     assertEquals(5, handler.getReturnLineNumberCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -229,7 +229,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -239,7 +239,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(2, process.getCounter());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -263,7 +263,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -272,7 +272,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(7, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Arrays.asList("error2", "error3", "error4", "error5", "error6", "error1"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_continue", "error3", "error4", "error5", "error_entry", "error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -282,7 +282,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals("[1] 4 5 6", debugger.getResult());
     assertEquals(8, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Collections.singletonList("error8"), receiver.getErrors());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   private static class OrdinaryTheRProcess extends MockTheRProcess {
@@ -295,7 +295,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -308,7 +308,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.END_TRACE,
           new TextRange(67, 76),
-          "error2"
+          "error_exit"
         );
       }
 
@@ -326,7 +326,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -345,7 +345,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRProcessResponseType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
-          "error2"
+          "error_debugging"
         );
       }
 
@@ -377,7 +377,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -396,7 +396,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.RECURSIVE_END_TRACE,
           new TextRange(189, 198),
-          "error2"
+          "error_exit"
         );
       }
 
@@ -428,7 +428,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -442,7 +442,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.END_TRACE,
           new TextRange(67, 76),
-          "error2"
+          "error_exit"
         );
       }
 
@@ -474,7 +474,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -494,7 +494,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.RECURSIVE_END_TRACE,
           new TextRange(189, 198),
-          "error2"
+          "error_exit"
         );
       }
 
@@ -536,7 +536,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -549,7 +549,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.END_TRACE,
           new TextRange(0, 9),
-          "error2"
+          "error_exit"
         );
       }
 
@@ -567,7 +567,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          "error1"
+          "error_ls"
         );
       }
 
@@ -590,7 +590,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRProcessResponseType.CONTINUE_TRACE,
           new TextRange(53, 62),
-          "error2"
+          "error_continue"
         );
       }
 
@@ -611,7 +611,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRProcessResponseType.START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
-          "error6"
+          "error_entry"
         );
       }
 
@@ -624,7 +624,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRProcessResponseType.END_TRACE,
           new TextRange(53, 62),
-          "error8"
+          "error_exit"
         );
       }
 
