@@ -1,5 +1,6 @@
 package com.jetbrains.ther.xdebugger.stack;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
@@ -37,17 +38,24 @@ class TheRXStackFrame extends XStackFrame {
 
   @Override
   public void computeChildren(@NotNull final XCompositeNode node) {
-    try {
-      node.addChildren(
-        transform(
-          myFrame.getLoader().load()
-        ),
-        true
-      );
-    }
-    catch (final TheRDebuggerException e) {
-      node.setErrorMessage(e.getMessage());
-    }
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            node.addChildren(
+              transform(
+                myFrame.getLoader().load()
+              ),
+              true
+            );
+          }
+          catch (final TheRDebuggerException e) {
+            node.setErrorMessage(e.getMessage());
+          }
+        }
+      }
+    );
   }
 
   @NotNull

@@ -3,6 +3,7 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -92,73 +93,101 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepOver() {
-    try {
-      final List<TheRStackFrame> stack = myDebugger.getStack();
-      final int targetDepth = stack.size();
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            final List<TheRStackFrame> stack = myDebugger.getStack();
+            final int targetDepth = stack.size();
 
-      do {
-        if (!advance()) return;
+            do {
+              if (!advance()) return;
 
-        myStack.update(stack);
+              myStack.update(stack);
+            }
+            while (!isBreakpoint() && stack.size() > targetDepth);
+
+            showDebugInformation();
+          }
+          catch (final TheRDebuggerException e) {
+            LOGGER.error(e);
+          }
+        }
       }
-      while (!isBreakpoint() && stack.size() > targetDepth);
-
-      showDebugInformation();
-    }
-    catch (final TheRDebuggerException e) {
-      LOGGER.error(e);
-    }
+    );
   }
 
   @Override
   public void startStepInto() {
-    try {
-      if (!advance()) return;
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            if (!advance()) return;
 
-      myStack.update(myDebugger.getStack());
+            myStack.update(myDebugger.getStack());
 
-      showDebugInformation();
-    }
-    catch (final TheRDebuggerException e) {
-      LOGGER.error(e);
-    }
+            showDebugInformation();
+          }
+          catch (final TheRDebuggerException e) {
+            LOGGER.error(e);
+          }
+        }
+      }
+    );
   }
 
   @Override
   public void startStepOut() {
-    try {
-      final List<TheRStackFrame> stack = myDebugger.getStack();
-      final int targetDepth = stack.size() - 1;
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            final List<TheRStackFrame> stack = myDebugger.getStack();
+            final int targetDepth = stack.size() - 1;
 
-      do {
-        if (!advance()) return;
+            do {
+              if (!advance()) return;
 
-        myStack.update(stack);
+              myStack.update(stack);
+            }
+            while (!isBreakpoint() && stack.size() > targetDepth);
+
+            showDebugInformation();
+          }
+          catch (final TheRDebuggerException e) {
+            LOGGER.error(e);
+          }
+        }
       }
-      while (!isBreakpoint() && stack.size() > targetDepth);
-
-      showDebugInformation();
-    }
-    catch (final TheRDebuggerException e) {
-      LOGGER.error(e);
-    }
+    );
   }
 
   @Override
   public void resume() {
-    try {
-      do {
-        if (!advance()) return;
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            do {
+              if (!advance()) return;
 
-        myStack.update(myDebugger.getStack());
+              myStack.update(myDebugger.getStack());
+            }
+            while (!isBreakpoint());
+
+            showDebugInformation();
+          }
+          catch (final TheRDebuggerException e) {
+            LOGGER.error(e);
+          }
+        }
       }
-      while (!isBreakpoint());
-
-      showDebugInformation();
-    }
-    catch (final TheRDebuggerException e) {
-      LOGGER.error(e);
-    }
+    );
   }
 
   @Override
