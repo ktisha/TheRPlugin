@@ -59,7 +59,7 @@ class TheRXDebugProcess extends XDebugProcess {
     super(session);
 
     myDebugger = debugger;
-    myStack = new TheRXStack(resolver.getSession()); // TODO [xdbg][update]
+    myStack = new TheRXStack(resolver.createSession());
     myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();

@@ -8,6 +8,10 @@ import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 // TODO [xdbg][test]
 class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
 
@@ -36,7 +40,7 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
 
       // `TheRAssignmentStatement` couldn't be without name
       //noinspection ConstantConditions
-      TheRXFunctionDescriptorUtils.add(
+      add(
         myRoot,
         parent.getName(),
         myDocument.getLineNumber(startOffset),
@@ -50,5 +54,59 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
   @NotNull
   public TheRXFunctionDescriptor getRoot() {
     return myRoot;
+  }
+
+  private void add(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                   @NotNull final String name,
+                   final int startLine,
+                   final int endLine) {
+    if (!trySiftDown(currentDescriptor, name, startLine, endLine)) {
+      addAsChild(currentDescriptor, name, startLine, endLine);
+    }
+  }
+
+  private boolean trySiftDown(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                              @NotNull final String name,
+                              final int startLine,
+                              final int endLine) {
+    for (final List<TheRXFunctionDescriptor> sameNameChildren : currentDescriptor.getChildren().values()) {
+      for (final TheRXFunctionDescriptor child : sameNameChildren) {
+        if (child.getStartLine() <= startLine && endLine <= child.getEndLine()) {
+          add(
+            child,
+            name,
+            startLine,
+            endLine
+          );
+
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private void addAsChild(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+                          @NotNull final String name,
+                          final int startLine,
+                          final int endLine) {
+    final Map<String, List<TheRXFunctionDescriptor>> children = currentDescriptor.getChildren();
+
+    if (!children.containsKey(name)) {
+      children.put(
+        name,
+        new ArrayList<TheRXFunctionDescriptor>()
+      );
+    }
+
+    children.get(name).add(
+      new TheRXFunctionDescriptor(
+        name,
+        currentDescriptor,
+        startLine,
+        endLine
+      )
+    );
   }
 }

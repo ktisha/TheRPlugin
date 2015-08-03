@@ -94,7 +94,7 @@ public class TheRXStack {
       0,
       new TheRXStackFrame(
         lastFrame,
-        mySession.resolveLast(
+        mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
         ) // TODO [xdbg][null]
       )
@@ -150,7 +150,7 @@ public class TheRXStack {
     result[0] =
       new TheRXStackFrame(
         lastFrame,
-        mySession.resolveLast(
+        mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
         ) // TODO [xdbg][null]
       );
