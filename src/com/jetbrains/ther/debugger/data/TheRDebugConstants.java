@@ -66,6 +66,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String SYS_FRAME_COMMAND = "sys.frame";
 
+  @NotNull
+  public static final String SYS_NFRAME_COMMAND = "sys.nframe()";
+
   // responses
 
   @NotNull

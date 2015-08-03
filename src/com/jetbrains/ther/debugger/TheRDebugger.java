@@ -10,12 +10,16 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SYS_NFRAME_COMMAND;
 
 public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
@@ -58,7 +62,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRVarsLoaderFactory loaderFactory,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
-                      @NotNull final TheROutputReceiver outputReceiver) {
+                      @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myLoaderFactory = loaderFactory;
@@ -149,12 +153,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   @Override
-  public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+  public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) throws TheRDebuggerException {
     myDebuggers.add(debugger);
     myStack.add(
       new TheRStackFrame(
         debugger.getLocation(),
-        myLoaderFactory.getLoader(myStack.size()),
+        myLoaderFactory.getLoader(loadFrameNumber()),
         myEvaluatorFactory.getEvaluator(myProcess, myDebuggerFactory, myOutputReceiver)
       )
     );
@@ -178,5 +182,11 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private void popDebugger() {
     myDebuggers.remove(myDebuggers.size() - 1);
     myStack.remove(myStack.size() - 1);
+  }
+
+  private int loadFrameNumber() throws TheRDebuggerException {
+    final String frameNumber = TheRProcessUtils.execute(myProcess, SYS_NFRAME_COMMAND, TheRProcessResponseType.RESPONSE, myOutputReceiver);
+
+    return Integer.parseInt(frameNumber.substring("[1] ".length()));
   }
 }
