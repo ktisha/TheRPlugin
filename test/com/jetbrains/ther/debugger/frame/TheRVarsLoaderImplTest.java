@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
@@ -11,9 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static org.junit.Assert.assertEquals;
 
@@ -72,6 +75,19 @@ public class TheRVarsLoaderImplTest {
         "}"
       )
     );
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void inDebug() throws TheRDebuggerException {
+    final List<TheRVar> actual = new TheRVarsLoaderImpl(
+      new InDebugTheRProcess(),
+      new IllegalTheROutputReceiver(),
+      0
+    ).load();
+
+    final List<TheRVar> expected = Collections.singletonList(new TheRVar("a", "[1] \"integer\"", "[1] 1 2 3"));
 
     assertEquals(expected, actual);
   }
@@ -146,6 +162,59 @@ public class TheRVarsLoaderImplTest {
                               "    x ^ 2\n" +
                               "}\n" +
                               "<" + ENVIRONMENT + ": 0xfffffff>";
+
+        return new TheRProcessResponse(
+          output,
+          RESPONSE,
+          TextRange.allOf(output),
+          ""
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class InDebugTheRProcess extends MockTheRProcess {
+
+    @NotNull
+    @Override
+    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() == 1) {
+        final String output = "[1] \"a\"";
+
+        return new TheRProcessResponse(
+          output,
+          RESPONSE,
+          TextRange.allOf(output),
+          ""
+        );
+      }
+
+      if (getCounter() == 2) {
+        final String output = "[1] \"integer\"";
+
+        return new TheRProcessResponse(
+          output,
+          RESPONSE,
+          TextRange.allOf(output),
+          ""
+        );
+      }
+
+      if (getCounter() == 3) {
+        final String output = TheRDebugConstants.DEBUG_AT + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
+
+        return new TheRProcessResponse(
+          output,
+          DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          ""
+        );
+      }
+
+      if (getCounter() == 4) {
+        final String output = "[1] 1 2 3";
 
         return new TheRProcessResponse(
           output,

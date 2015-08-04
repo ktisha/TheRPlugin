@@ -15,7 +15,10 @@ import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 final class TheRTraceAndDebugUtils {
 
   @NotNull
-  static final String LS_FUNCTIONS_COMMAND = "Filter(function(x) x == \"closure\", eapply(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + "))";
+  static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
+                                             "function(x) x == \"" + CLOSURE + "\", " +
+                                             EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
+                                             ")";
 
   @NotNull
   static final String NO_FUNCTIONS_RESPONSE = "named list()";

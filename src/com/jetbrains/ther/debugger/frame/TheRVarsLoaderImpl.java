@@ -4,7 +4,9 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
@@ -123,15 +127,35 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    return handleValue(
-      type,
-      execute(
-        myProcess,
-        valueCommand(var, type),
-        RESPONSE,
-        myReceiver
-      )
-    );
+    final TheRProcessResponse response = myProcess.execute(valueCommand(var));
+    appendError(response, myReceiver);
+
+    switch (response.getType()) {
+      case RESPONSE:
+        return handleValue(
+          type,
+          response.getOutput()
+        );
+      case DEBUG_AT:
+        return handleValue(
+          type,
+          execute(
+            myProcess,
+            EXECUTE_AND_STEP_COMMAND,
+            RESPONSE,
+            myReceiver
+          )
+        );
+      default:
+        throw new UnexpectedResponseException(
+          "Actual response type is not the same as expected: " +
+          "[" +
+          "actual: " + response.getType() + ", " +
+          "expected: " +
+          "[" + RESPONSE + ", " + DEBUG_AT + "]" +
+          "]"
+        );
+    }
   }
 
   private boolean isService(@NotNull final String var) {
@@ -160,13 +184,16 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   }
 
   @NotNull
-  private String valueCommand(@NotNull final String var, @NotNull final String type) {
-    if (type.equals(FUNCTION_TYPE)) {
-      return ATTR_COMMAND + "(" + myFrame + "$" + var + ", \"original\")";
-    }
-    else {
-      return PRINT_COMMAND + "(" + myFrame + "$" + var + ")";
-    }
+  private String valueCommand(@NotNull final String var) {
+    final String globalVar = myFrame + "$" + var;
+
+    final String isFunction = TYPEOF_COMMAND + "(" + globalVar + ") == \"" + CLOSURE + "\"";
+    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalVar + ")";
+
+    return "if (" + isFunction + " && " + isDebugged + ") " +
+           ATTR_COMMAND + "(" + globalVar + ", \"original\")" +
+           " else " +
+           globalVar;
   }
 
   private int findLastLineBegin(@NotNull final String text) {

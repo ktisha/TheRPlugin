@@ -52,9 +52,6 @@ public final class TheRDebugConstants {
   public static final String DEBUG_COMMAND = "debug";
 
   @NotNull
-  public static final String PRINT_COMMAND = "print";
-
-  @NotNull
   public static final String ATTR_COMMAND = "attr";
 
   @NotNull
@@ -65,6 +62,15 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String SYS_NFRAME_COMMAND = "sys.nframe()";
+
+  @NotNull
+  public static final String IS_DEBUGGED_COMMAND = "isdebugged";
+
+  @NotNull
+  public static final String EAPPLY_COMMAND = "eapply";
+
+  @NotNull
+  public static final String FILTER_COMMAND = "Filter";
 
   // responses
 
@@ -97,5 +103,8 @@ public final class TheRDebugConstants {
   public static final char COMMENT_SYMBOL = '#';
 
   @NotNull
-  public static final String FUNCTION_TYPE = "[1] \"closure\"";
+  public static final String CLOSURE = "closure";
+
+  @NotNull
+  public static final String FUNCTION_TYPE = "[1] \"" + CLOSURE + "\"";
 }
