@@ -16,12 +16,14 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.frame.XExecutionStack;
+import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
-import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.xdebugger.stack.TheRXStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,12 +56,12 @@ class TheRXDebugProcess extends XDebugProcess {
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRXResolver resolver,
+                           @NotNull final TheRXResolvingSession resolvingSession,
                            @NotNull final TheRXOutputBuffer outputBuffer) {
     super(session);
 
     myDebugger = debugger;
-    myStack = new TheRXStack(resolver.createSession());
+    myStack = new TheRXStack(resolvingSession);
     myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
@@ -280,7 +282,13 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private XSourcePosition getCurrentPosition() {
-    return myStack.getSuspendContext().getActiveExecutionStack().getTopFrame().getSourcePosition();  // TODO [xdbg][null]
+    final XExecutionStack stack = myStack.getSuspendContext().getActiveExecutionStack();
+    assert stack != null;
+
+    final XStackFrame frame = stack.getTopFrame();
+    assert frame != null;
+
+    return frame.getSourcePosition();  // TODO [xdbg][null]
   }
 
   private static class XSourcePositionWrapper {
@@ -317,16 +325,20 @@ class TheRXDebugProcess extends XDebugProcess {
 
     @Override
     public void registerBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint) {
+      assert breakpoint.getSourcePosition() != null;
+
       myBreakpoints.put(
-        new XSourcePositionWrapper(breakpoint.getSourcePosition()), // TODO [xdbg][null]
+        new XSourcePositionWrapper(breakpoint.getSourcePosition()),
         breakpoint
       );
     }
 
     @Override
     public void unregisterBreakpoint(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint, final boolean temporary) {
+      assert breakpoint.getSourcePosition() != null;
+
       myBreakpoints.remove(
-        new XSourcePositionWrapper(breakpoint.getSourcePosition()) // TODO [xdbg][null]
+        new XSourcePositionWrapper(breakpoint.getSourcePosition())
       );
     }
   }

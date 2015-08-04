@@ -75,7 +75,7 @@ public class TheRXStack {
       result[result.length - 1 - index] =
         new TheRXStackFrame(
           frame,
-          mySession.resolveNext(frame.getLocation()) // TODO [xdbg][null]
+          mySession.resolveNext(frame.getLocation())
         );
 
       index++;
@@ -96,7 +96,7 @@ public class TheRXStack {
         lastFrame,
         mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
-        ) // TODO [xdbg][null]
+        )
       )
     );
 
@@ -124,7 +124,7 @@ public class TheRXStack {
       result[offset - 1 - i] =
         new TheRXStackFrame(
           frame,
-          mySession.resolveNext(frame.getLocation()) // TODO [xdbg][null]
+          mySession.resolveNext(frame.getLocation())
         );
     }
 
@@ -152,7 +152,7 @@ public class TheRXStack {
         lastFrame,
         mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
-        ) // TODO [xdbg][null]
+        )
       );
 
     return Arrays.asList(result);

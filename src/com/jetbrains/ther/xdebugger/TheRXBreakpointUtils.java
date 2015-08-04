@@ -26,8 +26,14 @@ final class TheRXBreakpointUtils {
   }
 
   private static boolean isStoppable(@NotNull final VirtualFile file, final int line, @NotNull final Project project) {
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file); // TODO [xdbg][null]
-    final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile); // TODO [xdbg][null]
+    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+
+    if (psiFile == null) return false;
+
+    final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+
+    if (document == null) return false;
+
     final boolean[] justResult = new boolean[]{false};
 
     XDebuggerUtil.getInstance().iterateLine(

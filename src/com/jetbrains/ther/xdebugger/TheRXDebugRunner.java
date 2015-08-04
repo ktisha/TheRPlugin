@@ -23,7 +23,7 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
-import com.jetbrains.ther.xdebugger.resolve.TheRXResolver;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +62,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       environment,
       createDebugProcessStarter(
         createDebugger(interpreterPath, scriptPath, outputBuffer),
-        new TheRXResolver(project, scriptPath),
+        createResolvingSession(project, scriptPath),
         outputBuffer
       )
     );
@@ -72,13 +72,13 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger,
-                                                         @NotNull final TheRXResolver resolver,
+                                                         @NotNull final TheRXResolvingSession resolvingSession,
                                                          @NotNull final TheRXOutputBuffer outputBuffer) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        return new TheRXDebugProcess(session, debugger, resolver, outputBuffer);
+        return new TheRXDebugProcess(session, debugger, resolvingSession, outputBuffer);
       }
     };
   }
@@ -104,6 +104,17 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       throw new ExecutionException(e);
     }
     catch (final IOException e) {
+      throw new ExecutionException(e);
+    }
+  }
+
+  @NotNull
+  private TheRXResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final String scriptPath)
+    throws ExecutionException {
+    try {
+      return new TheRXResolvingSession(project, scriptPath);
+    }
+    catch (final TheRXDebuggerException e) {
       throw new ExecutionException(e);
     }
   }

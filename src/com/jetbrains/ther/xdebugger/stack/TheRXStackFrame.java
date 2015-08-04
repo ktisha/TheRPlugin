@@ -18,19 +18,19 @@ class TheRXStackFrame extends XStackFrame {
   @NotNull
   private final TheRStackFrame myFrame;
 
-  @NotNull
+  @Nullable
   private final XSourcePosition myPosition;
 
   @Nullable
   private TheRXDebuggerEvaluator myEvaluator;
 
-  public TheRXStackFrame(@NotNull final TheRStackFrame frame, @NotNull final XSourcePosition position) {
+  public TheRXStackFrame(@NotNull final TheRStackFrame frame, @Nullable final XSourcePosition position) {
     myPosition = position;
     myFrame = frame;
     myEvaluator = null;
   }
 
-  @NotNull
+  @Nullable
   @Override
   public XSourcePosition getSourcePosition() {
     return myPosition;

@@ -1,5 +1,6 @@
 package com.jetbrains.ther.xdebugger.stack;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XValue;
@@ -11,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 // TODO [xdbg][test]
 class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRXDebuggerEvaluator.class);
 
   @NotNull
   private final TheRDebuggerEvaluator myEvaluator;
@@ -52,12 +56,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void receiveError(@NotNull final Exception e) {
-      // TODO [xdbg][update]
+      LOGGER.info(e);
     }
 
     @Override
     public void receiveError(@NotNull final String error) {
-      // TODO [xdbg][update]
+      LOGGER.info(error);
     }
   }
 

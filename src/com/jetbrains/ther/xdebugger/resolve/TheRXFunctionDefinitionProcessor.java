@@ -39,7 +39,8 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
       final int startOffset = parent.getTextOffset();
 
       // `TheRAssignmentStatement` couldn't be without name
-      //noinspection ConstantConditions
+      assert parent.getName() != null;
+
       add(
         myRoot,
         parent.getName(),
