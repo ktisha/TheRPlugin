@@ -34,7 +34,7 @@ public class TheRProcessImpl implements TheRProcess {
 
   @Override
   @NotNull
-  public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
+  public synchronized TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
     mySender.send(command);
     return myReceiver.receive();
   }

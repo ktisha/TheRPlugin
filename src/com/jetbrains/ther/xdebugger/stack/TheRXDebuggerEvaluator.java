@@ -1,5 +1,6 @@
 package com.jetbrains.ther.xdebugger.stack;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
@@ -37,9 +38,16 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   public void evaluate(@NotNull final String expression,
                        @NotNull final XEvaluationCallback callback,
                        @Nullable final XSourcePosition expressionPosition) {
-    myEvaluator.evalExpression(
-      expression,
-      new ExpressionReceiver(callback)
+    ApplicationManager.getApplication().executeOnPooledThread(
+      new Runnable() {
+        @Override
+        public void run() {
+          myEvaluator.evalExpression(
+            expression,
+            new ExpressionReceiver(callback)
+          );
+        }
+      }
     );
   }
 
