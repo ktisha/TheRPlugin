@@ -6,12 +6,13 @@ import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
-import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,31 +20,37 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TheRVarsLoaderImplTest {
 
   @Test
   public void empty() throws TheRDebuggerException {
     final String output = "character(0)";
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(output, RESPONSE, TextRange.allOf(output), "");
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(output, RESPONSE, TextRange.allOf(output), "error");
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     assertEquals(
       0,
       new TheRVarsLoaderImpl(
         process,
-        new IllegalTheROutputReceiver(),
+        receiver,
         0
       ).load().size()
     );
 
     assertEquals(1, process.getCounter());
+    assertEquals(Collections.singletonList("error"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
   public void ordinary() throws TheRDebuggerException {
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
       new OrdinaryTheRProcess(),
-      new IllegalTheROutputReceiver(),
+      receiver,
       0
     ).load();
 
@@ -77,19 +84,28 @@ public class TheRVarsLoaderImplTest {
     );
 
     assertEquals(expected, actual);
+    assertEquals(
+      Arrays.asList("error_ls", "error_ta", "error_va", "error_t4", "error_vb", "error_t6", "error_vc", "error_t8"),
+      receiver.getErrors()
+    );
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
   public void inDebug() throws TheRDebuggerException {
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
       new InDebugTheRProcess(),
-      new IllegalTheROutputReceiver(),
+      receiver,
       0
     ).load();
 
     final List<TheRVar> expected = Collections.singletonList(new TheRVar("a", "[1] \"integer\"", "[1] 1 2 3"));
 
     assertEquals(expected, actual);
+    assertEquals(Arrays.asList("error_ls", "error_ta", "error_dbg_at", "error_va"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   private static class OrdinaryTheRProcess extends MockTheRProcess {
@@ -107,7 +123,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_ls"
         );
       }
 
@@ -118,7 +134,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_ta"
         );
       }
 
@@ -129,7 +145,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_va"
         );
       }
 
@@ -140,7 +156,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_t" + getCounter()
         );
       }
 
@@ -153,7 +169,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_vb"
         );
       }
 
@@ -167,7 +183,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_vc"
         );
       }
 
@@ -187,7 +203,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_ls"
         );
       }
 
@@ -198,7 +214,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_ta"
         );
       }
 
@@ -209,7 +225,7 @@ public class TheRVarsLoaderImplTest {
           output,
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_dbg_at"
         );
       }
 
@@ -220,7 +236,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_va"
         );
       }
 

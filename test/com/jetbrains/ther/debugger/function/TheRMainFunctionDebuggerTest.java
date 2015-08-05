@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
@@ -64,7 +65,7 @@ public class TheRMainFunctionDebuggerTest {
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(Collections.singletonList("error1"), receiver.getErrors());
+    assertEquals(Arrays.asList("error1", "error_ls_fun"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getLocation());
@@ -77,7 +78,7 @@ public class TheRMainFunctionDebuggerTest {
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(Collections.singletonList("error2"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_f1", "error_f2", "error_f3", "error_f4", "error_f5", "error_ls_fun"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 7), debugger.getLocation());
@@ -90,7 +91,7 @@ public class TheRMainFunctionDebuggerTest {
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals(Collections.singletonList("error3"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_ls_all", "error_ls_fun"), receiver.getErrors());
     assertEquals(Collections.singletonList("character(0)"), receiver.getOutputs());
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 10), debugger.getLocation());
@@ -103,7 +104,7 @@ public class TheRMainFunctionDebuggerTest {
     assertEquals(0, factory.getMainCounter());
     assertEquals(1, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
-    assertTrue(receiver.getErrors().isEmpty());
+    assertEquals(Collections.singletonList("error_f_call"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
     assertFalse(debugger.hasNext());
     assertEquals("", debugger.getResult());
@@ -193,7 +194,7 @@ public class TheRMainFunctionDebuggerTest {
           NO_FUNCTIONS_RESPONSE,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          ""
+          "error_ls_fun"
         );
       }
 
@@ -204,7 +205,7 @@ public class TheRMainFunctionDebuggerTest {
           "",
           TheRProcessResponseType.PLUS,
           TextRange.EMPTY_RANGE,
-          "error2"
+          "error_f1"
         );
       }
 
@@ -215,7 +216,7 @@ public class TheRMainFunctionDebuggerTest {
           "",
           TheRProcessResponseType.PLUS,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_f2"
         );
       }
 
@@ -226,7 +227,7 @@ public class TheRMainFunctionDebuggerTest {
           "",
           TheRProcessResponseType.PLUS,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_f3"
         );
       }
 
@@ -237,7 +238,7 @@ public class TheRMainFunctionDebuggerTest {
           "",
           TheRProcessResponseType.PLUS,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_f4"
         );
       }
 
@@ -248,7 +249,7 @@ public class TheRMainFunctionDebuggerTest {
           "",
           TheRProcessResponseType.EMPTY,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_f5"
         );
       }
 
@@ -259,7 +260,7 @@ public class TheRMainFunctionDebuggerTest {
           "character(0)",
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf("character(0)"),
-          "error3"
+          "error_ls_all"
         );
       }
 
@@ -275,7 +276,7 @@ public class TheRMainFunctionDebuggerTest {
           "}",
           TheRProcessResponseType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_f_call"
         );
       }
 

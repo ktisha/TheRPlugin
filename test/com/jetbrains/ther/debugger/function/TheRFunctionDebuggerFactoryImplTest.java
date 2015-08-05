@@ -7,13 +7,12 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.NO_FUNCTIONS_RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
@@ -35,29 +34,35 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 1);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(Collections.singletonList("error"), outputReceiver.getErrors());
+    assertEquals(Arrays.asList("error1", "error_st", "error_dbg_at", "error_trc"), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
   @Test
   public void unbraceFunction() throws TheRDebuggerException {
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
+
     final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new UnbraceTheRProcess(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheROutputReceiver()
+      outputReceiver
     );
 
     final TheRLocation expected = new TheRLocation("abc", 0);
 
     assertEquals(expected, debugger.getLocation());
+    assertEquals(Arrays.asList("error1", "error_st", "error_trc"), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
   @Test(expected = UnexpectedResponseException.class)
   public void unexpectedResponse() throws TheRDebuggerException {
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
+
     new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
       new UnexpectedResponseTheRProcess(),
       new IllegalTheRFunctionDebuggerHandler(),
-      new IllegalTheROutputReceiver()
+      outputReceiver
     );
   }
 
@@ -66,12 +71,12 @@ public class TheRFunctionDebuggerFactoryImplTest {
     @NotNull
     @Override
     protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (getCounter() < 2) {
+      if (getCounter() == 1) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
           TextRange.EMPTY_RANGE,
-          ""
+          "error1"
         );
       }
 
@@ -84,7 +89,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
           "}",
           START_TRACE_BRACE,
           TextRange.EMPTY_RANGE,
-          "error"
+          "error_st"
         );
       }
 
@@ -93,7 +98,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
           TheRDebugConstants.DEBUG_AT + "2: x + 1",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_dbg_at"
         );
       }
 
@@ -102,7 +107,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
           NO_FUNCTIONS_RESPONSE,
           RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          ""
+          "error_trc"
         );
       }
 
@@ -115,12 +120,12 @@ public class TheRFunctionDebuggerFactoryImplTest {
     @NotNull
     @Override
     protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (getCounter() < 2) {
+      if (getCounter() == 1) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
           TextRange.EMPTY_RANGE,
-          ""
+          "error1"
         );
       }
 
@@ -131,7 +136,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
           "debug: x + 1",
           START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_st"
         );
       }
 
@@ -140,7 +145,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
           NO_FUNCTIONS_RESPONSE,
           RESPONSE,
           TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-          ""
+          "error_trc"
         );
       }
 
@@ -153,21 +158,12 @@ public class TheRFunctionDebuggerFactoryImplTest {
     @NotNull
     @Override
     protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (getCounter() < 4) {
+      if (getCounter() < 3) {
         return new TheRProcessResponse(
           "",
           RESPONSE,
           TextRange.EMPTY_RANGE,
-          ""
-        );
-      }
-
-      if (getCounter() == 4) {
-        return new TheRProcessResponse(
-          "",
-          PLUS,
-          TextRange.EMPTY_RANGE,
-          ""
+          "error1"
         );
       }
 

@@ -6,9 +6,12 @@ import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
-import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.*;
@@ -23,27 +26,36 @@ public class TheRTraceAndDebugUtilsTest {
       NO_FUNCTIONS_RESPONSE,
       TheRProcessResponseType.RESPONSE,
       TextRange.allOf(NO_FUNCTIONS_RESPONSE),
-      ""
+      "error"
     );
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(
       process,
-      new IllegalTheROutputReceiver()
+      receiver
     );
 
     assertEquals(1, process.getCounter());
+    assertEquals(Collections.singletonList("error"), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
   public void ordinary() throws TheRDebuggerException {
     final MockTheRProcess process = new MockTheRProcess();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(
       process,
-      new IllegalTheROutputReceiver()
+      receiver
     );
 
     assertTrue(process.check());
+    assertEquals(
+      Arrays.asList("error_ls_fun", "error_x_e", "error_x_t", "error_x_d", "error_y_e", "error_y_t", "error_y_d"),
+      receiver.getErrors()
+    );
+    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   private static class MockTheRProcess implements TheRProcess {
@@ -78,7 +90,7 @@ public class TheRTraceAndDebugUtilsTest {
           output,
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf(output),
-          ""
+          "error_ls_fun"
         );
       }
 
@@ -91,7 +103,7 @@ public class TheRTraceAndDebugUtilsTest {
           "",
           TheRProcessResponseType.EMPTY,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_x_e"
         );
       }
 
@@ -105,7 +117,7 @@ public class TheRTraceAndDebugUtilsTest {
           "[1] \"x\"",
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf("[1] \"x\""),
-          ""
+          "error_x_t"
         );
       }
 
@@ -118,7 +130,7 @@ public class TheRTraceAndDebugUtilsTest {
           "",
           TheRProcessResponseType.EMPTY,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_x_d"
         );
       }
 
@@ -131,7 +143,7 @@ public class TheRTraceAndDebugUtilsTest {
           "",
           TheRProcessResponseType.EMPTY,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_y_e"
         );
       }
 
@@ -145,7 +157,7 @@ public class TheRTraceAndDebugUtilsTest {
           "[1] \"y\"",
           TheRProcessResponseType.RESPONSE,
           TextRange.allOf("[1] \"y\""),
-          ""
+          "error_y_t"
         );
       }
 
@@ -158,7 +170,7 @@ public class TheRTraceAndDebugUtilsTest {
           "",
           TheRProcessResponseType.EMPTY,
           TextRange.EMPTY_RANGE,
-          ""
+          "error_y_d"
         );
       }
 

@@ -22,11 +22,13 @@ public class TheRDebuggerEvaluatorImplTest {
 
   @Test
   public void unexpectedResponseType() {
+    final String expression = "def <- function() {";
+
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "",
       PLUS,
       TextRange.EMPTY_RANGE,
-      ""
+      "error"
     );
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
@@ -40,16 +42,18 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression("def <- function() {", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals("def <- function() {", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
 
   @Test
   public void errorDuringExecution() {
+    final String expression = "abc";
+
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
       "",
       EMPTY,
@@ -68,16 +72,18 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression("abc", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals("abc", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
 
   @Test
   public void exceptionDuringExecution() {
+    final String expression = "def";
+
     final ExceptionDuringExecutionTheRProcess process = new ExceptionDuringExecutionTheRProcess();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
@@ -91,23 +97,25 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression("def", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(0, handler.myCounter);
-    assertEquals("def", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
 
   @Test
   public void expression() {
-    final String text = "[1] 1 2 3";
+    final String expression = "def(c(1:5))";
+    final String output = "[1] 1 2 3";
+    final String error = "error";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      text,
+      output,
       RESPONSE,
-      TextRange.allOf(text),
-      "abc"
+      TextRange.allOf(output),
+      error
     );
 
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
@@ -121,20 +129,23 @@ public class TheRDebuggerEvaluatorImplTest {
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(text);
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression("def(c(1:5))", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(1, receiver.getCounter());
-    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals("def(c(1:5))", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
   public void inDebugExpression() {
+    final String expression = "def(c(1:5))";
+    final String output = "[1] 1 2 3";
+
     final InDebugTheRProcess process = new InDebugTheRProcess();
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
@@ -147,21 +158,24 @@ public class TheRDebuggerEvaluatorImplTest {
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression("def(c(1:5))", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(2, process.getCounter());
     assertEquals(1, receiver.getCounter());
     assertEquals(Arrays.asList("abc", "def"), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals("def(c(1:5))", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
   public void innerFunctionValue() {
-    final String text = "function(x) {\n" +
+    final String expression = "def";
+    final String error = "error";
+
+    final String output = "function(x) {\n" +
                         "    x ^ 2\n" +
                         "}\n" +
                         "<" + ENVIRONMENT + ": 0xfffffff>";
@@ -171,10 +185,10 @@ public class TheRDebuggerEvaluatorImplTest {
                           "}";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      text,
+      output,
       RESPONSE,
-      TextRange.allOf(text),
-      "abc"
+      TextRange.allOf(output),
+      error
     );
 
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
@@ -190,14 +204,14 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression("def", receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(1, receiver.getCounter());
-    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals("def", handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
@@ -208,13 +222,15 @@ public class TheRDebuggerEvaluatorImplTest {
     }
     */
 
-    final String command = "def(c(1:5))";
+    final String expression = "def(c(1:5))";
+    final String error = "error";
+    final String result = "[1] 1 2 3";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + command,
+      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
-      "abc"
+      error
     );
 
     final Stack1TheRFunctionDebugger functionDebugger = new Stack1TheRFunctionDebugger();
@@ -230,19 +246,19 @@ public class TheRDebuggerEvaluatorImplTest {
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(command, receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(1, debuggerFactory.getNotMainCounter());
     assertEquals(0, debuggerFactory.getMainCounter());
     assertEquals(1, functionDebugger.getCounter());
     assertEquals(1, receiver.getCounter());
-    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals(command, handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
@@ -258,39 +274,44 @@ public class TheRDebuggerEvaluatorImplTest {
     }
     */
 
-    final String command = "def(c(1:5))";
+    final String expression = "def(c(1:5))";
+    final String error = "error";
+    final String result = "[1] 1 2 3";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + command,
+      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
-      ""
+      error
     );
 
     final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack211TheRFunctionDebugger(secondFunctionDebugger);
     final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       debuggerFactory,
-      new IllegalTheROutputReceiver(),
+      outputReceiver,
       handler,
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(command, receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getMainCounter());
     assertEquals(1, debuggerFactory.getNotMainCounter());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals(command, handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
@@ -305,39 +326,44 @@ public class TheRDebuggerEvaluatorImplTest {
     }
     */
 
-    final String command = "def(c(1:5))";
+    final String expression = "def(c(1:5))";
+    final String error = "error";
+    final String result = "[1] 1 2 3";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + command,
+      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
-      ""
+      error
     );
 
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack222TheRFunctionDebugger();
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack221TheRFunctionDebugger(secondFunctionDebugger);
     final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       debuggerFactory,
-      new IllegalTheROutputReceiver(),
+      outputReceiver,
       handler,
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(command, receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getMainCounter());
     assertEquals(1, debuggerFactory.getNotMainCounter());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals(command, handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   @Test
@@ -356,32 +382,35 @@ public class TheRDebuggerEvaluatorImplTest {
     }
     */
 
-    final String command = "def(c(1:5))";
+    final String expression = "def(c(1:5))";
+    final String error = "error";
+    final String result = "[1] 1 2 3";
 
     final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + command,
+      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
-      ""
+      error
     );
 
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack33TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack32TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack31TheRFunctionDebugger(secondFunctionDebugger);
     final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
       debuggerFactory,
-      new IllegalTheROutputReceiver(),
+      outputReceiver,
       handler,
       0
     );
 
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver("[1] 1 2 3");
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(command, receiver);
+    evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
@@ -389,8 +418,10 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getMainCounter());
     assertEquals(1, debuggerFactory.getNotMainCounter());
+    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
-    assertEquals(command, handler.myLastExpression);
+    assertEquals(expression, handler.myLastExpression);
   }
 
   private static class MockTheRExpressionHandler extends IllegalTheRExpressionHandler {
