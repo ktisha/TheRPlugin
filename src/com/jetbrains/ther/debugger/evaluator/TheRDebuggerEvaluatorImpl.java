@@ -87,7 +87,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
         receiver.receiveResult(
           handleResult(
-            response.getResultRange().substring(response.getOutput())
+            response.getOutput()
           )
         );
 
@@ -95,11 +95,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       case DEBUG_AT:
         appendError(response, myReceiver);
 
-        final TheRProcessResponse finalResponse = execute(myProcess, EXECUTE_AND_STEP_COMMAND, myReceiver);
-
         receiver.receiveResult(
           handleResult(
-            finalResponse.getResultRange().substring(finalResponse.getOutput())
+            execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver)
           )
         );
 

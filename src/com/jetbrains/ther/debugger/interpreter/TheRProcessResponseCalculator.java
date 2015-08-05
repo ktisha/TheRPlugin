@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger.interpreter;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -138,6 +139,12 @@ final class TheRProcessResponseCalculator {
     }
 
     candidate = tryStartTrace(lines);
+
+    if (candidate != null) {
+      return candidate;
+    }
+
+    candidate = tryDebugAtUnbrace(lines);
 
     if (candidate != null) {
       return candidate;
@@ -324,6 +331,16 @@ final class TheRProcessResponseCalculator {
     }
 
     return null;
+  }
+
+  @Nullable
+  private static TypeAndResultLineBounds tryDebugAtUnbrace(@NotNull final String[] lines) {
+    if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG + ": ")) {
+      return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUG_AT, 1, lines.length - 3);
+    }
+    else {
+      return null;
+    }
   }
 
   private static int readDigitsBackward(@NotNull final CharSequence sequence, final int beginIndex) {

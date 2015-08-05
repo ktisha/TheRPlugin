@@ -34,7 +34,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 1);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(Arrays.asList("error1", "error_st", "error_dbg_at", "error_trc"), outputReceiver.getErrors());
+    assertEquals(Arrays.asList("error_entry", "error_st", "error_dbg_at", "error_trc"), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
@@ -51,7 +51,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 0);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(Arrays.asList("error1", "error_st", "error_trc"), outputReceiver.getErrors());
+    assertEquals(Arrays.asList("error_entry", "error_st", "error_trc"), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
@@ -74,9 +74,9 @@ public class TheRFunctionDebuggerFactoryImplTest {
       if (getCounter() == 1) {
         return new TheRProcessResponse(
           "",
-          RESPONSE,
+          DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          "error1"
+          "error_entry"
         );
       }
 
@@ -123,9 +123,9 @@ public class TheRFunctionDebuggerFactoryImplTest {
       if (getCounter() == 1) {
         return new TheRProcessResponse(
           "",
-          RESPONSE,
+          DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          "error1"
+          "error_entry"
         );
       }
 
@@ -161,9 +161,9 @@ public class TheRFunctionDebuggerFactoryImplTest {
       if (getCounter() < 3) {
         return new TheRProcessResponse(
           "",
-          RESPONSE,
+          DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          "error1"
+          "error_entry"
         );
       }
 

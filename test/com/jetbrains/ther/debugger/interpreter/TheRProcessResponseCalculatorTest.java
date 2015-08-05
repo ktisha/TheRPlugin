@@ -95,6 +95,17 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
+  public void calculateDebugAtUnbrace() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      TheRDebugConstants.DEBUG + ": x <- c(1)",
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      DEBUG_AT,
+      ""
+    );
+  }
+
+  @Test
   public void calculateDebugAtWithResponse() {
     check(
       EXECUTE_AND_STEP_COMMAND,

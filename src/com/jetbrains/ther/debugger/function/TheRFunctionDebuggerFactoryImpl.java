@@ -6,12 +6,14 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_BRACE;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_UNBRACE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFactory {
@@ -22,7 +24,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
-    execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
+    execute(process, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.DEBUG_AT, outputReceiver);
 
     final TheRProcessResponse startTraceResponse = execute(process, EXECUTE_AND_STEP_COMMAND, outputReceiver);
 

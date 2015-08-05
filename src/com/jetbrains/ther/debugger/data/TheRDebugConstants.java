@@ -90,6 +90,9 @@ public final class TheRDebugConstants {
   public static final String DEBUG_AT = "debug at #";
 
   @NotNull
+  public static final String DEBUG = "debug";
+
+  @NotNull
   public static final String TRACING = "Tracing";
 
   @NotNull

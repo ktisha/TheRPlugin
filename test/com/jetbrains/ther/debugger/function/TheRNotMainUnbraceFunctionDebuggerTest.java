@@ -272,7 +272,7 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(5, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Arrays.asList("error_continue", "error3", "error_entry", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_continue", "error_entry", "error_entry", "error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -571,9 +571,9 @@ public class TheRNotMainUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRProcessResponse(
           "output",
-          TheRProcessResponseType.RESPONSE,
+          TheRProcessResponseType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          "error3"
+          "error_entry"
         );
       }
 

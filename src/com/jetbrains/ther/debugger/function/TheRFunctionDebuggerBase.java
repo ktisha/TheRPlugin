@@ -15,7 +15,6 @@ import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendResult;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
@@ -122,7 +121,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     handleEndTraceResult(response);
     appendError(response, myOutputReceiver);
 
-    execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myOutputReceiver);
+    execute(myProcess, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.DEBUG_AT, myOutputReceiver);
     execute(myProcess, EXECUTE_AND_STEP_COMMAND, getStartTraceType(), myOutputReceiver);
 
     myCurrentLineNumber = initCurrentLine();

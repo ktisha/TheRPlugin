@@ -309,8 +309,10 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(7, process.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
-    assertEquals(Arrays.asList("error_continue", "error4", "error_entry", "error_dbg_at", "error_ls"),
-                 receiver.getErrors());
+    assertEquals(
+      Arrays.asList("error_continue", "error_entry", "error_entry", "error_dbg_at", "error_ls"),
+      receiver.getErrors()
+    );
 
     receiver.reset();
     debugger.advance();
@@ -701,9 +703,9 @@ public class TheRNotMainBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRProcessResponse(
           "output",
-          TheRProcessResponseType.RESPONSE,
+          TheRProcessResponseType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
-          "error4"
+          "error_entry"
         );
       }
 
