@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -28,19 +29,28 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   @NotNull
   private final TheROutputReceiver myReceiver;
 
+  @NotNull
+  private final TheRExpressionHandler myHandler;
+
+  private final int myFrameNumber;
+
   public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
                                    @NotNull final TheRFunctionDebuggerFactory factory,
-                                   @NotNull final TheROutputReceiver receiver) {
+                                   @NotNull final TheROutputReceiver receiver,
+                                   @NotNull final TheRExpressionHandler handler,
+                                   final int frameNumber) {
     myProcess = process;
     myFactory = factory;
     myReceiver = receiver;
+    myHandler = handler;
+    myFrameNumber = frameNumber;
   }
 
   @Override
   public void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver) {
     try {
       evaluate(
-        expression,
+        myHandler.handle(myFrameNumber, expression),
         receiver
       );
     }
@@ -74,7 +84,19 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(response, myReceiver);
 
         receiver.receiveResult(
-          response.getOutput()
+          response.getOutput() // TODO [dbg][update]
+        );
+
+        break;
+      case DEBUG_AT:
+        appendError(response, myReceiver);
+
+        final TheRProcessResponse finalResponse = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
+
+        appendError(finalResponse, myReceiver);
+
+        receiver.receiveResult(
+          finalResponse.getOutput() // TODO [dbg][update]
         );
 
         break;
@@ -84,7 +106,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           "[" +
           "actual: " + response.getType() + ", " +
           "expected: " +
-          "[" + DEBUGGING_IN + ", " + EMPTY + ", " + RESPONSE + "]" +
+          "[" + DEBUGGING_IN + ", " + EMPTY + ", " + RESPONSE + ", " + DEBUG_AT + "]" +
           "]"
         );
     }

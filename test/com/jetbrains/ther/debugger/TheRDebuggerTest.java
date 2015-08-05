@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
+import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoader;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactory;
@@ -39,6 +40,7 @@ public class TheRDebuggerTest {
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
+    final MockTheRExpressionHandler expressionHandler = new MockTheRExpressionHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
       process,
@@ -46,7 +48,8 @@ public class TheRDebuggerTest {
       loaderFactory,
       evaluatorFactory,
       reader,
-      new IllegalTheROutputReceiver()
+      new IllegalTheROutputReceiver(),
+      expressionHandler
     );
 
     assertFalse(process.myIsClosed);
@@ -57,6 +60,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
 
@@ -70,6 +74,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -83,6 +88,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -96,6 +102,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
   }
@@ -120,6 +127,7 @@ public class TheRDebuggerTest {
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
+    final MockTheRExpressionHandler expressionHandler = new MockTheRExpressionHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
       process,
@@ -127,7 +135,8 @@ public class TheRDebuggerTest {
       loaderFactory,
       evaluatorFactory,
       reader,
-      new IllegalTheROutputReceiver()
+      new IllegalTheROutputReceiver(),
+      expressionHandler
     );
 
     assertFalse(process.myIsClosed);
@@ -139,6 +148,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
 
@@ -153,6 +163,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -167,6 +178,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 0), debugger.getStack().get(1).getLocation());
@@ -182,6 +194,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -197,6 +210,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -211,6 +225,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -225,6 +240,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
@@ -254,6 +270,7 @@ public class TheRDebuggerTest {
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
+    final MockTheRExpressionHandler expressionHandler = new MockTheRExpressionHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
       process,
@@ -261,7 +278,8 @@ public class TheRDebuggerTest {
       loaderFactory,
       evaluatorFactory,
       reader,
-      new IllegalTheROutputReceiver()
+      new IllegalTheROutputReceiver(),
+      expressionHandler
     );
 
     assertFalse(process.myIsClosed);
@@ -274,6 +292,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
 
@@ -289,6 +308,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -304,6 +324,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 0), debugger.getStack().get(1).getLocation());
@@ -320,6 +341,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -336,6 +358,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -353,6 +376,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -370,6 +394,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 5), debugger.getStack().get(1).getLocation());
@@ -386,6 +411,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -401,6 +427,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -416,6 +443,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
@@ -444,6 +472,7 @@ public class TheRDebuggerTest {
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
+    final MockTheRExpressionHandler expressionHandler = new MockTheRExpressionHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
       process,
@@ -451,7 +480,8 @@ public class TheRDebuggerTest {
       loaderFactory,
       evaluatorFactory,
       reader,
-      new IllegalTheROutputReceiver()
+      new IllegalTheROutputReceiver(),
+      expressionHandler
     );
 
     assertFalse(process.myIsClosed);
@@ -464,6 +494,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
 
@@ -479,6 +510,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -494,6 +526,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 0), debugger.getStack().get(1).getLocation());
@@ -510,6 +543,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -526,6 +560,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -543,6 +578,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -560,6 +596,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -575,6 +612,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -590,6 +628,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
+    assertEquals(4, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
@@ -623,6 +662,7 @@ public class TheRDebuggerTest {
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
+    final MockTheRExpressionHandler expressionHandler = new MockTheRExpressionHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
       process,
@@ -630,7 +670,8 @@ public class TheRDebuggerTest {
       loaderFactory,
       evaluatorFactory,
       reader,
-      new IllegalTheROutputReceiver()
+      new IllegalTheROutputReceiver(),
+      expressionHandler
     );
 
     assertFalse(process.myIsClosed);
@@ -644,6 +685,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getStack().get(0).getLocation());
 
@@ -660,6 +702,7 @@ public class TheRDebuggerTest {
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(0, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
 
@@ -676,6 +719,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 0), debugger.getStack().get(1).getLocation());
@@ -693,6 +737,7 @@ public class TheRDebuggerTest {
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(1, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -710,6 +755,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -728,6 +774,7 @@ public class TheRDebuggerTest {
     assertEquals(6, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(3, expressionHandler.myCounter);
     assertEquals(3, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -746,6 +793,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(6, expressionHandler.myCounter);
     assertEquals(4, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -765,6 +813,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(6, expressionHandler.myCounter);
     assertEquals(4, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 1), debugger.getStack().get(1).getLocation());
@@ -784,6 +833,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(9, expressionHandler.myCounter);
     assertEquals(2, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getStack().get(0).getLocation());
     assertEquals(new TheRLocation("abc", 5), debugger.getStack().get(1).getLocation());
@@ -801,6 +851,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(9, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -817,6 +868,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
+    assertEquals(9, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
 
@@ -833,6 +885,7 @@ public class TheRDebuggerTest {
     assertEquals(10, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
+    assertEquals(9, expressionHandler.myCounter);
     assertEquals(1, debugger.getStack().size());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
@@ -879,7 +932,9 @@ public class TheRDebuggerTest {
     @Override
     public TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
                                               @NotNull final TheRFunctionDebuggerFactory factory,
-                                              @NotNull final TheROutputReceiver receiver) {
+                                              @NotNull final TheROutputReceiver receiver,
+                                              @NotNull final TheRExpressionHandler handler,
+                                              final int frameNumber) {
       myCounter++;
 
       return new IllegalTheRDebuggerEvaluator();
@@ -904,6 +959,16 @@ public class TheRDebuggerTest {
     @Override
     public void close() throws IOException {
       myIsClosed = true;
+    }
+  }
+
+  private static class MockTheRExpressionHandler extends IllegalTheRExpressionHandler {
+
+    private int myCounter = 0;
+
+    @Override
+    public void setMaxFrameNumber(final int maxFrameNumber) {
+      myCounter += maxFrameNumber;
     }
   }
 

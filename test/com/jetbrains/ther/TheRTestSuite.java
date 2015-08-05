@@ -4,6 +4,7 @@ import com.jetbrains.ther.debugger.TheRDebuggerStringUtilsTest;
 import com.jetbrains.ther.debugger.TheRDebuggerTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
+import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImplTest;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderImplTest;
 import com.jetbrains.ther.debugger.function.*;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
@@ -51,6 +52,7 @@ public class TheRTestSuite extends TestCase {
   private static void addDebuggerTests(@NotNull final TestSuite suite) {
     // evaluator package
     addJUnit4Test(suite, TheRDebuggerEvaluatorImplTest.class);
+    addJUnit4Test(suite, TheRExpressionHandlerImplTest.class);
 
     // frame package
     addJUnit4Test(suite, TheRVarsLoaderImplTest.class);

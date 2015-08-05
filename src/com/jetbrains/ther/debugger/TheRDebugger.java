@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.diagnostic.Logger;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
+import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactory;
@@ -45,6 +46,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheROutputReceiver myOutputReceiver;
 
   @NotNull
+  private final TheRExpressionHandler myExpressionHandler;
+
+  @NotNull
   private final List<TheRFunctionDebugger> myDebuggers;
 
   @NotNull
@@ -62,7 +66,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRVarsLoaderFactory loaderFactory,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
-                      @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
+                      @NotNull final TheROutputReceiver outputReceiver,
+                      @NotNull final TheRExpressionHandler handler) throws TheRDebuggerException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myLoaderFactory = loaderFactory;
@@ -70,6 +75,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myEvaluatorFactory = evaluatorFactory;
     myScriptReader = scriptReader;
     myOutputReceiver = outputReceiver;
+    myExpressionHandler = handler;
 
     myDebuggers = new ArrayList<TheRFunctionDebugger>();
     myStack = new ArrayList<TheRStackFrame>();
@@ -159,9 +165,17 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
       new TheRStackFrame(
         debugger.getLocation(),
         myLoaderFactory.getLoader(loadFrameNumber()),
-        myEvaluatorFactory.getEvaluator(myProcess, myDebuggerFactory, myOutputReceiver)
+        myEvaluatorFactory.getEvaluator(
+          myProcess,
+          myDebuggerFactory,
+          myOutputReceiver,
+          myExpressionHandler,
+          myStack.size()
+        )
       )
     );
+
+    myExpressionHandler.setMaxFrameNumber(myStack.size() - 1);
   }
 
   @Override
@@ -182,6 +196,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private void popDebugger() {
     myDebuggers.remove(myDebuggers.size() - 1);
     myStack.remove(myStack.size() - 1);
+
+    myExpressionHandler.setMaxFrameNumber(myStack.size() - 1);
   }
 
   private int loadFrameNumber() throws TheRDebuggerException {

@@ -10,5 +10,7 @@ public interface TheRDebuggerEvaluatorFactory {
   @NotNull
   TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
                                      @NotNull final TheRFunctionDebuggerFactory factory,
-                                     @NotNull final TheROutputReceiver receiver);
+                                     @NotNull final TheROutputReceiver receiver,
+                                     @NotNull final TheRExpressionHandler handler,
+                                     final int frameNumber);
 }
