@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -156,6 +157,47 @@ public class TheRDebuggerEvaluatorImplTest {
     assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(0, handler.myCounter);
     assertEquals("def(c(1:5))", handler.myLastExpression);
+  }
+
+  @Test
+  public void innerFunctionValue() {
+    final String text = "function(x) {\n" +
+                        "    x ^ 2\n" +
+                        "}\n" +
+                        "<" + ENVIRONMENT + ": 0xfffffff>";
+
+    final String result = "function(x) {\n" +
+                          "    x ^ 2\n" +
+                          "}";
+
+    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+      text,
+      RESPONSE,
+      TextRange.allOf(text),
+      "abc"
+    );
+
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
+    final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
+
+    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
+      process,
+      new MockTheRFunctionDebuggerFactory(null, null),
+      outputReceiver,
+      handler,
+      0
+    );
+
+    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
+
+    evaluator.evalExpression("def", receiver);
+
+    assertEquals(1, process.getCounter());
+    assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.singletonList("abc"), outputReceiver.getErrors());
+    assertTrue(outputReceiver.getOutputs().isEmpty());
+    assertEquals(0, handler.myCounter);
+    assertEquals("def", handler.myLastExpression);
   }
 
   @Test

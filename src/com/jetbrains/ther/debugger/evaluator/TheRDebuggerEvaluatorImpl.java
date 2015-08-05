@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.handleFunctionValue;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
@@ -69,7 +70,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(response, myReceiver);
 
         receiver.receiveResult(
-          evaluateFunction()
+          handleResult(evaluateFunction())
         );
 
         break;
@@ -85,7 +86,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(response, myReceiver);
 
         receiver.receiveResult(
-          response.getOutput() // TODO [dbg][update]
+          handleResult(
+            response.getResultRange().substring(response.getOutput())
+          )
         );
 
         break;
@@ -95,7 +98,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         final TheRProcessResponse finalResponse = execute(myProcess, EXECUTE_AND_STEP_COMMAND, myReceiver);
 
         receiver.receiveResult(
-          finalResponse.getOutput() // TODO [dbg][update]
+          handleResult(
+            finalResponse.getResultRange().substring(finalResponse.getOutput())
+          )
         );
 
         break;
@@ -124,6 +129,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
 
     return handler.getResult();
+  }
+
+  @NotNull
+  private String handleResult(@NotNull final String result) {
+    return handleFunctionValue(result);
   }
 
   private static class TheREvaluatedFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {

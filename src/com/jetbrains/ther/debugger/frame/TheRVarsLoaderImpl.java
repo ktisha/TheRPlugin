@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -164,17 +165,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   private String handleValue(@NotNull final String type,
                              @NotNull final String value) {
     if (type.equals(FUNCTION_TYPE)) {
-      final int lastLineBegin = findLastLineBegin(value);
-
-      if (value.startsWith(ENVIRONMENT, lastLineBegin + "<".length())) {
-        return value.substring(
-          0,
-          findLastButOneLineEnd(value, lastLineBegin)
-        );
-      }
-      else {
-        return value;
-      }
+      return TheRDebuggerStringUtils.handleFunctionValue(value);
     }
     else {
       return value;
@@ -192,25 +183,5 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
            ATTR_COMMAND + "(" + globalVar + ", \"original\")" +
            " else " +
            globalVar;
-  }
-
-  private int findLastLineBegin(@NotNull final String text) {
-    int current = text.length() - 1;
-
-    while (current > -1 && !StringUtil.isLineBreak(text.charAt(current))) {
-      current--;
-    }
-
-    return current + 1;
-  }
-
-  private int findLastButOneLineEnd(@NotNull final String text, final int lastLineBegin) {
-    int current = lastLineBegin - 1;
-
-    while (current > -1 && StringUtil.isLineBreak(text.charAt(current))) {
-      current--;
-    }
-
-    return current + 1;
   }
 }

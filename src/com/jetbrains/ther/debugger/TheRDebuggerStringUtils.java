@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.COMMENT_SYMBOL;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
 
 public final class TheRDebuggerStringUtils {
 
@@ -35,6 +36,21 @@ public final class TheRDebuggerStringUtils {
 
     if (!output.isEmpty()) {
       receiver.receiveOutput(output);
+    }
+  }
+
+  @NotNull
+  public static String handleFunctionValue(@NotNull final String functionValue) {
+    final int lastLineBegin = findLastLineBegin(functionValue);
+
+    if (functionValue.startsWith(ENVIRONMENT, lastLineBegin + "<".length())) {
+      return functionValue.substring(
+        0,
+        findLastButOneLineEnd(functionValue, lastLineBegin)
+      );
+    }
+    else {
+      return functionValue;
     }
   }
 
@@ -76,5 +92,25 @@ public final class TheRDebuggerStringUtils {
     }
 
     return current;
+  }
+
+  private static int findLastLineBegin(@NotNull final String text) {
+    int current = text.length() - 1;
+
+    while (current > -1 && !StringUtil.isLineBreak(text.charAt(current))) {
+      current--;
+    }
+
+    return current + 1;
+  }
+
+  private static int findLastButOneLineEnd(@NotNull final String text, final int lastLineBegin) {
+    int current = lastLineBegin - 1;
+
+    while (current > -1 && StringUtil.isLineBreak(text.charAt(current))) {
+      current--;
+    }
+
+    return current + 1;
   }
 }
