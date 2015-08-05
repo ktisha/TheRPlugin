@@ -9,6 +9,7 @@ import com.intellij.execution.runners.GenericProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ConcurrencyUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
@@ -29,8 +30,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class TheRXDebugRunner extends GenericProgramRunner {
+
+  @NotNull
+  public static final ThreadPoolExecutor SINGLE_EXECUTOR = ConcurrencyUtil.newSingleThreadExecutor("TheRDebuggerBackground");
 
   @NotNull
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";

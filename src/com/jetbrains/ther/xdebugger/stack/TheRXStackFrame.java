@@ -1,12 +1,12 @@
 package com.jetbrains.ther.xdebugger.stack;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ class TheRXStackFrame extends XStackFrame {
 
   @Override
   public void computeChildren(@NotNull final XCompositeNode node) {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {

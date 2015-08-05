@@ -1,6 +1,5 @@
 package com.jetbrains.ther.xdebugger.stack;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
@@ -8,6 +7,7 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
+import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   public void evaluate(@NotNull final String expression,
                        @NotNull final XEvaluationCallback callback,
                        @Nullable final XSourcePosition expressionPosition) {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {

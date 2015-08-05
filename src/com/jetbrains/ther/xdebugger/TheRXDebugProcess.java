@@ -3,7 +3,6 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -95,7 +94,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepOver() {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -122,7 +121,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepInto() {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -143,7 +142,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepOut() {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -170,7 +169,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void resume() {
-    ApplicationManager.getApplication().executeOnPooledThread(
+    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
       new Runnable() {
         @Override
         public void run() {
