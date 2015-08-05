@@ -8,7 +8,8 @@ import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
@@ -23,9 +24,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
     throws TheRDebuggerException {
     execute(process, EXECUTE_AND_STEP_COMMAND, RESPONSE, outputReceiver);
 
-    final TheRProcessResponse startTraceResponse = process.execute(EXECUTE_AND_STEP_COMMAND);
-
-    appendError(startTraceResponse, outputReceiver);
+    final TheRProcessResponse startTraceResponse = execute(process, EXECUTE_AND_STEP_COMMAND, outputReceiver);
 
     switch (startTraceResponse.getType()) {
       case START_TRACE_BRACE:

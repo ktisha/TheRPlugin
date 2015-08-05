@@ -10,11 +10,13 @@ import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendOutput;
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
@@ -87,7 +89,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
         return;
       }
 
-      final TheRProcessResponse response = myProcess.execute(line.getText());
+      final TheRProcessResponse response = TheRProcessUtils.execute(myProcess, line.getText(), myOutputReceiver);
 
       handleResponse(response);
 
@@ -125,8 +127,6 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   }
 
   private void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    appendError(response, myOutputReceiver);
-
     switch (response.getType()) {
       case DEBUGGING_IN:
         myIsNewDebuggerAppended = true;

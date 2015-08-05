@@ -35,4 +35,15 @@ public final class TheRProcessUtils {
 
     return response.getOutput();
   }
+
+  @NotNull
+  public static TheRProcessResponse execute(@NotNull final TheRProcess process,
+                                            @NotNull final String command,
+                                            @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
+    final TheRProcessResponse response = process.execute(command);
+
+    appendError(response, receiver);
+
+    return response;
+  }
 }

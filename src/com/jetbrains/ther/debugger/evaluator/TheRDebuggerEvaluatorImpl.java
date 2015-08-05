@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
@@ -16,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
@@ -91,9 +92,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
       case DEBUG_AT:
         appendError(response, myReceiver);
 
-        final TheRProcessResponse finalResponse = myProcess.execute(TheRDebugConstants.EXECUTE_AND_STEP_COMMAND);
-
-        appendError(finalResponse, myReceiver);
+        final TheRProcessResponse finalResponse = execute(myProcess, EXECUTE_AND_STEP_COMMAND, myReceiver);
 
         receiver.receiveResult(
           finalResponse.getOutput() // TODO [dbg][update]

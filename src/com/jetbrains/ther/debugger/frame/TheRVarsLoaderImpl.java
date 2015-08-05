@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
@@ -127,8 +126,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    final TheRProcessResponse response = myProcess.execute(valueCommand(var));
-    appendError(response, myReceiver);
+    final TheRProcessResponse response = execute(myProcess, valueCommand(var), myReceiver);
 
     switch (response.getType()) {
       case RESPONSE:

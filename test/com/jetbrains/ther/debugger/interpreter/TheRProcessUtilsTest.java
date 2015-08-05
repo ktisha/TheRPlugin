@@ -36,6 +36,7 @@ public class TheRProcessUtilsTest {
     final String error = "";
 
     final TheRProcess process = new AlwaysSameResponseTheRProcess(output, type, resultRange, error);
+
     final TheRProcessResponse response = execute(process, "def", RESPONSE);
 
     assertEquals(output, response.getOutput());
@@ -45,7 +46,7 @@ public class TheRProcessUtilsTest {
   }
 
   @Test
-  public void errorCommandExecuting() throws TheRDebuggerException {
+  public void errorCommandExecuting1() throws TheRDebuggerException {
     final String output = "abc";
     final TheRProcessResponseType type = RESPONSE;
     final TextRange resultRange = TextRange.allOf(output);
@@ -54,9 +55,30 @@ public class TheRProcessUtilsTest {
     final TheRProcess process = new AlwaysSameResponseTheRProcess(output, type, resultRange, error);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
-    execute(process, "def", RESPONSE, receiver);
+    final String response = execute(process, "def", RESPONSE, receiver);
 
-    assertEquals(Collections.singletonList("error"), receiver.getErrors());
+    assertEquals(output, response);
+    assertEquals(Collections.singletonList(error), receiver.getErrors());
+    assertTrue(receiver.getOutputs().isEmpty());
+  }
+
+  @Test
+  public void errorCommandExecuting2() throws TheRDebuggerException {
+    final String output = "abc";
+    final TheRProcessResponseType type = RESPONSE;
+    final TextRange resultRange = TextRange.allOf(output);
+    final String error = "error";
+
+    final TheRProcess process = new AlwaysSameResponseTheRProcess(output, type, resultRange, error);
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRProcessResponse response = execute(process, "def", receiver);
+
+    assertEquals(output, response.getOutput());
+    assertEquals(RESPONSE, response.getType());
+    assertEquals(resultRange, response.getResultRange());
+    assertEquals(error, response.getError());
+    assertEquals(Collections.singletonList(error), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
   }
 }
