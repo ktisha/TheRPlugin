@@ -8,16 +8,14 @@ import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import org.jetbrains.annotations.NotNull;
 
-// TODO [xdbg][test]
 final class TheRXPresentationUtils {
 
-  public static void computePresentation(@NotNull final TheRVar var,
-                                         @NotNull final XValueNode node) {
+  public static void computePresentation(@NotNull final TheRVar var, @NotNull final XValueNode node) {
     if (isOneLine(var.getValue())) {
-      setPresentation(node, var);
+      setVarPresentation(node, var.getType(), var.getValue());
     }
     else {
-      computeMultilinePresentation(var, node);
+      computeMultilineVarPresentation(var, node);
     }
   }
 
@@ -34,15 +32,19 @@ final class TheRXPresentationUtils {
     return TheRDebuggerStringUtils.findNextLineBegin(value, 0) == value.length();
   }
 
-  private static void setPresentation(@NotNull final XValueNode node, @NotNull final TheRVar var) {
-    setPresentation(node, var, var.getValue());
+  private static void setVarPresentation(@NotNull final XValueNode node, @NotNull final String type, @NotNull final String presentation) {
+    node.setPresentation(
+      AllIcons.Debugger.Value,
+      type,
+      presentation,
+      false
+    );
   }
 
-  private static void computeMultilinePresentation(@NotNull final TheRVar var,
-                                                   @NotNull final XValueNode node) {
+  private static void computeMultilineVarPresentation(@NotNull final TheRVar var, @NotNull final XValueNode node) {
     final String value = var.getValue();
 
-    setPresentation(node, var, calculateShortPresentation(value));
+    setVarPresentation(node, var.getType(), calculatePreview(value));
     setFullValueEvaluator(node, value);
   }
 
@@ -61,27 +63,17 @@ final class TheRXPresentationUtils {
     );
   }
 
-  private static void computeMultilinePresentation(@NotNull final String value,
-                                                   @NotNull final XValueNode node) {
-    setPresentation(node, calculateShortPresentation(value));
+  private static void computeMultilinePresentation(@NotNull final String value, @NotNull final XValueNode node) {
+    setPresentation(node, calculatePreview(value));
     setFullValueEvaluator(node, value);
   }
 
   @NotNull
-  private static String calculateShortPresentation(@NotNull final String value) {
+  private static String calculatePreview(@NotNull final String value) {
     return value.substring(
       0,
       TheRDebuggerStringUtils.findCurrentLineEnd(value, 0)
-    );
-  }
-
-  private static void setPresentation(@NotNull final XValueNode node, @NotNull final TheRVar var, @NotNull final String presentation) {
-    node.setPresentation(
-      AllIcons.Debugger.Value,
-      var.getType(),
-      presentation,
-      false
-    );
+    ).trim().replaceAll("\\s{2,}", " ");
   }
 
   private static void setFullValueEvaluator(@NotNull final XValueNode node, @NotNull final String value) {
