@@ -67,7 +67,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(interpreterPath, scriptPath, outputBuffer),
+        createDebugger(interpreterPath, project.getBasePath(), scriptPath, outputBuffer),
         createResolvingSession(project, scriptPath),
         outputBuffer
       )
@@ -91,11 +91,12 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private TheRDebugger createDebugger(@NotNull final String interpreterPath,
+                                      @Nullable final String workDir,
                                       @NotNull final String scriptPath,
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     try {
-      final TheRProcessImpl process = new TheRProcessImpl(interpreterPath);
+      final TheRProcessImpl process = new TheRProcessImpl(interpreterPath, workDir);
 
       return new TheRDebugger(
         process,
