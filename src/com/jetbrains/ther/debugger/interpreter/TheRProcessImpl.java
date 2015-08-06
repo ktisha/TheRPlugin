@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.interpreter;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -12,6 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class TheRProcessImpl implements TheRProcess {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRProcessImpl.class);
 
   @NotNull
   private final Process myProcess;
@@ -44,7 +48,24 @@ public class TheRProcessImpl implements TheRProcess {
 
   @Override
   public void stop() {
-    myProcess.destroy();
+    try {
+      mySender.send(TheRDebugConstants.Q_COMMAND);
+
+      final byte[] buffer = new byte[2];
+
+      //noinspection StatementWithEmptyBody
+      while (myProcess.getInputStream().read(buffer) != -1) {
+      }
+    }
+    catch (final IOException e) {
+      LOGGER.warn(e);
+    }
+    catch (final TheRDebuggerException e) {
+      LOGGER.warn(e);
+    }
+    finally {
+      myProcess.destroy();
+    }
   }
 
   @NotNull

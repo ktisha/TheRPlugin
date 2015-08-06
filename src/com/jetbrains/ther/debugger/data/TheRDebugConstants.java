@@ -72,6 +72,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String FILTER_COMMAND = "Filter";
 
+  @NotNull
+  public static final String Q_COMMAND = "Q";
+
   // responses
 
   @NotNull
