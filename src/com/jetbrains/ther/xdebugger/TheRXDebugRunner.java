@@ -26,6 +26,7 @@ import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
+import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSessionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,7 +121,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   private TheRXResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final String scriptPath)
     throws ExecutionException {
     try {
-      return new TheRXResolvingSession(project, scriptPath);
+      return new TheRXResolvingSessionImpl(project, scriptPath);
     }
     catch (final TheRXDebuggerException e) {
       throw new ExecutionException(e);
