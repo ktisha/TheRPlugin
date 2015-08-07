@@ -18,6 +18,7 @@ import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
 import com.jetbrains.ther.xdebugger.TheRXOutputBufferTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
+import com.jetbrains.ther.xdebugger.stack.TheRXSuspendContextTest;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -79,6 +80,7 @@ public class TheRTestSuite extends TestCase {
   private static void addXDebuggerTests(@NotNull final TestSuite suite) {
     // stack package
     addJUnit4Test(suite, TheRXPresentationUtilsTest.class);
+    addJUnit4Test(suite, TheRXSuspendContextTest.class);
 
     // `main` package
     addJUnit4Test(suite, TheRXOutputBufferTest.class);

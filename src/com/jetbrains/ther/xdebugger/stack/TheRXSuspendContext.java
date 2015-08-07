@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-// TODO [xdbg][test-active-stack]
 class TheRXSuspendContext extends XSuspendContext {
 
   @NotNull
@@ -18,7 +17,7 @@ class TheRXSuspendContext extends XSuspendContext {
     myExecutionStack = new TheRXExecutionStack(stack);
   }
 
-  @Nullable
+  @NotNull
   @Override
   public XExecutionStack getActiveExecutionStack() {
     return myExecutionStack;
