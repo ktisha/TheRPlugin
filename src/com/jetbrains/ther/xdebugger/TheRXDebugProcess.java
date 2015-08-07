@@ -66,7 +66,7 @@ class TheRXDebugProcess extends XDebugProcess {
     super(session);
 
     myDebugger = debugger;
-    myStack = new TheRXStack(resolvingSession);
+    myStack = new TheRXStack(myDebugger.getStack(), resolvingSession);
     myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
@@ -111,7 +111,7 @@ class TheRXDebugProcess extends XDebugProcess {
             do {
               if (!advance()) return;
 
-              myStack.update(stack);
+              myStack.update();
             }
             while (!isBreakpoint() && stack.size() > targetDepth);
 
@@ -134,7 +134,7 @@ class TheRXDebugProcess extends XDebugProcess {
           try {
             if (!advance()) return;
 
-            myStack.update(myDebugger.getStack());
+            myStack.update();
 
             showDebugInformation();
           }
@@ -159,7 +159,7 @@ class TheRXDebugProcess extends XDebugProcess {
             do {
               if (!advance()) return;
 
-              myStack.update(stack);
+              myStack.update();
             }
             while (!isBreakpoint() && stack.size() > targetDepth);
 
@@ -183,7 +183,7 @@ class TheRXDebugProcess extends XDebugProcess {
             do {
               if (!advance()) return;
 
-              myStack.update(myDebugger.getStack());
+              myStack.update();
             }
             while (!isBreakpoint());
 

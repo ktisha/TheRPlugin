@@ -15,6 +15,9 @@ import java.util.ListIterator;
 public class TheRXStack {
 
   @NotNull
+  private final List<TheRStackFrame> myOriginalStack;
+
+  @NotNull
   private final TheRXResolvingSession mySession;
 
   @Nullable
@@ -23,16 +26,17 @@ public class TheRXStack {
   @Nullable
   private XSuspendContext mySuspendContext;
 
-  public TheRXStack(@NotNull final TheRXResolvingSession session) {
+  public TheRXStack(@NotNull final List<TheRStackFrame> stack, @NotNull final TheRXResolvingSession session) {
+    myOriginalStack = stack;
     mySession = session;
     myStack = null;
     mySuspendContext = null;
   }
 
-  public void update(@NotNull final List<TheRStackFrame> stack) {
-    // `stack` ends with newest frame and `myStack` ends with eldest frame
+  public void update() {
+    // `myOriginalStack` ends with newest frame and `myStack` ends with eldest frame
 
-    myStack = calculateStack(myStack, stack);
+    myStack = calculateStack(myStack, myOriginalStack);
     mySuspendContext = new TheRXSuspendContext(myStack);
   }
 
