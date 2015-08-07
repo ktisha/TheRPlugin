@@ -3,6 +3,7 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -28,12 +29,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // TODO [xdbg][test]
 class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
+
+  @NotNull
+  private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
 
   @NotNull
   private final TheRDebugger myDebugger;
@@ -267,6 +273,10 @@ class TheRXDebugProcess extends XDebugProcess {
         final String text = message.getText();
         final ConsoleViewContentType type = message.getType();
 
+        if (type == ConsoleViewContentType.ERROR_OUTPUT) {
+          tryFailedImportMessage(text);
+        }
+
         myConsole.print(text, type);
 
         if (!StringUtil.endsWithLineBreak(text)) {
@@ -288,6 +298,38 @@ class TheRXDebugProcess extends XDebugProcess {
     assert frame != null;
 
     return frame.getSourcePosition();  // TODO [xdbg][null]
+  }
+
+  private void tryFailedImportMessage(@NotNull final String text) {
+    final Matcher matcher = FAILED_IMPORT_PATTERN.matcher(text);
+
+    if (matcher.find()) {
+      final boolean isError = text.startsWith("Error");
+      final String message = "T" + text.substring(matcher.start() + 1);
+      final String title = "PACKAGE LOADING";
+
+      ApplicationManager.getApplication().invokeLater(
+        new Runnable() {
+          @Override
+          public void run() {
+            if (isError) {
+              Messages.showErrorDialog(
+                getSession().getProject(),
+                message,
+                title
+              );
+            }
+            else {
+              Messages.showWarningDialog(
+                getSession().getProject(),
+                message,
+                title
+              );
+            }
+          }
+        }
+      );
+    }
   }
 
   private static class XSourcePositionWrapper {
