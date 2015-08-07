@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-// TODO [xdbg][test-compute-children]
 class TheRXStackFrame extends XStackFrame {
 
   @NotNull
