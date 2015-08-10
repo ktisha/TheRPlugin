@@ -19,12 +19,12 @@ public class MockXStackFrameContainer implements XExecutionStack.XStackFrameCont
 
   @Override
   public boolean isObsolete() {
-    throw new IllegalStateException();
+    throw new IllegalStateException("IsObsolete shouldn't be called");
   }
 
   @Override
   public void errorOccurred(@NotNull final String errorMessage) {
-    throw new IllegalStateException();
+    throw new IllegalStateException("ErrorOccurred shouldn't be called");
   }
 
   @NotNull

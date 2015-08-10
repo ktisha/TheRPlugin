@@ -73,12 +73,12 @@ public class TheRXPresentationUtilsTest {
                                 @Nullable final String type,
                                 @NotNull final String value,
                                 final boolean hasChildren) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetPresentation shouldn't be called");
     }
 
     @Override
     public void setPresentation(@Nullable final Icon icon, @NotNull final XValuePresentation presentation, final boolean hasChildren) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetPresentation shouldn't be called");
     }
 
     @Override
@@ -87,7 +87,7 @@ public class TheRXPresentationUtilsTest {
                                 @NotNull final String separator,
                                 @Nullable final String value,
                                 final boolean hasChildren) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetPresentation shouldn't be called");
     }
 
     @Override
@@ -96,7 +96,7 @@ public class TheRXPresentationUtilsTest {
                                 @NotNull final String value,
                                 @Nullable final NotNullFunction<String, String> valuePresenter,
                                 final boolean hasChildren) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetPresentation shouldn't be called");
     }
 
     @Override
@@ -106,17 +106,17 @@ public class TheRXPresentationUtilsTest {
                                 @NotNull final String value,
                                 @Nullable final NotNullFunction<String, String> valuePresenter,
                                 final boolean hasChildren) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetPresentation shouldn't be called");
     }
 
     @Override
     public void setFullValueEvaluator(@NotNull final XFullValueEvaluator fullValueEvaluator) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetFullValueEvaluator shouldn't be called");
     }
 
     @Override
     public boolean isObsolete() {
-      throw new IllegalStateException();
+      throw new IllegalStateException("IsObsolete shouldn't be called");
     }
   }
 
@@ -124,49 +124,49 @@ public class TheRXPresentationUtilsTest {
 
     @Override
     public void renderValue(@NotNull final String value) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderValue shouldn't be called");
     }
 
     @Override
     public void renderStringValue(@NotNull final String value) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderStringValue shouldn't be called");
     }
 
     @Override
     public void renderNumericValue(@NotNull final String value) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderNumericValue shouldn't be called");
     }
 
     @Override
     public void renderKeywordValue(@NotNull final String value) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderKeywordValue shouldn't be called");
     }
 
     @Override
     public void renderValue(@NotNull final String value, @NotNull final TextAttributesKey key) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderValue shouldn't be called");
     }
 
     @Override
     public void renderStringValue(@NotNull final String value,
                                   @Nullable final String additionalSpecialCharsToHighlight,
                                   final int maxLength) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderStringValue shouldn't be called");
     }
 
     @Override
     public void renderComment(@NotNull final String comment) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderComment shouldn't be called");
     }
 
     @Override
     public void renderSpecialSymbol(@NotNull final String symbol) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderSpecialSymbol shouldn't be called");
     }
 
     @Override
     public void renderError(@NotNull final String error) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("RenderError shouldn't be called");
     }
   }
 
@@ -174,22 +174,22 @@ public class TheRXPresentationUtilsTest {
 
     @Override
     public void evaluated(@NotNull final String fullValue) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("Evaluated shouldn't be called");
     }
 
     @Override
     public void evaluated(@NotNull final String fullValue, @Nullable final Font font) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("Evaluated shouldn't be called");
     }
 
     @Override
     public boolean isObsolete() {
-      throw new IllegalStateException();
+      throw new IllegalStateException("IsObsolete shouldn't be called");
     }
 
     @Override
     public void errorOccurred(@NotNull final String errorMessage) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("ErrorOccurred shouldn't be called");
     }
   }
 

@@ -91,27 +91,27 @@ public class TheRXStackFrameTest {
 
     @Override
     public void addChildren(@NotNull final XValueChildrenList children, final boolean last) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("AddChildren shouldn't be called");
     }
 
     @Override
     public void tooManyChildren(final int remaining) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("TooManyChildren shouldn't be called");
     }
 
     @Override
     public void setAlreadySorted(final boolean alreadySorted) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetAlreadySorted shouldn't be called");
     }
 
     @Override
     public void setErrorMessage(@NotNull final String errorMessage) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetErrorMessage shouldn't be called");
     }
 
     @Override
     public void setErrorMessage(@NotNull final String errorMessage, final XDebuggerTreeNodeHyperlink link) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetErrorMessage shouldn't be called");
     }
 
     @Override
@@ -119,12 +119,12 @@ public class TheRXStackFrameTest {
                            @Nullable final Icon icon,
                            @NotNull final SimpleTextAttributes attributes,
                            @Nullable final XDebuggerTreeNodeHyperlink link) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("SetMessage shouldn't be called");
     }
 
     @Override
     public boolean isObsolete() {
-      throw new IllegalStateException();
+      throw new IllegalStateException("IsObsolete shouldn't be called");
     }
   }
 

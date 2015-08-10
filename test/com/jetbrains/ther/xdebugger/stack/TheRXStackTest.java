@@ -321,19 +321,19 @@ public class TheRXStackTest {
 
     @Override
     public int getOffset() {
-      throw new IllegalStateException();
+      throw new IllegalStateException("GetOffset shouldn't be called");
     }
 
     @NotNull
     @Override
     public VirtualFile getFile() {
-      throw new IllegalStateException();
+      throw new IllegalStateException("GetFile shouldn't be called");
     }
 
     @NotNull
     @Override
     public Navigatable createNavigatable(@NotNull final Project project) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("CreateNavigatable shouldn't be called");
     }
   }
 }
