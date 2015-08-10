@@ -1,8 +1,5 @@
 package com.jetbrains.ther.xdebugger.stack;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.pom.Navigatable;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
@@ -10,6 +7,7 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
+import com.jetbrains.ther.xdebugger.mock.IllegalXSourcePosition;
 import com.jetbrains.ther.xdebugger.mock.MockXStackFrameContainer;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import org.jetbrains.annotations.NotNull;
@@ -306,7 +304,7 @@ public class TheRXStackTest {
     }
   }
 
-  private static class MockXSourcePosition implements XSourcePosition {
+  private static class MockXSourcePosition extends IllegalXSourcePosition {
 
     private final int myLine;
 
@@ -317,23 +315,6 @@ public class TheRXStackTest {
     @Override
     public int getLine() {
       return myLine;
-    }
-
-    @Override
-    public int getOffset() {
-      throw new IllegalStateException("GetOffset shouldn't be called");
-    }
-
-    @NotNull
-    @Override
-    public VirtualFile getFile() {
-      throw new IllegalStateException("GetFile shouldn't be called");
-    }
-
-    @NotNull
-    @Override
-    public Navigatable createNavigatable(@NotNull final Project project) {
-      throw new IllegalStateException("CreateNavigatable shouldn't be called");
     }
   }
 }

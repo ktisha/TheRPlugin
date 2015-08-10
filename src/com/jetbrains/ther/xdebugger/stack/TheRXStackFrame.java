@@ -1,8 +1,12 @@
 package com.jetbrains.ther.xdebugger.stack;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.ui.ColoredTextContainer;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
@@ -35,6 +39,16 @@ class TheRXStackFrame extends XStackFrame {
     return myPosition;
   }
 
+  @NotNull
+  @Override
+  public XDebuggerEvaluator getEvaluator() {
+    if (myEvaluator == null) {
+      myEvaluator = new TheRXDebuggerEvaluator(myFrame.getEvaluator());
+    }
+
+    return myEvaluator;
+  }
+
   @Override
   public void computeChildren(@NotNull final XCompositeNode node) {
     TheRXDebugRunner.SINGLE_EXECUTOR.execute(
@@ -57,14 +71,15 @@ class TheRXStackFrame extends XStackFrame {
     );
   }
 
-  @NotNull
   @Override
-  public XDebuggerEvaluator getEvaluator() {
-    if (myEvaluator == null) {
-      myEvaluator = new TheRXDebuggerEvaluator(myFrame.getEvaluator());
+  public void customizePresentation(@NotNull final ColoredTextContainer component) {
+    if (myPosition == null || myFrame.getLocation().getFunctionName().equals(TheRDebugConstants.MAIN_FUNCTION_NAME)) {
+      super.customizePresentation(component);
     }
-
-    return myEvaluator;
+    else {
+      component.append(getPresentationText(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+      component.setIcon(AllIcons.Debugger.StackFrame);
+    }
   }
 
   @NotNull
@@ -76,6 +91,13 @@ class TheRXStackFrame extends XStackFrame {
     }
 
     return result;
+  }
+
+  @NotNull
+  private String getPresentationText() {
+    assert myPosition != null; // see method usages
+
+    return myFrame.getLocation().getFunctionName() + ", " + myPosition.getFile().getName() + ":" + (myPosition.getLine() + 1);
   }
 
   private static class TheRXVar extends XNamedValue {
