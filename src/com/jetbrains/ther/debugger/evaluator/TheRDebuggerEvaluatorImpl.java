@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.evaluator;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
@@ -103,7 +103,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
         break;
       default:
-        throw new UnexpectedResponseException(
+        throw new TheRUnexpectedResponseException(
           "Actual response type is not the same as expected: " +
           "[" +
           "actual: " + response.getType() + ", " +

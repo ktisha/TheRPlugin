@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-// TODO [xdbg][test]
 public class TheRXStack {
 
   @NotNull

@@ -5,7 +5,7 @@ import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
@@ -146,7 +146,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
           )
         );
       default:
-        throw new UnexpectedResponseException(
+        throw new TheRUnexpectedResponseException(
           "Actual response type is not the same as expected: " +
           "[" +
           "actual: " + response.getType() + ", " +

@@ -4,7 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
@@ -55,7 +55,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     assertTrue(outputReceiver.getOutputs().isEmpty());
   }
 
-  @Test(expected = UnexpectedResponseException.class)
+  @Test(expected = TheRUnexpectedResponseException.class)
   public void unexpectedResponse() throws TheRDebuggerException {
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 

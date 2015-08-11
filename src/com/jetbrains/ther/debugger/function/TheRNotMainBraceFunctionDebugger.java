@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
@@ -39,7 +39,7 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
         handleRecursiveEndTrace(response);
         break;
       default:
-        throw new UnexpectedResponseException(
+        throw new TheRUnexpectedResponseException(
           "Actual response type is not the same as expected: " +
           "[" +
           "actual: " + response.getType() + ", " +

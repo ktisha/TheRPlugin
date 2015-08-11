@@ -174,7 +174,6 @@ public class TheRProcessReceiverTest {
         cbuf[index] = LINE_SEPARATOR.charAt(index);
       }
 
-
       return LINE_SEPARATOR.length();
     }
 

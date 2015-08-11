@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.interpreter;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
@@ -16,7 +16,7 @@ public final class TheRProcessUtils {
     final TheRProcessResponse response = process.execute(command);
 
     if (response.getType() != expectedType) {
-      throw new UnexpectedResponseException(
+      throw new TheRUnexpectedResponseException(
         "Actual response type is not the same as expected: [actual: " + response.getType() + ", expected: " + expectedType + "]"
       );
     }

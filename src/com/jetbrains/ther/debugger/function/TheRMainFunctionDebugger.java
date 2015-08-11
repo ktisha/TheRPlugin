@@ -6,7 +6,7 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.UnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
@@ -148,7 +148,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
       case EMPTY:
         break;
       default:
-        throw new UnexpectedResponseException(
+        throw new TheRUnexpectedResponseException(
           "Actual response type is not the same as expected: " +
           "[" +
           "actual: " + response.getType() + ", " +
