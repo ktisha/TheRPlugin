@@ -1,6 +1,5 @@
 package com.jetbrains.ther.debugger.frame;
 
-// TODO [dbg][test]
 public class TheRValueModifierHandlerImpl implements TheRValueModifierHandler {
 
   private int myMaxFrameNumber = 0;
