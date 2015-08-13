@@ -2,16 +2,15 @@ package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
+import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +34,7 @@ public class TheRVarsLoaderImplTest {
       new TheRVarsLoaderImpl(
         process,
         receiver,
+        new IllegalTheRValueModifier(),
         0
       ).load().size()
     );
@@ -51,39 +51,34 @@ public class TheRVarsLoaderImplTest {
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
       new OrdinaryTheRProcess(),
       receiver,
+      new IllegalTheRValueModifier(),
       0
     ).load();
 
-    final ArrayList<TheRVar> expected = new ArrayList<TheRVar>();
-    expected.add(
-      new TheRVar(
-        "a",
-        "[1] \"integer\"",
-        "[1] 1 2 3"
-      )
+    assertEquals(3, actual.size());
+
+    assertEquals("a", actual.get(0).getName());
+    assertEquals("[1] \"integer\"", actual.get(0).getType());
+    assertEquals("[1] 1 2 3", actual.get(0).getValue());
+
+    assertEquals("b", actual.get(1).getName());
+    assertEquals(FUNCTION_TYPE, actual.get(1).getType());
+    assertEquals(
+      "function(x) {\n" +
+      "    x ^ 2\n" +
+      "}",
+      actual.get(1).getValue()
     );
 
-    expected.add(
-      new TheRVar(
-        "b",
-        FUNCTION_TYPE,
-        "function(x) {\n" +
-        "    x ^ 2\n" +
-        "}"
-      )
+    assertEquals("c", actual.get(2).getName());
+    assertEquals(FUNCTION_TYPE, actual.get(2).getType());
+    assertEquals(
+      "function(x) {\n" +
+      "    x ^ 2\n" +
+      "}",
+      actual.get(2).getValue()
     );
 
-    expected.add(
-      new TheRVar(
-        "c",
-        FUNCTION_TYPE,
-        "function(x) {\n" +
-        "    x ^ 2\n" +
-        "}"
-      )
-    );
-
-    assertEquals(expected, actual);
     assertEquals(
       Arrays.asList("error_ls", "error_ta", "error_va", "error_t4", "error_vb", "error_t6", "error_vc", "error_t8"),
       receiver.getErrors()
@@ -98,12 +93,15 @@ public class TheRVarsLoaderImplTest {
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
       new InDebugTheRProcess(),
       receiver,
+      new IllegalTheRValueModifier(),
       0
     ).load();
 
-    final List<TheRVar> expected = Collections.singletonList(new TheRVar("a", "[1] \"integer\"", "[1] 1 2 3"));
+    assertEquals(1, actual.size());
+    assertEquals("a", actual.get(0).getName());
+    assertEquals("[1] \"integer\"", actual.get(0).getType());
+    assertEquals("[1] 1 2 3", actual.get(0).getValue());
 
-    assertEquals(expected, actual);
     assertEquals(Arrays.asList("error_ls", "error_ta", "error_dbg_at", "error_va"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
   }

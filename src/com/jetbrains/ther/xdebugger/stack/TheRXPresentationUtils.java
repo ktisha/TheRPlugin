@@ -5,7 +5,7 @@ import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
-import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.frame.TheRVar;
 import org.jetbrains.annotations.NotNull;
 
 final class TheRXPresentationUtils {

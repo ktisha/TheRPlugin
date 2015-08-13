@@ -6,7 +6,8 @@ import com.intellij.util.NotNullFunction;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
-import com.jetbrains.ther.debugger.data.TheRVar;
+import com.jetbrains.ther.debugger.frame.TheRVar;
+import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class TheRXPresentationUtilsTest {
     final OneLineVarNode node = new OneLineVarNode();
 
     TheRXPresentationUtils.computePresentation(
-      new TheRVar("nm", "tp", "vl"),
+      new TheRVar("nm", "tp", "vl", new IllegalTheRValueModifier()),
       node
     );
 
@@ -35,7 +36,7 @@ public class TheRXPresentationUtilsTest {
     final MultilineVarNode node = new MultilineVarNode();
 
     TheRXPresentationUtils.computePresentation(
-      new TheRVar("nm", "tp", " m  l   t    \nvl"),
+      new TheRVar("nm", "tp", " m  l   t    \nvl", new IllegalTheRValueModifier()),
       node
     );
 

@@ -3,7 +3,6 @@ package com.jetbrains.ther.debugger.frame;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcess;
@@ -29,13 +28,18 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   private final TheROutputReceiver myReceiver;
 
   @NotNull
+  private final TheRValueModifier myModifier;
+
+  @NotNull
   private final String myFrame;
 
   public TheRVarsLoaderImpl(@NotNull final TheRProcess process,
                             @NotNull final TheROutputReceiver receiver,
+                            @NotNull final TheRValueModifier modifier,
                             final int frameNumber) {
     myProcess = process;
     myReceiver = receiver;
+    myModifier = modifier;
     myFrame = SYS_FRAME_COMMAND + "(" + frameNumber + ")";
   }
 
@@ -98,7 +102,8 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     return new TheRVar(
       var,
       type,
-      loadValue(var, type)
+      loadValue(var, type),
+      myModifier
     );
   }
 

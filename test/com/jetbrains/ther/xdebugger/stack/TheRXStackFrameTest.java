@@ -10,11 +10,12 @@ import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.debugger.frame.TheRVar;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoader;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
+import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
 import com.jetbrains.ther.xdebugger.mock.IllegalXSourcePosition;
 import org.jetbrains.annotations.NotNull;
@@ -150,8 +151,8 @@ public class TheRXStackFrameTest {
       myCounter++;
 
       return Arrays.asList(
-        new TheRVar("n1", "t1", "v1"),
-        new TheRVar("n2", "t2", "v2")
+        new TheRVar("n1", "t1", "v1", new IllegalTheRValueModifier()),
+        new TheRVar("n2", "t2", "v2", new IllegalTheRValueModifier())
       );
     }
   }

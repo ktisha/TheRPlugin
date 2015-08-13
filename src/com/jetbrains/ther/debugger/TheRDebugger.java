@@ -6,6 +6,8 @@ import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.debugger.frame.TheRValueModifierFactory;
+import com.jetbrains.ther.debugger.frame.TheRValueModifierHandler;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
@@ -49,6 +51,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRExpressionHandler myExpressionHandler;
 
   @NotNull
+  private final TheRValueModifierFactory myModifierFactory;
+
+  @NotNull
+  private final TheRValueModifierHandler myModifierHandler;
+
+  @NotNull
   private final List<TheRFunctionDebugger> myDebuggers;
 
   @NotNull
@@ -67,7 +75,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
                       @NotNull final TheRScriptReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver,
-                      @NotNull final TheRExpressionHandler handler) throws TheRDebuggerException {
+                      @NotNull final TheRExpressionHandler expressionHandler,
+                      @NotNull final TheRValueModifierFactory modifierFactory,
+                      @NotNull final TheRValueModifierHandler modifierHandler) throws TheRDebuggerException {
     myProcess = process;
     myDebuggerFactory = debuggerFactory;
     myLoaderFactory = loaderFactory;
@@ -75,7 +85,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myEvaluatorFactory = evaluatorFactory;
     myScriptReader = scriptReader;
     myOutputReceiver = outputReceiver;
-    myExpressionHandler = handler;
+    myExpressionHandler = expressionHandler;
+    myModifierFactory = modifierFactory;
+    myModifierHandler = modifierHandler;
 
     myDebuggers = new ArrayList<TheRFunctionDebugger>();
     myStack = new ArrayList<TheRStackFrame>();
@@ -164,7 +176,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack.add(
       new TheRStackFrame(
         debugger.getLocation(),
-        myLoaderFactory.getLoader(loadFrameNumber()),
+        myLoaderFactory.getLoader(myModifierFactory.getModifier(), loadFrameNumber()),
         myEvaluatorFactory.getEvaluator(
           myProcess,
           myDebuggerFactory,
@@ -176,6 +188,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     );
 
     myExpressionHandler.setMaxFrameNumber(myStack.size() - 1);
+    myModifierHandler.setMaxFrameNumber(myStack.size() - 1);
   }
 
   @Override
@@ -198,6 +211,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack.remove(myStack.size() - 1);
 
     myExpressionHandler.setMaxFrameNumber(myStack.size() - 1);
+    myModifierHandler.setMaxFrameNumber(myStack.size() - 1);
   }
 
   private int loadFrameNumber() throws TheRDebuggerException {

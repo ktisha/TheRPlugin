@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.mock;
 
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.frame.TheRVar;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoader;
 import org.jetbrains.annotations.NotNull;
 

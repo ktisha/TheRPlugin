@@ -7,9 +7,9 @@ import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRVar;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.debugger.frame.TheRVar;
 import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,6 +114,17 @@ class TheRXStackFrame extends XStackFrame {
     @Override
     public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
       TheRXPresentationUtils.computePresentation(myVar, node);
+    }
+
+    @Nullable
+    @Override
+    public XValueModifier getModifier() {
+      if (!myVar.getModifier().isDisabled()) {
+        return new TheRXValueModifier(myVar.getModifier(), myVar.getName());
+      }
+      else {
+        return null;
+      }
     }
   }
 }
