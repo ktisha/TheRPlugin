@@ -214,6 +214,8 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(expression, handler.myLastExpression);
   }
 
+  // TODO [dbg][restructure_and_move_tests_below]
+
   @Test
   public void stack1() {
     /*

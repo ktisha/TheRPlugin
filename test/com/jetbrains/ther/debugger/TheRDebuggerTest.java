@@ -1173,7 +1173,11 @@ public class TheRDebuggerTest {
 
     @NotNull
     @Override
-    public TheRValueModifier getModifier() {
+    public TheRValueModifier getModifier(@NotNull final TheRProcess process,
+                                         @NotNull final TheRFunctionDebuggerFactory factory,
+                                         @NotNull final TheROutputReceiver receiver,
+                                         @NotNull final TheRValueModifierHandler handler,
+                                         final int frameNumber) {
       myCounter++;
 
       return new IllegalTheRValueModifier();

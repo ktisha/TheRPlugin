@@ -119,7 +119,7 @@ class TheRXStackFrame extends XStackFrame {
     @Nullable
     @Override
     public XValueModifier getModifier() {
-      if (!myVar.getModifier().isDisabled()) {
+      if (myVar.getModifier().isEnabled()) {
         return new TheRXValueModifier(myVar.getModifier(), myVar.getName());
       }
       else {

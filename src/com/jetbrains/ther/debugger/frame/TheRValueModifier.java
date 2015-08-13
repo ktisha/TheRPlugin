@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TheRValueModifier {
 
-  boolean isDisabled();
+  boolean isEnabled();
 
   void setValue(@NotNull final String name, @NotNull final String value, @NotNull final Listener listener);
 

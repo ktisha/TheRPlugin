@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 public class IllegalTheRValueModifier implements TheRValueModifier {
 
   @Override
-  public boolean isDisabled() {
-    throw new IllegalStateException("IsDisabled shouldn't be called");
+  public boolean isEnabled() {
+    throw new IllegalStateException("IsEnabled shouldn't be called");
   }
 
   @Override

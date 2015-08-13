@@ -176,7 +176,16 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack.add(
       new TheRStackFrame(
         debugger.getLocation(),
-        myLoaderFactory.getLoader(myModifierFactory.getModifier(), loadFrameNumber()),
+        myLoaderFactory.getLoader(
+          myModifierFactory.getModifier(
+            myProcess,
+            myDebuggerFactory,
+            myOutputReceiver,
+            myModifierHandler,
+            myStack.size()
+          ),
+          loadFrameNumber()
+        ),
         myEvaluatorFactory.getEvaluator(
           myProcess,
           myDebuggerFactory,
