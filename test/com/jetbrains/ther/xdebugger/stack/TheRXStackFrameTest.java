@@ -1,12 +1,8 @@
 package com.jetbrains.ther.xdebugger.stack;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.mock.MockVirtualFile;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.xdebugger.frame.XCompositeNode;
-import com.intellij.xdebugger.frame.XDebuggerTreeNodeHyperlink;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
@@ -17,7 +13,8 @@ import com.jetbrains.ther.debugger.frame.TheRVarsLoader;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
-import com.jetbrains.ther.xdebugger.mock.IllegalXSourcePosition;
+import com.jetbrains.ther.xdebugger.mock.IllegalXCompositeNode;
+import com.jetbrains.ther.xdebugger.mock.MockXSourcePosition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -157,47 +154,6 @@ public class TheRXStackFrameTest {
     }
   }
 
-  private static class IllegalXCompositeNode implements XCompositeNode {
-
-    @Override
-    public void addChildren(@NotNull final XValueChildrenList children, final boolean last) {
-      throw new IllegalStateException("AddChildren shouldn't be called");
-    }
-
-    @Override
-    public void tooManyChildren(final int remaining) {
-      throw new IllegalStateException("TooManyChildren shouldn't be called");
-    }
-
-    @Override
-    public void setAlreadySorted(final boolean alreadySorted) {
-      throw new IllegalStateException("SetAlreadySorted shouldn't be called");
-    }
-
-    @Override
-    public void setErrorMessage(@NotNull final String errorMessage) {
-      throw new IllegalStateException("SetErrorMessage shouldn't be called");
-    }
-
-    @Override
-    public void setErrorMessage(@NotNull final String errorMessage, final XDebuggerTreeNodeHyperlink link) {
-      throw new IllegalStateException("SetErrorMessage shouldn't be called");
-    }
-
-    @Override
-    public void setMessage(@NotNull final String message,
-                           @Nullable final Icon icon,
-                           @NotNull final SimpleTextAttributes attributes,
-                           @Nullable final XDebuggerTreeNodeHyperlink link) {
-      throw new IllegalStateException("SetMessage shouldn't be called");
-    }
-
-    @Override
-    public boolean isObsolete() {
-      throw new IllegalStateException("IsObsolete shouldn't be called");
-    }
-  }
-
   private static class OrdinaryXCompositeNode extends IllegalXCompositeNode {
 
     private int myCounter = 0;
@@ -267,30 +223,6 @@ public class TheRXStackFrameTest {
     @Override
     public void setToolTipText(@Nullable final String text) {
       throw new IllegalStateException("SetToolTipText shouldn't be called");
-    }
-  }
-
-  private static class MockXSourcePosition extends IllegalXSourcePosition {
-
-    @NotNull
-    private final String myFilename;
-
-    private final int myLine;
-
-    public MockXSourcePosition(@NotNull final String filename, final int line) {
-      myFilename = filename;
-      myLine = line;
-    }
-
-    @Override
-    public int getLine() {
-      return myLine;
-    }
-
-    @NotNull
-    @Override
-    public VirtualFile getFile() {
-      return new MockVirtualFile(myFilename);
     }
   }
 }

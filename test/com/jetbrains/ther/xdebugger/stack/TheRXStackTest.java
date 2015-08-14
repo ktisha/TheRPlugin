@@ -7,7 +7,7 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
-import com.jetbrains.ther.xdebugger.mock.IllegalXSourcePosition;
+import com.jetbrains.ther.xdebugger.mock.MockXSourcePosition;
 import com.jetbrains.ther.xdebugger.mock.MockXStackFrameContainer;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import org.jetbrains.annotations.NotNull;
@@ -287,7 +287,7 @@ public class TheRXStackTest {
     public XSourcePosition resolveNext(@NotNull final TheRLocation nextLocation) {
       myNext++;
 
-      return new MockXSourcePosition(myNext + myCurrent);
+      return new MockXSourcePosition(null, myNext + myCurrent);
     }
 
     @Nullable
@@ -295,26 +295,12 @@ public class TheRXStackTest {
     public XSourcePosition resolveCurrent(final int line) {
       myCurrent++;
 
-      return new MockXSourcePosition(myNext + myCurrent);
+      return new MockXSourcePosition(null, myNext + myCurrent);
     }
 
     @Override
     public void dropLast(final int number) {
       myDropped += number;
-    }
-  }
-
-  private static class MockXSourcePosition extends IllegalXSourcePosition {
-
-    private final int myLine;
-
-    private MockXSourcePosition(final int line) {
-      myLine = line;
-    }
-
-    @Override
-    public int getLine() {
-      return myLine;
     }
   }
 }
