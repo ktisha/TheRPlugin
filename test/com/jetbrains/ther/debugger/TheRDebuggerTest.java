@@ -1184,14 +1184,9 @@ public class TheRDebuggerTest {
     }
   }
 
-  private static class MockTheRValueModifierHandler implements TheRValueModifierHandler {
+  private static class MockTheRValueModifierHandler extends IllegalTheRValueModifierHandler {
 
     private int myCounter = 0;
-
-    @Override
-    public boolean isModificationAvailable(final int frameNumber) {
-      throw new IllegalStateException("IsModificationAvailable shouldn't be called");
-    }
 
     @Override
     public void setMaxFrameNumber(final int maxFrameNumber) {

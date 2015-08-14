@@ -13,7 +13,6 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_ST
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
 
-// TODO [dbg][test]
 class TheRValueModifierImpl implements TheRValueModifier {
 
   @NotNull
@@ -67,7 +66,12 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
     switch (response.getType()) {
       case EMPTY:
-        listener.onSuccess();
+        if (response.getError().isEmpty()) {
+          listener.onSuccess();
+        }
+        else {
+          listener.onError(response.getError());
+        }
 
         return;
       case DEBUGGING_IN:
