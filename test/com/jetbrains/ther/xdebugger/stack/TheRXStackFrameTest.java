@@ -25,8 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TheRXStackFrameTest {
 
@@ -148,8 +147,8 @@ public class TheRXStackFrameTest {
       myCounter++;
 
       return Arrays.asList(
-        new TheRVar("n1", "t1", "v1", new IllegalTheRValueModifier()),
-        new TheRVar("n2", "t2", "v2", new IllegalTheRValueModifier())
+        new TheRVar("n1", "t1", "v1", new MockTheRValueModifier(true)),
+        new TheRVar("n2", "t2", "v2", new MockTheRValueModifier(false))
       );
     }
   }
@@ -167,6 +166,9 @@ public class TheRXStackFrameTest {
 
       assertEquals("n1", children.getName(0));
       assertEquals("n2", children.getName(1));
+
+      assertNotNull(children.getValue(0).getModifier());
+      assertNull(children.getValue(1).getModifier());
     }
   }
 
@@ -223,6 +225,20 @@ public class TheRXStackFrameTest {
     @Override
     public void setToolTipText(@Nullable final String text) {
       throw new IllegalStateException("SetToolTipText shouldn't be called");
+    }
+  }
+
+  private static class MockTheRValueModifier extends IllegalTheRValueModifier {
+
+    private final boolean myIsEnabled;
+
+    public MockTheRValueModifier(final boolean isEnabled) {
+      myIsEnabled = isEnabled;
+    }
+
+    @Override
+    public boolean isEnabled() {
+      return myIsEnabled;
     }
   }
 }
