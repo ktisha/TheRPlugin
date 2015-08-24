@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO [dbg][test]
 public class TheRForcedFunctionDebuggerHandler implements TheRFunctionDebuggerHandler {
 
   @NotNull

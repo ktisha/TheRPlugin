@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import com.jetbrains.ther.debugger.mock.*;
@@ -37,7 +36,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver(),
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
@@ -45,7 +44,7 @@ public class TheRDebuggerEvaluatorImplTest {
     evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
@@ -67,7 +66,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver(),
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
@@ -75,7 +74,7 @@ public class TheRDebuggerEvaluatorImplTest {
     evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
@@ -92,7 +91,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheROutputReceiver(),
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
@@ -100,7 +99,7 @@ public class TheRDebuggerEvaluatorImplTest {
     evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
     assertEquals(1, receiver.getCounter());
   }
@@ -126,7 +125,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       outputReceiver,
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
@@ -137,7 +136,7 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, receiver.getCounter());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
 
@@ -155,7 +154,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       outputReceiver,
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
@@ -166,7 +165,7 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, receiver.getCounter());
     assertEquals(Arrays.asList("abc", "def"), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
 
@@ -176,9 +175,9 @@ public class TheRDebuggerEvaluatorImplTest {
     final String error = "error";
 
     final String output = "function(x) {\n" +
-                        "    x ^ 2\n" +
-                        "}\n" +
-                        "<" + ENVIRONMENT + ": 0xfffffff>";
+                          "    x ^ 2\n" +
+                          "}\n" +
+                          "<" + ENVIRONMENT + ": 0xfffffff>";
 
     final String result = "function(x) {\n" +
                           "    x ^ 2\n" +
@@ -199,7 +198,7 @@ public class TheRDebuggerEvaluatorImplTest {
       new MockTheRFunctionDebuggerFactory(null, null),
       outputReceiver,
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
@@ -210,20 +209,12 @@ public class TheRDebuggerEvaluatorImplTest {
     assertEquals(1, receiver.getCounter());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
 
-  // TODO [dbg][restructure_and_move_tests_below]
-
   @Test
-  public void stack1() {
-    /*
-    def() {
-      instruction1
-    }
-    */
-
+  public void function() {
     final String expression = "def(c(1:5))";
     final String error = "error";
     final String result = "[1] 1 2 3";
@@ -235,17 +226,17 @@ public class TheRDebuggerEvaluatorImplTest {
       error
     );
 
-    final Stack1TheRFunctionDebugger functionDebugger = new Stack1TheRFunctionDebugger();
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(functionDebugger, null);
+    final MyFunctionDebugger debugger = new MyFunctionDebugger();
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger, null);
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       process,
-      debuggerFactory,
+      factory,
       outputReceiver,
       handler,
-      0
+      1
     );
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
@@ -253,176 +244,13 @@ public class TheRDebuggerEvaluatorImplTest {
     evaluator.evalExpression(expression, receiver);
 
     assertEquals(1, process.getCounter());
-    assertEquals(1, debuggerFactory.getNotMainCounter());
-    assertEquals(0, debuggerFactory.getMainCounter());
-    assertEquals(1, functionDebugger.getCounter());
+    assertEquals(2, debugger.getCounter());
+    assertEquals(0, factory.getMainCounter());
+    assertEquals(1, factory.getNotMainCounter());
     assertEquals(1, receiver.getCounter());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
-    assertEquals(expression, handler.myLastExpression);
-  }
-
-  @Test
-  public void stack21() {
-    /*
-    def() {
-      instruction1
-      abc() {
-        instruction1
-        instruction2
-      }
-      instruction2
-    }
-    */
-
-    final String expression = "def(c(1:5))";
-    final String error = "error";
-    final String result = "[1] 1 2 3";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
-      DEBUGGING_IN,
-      TextRange.EMPTY_RANGE,
-      error
-    );
-
-    final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
-    final MockTheRFunctionDebugger firstFunctionDebugger = new Stack211TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
-    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
-    final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      debuggerFactory,
-      outputReceiver,
-      handler,
-      0
-    );
-
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
-
-    evaluator.evalExpression(expression, receiver);
-
-    assertEquals(1, process.getCounter());
-    assertEquals(2, secondFunctionDebugger.getCounter());
-    assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getMainCounter());
-    assertEquals(1, debuggerFactory.getNotMainCounter());
-    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
-    assertEquals(expression, handler.myLastExpression);
-  }
-
-  @Test
-  public void stack22() {
-    /*
-    def() {
-      instruction1
-      abc() {
-        instruction1
-        instruction2
-      }
-    }
-    */
-
-    final String expression = "def(c(1:5))";
-    final String error = "error";
-    final String result = "[1] 1 2 3";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
-      DEBUGGING_IN,
-      TextRange.EMPTY_RANGE,
-      error
-    );
-
-    final MockTheRFunctionDebugger secondFunctionDebugger = new Stack222TheRFunctionDebugger();
-    final MockTheRFunctionDebugger firstFunctionDebugger = new Stack221TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
-    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
-    final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      debuggerFactory,
-      outputReceiver,
-      handler,
-      0
-    );
-
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
-
-    evaluator.evalExpression(expression, receiver);
-
-    assertEquals(1, process.getCounter());
-    assertEquals(2, secondFunctionDebugger.getCounter());
-    assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getMainCounter());
-    assertEquals(1, debuggerFactory.getNotMainCounter());
-    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
-    assertEquals(expression, handler.myLastExpression);
-  }
-
-  @Test
-  public void stack3() {
-    /*
-    def() {
-      instruction1
-      abc() {
-        instruction1
-        ghi() {
-          instruction1
-          instruction2
-        }
-      }
-      instruction2
-    }
-    */
-
-    final String expression = "def(c(1:5))";
-    final String error = "error";
-    final String result = "[1] 1 2 3";
-
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
-      DEBUGGING_IN,
-      TextRange.EMPTY_RANGE,
-      error
-    );
-
-    final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack33TheRFunctionDebugger();
-    final MockTheRFunctionDebugger secondFunctionDebugger = new Stack32TheRFunctionDebugger(thirdFunctionDebugger);
-    final MockTheRFunctionDebugger firstFunctionDebugger = new Stack31TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
-    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
-    final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
-
-    final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
-      process,
-      debuggerFactory,
-      outputReceiver,
-      handler,
-      0
-    );
-
-    final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
-
-    evaluator.evalExpression(expression, receiver);
-
-    assertEquals(1, process.getCounter());
-    assertEquals(2, thirdFunctionDebugger.getCounter());
-    assertEquals(2, secondFunctionDebugger.getCounter());
-    assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getMainCounter());
-    assertEquals(1, debuggerFactory.getNotMainCounter());
-    assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
-    assertEquals(0, handler.myCounter);
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
 
@@ -479,189 +307,16 @@ public class TheRDebuggerEvaluatorImplTest {
     }
   }
 
-  private static class Stack1TheRFunctionDebugger extends MockTheRFunctionDebugger {
+  private static class MyFunctionDebugger extends MockTheRFunctionDebugger {
 
-    public Stack1TheRFunctionDebugger() {
-      super("", 1);
-    }
-
-    @NotNull
-    @Override
-    public TheRLocation getLocation() {
-      throw new IllegalStateException("GetLocation shouldn't be called");
-    }
-
-    @NotNull
-    @Override
-    public String getResult() {
-      return "[1] 1 2 3";
-    }
-  }
-
-  private static class Stack211TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    @NotNull
-    private final MockTheRFunctionDebugger myNextFunctionDebugger;
-
-    public Stack211TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger debugger) {
-      super("def", 3);
-
-      myNextFunctionDebugger = debugger;
-    }
-
-    @NotNull
-    @Override
-    public TheRLocation getLocation() {
-      throw new IllegalStateException("GetLocation shouldn't be called");
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        getHandler().appendDebugger(myNextFunctionDebugger);
-      }
-    }
-
-    @NotNull
-    @Override
-    public String getResult() {
-      return "[1] 1 2 3";
-    }
-  }
-
-  private static class Stack221TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    @NotNull
-    private final MockTheRFunctionDebugger myNextFunctionDebugger;
-
-    public Stack221TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger debugger) {
+    public MyFunctionDebugger() {
       super("def", 2);
-
-      myNextFunctionDebugger = debugger;
-    }
-
-    @NotNull
-    @Override
-    public TheRLocation getLocation() {
-      throw new IllegalStateException("GetLocation shouldn't be called");
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        myNextFunctionDebugger.setHandler(getHandler());
-        getHandler().appendDebugger(myNextFunctionDebugger);
-      }
-    }
-  }
-
-  private static class Stack222TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    public Stack222TheRFunctionDebugger() {
-      super("abc", 2);
-    }
-
-    @NotNull
-    @Override
-    public TheRLocation getLocation() {
-      throw new IllegalStateException("GetLocation shouldn't be called");
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        getHandler().setDropFrames(2);
-      }
     }
 
     @NotNull
     @Override
     public String getResult() {
       return "[1] 1 2 3";
-    }
-  }
-
-  private static class Stack31TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    @NotNull
-    private final MockTheRFunctionDebugger myNextFunctionDebugger;
-
-    public Stack31TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger nextFunctionDebugger) {
-      super("def", 3);
-
-      myNextFunctionDebugger = nextFunctionDebugger;
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        myNextFunctionDebugger.setHandler(getHandler());
-        getHandler().appendDebugger(myNextFunctionDebugger);
-      }
-    }
-
-    @NotNull
-    @Override
-    public String getResult() {
-      return "[1] 1 2 3";
-    }
-  }
-
-  private static class Stack32TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    @NotNull
-    private final MockTheRFunctionDebugger myNextFunctionDebugger;
-
-    public Stack32TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger nextFunctionDebugger) {
-      super("abc", 2);
-
-      myNextFunctionDebugger = nextFunctionDebugger;
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        myNextFunctionDebugger.setHandler(getHandler());
-        getHandler().appendDebugger(myNextFunctionDebugger);
-      }
-    }
-  }
-
-  private static class Stack33TheRFunctionDebugger extends MockTheRFunctionDebugger {
-
-    public Stack33TheRFunctionDebugger() {
-      super("ghi", 2);
-    }
-
-    @Override
-    public void advance() throws TheRDebuggerException {
-      super.advance();
-
-      if (getCounter() == 2) {
-        assert getHandler() != null;
-
-        getHandler().setDropFrames(2);
-      }
     }
   }
 }
