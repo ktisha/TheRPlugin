@@ -2,13 +2,10 @@ package com.jetbrains.ther.xdebugger;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -21,7 +18,6 @@ import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
@@ -30,17 +26,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // TODO [xdbg][test]
 class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
-
-  @NotNull
-  private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
 
   @NotNull
   private final TheRXProcessHandler myProcessHandler;
@@ -50,9 +41,6 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @NotNull
   private final TheRXStack myStack;
-
-  @NotNull
-  private final TheRXOutputBuffer myOutputBuffer;
 
   @NotNull
   private final Map<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
@@ -66,15 +54,13 @@ class TheRXDebugProcess extends XDebugProcess {
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRXProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRXResolvingSession resolvingSession,
-                           @NotNull final TheRXOutputBuffer outputBuffer) {
+                           @NotNull final TheRXResolvingSession resolvingSession) {
     super(session);
 
     myProcessHandler = processHandler;
 
     myDebugger = debugger;
     myStack = new TheRXStack(myDebugger.getStack(), resolvingSession);
-    myOutputBuffer = outputBuffer;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
@@ -241,8 +227,6 @@ class TheRXDebugProcess extends XDebugProcess {
   private boolean advance() throws TheRDebuggerException {
     final boolean executed = myDebugger.advance();
 
-    printInterpreterOutput();
-
     if (!executed) {
       getSession().stop();
     }
@@ -276,32 +260,6 @@ class TheRXDebugProcess extends XDebugProcess {
     return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
   }
 
-  private void printInterpreterOutput() {
-    final Queue<TheRXOutputBuffer.Entry> messages = myOutputBuffer.getMessages();
-
-    while (!messages.isEmpty()) {
-      final TheRXOutputBuffer.Entry message = messages.poll();
-
-      if (message != null) {
-        final String text = message.getText();
-        final ConsoleViewContentType type = message.getType();
-
-        if (type == ConsoleViewContentType.ERROR_OUTPUT) {
-          tryFailedImportMessage(text);
-        }
-
-        myConsole.print(text, type);
-
-        if (!StringUtil.endsWithLineBreak(text)) {
-          myConsole.print(
-            TheRDebugConstants.LINE_SEPARATOR,
-            type
-          );
-        }
-      }
-    }
-  }
-
   @NotNull
   private XSourcePosition getCurrentPosition() {
     final XExecutionStack stack = myStack.getSuspendContext().getActiveExecutionStack();
@@ -311,38 +269,6 @@ class TheRXDebugProcess extends XDebugProcess {
     assert frame != null;
 
     return frame.getSourcePosition();  // TODO [xdbg][null]
-  }
-
-  private void tryFailedImportMessage(@NotNull final String text) {
-    final Matcher matcher = FAILED_IMPORT_PATTERN.matcher(text);
-
-    if (matcher.find()) {
-      final boolean isError = text.startsWith("Error");
-      final String message = "T" + text.substring(matcher.start() + 1);
-      final String title = "PACKAGE LOADING";
-
-      ApplicationManager.getApplication().invokeLater(
-        new Runnable() {
-          @Override
-          public void run() {
-            if (isError) {
-              Messages.showErrorDialog(
-                getSession().getProject(),
-                message,
-                title
-              );
-            }
-            else {
-              Messages.showWarningDialog(
-                getSession().getProject(),
-                message,
-                title
-              );
-            }
-          }
-        }
-      );
-    }
   }
 
   private static class XSourcePositionWrapper {

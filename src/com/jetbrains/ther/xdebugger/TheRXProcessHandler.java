@@ -3,8 +3,13 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessOutputTypes;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
@@ -16,11 +21,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
 
-public class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor {
+public class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheROutputReceiver {
+
+  @NotNull
+  private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -80,6 +90,32 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRExecuto
     }
   }
 
+  @Override
+  public void receiveOutput(@NotNull final String output) {
+    notifyTextAvailable(output, ProcessOutputTypes.STDOUT);
+
+    if (!StringUtil.endsWithLineBreak(output)) {
+      notifyTextAvailable(
+        TheRDebugConstants.LINE_SEPARATOR,
+        ProcessOutputTypes.STDOUT
+      );
+    }
+  }
+
+  @Override
+  public void receiveError(@NotNull final String error) {
+    notifyTextAvailable(error, ProcessOutputTypes.STDERR);
+
+    if (!StringUtil.endsWithLineBreak(error)) {
+      notifyTextAvailable(
+        TheRDebugConstants.LINE_SEPARATOR,
+        ProcessOutputTypes.STDERR
+      );
+    }
+
+    tryFailedImportMessage(error);
+  }
+
   @NotNull
   @Override
   protected BaseDataReader createOutputDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
@@ -113,6 +149,38 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRExecuto
       while (myErrorReader.ready()) {
         myErrorBuffer.wait();
       }
+    }
+  }
+
+  private void tryFailedImportMessage(@NotNull final String text) {
+    final Matcher matcher = FAILED_IMPORT_PATTERN.matcher(text);
+
+    if (matcher.find()) {
+      final boolean isError = text.startsWith("Error");
+      final String message = "T" + text.substring(matcher.start() + 1);
+      final String title = "PACKAGE LOADING";
+
+      ApplicationManager.getApplication().invokeLater(
+        new Runnable() {
+          @Override
+          public void run() {
+            if (isError) {
+              Messages.showErrorDialog(
+                //getSession().getProject(), TODO [xdbg][update]
+                message,
+                title
+              );
+            }
+            else {
+              Messages.showWarningDialog(
+                //getSession().getProject(), TODO [xdbg][update]
+                message,
+                title
+              );
+            }
+          }
+        }
+      );
     }
   }
 
