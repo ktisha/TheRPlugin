@@ -61,7 +61,7 @@ public class TheRTraceAndDebugUtilsTest {
 
     assertTrue(executor.check());
     assertEquals(
-      Arrays.asList("error_ls_fun", "error_x_e", "error_x_t", "error_x_d", "error_y_e", "error_y_t", "error_y_d"),
+      Arrays.asList("error_ls_fun", "error_x_e", "error_x_d", "error_y_e", "error_y_d"),
       receiver.getErrors()
     );
     assertTrue(receiver.getOutputs().isEmpty());

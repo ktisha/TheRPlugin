@@ -55,7 +55,7 @@ final class TheRTraceAndDebugUtils {
     }
 
     execute(executor, enterFunction(functionName), EMPTY, receiver);
-    execute(executor, traceCommand(functionName), RESPONSE, receiver);
+    execute(executor, traceCommand(functionName), RESPONSE);
     execute(executor, debugCommand(functionName), EMPTY, receiver);
   }
 
