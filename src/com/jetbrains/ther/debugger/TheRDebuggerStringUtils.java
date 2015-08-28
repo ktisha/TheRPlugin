@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,28 +11,28 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
 
 public final class TheRDebuggerStringUtils {
 
-  public static void appendError(@NotNull final TheRProcessResponse response, @NotNull final TheROutputReceiver receiver) {
-    final String error = response.getError();
+  public static void appendError(@NotNull final TheRExecutionResult result, @NotNull final TheROutputReceiver receiver) {
+    final String error = result.getError();
 
     if (!error.isEmpty()) {
       receiver.receiveError(error);
     }
   }
 
-  public static void appendResult(@NotNull final TheRProcessResponse response, @NotNull final TheROutputReceiver receiver) {
-    final TextRange range = response.getResultRange();
+  public static void appendResult(@NotNull final TheRExecutionResult result, @NotNull final TheROutputReceiver receiver) {
+    final TextRange range = result.getResultRange();
 
     if (!range.isEmpty()) {
       receiver.receiveOutput(
         range.substring(
-          response.getOutput()
+          result.getOutput()
         )
       );
     }
   }
 
-  public static void appendOutput(@NotNull final TheRProcessResponse response, @NotNull final TheROutputReceiver receiver) {
-    final String output = response.getOutput();
+  public static void appendOutput(@NotNull final TheRExecutionResult result, @NotNull final TheROutputReceiver receiver) {
+    final String output = result.getOutput();
 
     if (!output.isEmpty()) {
       receiver.receiveOutput(output);

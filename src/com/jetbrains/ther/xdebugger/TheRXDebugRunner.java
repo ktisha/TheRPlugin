@@ -25,11 +25,11 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
@@ -71,16 +71,15 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
     final String scriptPath = ((TheRRunConfiguration)environment.getRunProfile()).getScriptName();
 
-    final TheRXProcessHandler process = new TheRXProcessHandler(getCommandLine(interpreterPath, project.getBasePath()));
-
+    final TheRXProcessHandler processHandler = new TheRXProcessHandler(getCommandLine(interpreterPath, project.getBasePath()));
     final TheRXOutputBuffer outputBuffer = new TheRXOutputBuffer();
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(process, scriptPath, outputBuffer),
+        createDebugger(processHandler, scriptPath, outputBuffer),
         createResolvingSession(project, scriptPath),
-        process,
+        processHandler,
         outputBuffer
       )
     );
@@ -97,29 +96,29 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        final TheRXDebugProcess process = new TheRXDebugProcess(session, processHandler, debugger, resolvingSession, outputBuffer);
+        final TheRXDebugProcess debugProcess = new TheRXDebugProcess(session, processHandler, debugger, resolvingSession, outputBuffer);
 
-        ((ConsoleView)process.createConsole()).attachToProcess(processHandler);
+        ((ConsoleView)debugProcess.createConsole()).attachToProcess(processHandler);
         ProcessTerminatedListener.attach(processHandler);
 
         processHandler.startNotify();
         initProcess(processHandler);
 
-        return process;
+        return debugProcess;
       }
     };
   }
 
   @NotNull
-  private TheRDebugger createDebugger(@NotNull final TheRProcess process,
+  private TheRDebugger createDebugger(@NotNull final TheRExecutor executor,
                                       @NotNull final String scriptPath,
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     try {
       return new TheRDebugger(
-        process,
+        executor,
         new TheRFunctionDebuggerFactoryImpl(),
-        new TheRVarsLoaderFactoryImpl(process, outputReceiver),
+        new TheRVarsLoaderFactoryImpl(executor, outputReceiver),
         new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReaderImpl(scriptPath),
         outputReceiver,
@@ -162,10 +161,10 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     return commandLine;
   }
 
-  private void initProcess(@NotNull final TheRProcess process) throws ExecutionException {
+  private void initProcess(@NotNull final TheRExecutor executor) throws ExecutionException {
     try {
-      process.execute(TheRDebugConstants.BROWSER_COMMAND);
-      process.execute(TheRDebugConstants.KEEP_SOURCE_COMMAND);
+      executor.execute(TheRDebugConstants.BROWSER_COMMAND);
+      executor.execute(TheRDebugConstants.KEEP_SOURCE_COMMAND);
     }
     catch (final TheRDebuggerException e) {
       throw new ExecutionException(e);

@@ -2,47 +2,47 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
 
-  public TheRNotMainBraceFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRNotMainBraceFunctionDebugger(@NotNull final TheRExecutor executor,
                                           @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                           @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                           @NotNull final TheROutputReceiver outputReceiver,
                                           @NotNull final String functionName) throws TheRDebuggerException {
-    super(process, debuggerFactory, debuggerHandler, outputReceiver, functionName);
+    super(executor, debuggerFactory, debuggerHandler, outputReceiver, functionName);
   }
 
   @Override
-  protected void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    switch (response.getType()) {
+  protected void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
+    switch (result.getType()) {
       case DEBUG_AT:
-        handleDebugAt(response);
+        handleDebugAt(result);
         break;
       case CONTINUE_TRACE:
-        handleContinueTrace(response);
+        handleContinueTrace(result);
         break;
       case EXITING_FROM:
-        handleEndTrace(response);
+        handleEndTrace(result);
         break;
       case DEBUGGING_IN:
-        handleDebuggingIn(response);
+        handleDebuggingIn(result);
         break;
       case RECURSIVE_EXITING_FROM:
-        handleRecursiveEndTrace(response);
+        handleRecursiveEndTrace(result);
         break;
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + response.getType() + ", " +
+          "actual: " + result.getType() + ", " +
           "expected: " +
           "[" + DEBUG_AT + ", " + CONTINUE_TRACE + ", " + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + "]" +
           "]"
@@ -57,7 +57,7 @@ class TheRNotMainBraceFunctionDebugger extends TheRFunctionDebuggerBase {
 
   @NotNull
   @Override
-  protected TheRProcessResponseType getStartTraceType() {
+  protected TheRExecutionResultType getStartTraceType() {
     return START_TRACE_BRACE;
   }
 }

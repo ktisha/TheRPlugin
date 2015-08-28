@@ -1,10 +1,10 @@
 package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class TheRForcedFunctionDebuggerHandler implements TheRFunctionDebuggerHa
   @Nullable
   private String myResult;
 
-  public TheRForcedFunctionDebuggerHandler(@NotNull final TheRProcess process,
+  public TheRForcedFunctionDebuggerHandler(@NotNull final TheRExecutor executor,
                                            @NotNull final TheRFunctionDebuggerFactory factory,
                                            @NotNull final TheROutputReceiver receiver) throws TheRDebuggerException {
     myDebuggers = new ArrayList<TheRFunctionDebugger>();
@@ -29,7 +29,7 @@ public class TheRForcedFunctionDebuggerHandler implements TheRFunctionDebuggerHa
 
     appendDebugger(
       factory.getNotMainFunctionDebugger(
-        process,
+        executor,
         this,
         receiver
       )

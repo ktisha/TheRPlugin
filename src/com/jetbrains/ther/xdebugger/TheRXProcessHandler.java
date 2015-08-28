@@ -7,8 +7,8 @@ import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,10 +17,10 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.concurrent.Future;
 
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
 
-public class TheRXProcessHandler extends OSProcessHandler implements TheRProcess {
+public class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor {
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -51,7 +51,7 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRProcess
 
   @NotNull
   @Override
-  public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
+  public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
     try {
       myWriter.write(command);
       myWriter.write(TheRDebugConstants.LINE_SEPARATOR);
@@ -63,7 +63,7 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRProcess
         synchronized (myErrorBuffer) {
           waitForError();
 
-          final TheRProcessResponse result = calculate(myOutputBuffer, myErrorBuffer.toString());
+          final TheRExecutionResult result = calculate(myOutputBuffer, myErrorBuffer.toString());
 
           myOutputBuffer.setLength(0);
           myErrorBuffer.setLength(0);
@@ -78,11 +78,6 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRProcess
     catch (final InterruptedException e) {
       throw new TheRDebuggerException(e);
     }
-  }
-
-  @Override
-  public void stop() {
-    //destroyProcess();
   }
 
   @NotNull

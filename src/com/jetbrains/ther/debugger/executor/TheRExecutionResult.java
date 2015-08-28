@@ -1,15 +1,15 @@
-package com.jetbrains.ther.debugger.interpreter;
+package com.jetbrains.ther.debugger.executor;
 
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRProcessResponse {
+public class TheRExecutionResult {
 
   @NotNull
   private final String myOutput;
 
   @NotNull
-  private final TheRProcessResponseType myType;
+  private final TheRExecutionResultType myType;
 
   @NotNull
   private final TextRange myResultRange;
@@ -17,8 +17,8 @@ public class TheRProcessResponse {
   @NotNull
   private final String myError;
 
-  public TheRProcessResponse(@NotNull final String output,
-                             @NotNull final TheRProcessResponseType type,
+  public TheRExecutionResult(@NotNull final String output,
+                             @NotNull final TheRExecutionResultType type,
                              @NotNull final TextRange resultRange,
                              @NotNull final String error) {
     myOutput = output;
@@ -33,7 +33,7 @@ public class TheRProcessResponse {
   }
 
   @NotNull
-  public TheRProcessResponseType getType() {
+  public TheRExecutionResultType getType() {
     return myType;
   }
 

@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.interpreter;
+package com.jetbrains.ther.debugger.executor;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
@@ -14,9 +14,9 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
-public final class TheRProcessResponseCalculator {
+public final class TheRExecutionResultCalculator {
 
   @NotNull
   private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");
@@ -24,14 +24,14 @@ public final class TheRProcessResponseCalculator {
   @NotNull
   private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)");
 
-  public static boolean isComplete(@NotNull final CharSequence response) {
-    return endsLineBreakAndPlusAndSpace(response) || endsLineBreakAndBrowseAndSpace(response);
+  public static boolean isComplete(@NotNull final CharSequence output) {
+    return endsLineBreakAndPlusAndSpace(output) || endsLineBreakAndBrowseAndSpace(output);
   }
 
   @NotNull
-  public static TheRProcessResponse calculate(@NotNull final CharSequence response, @NotNull final String error) {
+  public static TheRExecutionResult calculate(@NotNull final CharSequence output, @NotNull final String error) {
     final String[] lines =
-      LINE_BREAK_PATTERN.split(response); // Don't forget that first line is command and the last is invitation for the next one
+      LINE_BREAK_PATTERN.split(output); // Don't forget that first line is command and the last is invitation for the next one
 
     return calculateResult(
       lines,
@@ -40,23 +40,23 @@ public final class TheRProcessResponseCalculator {
     );
   }
 
-  private static boolean endsLineBreakAndPlusAndSpace(@NotNull final CharSequence sequence) {
-    final int length = sequence.length();
+  private static boolean endsLineBreakAndPlusAndSpace(@NotNull final CharSequence output) {
+    final int length = output.length();
 
-    return isSubsequence(PLUS_AND_SPACE, sequence, length - PLUS_AND_SPACE.length()) && // ends with PLUS_AND_SPACE
-           StringUtil.isLineBreak(sequence.charAt(length - PLUS_AND_SPACE.length() - 1)); // line break before PLUS_AND_SPACE
+    return isSubsequence(PLUS_AND_SPACE, output, length - PLUS_AND_SPACE.length()) && // ends with PLUS_AND_SPACE
+           StringUtil.isLineBreak(output.charAt(length - PLUS_AND_SPACE.length() - 1)); // line break before PLUS_AND_SPACE
   }
 
-  private static boolean endsLineBreakAndBrowseAndSpace(@NotNull final CharSequence sequence) {
-    final int length = sequence.length();
+  private static boolean endsLineBreakAndBrowseAndSpace(@NotNull final CharSequence output) {
+    final int length = output.length();
 
-    if (isSubsequence(BROWSE_SUFFIX, sequence, length - BROWSE_SUFFIX.length())) { // ends with BROWSE_SUFFIX
-      final int index = readDigitsBackward(sequence, length - BROWSE_SUFFIX.length() - 1); // read digits before BROWSE_SUFFIX
+    if (isSubsequence(BROWSE_SUFFIX, output, length - BROWSE_SUFFIX.length())) { // ends with BROWSE_SUFFIX
+      final int index = readDigitsBackward(output, length - BROWSE_SUFFIX.length() - 1); // read digits before BROWSE_SUFFIX
 
       return index != -1 && // there are symbols before digits
              index != length - BROWSE_SUFFIX.length() - 1 && // there are any digits before BROWSE_SUFFIX
-             isSubsequence(BROWSE_PREFIX, sequence, index - BROWSE_PREFIX.length() + 1) && // there is BROWSE_PREFIX before digits
-             StringUtil.isLineBreak(sequence.charAt(index - BROWSE_PREFIX.length())); // line break before all mentioned above
+             isSubsequence(BROWSE_PREFIX, output, index - BROWSE_PREFIX.length() + 1) && // there is BROWSE_PREFIX before digits
+             StringUtil.isLineBreak(output.charAt(index - BROWSE_PREFIX.length())); // line break before all mentioned above
     }
     else {
       return false;
@@ -64,7 +64,7 @@ public final class TheRProcessResponseCalculator {
   }
 
   @NotNull
-  private static TheRProcessResponse calculateResult(@NotNull final String[] lines,
+  private static TheRExecutionResult calculateResult(@NotNull final String[] lines,
                                                      @NotNull final TypeAndResultLineBounds typeAndResultLineBounds,
                                                      @NotNull final String error) {
     final StringBuilder sb = new StringBuilder();
@@ -88,7 +88,7 @@ public final class TheRProcessResponseCalculator {
       }
     }
 
-    return new TheRProcessResponse(
+    return new TheRExecutionResult(
       sb.toString(),
       typeAndResultLineBounds.myType,
       preCalculatedRange == null ? new TextRange(resultBegin, resultEnd) : preCalculatedRange,
@@ -111,7 +111,7 @@ public final class TheRProcessResponseCalculator {
     }
 
     if (!endsBrowseAndSpace(lines)) {
-      throw new IllegalArgumentException("Response is incomplete");
+      throw new IllegalArgumentException("Output is incomplete");
     }
 
     candidate = tryDebugging(lines);
@@ -228,7 +228,7 @@ public final class TheRProcessResponseCalculator {
   @Nullable
   private static TypeAndResultLineBounds tryDebugging(@NotNull final String[] lines) {
     if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN)) {
-      return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUGGING_IN, 1, 1);
+      return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUGGING_IN, 1, 1);
     }
     else {
       return null;
@@ -275,7 +275,7 @@ public final class TheRProcessResponseCalculator {
       return null;
     }
 
-    final TheRProcessResponseType type = (exitingFromIndices.size() == 1) ? TheRProcessResponseType.EXITING_FROM : RECURSIVE_EXITING_FROM;
+    final TheRExecutionResultType type = (exitingFromIndices.size() == 1) ? TheRExecutionResultType.EXITING_FROM : RECURSIVE_EXITING_FROM;
 
     final Integer firstExitingFrom = exitingFromIndices.get(0);
     final Integer lastExitingFrom = exitingFromIndices.get(exitingFromIndices.size() - 1);
@@ -302,7 +302,7 @@ public final class TheRProcessResponseCalculator {
       final boolean debugAtExists = debugAtLine < lines.length - 1;
 
       if (debugAtExists) {
-        return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUG_AT, 1, debugAtLine);
+        return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, debugAtLine);
       }
       else {
         return null;
@@ -336,7 +336,7 @@ public final class TheRProcessResponseCalculator {
   @Nullable
   private static TypeAndResultLineBounds tryDebugAtUnbrace(@NotNull final String[] lines) {
     if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG + ": ")) {
-      return new TypeAndResultLineBounds(TheRProcessResponseType.DEBUG_AT, 1, lines.length - 3);
+      return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 3);
     }
     else {
       return null;
@@ -383,13 +383,13 @@ public final class TheRProcessResponseCalculator {
   private static class TypeAndResultLineBounds {
 
     @NotNull
-    private final TheRProcessResponseType myType;
+    private final TheRExecutionResultType myType;
 
     private final int myResultBegin;
 
     private final int myResultEnd;
 
-    public TypeAndResultLineBounds(@NotNull final TheRProcessResponseType type, final int resultBegin, final int resultEnd) {
+    public TypeAndResultLineBounds(@NotNull final TheRExecutionResultType type, final int resultBegin, final int resultEnd) {
       myType = type;
       myResultBegin = resultBegin;
       myResultEnd = resultEnd;

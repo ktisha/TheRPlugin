@@ -3,54 +3,54 @@ package com.jetbrains.ther.debugger.function;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_BRACE;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.START_TRACE_UNBRACE;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_BRACE;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_UNBRACE;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
 public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFactory {
 
   @NotNull
   @Override
-  public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRExecutor executor,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
-    execute(process, EXECUTE_AND_STEP_COMMAND, TheRProcessResponseType.DEBUG_AT, outputReceiver);
+    execute(executor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT, outputReceiver);
 
-    final TheRProcessResponse startTraceResponse = execute(process, EXECUTE_AND_STEP_COMMAND, outputReceiver);
+    final TheRExecutionResult startTraceResult = execute(executor, EXECUTE_AND_STEP_COMMAND, outputReceiver);
 
-    switch (startTraceResponse.getType()) {
+    switch (startTraceResult.getType()) {
       case START_TRACE_BRACE:
         return new TheRNotMainBraceFunctionDebugger(
-          process,
+          executor,
           this,
           debuggerHandler,
           outputReceiver,
-          extractFunctionName(startTraceResponse.getOutput())
+          extractFunctionName(startTraceResult.getOutput())
         );
 
       case START_TRACE_UNBRACE:
         return new TheRNotMainUnbraceFunctionDebugger(
-          process,
+          executor,
           this,
           debuggerHandler,
           outputReceiver,
-          extractFunctionName(startTraceResponse.getOutput())
+          extractFunctionName(startTraceResult.getOutput())
         );
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + startTraceResponse.getType() + ", " +
+          "actual: " + startTraceResult.getType() + ", " +
           "expected: " +
           "[" + START_TRACE_BRACE + ", " + START_TRACE_UNBRACE + "]" +
           "]"
@@ -60,12 +60,12 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
 
   @NotNull
   @Override
-  public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRExecutor executor,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                       @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {
     return new TheRMainFunctionDebugger(
-      process, this, debuggerHandler, outputReceiver, scriptReader
+      executor, this, debuggerHandler, outputReceiver, scriptReader
     );
   }
 

@@ -4,9 +4,9 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
 class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheROutputReceiver myReceiver;
@@ -33,11 +33,11 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private final String myFrame;
 
-  public TheRVarsLoaderImpl(@NotNull final TheRProcess process,
+  public TheRVarsLoaderImpl(@NotNull final TheRExecutor executor,
                             @NotNull final TheROutputReceiver receiver,
                             @NotNull final TheRValueModifier modifier,
                             final int frameNumber) {
-    myProcess = process;
+    myExecutor = executor;
     myReceiver = receiver;
     myModifier = modifier;
     myFrame = SYS_FRAME_COMMAND + "(" + frameNumber + ")";
@@ -47,7 +47,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @Override
   public List<TheRVar> load() throws TheRDebuggerException {
     final String text = execute(
-      myProcess,
+      myExecutor,
       LS_COMMAND + "(" + myFrame + ")",
       RESPONSE,
       myReceiver
@@ -67,10 +67,10 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   }
 
   @NotNull
-  private List<String> calculateVariableNames(@NotNull final String response) {
+  private List<String> calculateVariableNames(@NotNull final String text) {
     final List<String> result = new ArrayList<String>();
 
-    for (final String line : StringUtil.splitByLines(response)) {
+    for (final String line : StringUtil.splitByLines(text)) {
       for (final String token : StringUtil.tokenize(new StringTokenizer(line))) {
         final String var = getVariableName(token);
 
@@ -88,7 +88,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     final String type = handleType(
       var,
       execute(
-        myProcess,
+        myExecutor,
         TYPEOF_COMMAND + "(" + myFrame + "$" + var + ")",
         RESPONSE,
         myReceiver
@@ -132,29 +132,29 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    final TheRProcessResponse response = execute(myProcess, valueCommand(var), myReceiver);
+    final TheRExecutionResult result = execute(myExecutor, valueCommand(var), myReceiver);
 
-    switch (response.getType()) {
+    switch (result.getType()) {
       case RESPONSE:
         return handleValue(
           type,
-          response.getOutput()
+          result.getOutput()
         );
       case DEBUG_AT:
         return handleValue(
           type,
           execute(
-            myProcess,
+            myExecutor,
             EXECUTE_AND_STEP_COMMAND,
             RESPONSE,
             myReceiver
           )
         );
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + response.getType() + ", " +
+          "actual: " + result.getType() + ", " +
           "expected: " +
           "[" + RESPONSE + ", " + DEBUG_AT + "]" +
           "]"

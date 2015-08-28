@@ -5,6 +5,9 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
+import com.jetbrains.ther.debugger.executor.TheRExecutorUtils;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactory;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandler;
@@ -12,9 +15,6 @@ import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private static final Logger LOGGER = Logger.getInstance(TheRDebugger.class);
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheRFunctionDebuggerFactory myDebuggerFactory;
@@ -69,7 +69,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   private int myDropFrames;
 
-  public TheRDebugger(@NotNull final TheRProcess process,
+  public TheRDebugger(@NotNull final TheRExecutor executor,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                       @NotNull final TheRVarsLoaderFactory loaderFactory,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
@@ -78,7 +78,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRExpressionHandler expressionHandler,
                       @NotNull final TheRValueModifierFactory modifierFactory,
                       @NotNull final TheRValueModifierHandler modifierHandler) throws TheRDebuggerException {
-    myProcess = process;
+    myExecutor = executor;
     myDebuggerFactory = debuggerFactory;
     myLoaderFactory = loaderFactory;
 
@@ -98,7 +98,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     appendDebugger(
       myDebuggerFactory.getMainFunctionDebugger(
-        myProcess,
+        myExecutor,
         this,
         myOutputReceiver,
         myScriptReader
@@ -166,8 +166,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     catch (final IOException e) {
       LOGGER.warn(e);
     }
-
-    myProcess.stop();
   }
 
   @Override
@@ -178,7 +176,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
         debugger.getLocation(),
         myLoaderFactory.getLoader(
           myModifierFactory.getModifier(
-            myProcess,
+            myExecutor,
             myDebuggerFactory,
             myOutputReceiver,
             myModifierHandler,
@@ -187,7 +185,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
           myStack.isEmpty() ? 0 : loadFrameNumber()
         ),
         myEvaluatorFactory.getEvaluator(
-          myProcess,
+          myExecutor,
           myDebuggerFactory,
           myOutputReceiver,
           myExpressionHandler,
@@ -224,7 +222,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   private int loadFrameNumber() throws TheRDebuggerException {
-    final String frameNumber = TheRProcessUtils.execute(myProcess, SYS_NFRAME_COMMAND, TheRProcessResponseType.RESPONSE, myOutputReceiver);
+    final String frameNumber =
+      TheRExecutorUtils.execute(myExecutor, SYS_NFRAME_COMMAND, TheRExecutionResultType.RESPONSE, myOutputReceiver);
 
     return Integer.parseInt(frameNumber.substring("[1] ".length()));
   }

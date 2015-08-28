@@ -3,22 +3,22 @@ package com.jetbrains.ther.debugger.evaluator;
 import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.handleFunctionValue;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
 class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheRFunctionDebuggerFactory myFactory;
@@ -31,12 +31,12 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   private final int myFrameNumber;
 
-  public TheRDebuggerEvaluatorImpl(@NotNull final TheRProcess process,
+  public TheRDebuggerEvaluatorImpl(@NotNull final TheRExecutor executor,
                                    @NotNull final TheRFunctionDebuggerFactory factory,
                                    @NotNull final TheROutputReceiver receiver,
                                    @NotNull final TheRExpressionHandler handler,
                                    final int frameNumber) {
-    myProcess = process;
+    myExecutor = executor;
     myFactory = factory;
     myReceiver = receiver;
     myHandler = handler;
@@ -58,11 +58,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
   private void evaluate(@NotNull final String expression,
                         @NotNull final Receiver receiver) throws TheRDebuggerException {
-    final TheRProcessResponse response = myProcess.execute(expression);
+    final TheRExecutionResult result = myExecutor.execute(expression);
 
-    switch (response.getType()) {
+    switch (result.getType()) {
       case DEBUGGING_IN:
-        appendError(response, myReceiver);
+        appendError(result, myReceiver);
 
         receiver.receiveResult(
           handleResult(evaluateFunction())
@@ -70,7 +70,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
         break;
       case EMPTY:
-        final String error = response.getError();
+        final String error = result.getError();
 
         if (!error.isEmpty()) {
           receiver.receiveError(error);
@@ -78,30 +78,30 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
 
         break;
       case RESPONSE:
-        appendError(response, myReceiver);
+        appendError(result, myReceiver);
 
         receiver.receiveResult(
           handleResult(
-            response.getOutput()
+            result.getOutput()
           )
         );
 
         break;
       case DEBUG_AT:
-        appendError(response, myReceiver);
+        appendError(result, myReceiver);
 
         receiver.receiveResult(
           handleResult(
-            execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver)
+            execute(myExecutor, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver)
           )
         );
 
         break;
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + response.getType() + ", " +
+          "actual: " + result.getType() + ", " +
           "expected: " +
           "[" + DEBUGGING_IN + ", " + EMPTY + ", " + RESPONSE + ", " + DEBUG_AT + "]" +
           "]"
@@ -112,7 +112,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   @NotNull
   private String evaluateFunction() throws TheRDebuggerException {
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myProcess,
+      myExecutor,
       myFactory,
       myReceiver
     );

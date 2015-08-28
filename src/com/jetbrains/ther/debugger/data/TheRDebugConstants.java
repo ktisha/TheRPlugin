@@ -8,9 +8,6 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String LINE_SEPARATOR = LineSeparator.getSystemLineSeparator().getSeparatorString();
 
-  public static final long INITIAL_SLEEP = 2;
-  public static final int DEFAULT_BUFFER = 2048;
-
   @NotNull
   public static final String SERVICE_FUNCTION_PREFIX = "intellij_ther_";
 

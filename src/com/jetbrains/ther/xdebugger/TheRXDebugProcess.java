@@ -43,7 +43,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
 
   @NotNull
-  private final ProcessHandler myProcessHandler;
+  private final TheRXProcessHandler myProcessHandler;
 
   @NotNull
   private final TheRDebugger myDebugger;
@@ -64,7 +64,7 @@ class TheRXDebugProcess extends XDebugProcess {
   private final ConsoleView myConsole;
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
-                           @NotNull final ProcessHandler processHandler,
+                           @NotNull final TheRXProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXResolvingSession resolvingSession,
                            @NotNull final TheRXOutputBuffer outputBuffer) {

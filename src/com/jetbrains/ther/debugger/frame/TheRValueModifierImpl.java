@@ -3,20 +3,20 @@ package com.jetbrains.ther.debugger.frame;
 import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
 class TheRValueModifierImpl implements TheRValueModifier {
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheRFunctionDebuggerFactory myFactory;
@@ -29,12 +29,12 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
   private final int myFrameNumber;
 
-  public TheRValueModifierImpl(@NotNull final TheRProcess process,
+  public TheRValueModifierImpl(@NotNull final TheRExecutor executor,
                                @NotNull final TheRFunctionDebuggerFactory factory,
                                @NotNull final TheROutputReceiver receiver,
                                @NotNull final TheRValueModifierHandler handler,
                                final int frameNumber) {
-    myProcess = process;
+    myExecutor = executor;
     myFactory = factory;
     myReceiver = receiver;
     myHandler = handler;
@@ -62,15 +62,15 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
   private void doSetValue(@NotNull final String name, @NotNull final String value, @NotNull final Listener listener)
     throws TheRDebuggerException {
-    final TheRProcessResponse response = execute(myProcess, name + " <- " + value, myReceiver);
+    final TheRExecutionResult result = execute(myExecutor, name + " <- " + value, myReceiver);
 
-    switch (response.getType()) {
+    switch (result.getType()) {
       case EMPTY:
-        if (response.getError().isEmpty()) {
+        if (result.getError().isEmpty()) {
           listener.onSuccess();
         }
         else {
-          listener.onError(response.getError());
+          listener.onError(result.getError());
         }
 
         return;
@@ -81,16 +81,16 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
         return;
       case DEBUG_AT:
-        execute(myProcess, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver);
+        execute(myExecutor, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver);
 
         listener.onSuccess();
 
         return;
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + response.getType() + ", " +
+          "actual: " + result.getType() + ", " +
           "expected: " +
           "[" + DEBUGGING_IN + ", " + EMPTY + ", " + DEBUG_AT + "]" +
           "]"
@@ -100,7 +100,7 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
   private void runFunction() throws TheRDebuggerException {
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myProcess,
+      myExecutor,
       myFactory,
       myReceiver
     );

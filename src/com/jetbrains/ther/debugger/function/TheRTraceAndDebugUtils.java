@@ -2,31 +2,28 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.EMPTY;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessUtils.execute;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
 final class TheRTraceAndDebugUtils {
 
   @NotNull
-  static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
-                                             "function(x) x == \"" + CLOSURE + "\", " +
-                                             EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
-                                             ")";
+  private static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
+                                                     "function(x) x == \"" + CLOSURE + "\", " +
+                                                     EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
+                                                     ")";
 
-  @NotNull
-  static final String NO_FUNCTIONS_RESPONSE = "named list()";
-
-  public static void traceAndDebugFunctions(@NotNull final TheRProcess process, @NotNull final TheROutputReceiver receiver)
+  public static void traceAndDebugFunctions(@NotNull final TheRExecutor executor, @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
     final String output = execute(
-      process,
+      executor,
       LS_FUNCTIONS_COMMAND,
       RESPONSE,
       receiver
@@ -38,7 +35,7 @@ final class TheRTraceAndDebugUtils {
       final int currentLineEnd = findCurrentLineEnd(output, index + 2);
 
       traceAndDebugFunction(
-        process,
+        executor,
         receiver,
         output.substring(
           index + 1,
@@ -50,16 +47,16 @@ final class TheRTraceAndDebugUtils {
     }
   }
 
-  private static void traceAndDebugFunction(@NotNull final TheRProcess process,
+  private static void traceAndDebugFunction(@NotNull final TheRExecutor executor,
                                             @NotNull final TheROutputReceiver receiver,
                                             @NotNull final String functionName) throws TheRDebuggerException {
     if (functionName.startsWith(SERVICE_FUNCTION_PREFIX) && functionName.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX)) {
       return;
     }
 
-    execute(process, enterFunction(functionName), EMPTY, receiver);
-    execute(process, traceCommand(functionName), RESPONSE, receiver);
-    execute(process, debugCommand(functionName), EMPTY, receiver);
+    execute(executor, enterFunction(functionName), EMPTY, receiver);
+    execute(executor, traceCommand(functionName), RESPONSE, receiver);
+    execute(executor, debugCommand(functionName), EMPTY, receiver);
   }
 
   @NotNull

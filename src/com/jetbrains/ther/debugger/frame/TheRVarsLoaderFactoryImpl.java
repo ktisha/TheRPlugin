@@ -1,19 +1,19 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRVarsLoaderFactoryImpl implements TheRVarsLoaderFactory {
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheROutputReceiver myReceiver;
 
-  public TheRVarsLoaderFactoryImpl(@NotNull final TheRProcess process, @NotNull final TheROutputReceiver receiver) {
-    myProcess = process;
+  public TheRVarsLoaderFactoryImpl(@NotNull final TheRExecutor executor, @NotNull final TheROutputReceiver receiver) {
+    myExecutor = executor;
     myReceiver = receiver;
   }
 
@@ -21,6 +21,6 @@ public class TheRVarsLoaderFactoryImpl implements TheRVarsLoaderFactory {
   @Override
   public TheRVarsLoader getLoader(@NotNull final TheRValueModifier modifier,
                                   final int frameNumber) {
-    return new TheRVarsLoaderImpl(myProcess, myReceiver, modifier, frameNumber);
+    return new TheRVarsLoaderImpl(myExecutor, myReceiver, modifier, frameNumber);
   }
 }

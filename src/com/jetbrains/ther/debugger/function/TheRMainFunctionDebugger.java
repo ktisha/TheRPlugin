@@ -6,24 +6,24 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedResponseException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessUtils;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
+import com.jetbrains.ther.debugger.executor.TheRExecutorUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendOutput;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
 class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
-  private final TheRProcess myProcess;
+  private final TheRExecutor myExecutor;
 
   @NotNull
   private final TheRFunctionDebuggerFactory myDebuggerFactory;
@@ -40,12 +40,12 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   private boolean myIsRunning;
   private boolean myIsNewDebuggerAppended;
 
-  public TheRMainFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRMainFunctionDebugger(@NotNull final TheRExecutor executor,
                                   @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                                   @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                   @NotNull final TheROutputReceiver outputReceiver,
                                   @NotNull final TheRScriptReader scriptReader) {
-    myProcess = process;
+    myExecutor = executor;
     myDebuggerFactory = debuggerFactory;
     myDebuggerHandler = debuggerHandler;
     myOutputReceiver = outputReceiver;
@@ -89,11 +89,11 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
         return;
       }
 
-      final TheRProcessResponse response = TheRProcessUtils.execute(myProcess, line.getText(), myOutputReceiver);
+      final TheRExecutionResult result = TheRExecutorUtils.execute(myExecutor, line.getText(), myOutputReceiver);
 
-      handleResponse(response);
+      handleExecutionResult(result);
 
-      accepted = response.getType() != TheRProcessResponseType.PLUS;
+      accepted = result.getType() != TheRExecutionResultType.PLUS;
       isFirstLine = false;
 
       advanceScriptReader();
@@ -102,7 +102,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     forwardCommentsAndEmptyLines();
 
     if (!myIsNewDebuggerAppended) {
-      traceAndDebugFunctions(myProcess, myOutputReceiver);
+      traceAndDebugFunctions(myExecutor, myOutputReceiver);
     }
   }
 
@@ -126,14 +126,14 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
     }
   }
 
-  private void handleResponse(@NotNull final TheRProcessResponse response) throws TheRDebuggerException {
-    switch (response.getType()) {
+  private void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
+    switch (result.getType()) {
       case DEBUGGING_IN:
         myIsNewDebuggerAppended = true;
 
         myDebuggerHandler.appendDebugger(
           myDebuggerFactory.getNotMainFunctionDebugger(
-            myProcess,
+            myExecutor,
             myDebuggerHandler,
             myOutputReceiver
           )
@@ -141,17 +141,17 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
 
         break;
       case RESPONSE:
-        appendOutput(response, myOutputReceiver);
+        appendOutput(result, myOutputReceiver);
 
         break;
       case PLUS:
       case EMPTY:
         break;
       default:
-        throw new TheRUnexpectedResponseException(
-          "Actual response type is not the same as expected: " +
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
           "[" +
-          "actual: " + response.getType() + ", " +
+          "actual: " + result.getType() + ", " +
           "expected: " +
           "[" + DEBUGGING_IN + ", " + RESPONSE + ", " + PLUS + ", " + EMPTY + "]" +
           "]"
