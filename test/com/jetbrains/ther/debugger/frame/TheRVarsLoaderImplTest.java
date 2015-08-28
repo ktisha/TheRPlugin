@@ -3,11 +3,11 @@ package com.jetbrains.ther.debugger.frame;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.mock.AlwaysSameResultTheRExecutor;
 import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
+import com.jetbrains.ther.debugger.mock.MockTheRExecutor;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
-import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.RESPONSE;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,20 +26,20 @@ public class TheRVarsLoaderImplTest {
   @Test
   public void empty() throws TheRDebuggerException {
     final String output = "character(0)";
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(output, RESPONSE, TextRange.allOf(output), "error");
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(output, RESPONSE, TextRange.allOf(output), "error");
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     assertEquals(
       0,
       new TheRVarsLoaderImpl(
-        process,
+        executor,
         receiver,
         new IllegalTheRValueModifier(),
         0
       ).load().size()
     );
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
   }
@@ -49,7 +49,7 @@ public class TheRVarsLoaderImplTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
-      new OrdinaryTheRProcess(),
+      new OrdinaryTheRExecutor(),
       receiver,
       new IllegalTheRValueModifier(),
       0
@@ -91,7 +91,7 @@ public class TheRVarsLoaderImplTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final List<TheRVar> actual = new TheRVarsLoaderImpl(
-      new InDebugTheRProcess(),
+      new InDebugTheRExecutor(),
       receiver,
       new IllegalTheRValueModifier(),
       0
@@ -106,18 +106,18 @@ public class TheRVarsLoaderImplTest {
     assertTrue(receiver.getOutputs().isEmpty());
   }
 
-  private static class OrdinaryTheRProcess extends MockTheRProcess {
+  private static class OrdinaryTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         final String output = "[1] \"a\" \"b\" \"c\"\n" +
                               "[4] " +
                               "\"" + SERVICE_FUNCTION_PREFIX + "d" + SERVICE_ENTER_FUNCTION_SUFFIX + "\"";
         // list, function, inner function and service functions
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -128,7 +128,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 2) { // type of a
         final String output = "[1] \"integer\"";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -139,7 +139,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 3) { // value of a
         final String output = "[1] 1 2 3";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -150,7 +150,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 4 || getCounter() == 6 || getCounter() == 8 || getCounter() == 9) { // type of b, c, d, e
         final String output = FUNCTION_TYPE;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -163,7 +163,7 @@ public class TheRVarsLoaderImplTest {
                               "    x ^ 2\n" +
                               "}";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -177,7 +177,7 @@ public class TheRVarsLoaderImplTest {
                               "}\n" +
                               "<" + ENVIRONMENT + ": 0xfffffff>";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -189,15 +189,15 @@ public class TheRVarsLoaderImplTest {
     }
   }
 
-  private static class InDebugTheRProcess extends MockTheRProcess {
+  private static class InDebugTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         final String output = "[1] \"a\"";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -208,7 +208,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 2) {
         final String output = "[1] \"integer\"";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),
@@ -219,7 +219,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 3) {
         final String output = TheRDebugConstants.DEBUG_AT + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -230,7 +230,7 @@ public class TheRVarsLoaderImplTest {
       if (getCounter() == 4) {
         final String output = "[1] 1 2 3";
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
           RESPONSE,
           TextRange.allOf(output),

@@ -3,15 +3,15 @@ package com.jetbrains.ther.debugger.frame;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -19,9 +19,9 @@ public class TheRValueModifierImplTest {
 
   @Test
   public void illegal() {
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       "text",
-      TheRProcessResponseType.RESPONSE,
+      TheRExecutionResultType.RESPONSE,
       TextRange.allOf("text"),
       ""
     );
@@ -30,7 +30,7 @@ public class TheRValueModifierImplTest {
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(false);
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       new IllegalTheROutputReceiver(),
       handler,
@@ -45,17 +45,17 @@ public class TheRValueModifierImplTest {
     catch (final IllegalStateException ignored) {
     }
 
-    assertEquals(0, process.getCounter());
+    assertEquals(0, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
   }
 
   @Test
-  public void unexpectedResponseType() {
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+  public void unexpectedResultType() {
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       "text",
-      TheRProcessResponseType.RESPONSE,
+      TheRExecutionResultType.RESPONSE,
       TextRange.allOf("text"),
       "error"
     );
@@ -65,7 +65,7 @@ public class TheRValueModifierImplTest {
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       receiver,
       handler,
@@ -80,7 +80,7 @@ public class TheRValueModifierImplTest {
     catch (final IllegalStateException ignored) {
     }
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
@@ -90,9 +90,9 @@ public class TheRValueModifierImplTest {
 
   @Test
   public void errorDuringExecution() {
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       "",
-      TheRProcessResponseType.EMPTY,
+      TheRExecutionResultType.EMPTY,
       TextRange.EMPTY_RANGE,
       "error"
     );
@@ -103,7 +103,7 @@ public class TheRValueModifierImplTest {
     final ErrorListener listener = new ErrorListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       receiver,
       handler,
@@ -112,7 +112,7 @@ public class TheRValueModifierImplTest {
 
     modifier.setValue("name", "value", listener);
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
@@ -123,13 +123,13 @@ public class TheRValueModifierImplTest {
 
   @Test
   public void exceptionDuringExecution() {
-    final ExceptionDuringExecutionTheRProcess process = new ExceptionDuringExecutionTheRProcess();
+    final ExceptionDuringExecutionTheRExecutor executor = new ExceptionDuringExecutionTheRExecutor();
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final ExceptionListener listener = new ExceptionListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       new IllegalTheROutputReceiver(),
       handler,
@@ -138,7 +138,7 @@ public class TheRValueModifierImplTest {
 
     modifier.setValue("name", "value", listener);
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
@@ -147,9 +147,9 @@ public class TheRValueModifierImplTest {
 
   @Test
   public void expression() {
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       "",
-      TheRProcessResponseType.EMPTY,
+      TheRExecutionResultType.EMPTY,
       TextRange.EMPTY_RANGE,
       ""
     );
@@ -159,7 +159,7 @@ public class TheRValueModifierImplTest {
     final SuccessListener listener = new SuccessListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       new IllegalTheROutputReceiver(),
       handler,
@@ -168,7 +168,7 @@ public class TheRValueModifierImplTest {
 
     modifier.setValue("name", "value", listener);
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
@@ -177,7 +177,7 @@ public class TheRValueModifierImplTest {
 
   @Test
   public void inDebugExpression() {
-    final InDebugTheRProcess process = new InDebugTheRProcess();
+    final InDebugTheRExecutor executor = new InDebugTheRExecutor();
 
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
@@ -185,7 +185,7 @@ public class TheRValueModifierImplTest {
     final SuccessListener listener = new SuccessListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       receiver,
       handler,
@@ -194,7 +194,7 @@ public class TheRValueModifierImplTest {
 
     modifier.setValue("name", "value", listener);
 
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("abc"), receiver.getErrors());
@@ -207,7 +207,7 @@ public class TheRValueModifierImplTest {
   public void function() {
     final String error = "error";
 
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       TheRDebugConstants.DEBUGGING_IN + ": def(c(1:5))",
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
@@ -221,7 +221,7 @@ public class TheRValueModifierImplTest {
     final SuccessListener listener = new SuccessListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
-      process,
+      executor,
       factory,
       receiver,
       handler,
@@ -230,7 +230,7 @@ public class TheRValueModifierImplTest {
 
     modifier.setValue("name", "value", listener);
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(2, debugger.getCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(1, factory.getNotMainCounter());
@@ -286,11 +286,11 @@ public class TheRValueModifierImplTest {
     }
   }
 
-  private static class ExceptionDuringExecutionTheRProcess extends MockTheRProcess {
+  private static class ExceptionDuringExecutionTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       throw new TheRDebuggerException("");
     }
   }
@@ -315,13 +315,13 @@ public class TheRValueModifierImplTest {
     }
   }
 
-  private static class InDebugTheRProcess extends MockTheRProcess {
+  private static class InDebugTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "2: x <- c(1:10)",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -330,7 +330,7 @@ public class TheRValueModifierImplTest {
       }
 
       if (getCounter() == 2) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
           RESPONSE,
           TextRange.EMPTY_RANGE,

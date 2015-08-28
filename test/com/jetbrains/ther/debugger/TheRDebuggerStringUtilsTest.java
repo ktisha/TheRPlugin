@@ -1,8 +1,8 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.mock.IllegalTheROutputReceiver;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class TheRDebuggerStringUtilsTest {
   @Test
   public void emptyErrorAppending() {
     appendError(
-      new TheRProcessResponse("", TheRProcessResponseType.EMPTY, TextRange.EMPTY_RANGE, ""),
+      new TheRExecutionResult("", TheRExecutionResultType.EMPTY, TextRange.EMPTY_RANGE, ""),
       new IllegalTheROutputReceiver()
     );
   }
@@ -26,7 +26,7 @@ public class TheRDebuggerStringUtilsTest {
   @Test
   public void emptyOutputAppending() {
     appendOutput(
-      new TheRProcessResponse("", TheRProcessResponseType.EMPTY, TextRange.EMPTY_RANGE, ""),
+      new TheRExecutionResult("", TheRExecutionResultType.EMPTY, TextRange.EMPTY_RANGE, ""),
       new IllegalTheROutputReceiver()
     );
   }
@@ -34,7 +34,7 @@ public class TheRDebuggerStringUtilsTest {
   @Test
   public void emptyResultAppending() {
     appendResult(
-      new TheRProcessResponse("abc", TheRProcessResponseType.RESPONSE, TextRange.EMPTY_RANGE, ""),
+      new TheRExecutionResult("abc", TheRExecutionResultType.RESPONSE, TextRange.EMPTY_RANGE, ""),
       new IllegalTheROutputReceiver()
     );
   }
@@ -44,7 +44,7 @@ public class TheRDebuggerStringUtilsTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     appendError(
-      new TheRProcessResponse("", TheRProcessResponseType.EMPTY, TextRange.EMPTY_RANGE, "error"),
+      new TheRExecutionResult("", TheRExecutionResultType.EMPTY, TextRange.EMPTY_RANGE, "error"),
       receiver
     );
 
@@ -57,7 +57,7 @@ public class TheRDebuggerStringUtilsTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     appendOutput(
-      new TheRProcessResponse("output", TheRProcessResponseType.RESPONSE, TextRange.allOf("output"), ""),
+      new TheRExecutionResult("output", TheRExecutionResultType.RESPONSE, TextRange.allOf("output"), ""),
       receiver
     );
 
@@ -70,7 +70,7 @@ public class TheRDebuggerStringUtilsTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     appendResult(
-      new TheRProcessResponse("output", TheRProcessResponseType.RESPONSE, new TextRange(0, 3), ""),
+      new TheRExecutionResult("output", TheRExecutionResultType.RESPONSE, new TextRange(0, 3), ""),
       receiver
     );
 

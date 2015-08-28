@@ -5,9 +5,9 @@ import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebugger;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.MockTheRFunctionDebuggerFactory;
@@ -20,21 +20,21 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.NO_FUNCTIONS_RESPONSE;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
 import static org.junit.Assert.*;
 
 public class TheRMainFunctionDebuggerTest {
 
   @Test
   public void ordinary() throws TheRDebuggerException {
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger(), null);
     final MockTheRFunctionDebuggerHandler handler = new MockTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRMainFunctionDebugger debugger = new TheRMainFunctionDebugger(
-      process,
+      executor,
       factory,
       handler,
       receiver,
@@ -44,11 +44,11 @@ public class TheRMainFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 0), debugger.getLocation());
 
-    process.reset();
+    executor.reset();
     receiver.reset();
     debugger.advance();
 
-    assertTrue(process.check0());
+    assertTrue(executor.check0());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
@@ -57,11 +57,11 @@ public class TheRMainFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 1), debugger.getLocation());
 
-    process.reset();
+    executor.reset();
     receiver.reset();
     debugger.advance();
 
-    assertTrue(process.check1());
+    assertTrue(executor.check1());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
@@ -70,11 +70,11 @@ public class TheRMainFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getLocation());
 
-    process.reset();
+    executor.reset();
     receiver.reset();
     debugger.advance();
 
-    assertTrue(process.check2());
+    assertTrue(executor.check2());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
@@ -83,11 +83,11 @@ public class TheRMainFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 7), debugger.getLocation());
 
-    process.reset();
+    executor.reset();
     receiver.reset();
     debugger.advance();
 
-    assertTrue(process.check3());
+    assertTrue(executor.check3());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, handler.myCounter);
@@ -96,11 +96,11 @@ public class TheRMainFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 10), debugger.getLocation());
 
-    process.reset();
+    executor.reset();
     receiver.reset();
     debugger.advance();
 
-    assertTrue(process.check4());
+    assertTrue(executor.check4());
     assertEquals(0, factory.getMainCounter());
     assertEquals(1, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
@@ -111,7 +111,7 @@ public class TheRMainFunctionDebuggerTest {
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, -1), debugger.getLocation());
   }
 
-  private static class MockTheRProcess implements TheRProcess {
+  private static class MockTheRExecutor implements TheRExecutor {
 
     private int myExecuted = 0;
     private int myTraceAndDebugExecuted = 0;
@@ -173,15 +173,15 @@ public class TheRMainFunctionDebuggerTest {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
+    public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
       myExecuted++;
 
       if (command.equals("x <- c(1:10)")) {
         my1Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error1"
         );
@@ -190,10 +190,10 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         myTraceAndDebugExecuted++;
 
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls_fun"
         );
       }
@@ -201,9 +201,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals("f <- function(x) {")) {
         my20Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.PLUS,
+          TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error_f1"
         );
@@ -212,9 +212,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals("# comment in function")) {
         my21Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.PLUS,
+          TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error_f2"
         );
@@ -223,9 +223,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals(" ")) {
         my22Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.PLUS,
+          TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error_f3"
         );
@@ -234,9 +234,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals("x + 1")) {
         my23Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.PLUS,
+          TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error_f4"
         );
@@ -245,9 +245,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals("}")) {
         my24Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_f5"
         );
@@ -256,9 +256,9 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals(LS_COMMAND + "()")) {
         my3Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "character(0)",
-          TheRProcessResponseType.RESPONSE,
+          TheRExecutionResultType.RESPONSE,
           TextRange.allOf("character(0)"),
           "error_ls_all"
         );
@@ -267,24 +267,20 @@ public class TheRMainFunctionDebuggerTest {
       if (command.equals("f(x)")) {
         my4Executed = true;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           DEBUGGING_IN + ": f(x)\n" +
           "debug: {\n" +
           "    # comment in function\n" +
           "     \n" +
           "    x + 1\n" +
           "}",
-          TheRProcessResponseType.DEBUGGING_IN,
+          TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
           "error_f_call"
         );
       }
 
       throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
     }
   }
 

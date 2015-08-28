@@ -1,4 +1,4 @@
-package com.jetbrains.ther.debugger.interpreter;
+package com.jetbrains.ther.debugger.executor;
 
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
@@ -6,14 +6,14 @@ import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.calculate;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculator.isComplete;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static org.junit.Assert.*;
 
-public class TheRProcessResponseCalculatorTest {
+public class TheRExecutionResultCalculatorTest {
 
   @NotNull
   private static final String INTELLIJ_THER_X_ENTER = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_ENTER_FUNCTION_SUFFIX;
@@ -106,7 +106,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateDebugAtWithResponse() {
+  public void calculateDebugAtWithOutput() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
@@ -177,7 +177,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateContinueTraceWithResponseBefore() {
+  public void calculateContinueTraceWithOutputBefore() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
@@ -196,7 +196,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateContinueTraceWithResponseAfter() {
+  public void calculateContinueTraceWithOutputAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[1L]], ...)\n" +
@@ -220,57 +220,57 @@ public class TheRProcessResponseCalculatorTest {
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      TheRProcessResponseType.EXITING_FROM,
+      TheRExecutionResultType.EXITING_FROM,
       ""
     );
   }
 
   @Test
-  public void calculateExitingFromWithResponseBefore() {
+  public void calculateExitingFromWithOutputBefore() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      TheRProcessResponseType.EXITING_FROM,
+      TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateExitingFromWithResponseAfter() {
+  public void calculateExitingFromWithOutputAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      TheRProcessResponseType.EXITING_FROM,
+      TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateExitingFromWithResponseBeforeAndDebugAt() {
+  public void calculateExitingFromWithOutputBeforeAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      TheRProcessResponseType.EXITING_FROM,
+      TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
 
   @Test
-  public void calculateExitingFromWithResponseAfterAndDebugAt() {
+  public void calculateExitingFromWithOutputAfterAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-      TheRProcessResponseType.EXITING_FROM,
+      TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
     );
   }
@@ -289,7 +289,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateRecursiveExitingFromWithResponseBefore() {
+  public void calculateRecursiveExitingFromWithOutputBefore() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
@@ -303,7 +303,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateRecursiveExitingFromWithResponseAfter() {
+  public void calculateRecursiveExitingFromWithOutputAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
@@ -317,7 +317,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateRecursiveExitingFromWithResponseBeforeAndDebugAt() {
+  public void calculateRecursiveExitingFromWithOutputBeforeAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
@@ -332,7 +332,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateRecursiveExitingFromWithResponseAfterAndDebugAt() {
+  public void calculateRecursiveExitingFromWithOutputAfterAndDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
@@ -347,7 +347,7 @@ public class TheRProcessResponseCalculatorTest {
   }
 
   @Test
-  public void calculateResponseAndBrowse() {
+  public void calculateOutputAndBrowse() {
     check(
       "ls()",
       "[1] \"x\"",
@@ -360,29 +360,29 @@ public class TheRProcessResponseCalculatorTest {
   private void check(@NotNull final String command,
                      @NotNull final String expectedOutput,
                      @NotNull final String tail,
-                     @NotNull final TheRProcessResponseType expectedType,
+                     @NotNull final TheRExecutionResultType expectedType,
                      @NotNull final String expectedResult) {
-    final TheRProcessResponse response = calculate(
+    final TheRExecutionResult result = calculate(
       calculateFinalCommand(command, expectedOutput, tail),
       ""
     );
 
-    assertEquals(expectedOutput, response.getOutput());
-    assertEquals(expectedType, response.getType());
-    assertEquals(expectedResult, response.getResultRange().substring(response.getOutput()));
-    assertEquals("", response.getError());
+    assertEquals(expectedOutput, result.getOutput());
+    assertEquals(expectedType, result.getType());
+    assertEquals(expectedResult, result.getResultRange().substring(result.getOutput()));
+    assertEquals("", result.getError());
   }
 
   private String calculateFinalCommand(@NotNull final String command,
-                                       @NotNull final String expectedResponse,
+                                       @NotNull final String expectedOutput,
                                        @NotNull final String tail) {
     final StringBuilder sb = new StringBuilder();
 
     sb.append(command);
     sb.append(TheRDebugConstants.LINE_SEPARATOR);
 
-    if (!expectedResponse.isEmpty()) {
-      sb.append(expectedResponse);
+    if (!expectedOutput.isEmpty()) {
+      sb.append(expectedOutput);
       sb.append(TheRDebugConstants.LINE_SEPARATOR);
     }
 

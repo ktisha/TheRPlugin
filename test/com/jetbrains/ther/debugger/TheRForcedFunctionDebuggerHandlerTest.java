@@ -2,11 +2,11 @@ package com.jetbrains.ther.debugger;
 
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.mock.MockTheRExecutor;
 import com.jetbrains.ther.debugger.mock.MockTheRFunctionDebugger;
 import com.jetbrains.ther.debugger.mock.MockTheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
-import com.jetbrains.ther.debugger.mock.MockTheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      new IllegalTheRProcess(),
+      new IllegalTheRExecutor(),
       factory,
       receiver
     );
@@ -68,7 +68,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      new IllegalTheRProcess(),
+      new IllegalTheRExecutor(),
       factory,
       receiver
     );
@@ -106,7 +106,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      new IllegalTheRProcess(),
+      new IllegalTheRExecutor(),
       factory,
       receiver
     );
@@ -149,7 +149,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      new IllegalTheRProcess(),
+      new IllegalTheRExecutor(),
       factory,
       receiver
     );
@@ -168,11 +168,11 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     assertEquals(result, handler.getResult());
   }
 
-  private static class IllegalTheRProcess extends MockTheRProcess {
+  private static class IllegalTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       throw new IllegalStateException("DoExecute shouldn't be called");
     }
   }

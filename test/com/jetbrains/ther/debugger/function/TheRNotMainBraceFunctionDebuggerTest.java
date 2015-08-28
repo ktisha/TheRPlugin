@@ -4,8 +4,8 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.NO_FUNCTIONS_RESPONSE;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
 import static org.junit.Assert.*;
 
 public class TheRNotMainBraceFunctionDebuggerTest {
@@ -29,11 +29,11 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final OrdinaryTheRProcess process = new OrdinaryTheRProcess();
+    final OrdinaryTheRExecutor executor = new OrdinaryTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheRFunctionDebuggerHandler(),
       receiver,
@@ -42,7 +42,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(Arrays.asList("error_dbg_at_1", "error_ls"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
 
@@ -51,7 +51,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
-    assertEquals(4, process.getCounter());
+    assertEquals(4, executor.getCounter());
     assertEquals(Arrays.asList("error_dbg_at_2", "error_ls"), receiver.getErrors());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
 
@@ -61,7 +61,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(5, process.getCounter());
+    assertEquals(5, executor.getCounter());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
   }
@@ -75,13 +75,13 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final FunctionTheRProcess process = new FunctionTheRProcess();
+    final FunctionTheRExecutor executor = new FunctionTheRExecutor();
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger(), null);
     final FunctionTheRFunctionDebuggerHandler handler = new FunctionTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       factory,
       handler,
       receiver,
@@ -90,7 +90,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(0, factory.getNotMainCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(0, handler.getCounter());
@@ -102,7 +102,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(3, process.getCounter());
+    assertEquals(3, executor.getCounter());
     assertEquals(1, factory.getNotMainCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(1, handler.getCounter());
@@ -115,7 +115,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(4, process.getCounter());
+    assertEquals(4, executor.getCounter());
     assertEquals(1, factory.getNotMainCounter());
     assertEquals(0, factory.getMainCounter());
     assertEquals(1, handler.getCounter());
@@ -131,12 +131,12 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final RecursiveReturnTheRProcess process = new RecursiveReturnTheRProcess();
+    final RecursiveReturnTheRExecutor executor = new RecursiveReturnTheRExecutor();
     final RecursiveReturnTheRFunctionDebuggerHandler handler = new RecursiveReturnTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       handler,
       receiver,
@@ -145,7 +145,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
@@ -156,7 +156,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, process.getCounter());
+    assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getCounter());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
@@ -170,12 +170,12 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final DebugAtTheRProcess process = new DebugAtTheRProcess();
+    final DebugAtTheRExecutor executor = new DebugAtTheRExecutor();
     final DebugAtTheRFunctionDebuggerHandler handler = new DebugAtTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       handler,
       receiver,
@@ -184,7 +184,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
@@ -195,7 +195,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, process.getCounter());
+    assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getCounter());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
@@ -208,12 +208,12 @@ public class TheRNotMainBraceFunctionDebuggerTest {
       `x + 1` with recursive return and `debug at`
     */
 
-    final RecursiveReturnDebugAtTheRProcess process = new RecursiveReturnDebugAtTheRProcess();
+    final RecursiveReturnDebugAtTheRExecutor executor = new RecursiveReturnDebugAtTheRExecutor();
     final RecursiveReturnDebugAtTheRFunctionDebuggerHandler handler = new RecursiveReturnDebugAtTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       handler,
       receiver,
@@ -222,7 +222,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLinesCounter());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
@@ -234,7 +234,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, process.getCounter());
+    assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getDroppedFramesCounter());
     assertEquals(3, handler.getReturnLinesCounter());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
@@ -249,11 +249,11 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final PrintTheRProcess process = new PrintTheRProcess();
+    final PrintTheRExecutor executor = new PrintTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheRFunctionDebuggerHandler(),
       receiver,
@@ -262,7 +262,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
 
@@ -272,7 +272,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, process.getCounter());
+    assertEquals(3, executor.getCounter());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
   }
@@ -285,11 +285,11 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
     */
 
-    final ContinueTraceTheRProcess process = new ContinueTraceTheRProcess();
+    final ContinueTraceTheRExecutor executor = new ContinueTraceTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRNotMainBraceFunctionDebugger debugger = new TheRNotMainBraceFunctionDebugger(
-      process,
+      executor,
       new MockTheRFunctionDebuggerFactory(null, null),
       new IllegalTheRFunctionDebuggerHandler(),
       receiver,
@@ -298,7 +298,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, process.getCounter());
+    assertEquals(2, executor.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
 
@@ -307,7 +307,7 @@ public class TheRNotMainBraceFunctionDebuggerTest {
 
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(7, process.getCounter());
+    assertEquals(7, executor.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(
       Arrays.asList("error_continue", "error_entry", "error_entry", "error_dbg_at", "error_ls"),
@@ -320,52 +320,52 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 4 5 6", debugger.getResult());
-    assertEquals(8, process.getCounter());
+    assertEquals(8, executor.getCounter());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
-  private static class OrdinaryTheRProcess extends MockTheRProcess {
+  private static class OrdinaryTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: print(c(1))\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at_1"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "2: c(1) + 1\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           new TextRange(0, 9),
           "error_dbg_at_2"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.EXITING_FROM,
+          TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
           "error_exit"
         );
@@ -375,32 +375,32 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class FunctionTheRProcess extends MockTheRProcess {
+  private static class FunctionTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: def()\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at_1"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUGGING_IN + ": def()\n" +
           "debug: {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
@@ -409,18 +409,18 @@ public class TheRNotMainBraceFunctionDebuggerTest {
           "    }\n" +
           "}\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUGGING_IN,
+          TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
           "error_debugging"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.EXITING_FROM,
+          TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
           "error_exit"
         );
@@ -444,38 +444,38 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class RecursiveReturnTheRProcess extends MockTheRProcess {
+  private static class RecursiveReturnTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " ghi()\n" +
           EXITING_FROM + " def()\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.RECURSIVE_EXITING_FROM,
+          TheRExecutionResultType.RECURSIVE_EXITING_FROM,
           new TextRange(60, 69),
           "error_exit"
         );
@@ -499,37 +499,37 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class DebugAtTheRProcess extends MockTheRProcess {
+  private static class DebugAtTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.EXITING_FROM,
+          TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
           "error_exit"
         );
@@ -553,39 +553,39 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class RecursiveReturnDebugAtTheRProcess extends MockTheRProcess {
+  private static class RecursiveReturnDebugAtTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " ghi()\n" +
           EXITING_FROM + " def()\n" +
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.RECURSIVE_EXITING_FROM,
+          TheRExecutionResultType.RECURSIVE_EXITING_FROM,
           new TextRange(60, 69),
           "error_exit"
         );
@@ -619,36 +619,36 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class PrintTheRProcess extends MockTheRProcess {
+  private static class PrintTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "[1] 1 2 3\n" +
           EXITING_FROM + " abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.EXITING_FROM,
+          TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 9),
           "error_exit"
         );
@@ -658,32 +658,32 @@ public class TheRNotMainBraceFunctionDebuggerTest {
     }
   }
 
-  private static class ContinueTraceTheRProcess extends MockTheRProcess {
+  private static class ContinueTraceTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(TheRTraceAndDebugUtils.LS_FUNCTIONS_COMMAND)) {
-        return new TheRProcessResponse(
-          NO_FUNCTIONS_RESPONSE,
-          TheRProcessResponseType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(LS_FUNCTIONS_COMMAND)) {
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
           "error_ls"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 1 || getCounter() == 6)) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1:3)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
@@ -694,41 +694,41 @@ public class TheRNotMainBraceFunctionDebuggerTest {
           "    }\n" +
           "}\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.CONTINUE_TRACE,
+          TheRExecutionResultType.CONTINUE_TRACE,
           new TextRange(20, 29),
           "error_continue"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "output",
-          TheRProcessResponseType.DEBUG_AT,
+          TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_entry"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           TRACING + " abc() on entry \n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    c(4:6)\n" +
           "}\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRProcessResponseType.START_TRACE_BRACE,
+          TheRExecutionResultType.START_TRACE_BRACE,
           TextRange.EMPTY_RANGE,
           "error_entry"
         );
       }
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 8) {
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
           "[1] 4 5 6\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRProcessResponseType.EXITING_FROM,
+          TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
           "error_exit"
         );

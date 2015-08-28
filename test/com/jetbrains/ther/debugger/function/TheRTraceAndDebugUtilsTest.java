@@ -2,10 +2,10 @@ package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
-import com.jetbrains.ther.debugger.mock.AlwaysSameResponseTheRProcess;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
+import com.jetbrains.ther.debugger.mock.AlwaysSameResultTheRExecutor;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -14,43 +14,52 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.*;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TheRTraceAndDebugUtilsTest {
 
+  @NotNull
+  public static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
+                                                    "function(x) x == \"" + CLOSURE + "\", " +
+                                                    EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
+                                                    ")";
+
+  @NotNull
+  public static final String NO_FUNCTIONS_RESULT = "named list()";
+
   @Test
   public void empty() throws TheRDebuggerException {
-    final AlwaysSameResponseTheRProcess process = new AlwaysSameResponseTheRProcess(
-      NO_FUNCTIONS_RESPONSE,
-      TheRProcessResponseType.RESPONSE,
-      TextRange.allOf(NO_FUNCTIONS_RESPONSE),
+    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
+      NO_FUNCTIONS_RESULT,
+      TheRExecutionResultType.RESPONSE,
+      TextRange.allOf(NO_FUNCTIONS_RESULT),
       "error"
     );
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(
-      process,
+      executor,
       receiver
     );
 
-    assertEquals(1, process.getCounter());
+    assertEquals(1, executor.getCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
   public void ordinary() throws TheRDebuggerException {
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(
-      process,
+      executor,
       receiver
     );
 
-    assertTrue(process.check());
+    assertTrue(executor.check());
     assertEquals(
       Arrays.asList("error_ls_fun", "error_x_e", "error_x_t", "error_x_d", "error_y_e", "error_y_t", "error_y_d"),
       receiver.getErrors()
@@ -58,7 +67,7 @@ public class TheRTraceAndDebugUtilsTest {
     assertTrue(receiver.getOutputs().isEmpty());
   }
 
-  private static class MockTheRProcess implements TheRProcess {
+  private static class MockTheRExecutor implements TheRExecutor {
 
     private int myLsExecuted = 0;
 
@@ -72,7 +81,7 @@ public class TheRTraceAndDebugUtilsTest {
 
     @NotNull
     @Override
-    public TheRProcessResponse execute(@NotNull final String command) throws TheRDebuggerException {
+    public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
       final String xEnterFunctionName = "intellij_ther_x_enter";
       final String yEnterFunctionName = "intellij_ther_y_enter";
 
@@ -86,9 +95,9 @@ public class TheRTraceAndDebugUtilsTest {
                               "$y\n" +
                               FUNCTION_TYPE;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           output,
-          TheRProcessResponseType.RESPONSE,
+          TheRExecutionResultType.RESPONSE,
           TextRange.allOf(output),
           "error_ls_fun"
         );
@@ -99,9 +108,9 @@ public class TheRTraceAndDebugUtilsTest {
 
         myXEnterExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_x_e"
         );
@@ -113,9 +122,9 @@ public class TheRTraceAndDebugUtilsTest {
 
         myXTraceExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "[1] \"x\"",
-          TheRProcessResponseType.RESPONSE,
+          TheRExecutionResultType.RESPONSE,
           TextRange.allOf("[1] \"x\""),
           "error_x_t"
         );
@@ -126,9 +135,9 @@ public class TheRTraceAndDebugUtilsTest {
 
         myXDebugExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_x_d"
         );
@@ -139,9 +148,9 @@ public class TheRTraceAndDebugUtilsTest {
 
         myYEnterExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_y_e"
         );
@@ -153,9 +162,9 @@ public class TheRTraceAndDebugUtilsTest {
 
         myYTraceExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "[1] \"y\"",
-          TheRProcessResponseType.RESPONSE,
+          TheRExecutionResultType.RESPONSE,
           TextRange.allOf("[1] \"y\""),
           "error_y_t"
         );
@@ -166,19 +175,15 @@ public class TheRTraceAndDebugUtilsTest {
 
         myYDebugExecuted++;
 
-        return new TheRProcessResponse(
+        return new TheRExecutionResult(
           "",
-          TheRProcessResponseType.EMPTY,
+          TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_y_d"
         );
       }
 
       throw new IllegalStateException("Unexpected command");
-    }
-
-    @Override
-    public void stop() {
     }
 
     public boolean check() {

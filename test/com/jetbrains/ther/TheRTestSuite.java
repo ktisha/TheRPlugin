@@ -6,13 +6,12 @@ import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandlerTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImplTest;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorTest;
+import com.jetbrains.ther.debugger.executor.TheRExecutorUtilsTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImplTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierImplTest;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderImplTest;
 import com.jetbrains.ther.debugger.function.*;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessReceiverTest;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseCalculatorTest;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessUtilsTest;
 import com.jetbrains.ther.inspections.TheRTypeCheckerInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
@@ -74,9 +73,8 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRTraceAndDebugUtilsTest.class);
 
     // interpreter package
-    addJUnit4Test(suite, TheRProcessReceiverTest.class);
-    addJUnit4Test(suite, TheRProcessResponseCalculatorTest.class);
-    addJUnit4Test(suite, TheRProcessUtilsTest.class);
+    addJUnit4Test(suite, TheRExecutionResultCalculatorTest.class);
+    addJUnit4Test(suite, TheRExecutorUtilsTest.class);
 
     // `main` package
     addJUnit4Test(suite, TheRDebuggerTest.class);

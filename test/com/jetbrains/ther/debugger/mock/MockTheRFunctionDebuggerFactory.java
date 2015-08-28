@@ -3,10 +3,10 @@ package com.jetbrains.ther.debugger.mock;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +32,7 @@ public class MockTheRFunctionDebuggerFactory implements TheRFunctionDebuggerFact
 
   @NotNull
   @Override
-  public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRExecutor executor,
                                                          @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                          @NotNull final TheROutputReceiver outputReceiver) throws TheRDebuggerException {
     if (myNotMainDebugger == null) {
@@ -48,7 +48,7 @@ public class MockTheRFunctionDebuggerFactory implements TheRFunctionDebuggerFact
 
   @NotNull
   @Override
-  public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRProcess process,
+  public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRExecutor executor,
                                                       @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
                                                       @NotNull final TheROutputReceiver outputReceiver,
                                                       @NotNull final TheRScriptReader scriptReader) {

@@ -7,14 +7,15 @@ import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.frame.*;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebugger;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
-import com.jetbrains.ther.debugger.interpreter.TheRProcess;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponse;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class TheRDebuggerTest {
     instruction2
     */
 
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger functionDebugger = new MockTheRFunctionDebugger(MAIN_FUNCTION_NAME, 2);
     final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, functionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
@@ -47,7 +48,7 @@ public class TheRDebuggerTest {
     final MockTheRValueModifierHandler modifierHandler = new MockTheRValueModifierHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
-      process,
+      executor,
       debuggerFactory,
       loaderFactory,
       evaluatorFactory,
@@ -58,8 +59,7 @@ public class TheRDebuggerTest {
       modifierHandler
     );
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, functionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
     assertEquals(1, debuggerFactory.getMainCounter());
@@ -76,8 +76,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(1, functionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
     assertEquals(1, debuggerFactory.getMainCounter());
@@ -94,8 +93,7 @@ public class TheRDebuggerTest {
 
     assertFalse(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(2, functionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
     assertEquals(1, debuggerFactory.getMainCounter());
@@ -112,8 +110,7 @@ public class TheRDebuggerTest {
 
     debugger.stop();
 
-    assertTrue(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(2, functionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
     assertEquals(1, debuggerFactory.getMainCounter());
@@ -142,7 +139,7 @@ public class TheRDebuggerTest {
     instruction2
     */
 
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
     final Stack21TheRFunctionDebugger firstFunctionDebugger = new Stack21TheRFunctionDebugger(secondFunctionDebugger);
     final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, firstFunctionDebugger);
@@ -155,7 +152,7 @@ public class TheRDebuggerTest {
     final MockTheRValueModifierHandler modifierHandler = new MockTheRValueModifierHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
-      process,
+      executor,
       debuggerFactory,
       loaderFactory,
       evaluatorFactory,
@@ -166,8 +163,7 @@ public class TheRDebuggerTest {
       modifierHandler
     );
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -185,8 +181,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -204,8 +199,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -224,8 +218,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -244,8 +237,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -263,8 +255,7 @@ public class TheRDebuggerTest {
 
     assertFalse(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -282,8 +273,7 @@ public class TheRDebuggerTest {
 
     debugger.stop();
 
-    assertTrue(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(0, debuggerFactory.getNotMainCounter());
@@ -317,7 +307,7 @@ public class TheRDebuggerTest {
      instruction2
      */
 
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack313TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack312TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack311TheRFunctionDebugger(secondFunctionDebugger);
@@ -331,7 +321,7 @@ public class TheRDebuggerTest {
     final MockTheRValueModifierHandler modifierHandler = new MockTheRValueModifierHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
-      process,
+      executor,
       debuggerFactory,
       loaderFactory,
       evaluatorFactory,
@@ -342,8 +332,7 @@ public class TheRDebuggerTest {
       modifierHandler
     );
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
@@ -362,8 +351,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
@@ -382,8 +370,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -403,8 +390,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -424,8 +410,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -446,8 +431,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -468,8 +452,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -489,8 +472,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -509,8 +491,7 @@ public class TheRDebuggerTest {
 
     assertFalse(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
@@ -529,8 +510,7 @@ public class TheRDebuggerTest {
 
     debugger.stop();
 
-    assertTrue(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
@@ -564,7 +544,7 @@ public class TheRDebuggerTest {
     instruction2
     */
 
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack323TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack322TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack321TheRFunctionDebugger(secondFunctionDebugger);
@@ -578,7 +558,7 @@ public class TheRDebuggerTest {
     final MockTheRValueModifierHandler modifierHandler = new MockTheRValueModifierHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
-      process,
+      executor,
       debuggerFactory,
       loaderFactory,
       evaluatorFactory,
@@ -589,8 +569,7 @@ public class TheRDebuggerTest {
       modifierHandler
     );
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
@@ -609,8 +588,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
@@ -629,8 +607,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -650,8 +627,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -671,8 +647,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -693,8 +668,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -715,8 +689,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
@@ -735,8 +708,7 @@ public class TheRDebuggerTest {
 
     assertFalse(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
@@ -755,8 +727,7 @@ public class TheRDebuggerTest {
 
     debugger.stop();
 
-    assertTrue(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
@@ -794,7 +765,7 @@ public class TheRDebuggerTest {
     instruction2
     */
 
-    final MockTheRProcess process = new MockTheRProcess();
+    final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger fourthFunctionDebugger = new Stack44TheRFunctionDebugger();
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack43TheRFunctionDebugger(fourthFunctionDebugger);
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack42TheRFunctionDebugger(thirdFunctionDebugger);
@@ -809,7 +780,7 @@ public class TheRDebuggerTest {
     final MockTheRValueModifierHandler modifierHandler = new MockTheRValueModifierHandler();
 
     final TheRDebugger debugger = new TheRDebugger(
-      process,
+      executor,
       debuggerFactory,
       loaderFactory,
       evaluatorFactory,
@@ -820,8 +791,7 @@ public class TheRDebuggerTest {
       modifierHandler
     );
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
@@ -841,8 +811,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(1, process.getCounter());
+    Assert.assertEquals(1, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
@@ -862,8 +831,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
@@ -884,8 +852,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(2, process.getCounter());
+    Assert.assertEquals(2, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
@@ -906,8 +873,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
@@ -929,8 +895,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(3, process.getCounter());
+    Assert.assertEquals(3, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
@@ -952,8 +917,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(0, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
@@ -976,8 +940,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(1, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
@@ -1000,8 +963,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(2, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
@@ -1022,8 +984,7 @@ public class TheRDebuggerTest {
 
     assertTrue(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(2, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
@@ -1043,8 +1004,7 @@ public class TheRDebuggerTest {
 
     assertFalse(debugger.advance());
 
-    assertFalse(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(2, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
@@ -1064,8 +1024,7 @@ public class TheRDebuggerTest {
 
     debugger.stop();
 
-    assertTrue(process.myIsClosed);
-    assertEquals(4, process.getCounter());
+    Assert.assertEquals(4, executor.getCounter());
     assertEquals(2, fourthFunctionDebugger.getCounter());
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
@@ -1084,24 +1043,17 @@ public class TheRDebuggerTest {
     assertEquals(new TheRLocation(MAIN_FUNCTION_NAME, 2), debugger.getStack().get(0).getLocation());
   }
 
-  private static class MockTheRProcess extends com.jetbrains.ther.debugger.mock.MockTheRProcess {
-
-    private boolean myIsClosed = false;
+  private static class MockTheRExecutor extends com.jetbrains.ther.debugger.mock.MockTheRExecutor {
 
     @NotNull
     @Override
-    protected TheRProcessResponse doExecute(@NotNull final String command) throws TheRDebuggerException {
-      return new TheRProcessResponse(
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      return new TheRExecutionResult(
         "[1] " + getCounter(),
-        TheRProcessResponseType.RESPONSE,
+        TheRExecutionResultType.RESPONSE,
         TextRange.allOf("[1] " + getCounter()),
         "error" + getCounter()
       );
-    }
-
-    @Override
-    public void stop() {
-      myIsClosed = true;
     }
   }
 
@@ -1125,7 +1077,7 @@ public class TheRDebuggerTest {
 
     @NotNull
     @Override
-    public TheRDebuggerEvaluator getEvaluator(@NotNull final TheRProcess process,
+    public TheRDebuggerEvaluator getEvaluator(@NotNull final TheRExecutor executor,
                                               @NotNull final TheRFunctionDebuggerFactory factory,
                                               @NotNull final TheROutputReceiver receiver,
                                               @NotNull final TheRExpressionHandler handler,
@@ -1173,7 +1125,7 @@ public class TheRDebuggerTest {
 
     @NotNull
     @Override
-    public TheRValueModifier getModifier(@NotNull final TheRProcess process,
+    public TheRValueModifier getModifier(@NotNull final TheRExecutor executor,
                                          @NotNull final TheRFunctionDebuggerFactory factory,
                                          @NotNull final TheROutputReceiver receiver,
                                          @NotNull final TheRValueModifierHandler handler,
