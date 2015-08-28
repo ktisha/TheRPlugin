@@ -16,7 +16,7 @@ import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.interpreter.TheRProcessResponseType.*;
 
-final class TheRProcessResponseCalculator {
+public final class TheRProcessResponseCalculator {
 
   @NotNull
   private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");

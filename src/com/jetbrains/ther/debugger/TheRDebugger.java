@@ -184,7 +184,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
             myModifierHandler,
             myStack.size()
           ),
-          loadFrameNumber()
+          myStack.isEmpty() ? 0 : loadFrameNumber()
         ),
         myEvaluatorFactory.getEvaluator(
           myProcess,

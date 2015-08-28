@@ -1,14 +1,18 @@
 package com.jetbrains.ther.xdebugger;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.executors.DefaultDebugExecutor;
+import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.GenericProgramRunner;
+import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.ConcurrencyUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
@@ -17,6 +21,7 @@ import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReaderImpl;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -24,7 +29,7 @@ import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
-import com.jetbrains.ther.debugger.interpreter.TheRProcessImpl;
+import com.jetbrains.ther.debugger.interpreter.TheRProcess;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
@@ -33,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class TheRXDebugRunner extends GenericProgramRunner {
@@ -65,13 +71,16 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
     final String scriptPath = ((TheRRunConfiguration)environment.getRunProfile()).getScriptName();
 
+    final TheRXProcessHandler process = new TheRXProcessHandler(getCommandLine(interpreterPath, project.getBasePath()));
+
     final TheRXOutputBuffer outputBuffer = new TheRXOutputBuffer();
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
-        createDebugger(interpreterPath, project.getBasePath(), scriptPath, outputBuffer),
+        createDebugger(process, scriptPath, outputBuffer),
         createResolvingSession(project, scriptPath),
+        process,
         outputBuffer
       )
     );
@@ -82,25 +91,31 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRDebugger debugger,
                                                          @NotNull final TheRXResolvingSession resolvingSession,
+                                                         @NotNull final TheRXProcessHandler processHandler,
                                                          @NotNull final TheRXOutputBuffer outputBuffer) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        return new TheRXDebugProcess(session, debugger, resolvingSession, outputBuffer);
+        final TheRXDebugProcess process = new TheRXDebugProcess(session, processHandler, debugger, resolvingSession, outputBuffer);
+
+        ((ConsoleView)process.createConsole()).attachToProcess(processHandler);
+        ProcessTerminatedListener.attach(processHandler);
+
+        processHandler.startNotify();
+        initProcess(processHandler);
+
+        return process;
       }
     };
   }
 
   @NotNull
-  private TheRDebugger createDebugger(@NotNull final String interpreterPath,
-                                      @Nullable final String workDir,
+  private TheRDebugger createDebugger(@NotNull final TheRProcess process,
                                       @NotNull final String scriptPath,
                                       @NotNull final TheROutputReceiver outputReceiver)
     throws ExecutionException {
     try {
-      final TheRProcessImpl process = new TheRProcessImpl(interpreterPath, workDir);
-
       return new TheRDebugger(
         process,
         new TheRFunctionDebuggerFactoryImpl(),
@@ -128,6 +143,31 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       return new TheRXResolvingSessionImpl(project, scriptPath);
     }
     catch (final TheRXDebuggerException e) {
+      throw new ExecutionException(e);
+    }
+  }
+
+  @NotNull
+  private GeneralCommandLine getCommandLine(@NotNull final String interpreterPath, @Nullable final String workDir) {
+    final GeneralCommandLine commandLine = new GeneralCommandLine(
+      Arrays.asList(
+        FileUtil.toSystemDependentName(interpreterPath),
+        TheRDebugConstants.NO_SAVE_PARAMETER,
+        TheRDebugConstants.QUIET_PARAMETER
+      )
+    );
+
+    commandLine.withWorkDirectory(workDir);
+
+    return commandLine;
+  }
+
+  private void initProcess(@NotNull final TheRProcess process) throws ExecutionException {
+    try {
+      process.execute(TheRDebugConstants.BROWSER_COMMAND);
+      process.execute(TheRDebugConstants.KEEP_SOURCE_COMMAND);
+    }
+    catch (final TheRDebuggerException e) {
       throw new ExecutionException(e);
     }
   }

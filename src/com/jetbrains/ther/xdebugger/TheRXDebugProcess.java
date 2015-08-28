@@ -1,5 +1,6 @@
 package com.jetbrains.ther.xdebugger;
 
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.ExecutionConsole;
@@ -42,6 +43,9 @@ class TheRXDebugProcess extends XDebugProcess {
   private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
 
   @NotNull
+  private final ProcessHandler myProcessHandler;
+
+  @NotNull
   private final TheRDebugger myDebugger;
 
   @NotNull
@@ -60,10 +64,13 @@ class TheRXDebugProcess extends XDebugProcess {
   private final ConsoleView myConsole;
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
+                           @NotNull final ProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXResolvingSession resolvingSession,
                            @NotNull final TheRXOutputBuffer outputBuffer) {
     super(session);
+
+    myProcessHandler = processHandler;
 
     myDebugger = debugger;
     myStack = new TheRXStack(myDebugger.getStack(), resolvingSession);
@@ -96,6 +103,12 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void sessionInitialized() {
     resume();
+  }
+
+  @Nullable
+  @Override
+  protected ProcessHandler doGetProcessHandler() {
+    return myProcessHandler;
   }
 
   @Override
