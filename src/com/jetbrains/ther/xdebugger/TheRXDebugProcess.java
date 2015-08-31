@@ -117,7 +117,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            LOGGER.error(e);
+            logException(e);
           }
         }
       }
@@ -138,7 +138,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            LOGGER.error(e);
+            logException(e);
           }
         }
       }
@@ -165,7 +165,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            LOGGER.error(e);
+            logException(e);
           }
         }
       }
@@ -189,7 +189,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            LOGGER.error(e);
+            logException(e);
           }
         }
       }
@@ -222,6 +222,7 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void stop() {
     myDebugger.stop();
+    TheRXDebugRunner.SINGLE_EXECUTOR.shutdownNow();
   }
 
   private boolean advance() throws TheRDebuggerException {
@@ -232,6 +233,12 @@ class TheRXDebugProcess extends XDebugProcess {
     }
 
     return executed;
+  }
+
+  private boolean isBreakpoint() {
+    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentPosition());
+
+    return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
   }
 
   private void showDebugInformation() {
@@ -254,10 +261,12 @@ class TheRXDebugProcess extends XDebugProcess {
     }
   }
 
-  private boolean isBreakpoint() {
-    final XSourcePositionWrapper wrapper = new XSourcePositionWrapper(getCurrentPosition());
+  private void logException(@NotNull final TheRDebuggerException e) {
+    if (TheRXDebugRunner.SINGLE_EXECUTOR.isShutdown() && e.getCause() instanceof InterruptedException) {
+      return;
+    }
 
-    return myBreakpoints.containsKey(wrapper) || myTempBreakpoints.contains(wrapper);
+    LOGGER.error(e);
   }
 
   @NotNull
