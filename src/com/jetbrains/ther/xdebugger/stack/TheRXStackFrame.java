@@ -10,11 +10,11 @@ import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.frame.TheRVar;
-import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 class TheRXStackFrame extends XStackFrame {
 
@@ -24,12 +24,18 @@ class TheRXStackFrame extends XStackFrame {
   @Nullable
   private final XSourcePosition myPosition;
 
+  @NotNull
+  private final ExecutorService myExecutor;
+
   @Nullable
   private TheRXDebuggerEvaluator myEvaluator;
 
-  public TheRXStackFrame(@NotNull final TheRStackFrame frame, @Nullable final XSourcePosition position) {
+  public TheRXStackFrame(@NotNull final TheRStackFrame frame,
+                         @Nullable final XSourcePosition position,
+                         @NotNull final ExecutorService executor) {
     myPosition = position;
     myFrame = frame;
+    myExecutor = executor;
     myEvaluator = null;
   }
 
@@ -43,7 +49,7 @@ class TheRXStackFrame extends XStackFrame {
   @Override
   public XDebuggerEvaluator getEvaluator() {
     if (myEvaluator == null) {
-      myEvaluator = new TheRXDebuggerEvaluator(myFrame.getEvaluator());
+      myEvaluator = new TheRXDebuggerEvaluator(myFrame.getEvaluator(), myExecutor);
     }
 
     return myEvaluator;
@@ -51,7 +57,7 @@ class TheRXStackFrame extends XStackFrame {
 
   @Override
   public void computeChildren(@NotNull final XCompositeNode node) {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -87,7 +93,7 @@ class TheRXStackFrame extends XStackFrame {
     final XValueChildrenList result = new XValueChildrenList();
 
     for (final TheRVar var : vars) {
-      result.add(new TheRXVar(var));
+      result.add(new TheRXVar(var, myExecutor));
     }
 
     return result;
@@ -105,10 +111,14 @@ class TheRXStackFrame extends XStackFrame {
     @NotNull
     private final TheRVar myVar;
 
-    public TheRXVar(@NotNull final TheRVar var) {
+    @NotNull
+    private final ExecutorService myExecutor;
+
+    public TheRXVar(@NotNull final TheRVar var, @NotNull final ExecutorService executor) {
       super(var.getName());
 
       myVar = var;
+      myExecutor = executor;
     }
 
     @Override
@@ -120,7 +130,7 @@ class TheRXStackFrame extends XStackFrame {
     @Override
     public XValueModifier getModifier() {
       if (myVar.getModifier().isEnabled()) {
-        return new TheRXValueModifier(myVar.getModifier(), myVar.getName());
+        return new TheRXValueModifier(myVar.getModifier(), myVar.getName(), myExecutor);
       }
       else {
         return null;

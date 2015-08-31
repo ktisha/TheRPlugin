@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ExecutorService;
 
 public class TheRXStack {
 
@@ -19,15 +20,21 @@ public class TheRXStack {
   @NotNull
   private final TheRXResolvingSession mySession;
 
+  @NotNull
+  private final ExecutorService myExecutor;
+
   @Nullable
   private List<TheRXStackFrame> myStack;
 
   @Nullable
   private XSuspendContext mySuspendContext;
 
-  public TheRXStack(@NotNull final List<TheRStackFrame> stack, @NotNull final TheRXResolvingSession session) {
+  public TheRXStack(@NotNull final List<TheRStackFrame> stack,
+                    @NotNull final TheRXResolvingSession session,
+                    @NotNull final ExecutorService executor) {
     myOriginalStack = stack;
     mySession = session;
+    myExecutor = executor;
     myStack = null;
     mySuspendContext = null;
   }
@@ -78,7 +85,8 @@ public class TheRXStack {
       result[result.length - 1 - index] =
         new TheRXStackFrame(
           frame,
-          mySession.resolveNext(frame.getLocation())
+          mySession.resolveNext(frame.getLocation()),
+          myExecutor
         );
 
       index++;
@@ -99,7 +107,8 @@ public class TheRXStack {
         lastFrame,
         mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
-        )
+        ),
+        myExecutor
       )
     );
 
@@ -127,7 +136,8 @@ public class TheRXStack {
       result[offset - 1 - i] =
         new TheRXStackFrame(
           frame,
-          mySession.resolveNext(frame.getLocation())
+          mySession.resolveNext(frame.getLocation()),
+          myExecutor
         );
     }
 
@@ -155,7 +165,8 @@ public class TheRXStack {
         lastFrame,
         mySession.resolveCurrent(
           lastFrame.getLocation().getLine()
-        )
+        ),
+        myExecutor
       );
 
     return Arrays.asList(result);

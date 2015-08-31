@@ -2,8 +2,9 @@ package com.jetbrains.ther.xdebugger.stack;
 
 import com.intellij.xdebugger.frame.XValueModifier;
 import com.jetbrains.ther.debugger.frame.TheRValueModifier;
-import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.ExecutorService;
 
 // TODO [xdbg][test]
 class TheRXValueModifier extends XValueModifier {
@@ -14,14 +15,18 @@ class TheRXValueModifier extends XValueModifier {
   @NotNull
   private final String myName;
 
-  public TheRXValueModifier(@NotNull final TheRValueModifier modifier, @NotNull final String name) {
+  @NotNull
+  private final ExecutorService myExecutor;
+
+  public TheRXValueModifier(@NotNull final TheRValueModifier modifier, @NotNull final String name, @NotNull final ExecutorService executor) {
     myModifier = modifier;
     myName = name;
+    myExecutor = executor;
   }
 
   @Override
   public void setValue(@NotNull final String expression, @NotNull final XModificationCallback callback) {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {

@@ -13,6 +13,7 @@ import com.jetbrains.ther.debugger.frame.TheRVarsLoader;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.mock.IllegalTheRValueModifier;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
+import com.jetbrains.ther.xdebugger.mock.ExecutorServices;
 import com.jetbrains.ther.xdebugger.mock.IllegalXCompositeNode;
 import com.jetbrains.ther.xdebugger.mock.MockXSourcePosition;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,8 @@ public class TheRXStackFrameTest {
         loader,
         new IllegalTheRDebuggerEvaluator()
       ),
-      null
+      null,
+      ExecutorServices.SINGLE_EXECUTOR
     );
 
     frame.computeChildren(node);
@@ -64,7 +66,8 @@ public class TheRXStackFrameTest {
         loader,
         new IllegalTheRDebuggerEvaluator()
       ),
-      null
+      null,
+      ExecutorServices.SINGLE_EXECUTOR
     );
 
     frame.computeChildren(node);
@@ -85,7 +88,8 @@ public class TheRXStackFrameTest {
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),
-      null
+      null,
+      ExecutorServices.ILLEGAL_EXECUTOR
     );
 
     final MockColoredTextContainer container = new MockColoredTextContainer();
@@ -105,7 +109,8 @@ public class TheRXStackFrameTest {
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),
-      new MockXSourcePosition("script.r", 2)
+      new MockXSourcePosition("script.r", 2),
+      ExecutorServices.ILLEGAL_EXECUTOR
     );
 
     final MockColoredTextContainer container = new MockColoredTextContainer();
@@ -125,7 +130,8 @@ public class TheRXStackFrameTest {
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),
-      new MockXSourcePosition("script.r", 9)
+      new MockXSourcePosition("script.r", 9),
+      ExecutorServices.ILLEGAL_EXECUTOR
     );
 
     final MockColoredTextContainer container = new MockColoredTextContainer();

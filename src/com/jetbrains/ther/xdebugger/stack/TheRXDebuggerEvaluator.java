@@ -7,9 +7,10 @@ import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
-import com.jetbrains.ther.xdebugger.TheRXDebugRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.ExecutorService;
 
 // TODO [xdbg][test]
 class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
@@ -20,8 +21,12 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   @NotNull
   private final TheRDebuggerEvaluator myEvaluator;
 
-  public TheRXDebuggerEvaluator(@NotNull final TheRDebuggerEvaluator evaluator) {
+  @NotNull
+  private final ExecutorService myExecutor;
+
+  public TheRXDebuggerEvaluator(@NotNull final TheRDebuggerEvaluator evaluator, @NotNull final ExecutorService executor) {
     myEvaluator = evaluator;
+    myExecutor = executor;
   }
 
   // This method is overridden because XDebugSessionImpl.breakpointReached(XBreakpoint<?>, String, XSuspendContext) calls it anyway
@@ -38,7 +43,7 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   public void evaluate(@NotNull final String expression,
                        @NotNull final XEvaluationCallback callback,
                        @Nullable final XSourcePosition expressionPosition) {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {

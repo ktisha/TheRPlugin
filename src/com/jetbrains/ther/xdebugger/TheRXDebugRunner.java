@@ -38,12 +38,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class TheRXDebugRunner extends GenericProgramRunner {
-
-  @NotNull
-  public static final ThreadPoolExecutor SINGLE_EXECUTOR = ConcurrencyUtil.newSingleThreadExecutor("TheRDebuggerBackground");
 
   @NotNull
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
@@ -92,7 +88,13 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        final TheRXDebugProcess debugProcess = new TheRXDebugProcess(session, processHandler, debugger, resolvingSession);
+        final TheRXDebugProcess debugProcess = new TheRXDebugProcess(
+          session,
+          processHandler,
+          debugger,
+          resolvingSession,
+          ConcurrencyUtil.newSingleThreadExecutor("TheRDebuggerBackground")
+        );
 
         ((ConsoleView)debugProcess.createConsole()).attachToProcess(processHandler);
         ProcessTerminatedListener.attach(processHandler);

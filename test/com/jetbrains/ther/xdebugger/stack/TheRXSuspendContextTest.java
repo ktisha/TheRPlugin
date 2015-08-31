@@ -5,6 +5,7 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.mock.IllegalTheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
+import com.jetbrains.ther.xdebugger.mock.ExecutorServices;
 import com.jetbrains.ther.xdebugger.mock.MockXStackFrameContainer;
 import org.junit.Test;
 
@@ -23,7 +24,8 @@ public class TheRXSuspendContextTest {
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),
-      null
+      null,
+      ExecutorServices.ILLEGAL_EXECUTOR
     );
 
     final TheRXStackFrame second = new TheRXStackFrame(
@@ -32,7 +34,8 @@ public class TheRXSuspendContextTest {
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),
-      null
+      null,
+      ExecutorServices.ILLEGAL_EXECUTOR
     );
 
     final TheRXSuspendContext context = new TheRXSuspendContext(Arrays.asList(first, second));

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 // TODO [xdbg][test]
 class TheRXDebugProcess extends XDebugProcess {
@@ -43,6 +44,9 @@ class TheRXDebugProcess extends XDebugProcess {
   private final TheRXStack myStack;
 
   @NotNull
+  private final ExecutorService myExecutor;
+
+  @NotNull
   private final Map<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>> myBreakpoints;
 
   @NotNull
@@ -54,13 +58,15 @@ class TheRXDebugProcess extends XDebugProcess {
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRXProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRXResolvingSession resolvingSession) {
+                           @NotNull final TheRXResolvingSession resolvingSession,
+                           @NotNull final ExecutorService executor) {
     super(session);
 
     myProcessHandler = processHandler;
 
     myDebugger = debugger;
-    myStack = new TheRXStack(myDebugger.getStack(), resolvingSession);
+    myStack = new TheRXStack(myDebugger.getStack(), resolvingSession, executor);
+    myExecutor = executor;
 
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
@@ -99,7 +105,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepOver() {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -126,7 +132,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepInto() {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -147,7 +153,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void startStepOut() {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -174,7 +180,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void resume() {
-    TheRXDebugRunner.SINGLE_EXECUTOR.execute(
+    myExecutor.execute(
       new Runnable() {
         @Override
         public void run() {
@@ -222,7 +228,7 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void stop() {
     myDebugger.stop();
-    TheRXDebugRunner.SINGLE_EXECUTOR.shutdownNow();
+    myExecutor.shutdownNow();
   }
 
   private boolean advance() throws TheRDebuggerException {
@@ -262,7 +268,7 @@ class TheRXDebugProcess extends XDebugProcess {
   }
 
   private void logException(@NotNull final TheRDebuggerException e) {
-    if (TheRXDebugRunner.SINGLE_EXECUTOR.isShutdown() && e.getCause() instanceof InterruptedException) {
+    if (myExecutor.isShutdown() && e.getCause() instanceof InterruptedException) {
       return;
     }
 
