@@ -141,7 +141,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
   protected BaseDataReader createOutputDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
     myOutputReader = super.createProcessOutReader();
 
-    return new TheRXOutputReader(myOutputReader, sleepingPolicy);
+    return new TheRXBaseOutputReader(myOutputReader, sleepingPolicy, myOutputBuffer);
   }
 
   @NotNull
@@ -149,7 +149,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
   protected BaseDataReader createErrorDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
     myErrorReader = super.createProcessErrReader();
 
-    return new TheRXErrorReader(myErrorReader, sleepingPolicy);
+    return new TheRXBaseOutputReader(myErrorReader, sleepingPolicy, myErrorBuffer);
   }
 
   private void waitForOutput() throws IOException, InterruptedException {
@@ -204,41 +204,26 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
     }
   }
 
-  private class TheRXOutputReader extends BaseOutputReader {
+  private class TheRXBaseOutputReader extends BaseOutputReader {
 
-    public TheRXOutputReader(@NotNull final Reader reader, @NotNull final SleepingPolicy sleepingPolicy) {
+    @NotNull
+    private final StringBuilder myBuffer;
+
+    public TheRXBaseOutputReader(@NotNull final Reader reader,
+                                 @NotNull final SleepingPolicy sleepingPolicy,
+                                 @NotNull final StringBuilder buffer) {
       super(reader, sleepingPolicy);
+
+      myBuffer = buffer;
 
       start();
     }
 
     @Override
     protected void onTextAvailable(@NotNull final String text) {
-      synchronized (myOutputBuffer) {
-        myOutputBuffer.append(text);
-        myOutputBuffer.notify();
-      }
-    }
-
-    @Override
-    protected Future<?> executeOnPooledThread(@NotNull final Runnable runnable) {
-      return TheRXProcessHandler.this.executeOnPooledThread(runnable);
-    }
-  }
-
-  private class TheRXErrorReader extends BaseOutputReader {
-
-    public TheRXErrorReader(@NotNull final Reader reader, @NotNull final SleepingPolicy sleepingPolicy) {
-      super(reader, sleepingPolicy);
-
-      start();
-    }
-
-    @Override
-    protected void onTextAvailable(@NotNull final String text) {
-      synchronized (myErrorBuffer) {
-        myErrorBuffer.append(text);
-        myErrorBuffer.notify();
+      synchronized (myBuffer) {
+        myBuffer.append(text);
+        myBuffer.notify();
       }
     }
 
