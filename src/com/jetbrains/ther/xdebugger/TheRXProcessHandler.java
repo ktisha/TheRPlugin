@@ -2,7 +2,7 @@ package com.jetbrains.ther.xdebugger;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -20,7 +20,7 @@ import java.util.concurrent.Future;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
-class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor {
+class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
 
   @NotNull
   private final List<String> myInitCommands;

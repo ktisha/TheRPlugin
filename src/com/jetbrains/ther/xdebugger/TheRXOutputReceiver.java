@@ -1,6 +1,5 @@
 package com.jetbrains.ther.xdebugger;
 
-import com.intellij.execution.process.AnsiEscapeDecoder;
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -15,7 +14,7 @@ import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
-public class TheRXOutputReceiver implements TheROutputReceiver, AnsiEscapeDecoder.ColoredTextAcceptor {
+public class TheRXOutputReceiver implements TheROutputReceiver {
 
   @NotNull
   private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
@@ -26,13 +25,9 @@ public class TheRXOutputReceiver implements TheROutputReceiver, AnsiEscapeDecode
   @NotNull
   private final TheRXProcessHandler myProcessHandler;
 
-  @NotNull
-  private final AnsiEscapeDecoder myDecoder;
-
   public TheRXOutputReceiver(@NotNull final Project project, @NotNull final TheRXProcessHandler processHandler) {
     myProject = project;
     myProcessHandler = processHandler;
-    myDecoder = new AnsiEscapeDecoder();
   }
 
   @Override
@@ -47,19 +42,11 @@ public class TheRXOutputReceiver implements TheROutputReceiver, AnsiEscapeDecode
     tryFailedImportMessage(error);
   }
 
-  @Override
-  public void coloredTextAvailable(@NotNull final String text, @NotNull final Key attributes) {
-    myProcessHandler.notifyTextAvailable(text, attributes);
-  }
-
   private void receiveOutput(@NotNull final String output, @NotNull final Key type) {
-    myDecoder.escapeText(output, type, this);
+    myProcessHandler.notifyTextAvailable(output, type);
 
     if (!StringUtil.endsWithLineBreak(output)) {
-      myProcessHandler.notifyTextAvailable(
-        LINE_SEPARATOR,
-        type
-      );
+      myProcessHandler.notifyTextAvailable(LINE_SEPARATOR, type);
     }
   }
 
