@@ -23,6 +23,7 @@ import com.jetbrains.ther.debugger.TheRScriptReaderImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImpl;
 import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
@@ -71,7 +72,8 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         interpreterPath,
         project.getBasePath()
       ),
-      TheRProcessUtils.getInitCommands()
+      TheRProcessUtils.getInitCommands(),
+      new TheRExecutionResultCalculatorImpl()
     );
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(

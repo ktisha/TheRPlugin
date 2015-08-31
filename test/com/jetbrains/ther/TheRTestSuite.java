@@ -6,7 +6,7 @@ import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandlerTest;
 import com.jetbrains.ther.debugger.TheRScriptReaderImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImplTest;
-import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorTest;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImplTest;
 import com.jetbrains.ther.debugger.executor.TheRExecutorUtilsTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImplTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierImplTest;
@@ -72,7 +72,7 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRTraceAndDebugUtilsTest.class);
 
     // interpreter package
-    addJUnit4Test(suite, TheRExecutionResultCalculatorTest.class);
+    addJUnit4Test(suite, TheRExecutionResultCalculatorImplTest.class);
     addJUnit4Test(suite, TheRExecutorUtilsTest.class);
 
     // `main` package

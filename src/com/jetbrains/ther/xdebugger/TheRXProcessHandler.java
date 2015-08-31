@@ -10,9 +10,9 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,8 +25,7 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
 class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheROutputReceiver {
 
@@ -35,6 +34,9 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
 
   @NotNull
   private final List<String> myInitCommands;
+
+  @NotNull
+  private final TheRExecutionResultCalculator myResultCalculator;
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -51,11 +53,14 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
   @Nullable
   private Reader myErrorReader;
 
-  public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine, @NotNull final List<String> initCommands)
+  public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine,
+                             @NotNull final List<String> initCommands,
+                             @NotNull final TheRExecutionResultCalculator resultCalculator)
     throws ExecutionException {
     super(commandLine);
 
     myInitCommands = initCommands;
+    myResultCalculator = resultCalculator;
 
     myOutputBuffer = new StringBuilder();
     myErrorBuffer = new StringBuilder();
@@ -71,7 +76,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
   public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
     try {
       myWriter.write(command);
-      myWriter.write(TheRDebugConstants.LINE_SEPARATOR);
+      myWriter.write(LINE_SEPARATOR);
       myWriter.flush();
 
       synchronized (myOutputBuffer) {
@@ -80,7 +85,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
         synchronized (myErrorBuffer) {
           waitForError();
 
-          final TheRExecutionResult result = calculate(myOutputBuffer, myErrorBuffer.toString());
+          final TheRExecutionResult result = myResultCalculator.calculate(myOutputBuffer, myErrorBuffer.toString());
 
           myOutputBuffer.setLength(0);
           myErrorBuffer.setLength(0);
@@ -103,7 +108,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
 
     if (!StringUtil.endsWithLineBreak(output)) {
       notifyTextAvailable(
-        TheRDebugConstants.LINE_SEPARATOR,
+        LINE_SEPARATOR,
         ProcessOutputTypes.STDOUT
       );
     }
@@ -115,7 +120,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
 
     if (!StringUtil.endsWithLineBreak(error)) {
       notifyTextAvailable(
-        TheRDebugConstants.LINE_SEPARATOR,
+        LINE_SEPARATOR,
         ProcessOutputTypes.STDERR
       );
     }
@@ -151,7 +156,7 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
     assert myOutputReader != null;
 
     synchronized (myOutputBuffer) {
-      while (myOutputReader.ready() || !isComplete(myOutputBuffer)) {
+      while (myOutputReader.ready() || !myResultCalculator.isComplete(myOutputBuffer)) {
         myOutputBuffer.wait();
       }
     }

@@ -6,31 +6,32 @@ import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static org.junit.Assert.*;
 
-public class TheRExecutionResultCalculatorTest {
+public class TheRExecutionResultCalculatorImplTest {
 
   @NotNull
   private static final String INTELLIJ_THER_X_ENTER = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_ENTER_FUNCTION_SUFFIX;
 
+  @NotNull
+  private static final TheRExecutionResultCalculatorImpl CALCULATOR = new TheRExecutionResultCalculatorImpl();
+
   @Test
   public void completePlus() {
-    assertTrue(isComplete("x <- function() {\n" + PLUS_AND_SPACE));
+    assertTrue(CALCULATOR.isComplete("x <- function() {\n" + PLUS_AND_SPACE));
   }
 
   @Test
   public void completeBrowser() {
-    assertTrue(isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
+    assertTrue(CALCULATOR.isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX + "1" + BROWSE_SUFFIX));
   }
 
   @Test
   public void completeIncomplete() {
-    assertFalse(isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX));
+    assertFalse(CALCULATOR.isComplete("ls()\n[1] \"x\"\n" + BROWSE_PREFIX));
   }
 
   @Test
@@ -362,7 +363,7 @@ public class TheRExecutionResultCalculatorTest {
                      @NotNull final String tail,
                      @NotNull final TheRExecutionResultType expectedType,
                      @NotNull final String expectedResult) {
-    final TheRExecutionResult result = calculate(
+    final TheRExecutionResult result = CALCULATOR.calculate(
       calculateFinalCommand(command, expectedOutput, tail),
       ""
     );
