@@ -3,13 +3,8 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessOutputTypes;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
-import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
@@ -22,15 +17,10 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
-class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheROutputReceiver {
-
-  @NotNull
-  private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
+class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor {
 
   @NotNull
   private final List<String> myInitCommands;
@@ -102,32 +92,6 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
     }
   }
 
-  @Override
-  public void receiveOutput(@NotNull final String output) {
-    notifyTextAvailable(output, ProcessOutputTypes.STDOUT);
-
-    if (!StringUtil.endsWithLineBreak(output)) {
-      notifyTextAvailable(
-        LINE_SEPARATOR,
-        ProcessOutputTypes.STDOUT
-      );
-    }
-  }
-
-  @Override
-  public void receiveError(@NotNull final String error) {
-    notifyTextAvailable(error, ProcessOutputTypes.STDERR);
-
-    if (!StringUtil.endsWithLineBreak(error)) {
-      notifyTextAvailable(
-        LINE_SEPARATOR,
-        ProcessOutputTypes.STDERR
-      );
-    }
-
-    tryFailedImportMessage(error);
-  }
-
   public void start() throws TheRDebuggerException {
     super.startNotify();
 
@@ -169,38 +133,6 @@ class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheR
       while (myErrorReader.ready()) {
         myErrorBuffer.wait();
       }
-    }
-  }
-
-  private void tryFailedImportMessage(@NotNull final String text) {
-    final Matcher matcher = FAILED_IMPORT_PATTERN.matcher(text);
-
-    if (matcher.find()) {
-      final boolean isError = text.startsWith("Error");
-      final String message = "T" + text.substring(matcher.start() + 1);
-      final String title = "PACKAGE LOADING";
-
-      ApplicationManager.getApplication().invokeLater(
-        new Runnable() {
-          @Override
-          public void run() {
-            if (isError) {
-              Messages.showErrorDialog(
-                //getSession().getProject(), TODO [xdbg][update]
-                message,
-                title
-              );
-            }
-            else {
-              Messages.showWarningDialog(
-                //getSession().getProject(), TODO [xdbg][update]
-                message,
-                title
-              );
-            }
-          }
-        }
-      );
     }
   }
 

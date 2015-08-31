@@ -80,7 +80,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       environment,
       createDebugProcessStarter(
         processHandler,
-        createDebugger(processHandler, scriptPath),
+        createDebugger(processHandler, new TheRXOutputReceiver(project, processHandler), scriptPath),
         createResolvingSession(project, scriptPath)
       )
     );
@@ -128,16 +128,18 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRDebugger createDebugger(@NotNull final TheRXProcessHandler processHandler, @NotNull final String scriptPath)
+  private TheRDebugger createDebugger(@NotNull final TheRXProcessHandler processHandler,
+                                      @NotNull final TheRXOutputReceiver outputReceiver,
+                                      @NotNull final String scriptPath)
     throws ExecutionException {
     try {
       return new TheRDebugger(
         processHandler,
         new TheRFunctionDebuggerFactoryImpl(),
-        new TheRVarsLoaderFactoryImpl(processHandler, processHandler),
+        new TheRVarsLoaderFactoryImpl(processHandler, outputReceiver),
         new TheRDebuggerEvaluatorFactoryImpl(),
         new TheRScriptReaderImpl(scriptPath),
-        processHandler,
+        outputReceiver,
         new TheRExpressionHandlerImpl(),
         new TheRValueModifierFactoryImpl(),
         new TheRValueModifierHandlerImpl()
