@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,10 +28,13 @@ import java.util.regex.Pattern;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.calculate;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator.isComplete;
 
-public class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheROutputReceiver {
+class TheRXProcessHandler extends OSProcessHandler implements TheRExecutor, TheROutputReceiver {
 
   @NotNull
   private static final Pattern FAILED_IMPORT_PATTERN = Pattern.compile("there is no package called ‘\\w+’$");
+
+  @NotNull
+  private final List<String> myInitCommands;
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -47,8 +51,11 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRExecuto
   @Nullable
   private Reader myErrorReader;
 
-  public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine) throws ExecutionException {
+  public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine, @NotNull final List<String> initCommands)
+    throws ExecutionException {
     super(commandLine);
+
+    myInitCommands = initCommands;
 
     myOutputBuffer = new StringBuilder();
     myErrorBuffer = new StringBuilder();
@@ -114,6 +121,14 @@ public class TheRXProcessHandler extends OSProcessHandler implements TheRExecuto
     }
 
     tryFailedImportMessage(error);
+  }
+
+  public void start() throws TheRDebuggerException {
+    super.startNotify();
+
+    for (final String initCommand : myInitCommands) {
+      execute(initCommand);
+    }
   }
 
   @NotNull
