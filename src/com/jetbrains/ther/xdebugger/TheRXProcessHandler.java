@@ -129,7 +129,7 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     // reworked version of com.intellij.execution.process.impl.OSProcessManagerImpl#killProcessTree
 
     if (SystemInfo.isUnix) {
-      UnixProcessManager.sendSignalToProcessTree(getProcess(), 15); // sigterm
+      UnixProcessManager.sendSignalToProcessTree(getProcess(), UnixProcessManager.SIGTERM);
     }
     else if (SystemInfo.isWindows) {
       convertToWinProcess(getProcess()).killRecursively(); // TODO [xdbg][check]

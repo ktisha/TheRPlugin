@@ -6,7 +6,6 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.*;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.frame.TheRVar;
@@ -15,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 
 class TheRXStackFrame extends XStackFrame {
 
@@ -79,7 +80,7 @@ class TheRXStackFrame extends XStackFrame {
 
   @Override
   public void customizePresentation(@NotNull final ColoredTextContainer component) {
-    if (myPosition == null || myFrame.getLocation().getFunctionName().equals(TheRDebugConstants.MAIN_FUNCTION_NAME)) {
+    if (myPosition == null || myFrame.getLocation().getFunctionName().equals(MAIN_FUNCTION_NAME)) {
       super.customizePresentation(component);
     }
     else {

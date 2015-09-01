@@ -3,7 +3,6 @@ package com.jetbrains.ther.xdebugger.resolve;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.PsiElementProcessor;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 
 // TODO [xdbg][test]
 class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
@@ -25,7 +26,7 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
     myDocument = document;
 
     myRoot = new TheRXFunctionDescriptor(
-      TheRDebugConstants.MAIN_FUNCTION_NAME,
+      MAIN_FUNCTION_NAME,
       null,
       0,
       Integer.MAX_VALUE

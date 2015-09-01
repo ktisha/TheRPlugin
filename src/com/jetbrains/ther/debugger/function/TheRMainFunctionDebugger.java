@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.TheRScriptReader;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRScriptLine;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -17,6 +16,7 @@ import java.io.IOException;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendOutput;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.isCommentOrSpaces;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
@@ -59,7 +59,7 @@ class TheRMainFunctionDebugger implements TheRFunctionDebugger {
   @Override
   public TheRLocation getLocation() {
     return new TheRLocation(
-      TheRDebugConstants.MAIN_FUNCTION_NAME,
+      MAIN_FUNCTION_NAME,
       getCurrentLineNumber()
     );
   }
