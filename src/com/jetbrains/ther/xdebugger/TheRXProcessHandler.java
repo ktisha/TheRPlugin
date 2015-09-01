@@ -3,6 +3,10 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ColoredProcessHandler;
+import com.intellij.execution.process.RunnerWinProcess;
+import com.intellij.execution.process.UnixProcessManager;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -11,6 +15,7 @@ import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jvnet.winp.WinProcess;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -21,6 +26,9 @@ import java.util.concurrent.Future;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
 class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRXProcessHandler.class);
 
   @NotNull
   private final List<String> myInitCommands;
@@ -116,6 +124,23 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     return new TheRXBaseOutputReader(myErrorReader, sleepingPolicy, myErrorBuffer);
   }
 
+  @Override
+  protected void doDestroyProcess() {
+    // reworked version of com.intellij.execution.process.impl.OSProcessManagerImpl#killProcessTree
+
+    if (SystemInfo.isUnix) {
+      UnixProcessManager.sendSignalToProcessTree(getProcess(), 15); // sigterm
+    }
+    else if (SystemInfo.isWindows) {
+      convertToWinProcess(getProcess()).killRecursively(); // TODO [xdbg][check]
+    }
+    else {
+      LOGGER.warn("Unexpected OS. Process will be destroyed using Java API");
+
+      getProcess().destroy();
+    }
+  }
+
   private void waitForOutput() throws IOException, InterruptedException {
     assert myOutputReader != null;
 
@@ -133,6 +158,18 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
       while (myErrorReader.ready()) {
         myErrorBuffer.wait();
       }
+    }
+  }
+
+  @NotNull
+  private WinProcess convertToWinProcess(@NotNull final Process process) {
+    // copied from com.intellij.execution.process.impl.OSProcessManagerImpl#createWinProcess
+
+    if (process instanceof RunnerWinProcess) {
+      return new WinProcess(((RunnerWinProcess)process).getOriginalProcess());
+    }
+    else {
+      return new WinProcess(process);
     }
   }
 
