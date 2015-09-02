@@ -7,7 +7,6 @@ import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
-import com.jetbrains.ther.debugger.executor.TheRExecutorUtils;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactory;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandler;
@@ -22,7 +21,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SYS_NFRAME_COMMAND;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.PLUS;
+import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
+import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
 public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
@@ -69,6 +73,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   private int myDropFrames;
 
+  private boolean myIsRunning;
+
   public TheRDebugger(@NotNull final TheRExecutor executor,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                       @NotNull final TheRVarsLoaderFactory loaderFactory,
@@ -95,63 +101,16 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     myReturnLineNumber = -1;
     myDropFrames = 1;
-
-    appendDebugger(
-      myDebuggerFactory.getMainFunctionDebugger(
-        myExecutor,
-        this,
-        myOutputReceiver,
-        myScriptReader
-      )
-    );
+    myIsRunning = false;
   }
 
   public boolean advance() throws TheRDebuggerException {
-    topDebugger().advance(); // Don't forget that advance could append new debugger
-
-    while (!topDebugger().hasNext()) {
-      if (myDebuggers.size() == 1) {
-        return false;
-      }
-
-      for (int i = 0; i < myDropFrames; i++) {
-        popDebugger();
-      }
-
-      myDropFrames = 1;
+    if (!myIsRunning) {
+      return startDebugging();
     }
-
-    final TheRLocation topLocation = getTopLocation();
-    final TheRStackFrame lastFrame = myStack.get(myStack.size() - 1);
-
-    myStack.set(
-      myStack.size() - 1,
-      new TheRStackFrame(
-        topLocation,
-        lastFrame.getLoader(),
-        lastFrame.getEvaluator()
-      )
-    );
-
-    return true;
-  }
-
-  @NotNull
-  private TheRLocation getTopLocation() {
-    final TheRFunctionDebugger topDebugger = topDebugger();
-
-    if (myReturnLineNumber != -1) {
-      final TheRLocation result = new TheRLocation(
-        topDebugger.getLocation().getFunctionName(),
-        myReturnLineNumber
-      );
-
-      myReturnLineNumber = -1;
-
-      return result;
+    else {
+      return continueDebugging();
     }
-
-    return topDebugger.getLocation();
   }
 
   @NotNull
@@ -171,6 +130,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @Override
   public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) throws TheRDebuggerException {
     myDebuggers.add(debugger);
+
     myStack.add(
       new TheRStackFrame(
         debugger.getLocation(),
@@ -182,7 +142,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
             myModifierHandler,
             myStack.size()
           ),
-          myStack.isEmpty() ? 0 : loadFrameNumber()
+          loadFrameNumber()
         ),
         myEvaluatorFactory.getEvaluator(
           myExecutor,
@@ -208,6 +168,79 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myDropFrames = number;
   }
 
+  private boolean startDebugging() throws TheRDebuggerException {
+    myIsRunning = true;
+
+    submitMainFunction();
+
+    traceAndDebugFunctions(myExecutor, myOutputReceiver);
+
+    execute(myExecutor, MAIN_FUNCTION_NAME + "()", TheRExecutionResultType.DEBUGGING_IN, myOutputReceiver);
+
+    appendDebugger(
+      myDebuggerFactory.getNotMainFunctionDebugger(
+        myExecutor,
+        this,
+        myOutputReceiver
+      )
+    );
+
+    return topDebugger().hasNext();
+  }
+
+  private boolean continueDebugging() throws TheRDebuggerException {
+    topDebugger().advance(); // Don't forget that advance could append new debugger
+
+    while (!topDebugger().hasNext()) {
+      for (int i = 0; i < myDropFrames; i++) {
+        popDebugger();
+      }
+
+      myDropFrames = 1;
+
+      if (myDebuggers.isEmpty()) {
+        return false;
+      }
+    }
+
+    final TheRLocation topLocation = getTopLocation();
+    final TheRStackFrame lastFrame = myStack.get(myStack.size() - 1);
+
+    myStack.set(
+      myStack.size() - 1,
+      new TheRStackFrame(
+        topLocation,
+        lastFrame.getLoader(),
+        lastFrame.getEvaluator()
+      )
+    );
+
+    return true;
+  }
+
+  private void submitMainFunction() throws TheRDebuggerException {
+    execute(myExecutor, MAIN_FUNCTION_NAME + " <- function() {", PLUS, myOutputReceiver);
+
+    try {
+      myScriptReader.advance();
+
+      while (myScriptReader.getCurrentLine().getNumber() != -1) {
+        final String command = myScriptReader.getCurrentLine().getText();
+
+        assert command != null;
+
+        execute(myExecutor, command, PLUS, myOutputReceiver);
+
+        myScriptReader.advance();
+      }
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
+    }
+
+    execute(myExecutor, "}", EMPTY, myOutputReceiver);
+  }
+
   @NotNull
   private TheRFunctionDebugger topDebugger() {
     return myDebuggers.get(myDebuggers.size() - 1);
@@ -221,9 +254,26 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myModifierHandler.setMaxFrameNumber(myStack.size() - 1);
   }
 
+  @NotNull
+  private TheRLocation getTopLocation() {
+    final TheRFunctionDebugger topDebugger = topDebugger();
+
+    if (myReturnLineNumber != -1) {
+      final TheRLocation result = new TheRLocation(
+        topDebugger.getLocation().getFunctionName(),
+        myReturnLineNumber
+      );
+
+      myReturnLineNumber = -1;
+
+      return result;
+    }
+
+    return topDebugger.getLocation();
+  }
+
   private int loadFrameNumber() throws TheRDebuggerException {
-    final String frameNumber =
-      TheRExecutorUtils.execute(myExecutor, SYS_NFRAME_COMMAND, TheRExecutionResultType.RESPONSE, myOutputReceiver);
+    final String frameNumber = execute(myExecutor, SYS_NFRAME_COMMAND, TheRExecutionResultType.RESPONSE, myOutputReceiver);
 
     return Integer.parseInt(frameNumber.substring("[1] ".length()));
   }

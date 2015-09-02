@@ -12,7 +12,7 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
-final class TheRTraceAndDebugUtils {
+public final class TheRTraceAndDebugUtils {
 
   @NotNull
   private static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +

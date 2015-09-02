@@ -119,9 +119,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
       return null;
     }
 
-    final int result = calculateLineOffset(entry.myDescriptor) + entry.myLine;
-
-    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, result);
+    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, entry.myLine - 1); // convert 1-based to 0-based
   }
 
   private void updateCurrentEntry(final int line) {
@@ -152,14 +150,6 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
     return resolveDescriptor(entries, nextFunctionName);
   }
 
-  private int calculateLineOffset(@NotNull final TheRXFunctionDescriptor descriptor) {
-    if (descriptor.getParent() == null) {
-      return 0;
-    }
-
-    return getEldestNotMainParent(descriptor).getStartLine();
-  }
-
   @Nullable
   private TheRXFunctionDescriptor resolveDescriptor(@NotNull final TheRXResolvingSessionEntry entry,
                                                     @NotNull final String nextFunctionName) {
@@ -185,25 +175,6 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
     }
 
     return result;
-  }
-
-  @NotNull
-  private TheRXFunctionDescriptor getEldestNotMainParent(@NotNull final TheRXFunctionDescriptor descriptor) {
-    TheRXFunctionDescriptor current = descriptor;
-
-    // 1. Method is called with descriptor which holds any function except `MAIN_FUNCTION`.
-    // 2. There is only one descriptor which has `null` parent. This descriptor is root and it holds `MAIN_FUNCTION`.
-    // Conclusion: current.getParent() can't return `null` here.
-
-    assert current.getParent() != null;
-
-    while (current.getParent().getParent() != null) {
-      current = current.getParent();
-
-      assert current.getParent() != null;
-    }
-
-    return current;
   }
 
   private static class TheRXResolvingSessionEntry {

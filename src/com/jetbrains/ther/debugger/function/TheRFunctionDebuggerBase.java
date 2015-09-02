@@ -172,7 +172,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final int lineNumberBegin = index + DEBUG_AT.length();
     final int lineNumberEnd = text.indexOf(':', lineNumberBegin + 1);
 
-    return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1;
+    return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
   }
 
   private int findNextLineAfterResultBegin(@NotNull final TheRExecutionResult result) {
