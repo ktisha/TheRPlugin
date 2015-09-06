@@ -11,7 +11,10 @@ import com.jetbrains.ther.debugger.executor.TheRExecutorUtilsTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImplTest;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierImplTest;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderImplTest;
-import com.jetbrains.ther.debugger.function.*;
+import com.jetbrains.ther.debugger.function.TheRBraceFunctionDebuggerTest;
+import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImplTest;
+import com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest;
+import com.jetbrains.ther.debugger.function.TheRUnbraceFunctionDebuggerTest;
 import com.jetbrains.ther.inspections.TheRTypeCheckerInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspectionTest;
 import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
@@ -66,9 +69,8 @@ public class TheRTestSuite extends TestCase {
 
     // function package
     addJUnit4Test(suite, TheRFunctionDebuggerFactoryImplTest.class);
-    addJUnit4Test(suite, TheRMainFunctionDebuggerTest.class);
-    addJUnit4Test(suite, TheRNotMainBraceFunctionDebuggerTest.class);
-    addJUnit4Test(suite, TheRNotMainUnbraceFunctionDebuggerTest.class);
+    addJUnit4Test(suite, TheRBraceFunctionDebuggerTest.class);
+    addJUnit4Test(suite, TheRUnbraceFunctionDebuggerTest.class);
     addJUnit4Test(suite, TheRTraceAndDebugUtilsTest.class);
 
     // interpreter package

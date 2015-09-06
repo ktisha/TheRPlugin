@@ -25,7 +25,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
   public void braceFunction() throws TheRDebuggerException {
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
-    final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
+    final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getFunctionDebugger(
       new BraceTheRExecutor(),
       new IllegalTheRFunctionDebuggerHandler(),
       outputReceiver
@@ -42,7 +42,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
   public void unbraceFunction() throws TheRDebuggerException {
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
-    final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
+    final TheRFunctionDebugger debugger = new TheRFunctionDebuggerFactoryImpl().getFunctionDebugger(
       new UnbraceTheRExecutor(),
       new IllegalTheRFunctionDebuggerHandler(),
       outputReceiver
@@ -59,7 +59,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
   public void unexpectedResult() throws TheRDebuggerException {
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
-    new TheRFunctionDebuggerFactoryImpl().getNotMainFunctionDebugger(
+    new TheRFunctionDebuggerFactoryImpl().getFunctionDebugger(
       new UnexpectedResultTheRExecutor(),
       new IllegalTheRFunctionDebuggerHandler(),
       outputReceiver

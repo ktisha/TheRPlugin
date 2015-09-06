@@ -26,12 +26,11 @@ public class TheRValueModifierImplTest {
       ""
     );
 
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(false);
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       0
@@ -46,8 +45,6 @@ public class TheRValueModifierImplTest {
     }
 
     assertEquals(0, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
   }
 
@@ -60,13 +57,12 @@ public class TheRValueModifierImplTest {
       "error"
     );
 
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       receiver,
       handler,
       0
@@ -81,8 +77,6 @@ public class TheRValueModifierImplTest {
     }
 
     assertEquals(1, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);
@@ -97,14 +91,13 @@ public class TheRValueModifierImplTest {
       "error"
     );
 
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final ErrorListener listener = new ErrorListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       receiver,
       handler,
       0
@@ -113,8 +106,6 @@ public class TheRValueModifierImplTest {
     modifier.setValue("name", "value", listener);
 
     assertEquals(1, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);
@@ -124,13 +115,12 @@ public class TheRValueModifierImplTest {
   @Test
   public void exceptionDuringExecution() {
     final ExceptionDuringExecutionTheRExecutor executor = new ExceptionDuringExecutionTheRExecutor();
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final ExceptionListener listener = new ExceptionListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       0
@@ -139,8 +129,6 @@ public class TheRValueModifierImplTest {
     modifier.setValue("name", "value", listener);
 
     assertEquals(1, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
     assertEquals(1, listener.myCounter);
   }
@@ -154,13 +142,12 @@ public class TheRValueModifierImplTest {
       ""
     );
 
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final SuccessListener listener = new SuccessListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       0
@@ -169,8 +156,6 @@ public class TheRValueModifierImplTest {
     modifier.setValue("name", "value", listener);
 
     assertEquals(1, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(1, handler.myCounter);
     assertEquals(1, listener.myCounter);
   }
@@ -179,14 +164,13 @@ public class TheRValueModifierImplTest {
   public void inDebugExpression() {
     final InDebugTheRExecutor executor = new InDebugTheRExecutor();
 
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(null, null);
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
     final SuccessListener listener = new SuccessListener();
 
     final TheRValueModifierImpl modifier = new TheRValueModifierImpl(
       executor,
-      factory,
+      new MockTheRFunctionDebuggerFactory(null),
       receiver,
       handler,
       0
@@ -195,8 +179,6 @@ public class TheRValueModifierImplTest {
     modifier.setValue("name", "value", listener);
 
     assertEquals(2, executor.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(0, factory.getNotMainCounter());
     assertEquals(Collections.singletonList("abc"), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);
@@ -215,7 +197,7 @@ public class TheRValueModifierImplTest {
     );
 
     final MockTheRFunctionDebugger debugger = new MockTheRFunctionDebugger("def", 2);
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);
     final SuccessListener listener = new SuccessListener();
@@ -232,8 +214,7 @@ public class TheRValueModifierImplTest {
 
     assertEquals(1, executor.getCounter());
     assertEquals(2, debugger.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(1, factory.getNotMainCounter());
+    assertEquals(1, factory.getCounter());
     assertEquals(Collections.singletonList(error), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);

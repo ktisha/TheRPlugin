@@ -28,7 +28,7 @@ public class TheRForcedFunctionDebuggerHandler implements TheRFunctionDebuggerHa
     myDropFrames = 1;
 
     appendDebugger(
-      factory.getNotMainFunctionDebugger(
+      factory.getFunctionDebugger(
         executor,
         this,
         receiver

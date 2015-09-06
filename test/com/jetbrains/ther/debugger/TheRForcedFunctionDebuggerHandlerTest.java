@@ -26,7 +26,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final String result = "[1] 1 2 3";
 
     final Stack1TheRFunctionDebugger debugger = new Stack1TheRFunctionDebugger();
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
@@ -40,8 +40,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     }
 
     assertEquals(1, debugger.getCounter());
-    assertEquals(1, factory.getNotMainCounter());
-    assertEquals(0, factory.getMainCounter());
+    assertEquals(1, factory.getCounter());
     assertTrue(receiver.getErrors().isEmpty());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(result, handler.getResult());
@@ -64,7 +63,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack211TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
@@ -79,8 +78,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(1, factory.getNotMainCounter());
+    assertEquals(1, factory.getCounter());
     assertTrue(receiver.getErrors().isEmpty());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(result, handler.getResult());
@@ -102,7 +100,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack222TheRFunctionDebugger();
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack221TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
@@ -117,8 +115,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(1, factory.getNotMainCounter());
+    assertEquals(1, factory.getCounter());
     assertTrue(receiver.getErrors().isEmpty());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(result, handler.getResult());
@@ -145,7 +142,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack33TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack32TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack31TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
@@ -161,8 +158,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(1, factory.getNotMainCounter());
+    assertEquals(1, factory.getCounter());
     assertTrue(receiver.getErrors().isEmpty());
     assertTrue(receiver.getOutputs().isEmpty());
     assertEquals(result, handler.getResult());

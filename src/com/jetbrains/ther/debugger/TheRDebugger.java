@@ -178,7 +178,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     execute(myExecutor, MAIN_FUNCTION_NAME + "()", TheRExecutionResultType.DEBUGGING_IN, myOutputReceiver);
 
     appendDebugger(
-      myDebuggerFactory.getNotMainFunctionDebugger(
+      myDebuggerFactory.getFunctionDebugger(
         myExecutor,
         this,
         myOutputReceiver

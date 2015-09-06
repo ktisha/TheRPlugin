@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
-class TheRNotMainUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
+class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
 
-  public TheRNotMainUnbraceFunctionDebugger(@NotNull final TheRExecutor executor,
-                                            @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
-                                            @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                            @NotNull final TheROutputReceiver outputReceiver,
-                                            @NotNull final String functionName) throws TheRDebuggerException {
+  public TheRUnbraceFunctionDebugger(@NotNull final TheRExecutor executor,
+                                     @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
+                                     @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                     @NotNull final TheROutputReceiver outputReceiver,
+                                     @NotNull final String functionName) throws TheRDebuggerException {
     super(executor, debuggerFactory, debuggerHandler, outputReceiver, functionName);
   }
 

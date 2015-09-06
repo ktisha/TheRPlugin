@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.TheRScriptReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
@@ -20,9 +19,9 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
 
   @NotNull
   @Override
-  public TheRFunctionDebugger getNotMainFunctionDebugger(@NotNull final TheRExecutor executor,
-                                                         @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                         @NotNull final TheROutputReceiver outputReceiver)
+  public TheRFunctionDebugger getFunctionDebugger(@NotNull final TheRExecutor executor,
+                                                  @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
+                                                  @NotNull final TheROutputReceiver outputReceiver)
     throws TheRDebuggerException {
     execute(executor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT, outputReceiver);
 
@@ -30,7 +29,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
 
     switch (startTraceResult.getType()) {
       case START_TRACE_BRACE:
-        return new TheRNotMainBraceFunctionDebugger(
+        return new TheRBraceFunctionDebugger(
           executor,
           this,
           debuggerHandler,
@@ -39,7 +38,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
         );
 
       case START_TRACE_UNBRACE:
-        return new TheRNotMainUnbraceFunctionDebugger(
+        return new TheRUnbraceFunctionDebugger(
           executor,
           this,
           debuggerHandler,
@@ -56,17 +55,6 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           "]"
         );
     }
-  }
-
-  @NotNull
-  @Override
-  public TheRFunctionDebugger getMainFunctionDebugger(@NotNull final TheRExecutor executor,
-                                                      @NotNull final TheRFunctionDebuggerHandler debuggerHandler,
-                                                      @NotNull final TheROutputReceiver outputReceiver,
-                                                      @NotNull final TheRScriptReader scriptReader) {
-    return new TheRMainFunctionDebugger(
-      executor, this, debuggerHandler, outputReceiver, scriptReader
-    );
   }
 
   @NotNull

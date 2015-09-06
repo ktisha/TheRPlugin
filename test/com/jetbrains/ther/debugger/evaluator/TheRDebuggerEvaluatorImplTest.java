@@ -33,7 +33,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       1
@@ -63,7 +63,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       1
@@ -88,7 +88,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       new IllegalTheROutputReceiver(),
       handler,
       1
@@ -122,7 +122,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       outputReceiver,
       handler,
       1
@@ -151,7 +151,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       outputReceiver,
       handler,
       1
@@ -195,7 +195,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorImpl evaluator = new TheRDebuggerEvaluatorImpl(
       executor,
-      new MockTheRFunctionDebuggerFactory(null, null),
+      new MockTheRFunctionDebuggerFactory(null),
       outputReceiver,
       handler,
       1
@@ -227,7 +227,7 @@ public class TheRDebuggerEvaluatorImplTest {
     );
 
     final MyFunctionDebugger debugger = new MyFunctionDebugger();
-    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger, null);
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger);
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
     final MockTheRExpressionHandler handler = new MockTheRExpressionHandler();
 
@@ -245,8 +245,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(1, executor.getCounter());
     assertEquals(2, debugger.getCounter());
-    assertEquals(0, factory.getMainCounter());
-    assertEquals(1, factory.getNotMainCounter());
+    assertEquals(1, factory.getCounter());
     assertEquals(1, receiver.getCounter());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());

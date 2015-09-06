@@ -37,7 +37,7 @@ public class TheRDebuggerTest {
 
     final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger functionDebugger = new MockTheRFunctionDebugger(MAIN_FUNCTION_NAME, 2);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, functionDebugger);
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(functionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
@@ -60,8 +60,7 @@ public class TheRDebuggerTest {
 
     assertEquals(0, executor.getCounter());
     assertEquals(0, functionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -77,8 +76,7 @@ public class TheRDebuggerTest {
 
     assertEquals(0, executor.getCounter());
     assertEquals(1, functionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -94,8 +92,7 @@ public class TheRDebuggerTest {
 
     assertEquals(0, executor.getCounter());
     assertEquals(2, functionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -111,8 +108,7 @@ public class TheRDebuggerTest {
 
     assertEquals(0, executor.getCounter());
     assertEquals(2, functionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
@@ -141,7 +137,7 @@ public class TheRDebuggerTest {
     final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
     final Stack21TheRFunctionDebugger firstFunctionDebugger = new Stack21TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, firstFunctionDebugger);
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
@@ -165,8 +161,7 @@ public class TheRDebuggerTest {
     assertEquals(0, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -183,8 +178,7 @@ public class TheRDebuggerTest {
     assertEquals(0, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -201,8 +195,7 @@ public class TheRDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -220,8 +213,7 @@ public class TheRDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -239,8 +231,7 @@ public class TheRDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -257,8 +248,7 @@ public class TheRDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -275,8 +265,7 @@ public class TheRDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
@@ -310,7 +299,7 @@ public class TheRDebuggerTest {
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack313TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack312TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack311TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, firstFunctionDebugger);
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
@@ -335,8 +324,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -354,8 +342,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -373,8 +360,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -393,8 +379,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -413,8 +398,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -434,8 +418,7 @@ public class TheRDebuggerTest {
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -455,8 +438,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -475,8 +457,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -494,8 +475,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -513,8 +493,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
@@ -547,7 +526,7 @@ public class TheRDebuggerTest {
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack323TheRFunctionDebugger();
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack322TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack321TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, firstFunctionDebugger);
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
@@ -572,8 +551,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -591,8 +569,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -610,8 +587,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -630,8 +606,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -650,8 +625,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -671,8 +645,7 @@ public class TheRDebuggerTest {
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -692,8 +665,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -711,8 +683,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -730,8 +701,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
@@ -769,7 +739,7 @@ public class TheRDebuggerTest {
     final MockTheRFunctionDebugger thirdFunctionDebugger = new Stack43TheRFunctionDebugger(fourthFunctionDebugger);
     final MockTheRFunctionDebugger secondFunctionDebugger = new Stack42TheRFunctionDebugger(thirdFunctionDebugger);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack41TheRFunctionDebugger(secondFunctionDebugger);
-    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(null, firstFunctionDebugger);
+    final MockTheRFunctionDebuggerFactory debuggerFactory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
     final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
     final MockTheRScriptReader reader = new MockTheRScriptReader();
@@ -795,8 +765,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(0, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -815,8 +784,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(1, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(1, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -835,8 +803,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(0, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -856,8 +823,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(1, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(0, loaderFactory.myCounter);
     assertEquals(2, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -877,8 +843,7 @@ public class TheRDebuggerTest {
     assertEquals(0, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -899,8 +864,7 @@ public class TheRDebuggerTest {
     assertEquals(1, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(1, loaderFactory.myCounter);
     assertEquals(3, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -921,8 +885,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -944,8 +907,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -967,8 +929,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -988,8 +949,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -1008,8 +968,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertFalse(reader.myIsClosed);
@@ -1028,8 +987,7 @@ public class TheRDebuggerTest {
     assertEquals(2, thirdFunctionDebugger.getCounter());
     assertEquals(3, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
-    assertEquals(0, debuggerFactory.getNotMainCounter());
-    assertEquals(1, debuggerFactory.getMainCounter());
+    assertEquals(1, debuggerFactory.getCounter());
     assertEquals(3, loaderFactory.myCounter);
     assertEquals(4, evaluatorFactory.myCounter);
     assertTrue(reader.myIsClosed);
