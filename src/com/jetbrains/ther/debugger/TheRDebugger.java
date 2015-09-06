@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
@@ -21,10 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SYS_NFRAME_COMMAND;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.PLUS;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
@@ -175,6 +174,10 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     traceAndDebugFunctions(myExecutor, myOutputReceiver);
 
+    if (isMainFunctionEmpty()) {
+      return false;
+    }
+
     execute(myExecutor, MAIN_FUNCTION_NAME + "()", TheRExecutionResultType.DEBUGGING_IN, myOutputReceiver);
 
     appendDebugger(
@@ -216,6 +219,12 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     );
 
     return true;
+  }
+
+  private int loadFrameNumber() throws TheRDebuggerException {
+    final String frameNumber = execute(myExecutor, SYS_NFRAME_COMMAND, TheRExecutionResultType.RESPONSE, myOutputReceiver);
+
+    return Integer.parseInt(frameNumber.substring("[1] ".length()));
   }
 
   private void submitMainFunction() throws TheRDebuggerException {
@@ -272,9 +281,9 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     return topDebugger.getLocation();
   }
 
-  private int loadFrameNumber() throws TheRDebuggerException {
-    final String frameNumber = execute(myExecutor, SYS_NFRAME_COMMAND, TheRExecutionResultType.RESPONSE, myOutputReceiver);
+  private boolean isMainFunctionEmpty() throws TheRDebuggerException {
+    final String collapsedMainFunction = execute(myExecutor, BODY_COMMAND + "(" + MAIN_FUNCTION_NAME + ")", RESPONSE, myOutputReceiver);
 
-    return Integer.parseInt(frameNumber.substring("[1] ".length()));
+    return StringUtil.countNewLines(collapsedMainFunction) < 5;
   }
 }
