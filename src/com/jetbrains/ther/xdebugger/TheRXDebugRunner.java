@@ -73,7 +73,10 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         project.getBasePath()
       ),
       TheRProcessUtils.getInitCommands(),
-      new TheRExecutionResultCalculatorImpl()
+      new TheRExecutionResultCalculatorImpl(),
+      false,
+      false,
+      false
     );
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(

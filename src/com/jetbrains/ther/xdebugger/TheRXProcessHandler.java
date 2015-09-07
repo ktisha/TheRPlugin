@@ -3,15 +3,18 @@ package com.jetbrains.ther.xdebugger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ColoredProcessHandler;
+import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.process.RunnerWinProcess;
 import com.intellij.execution.process.UnixProcessManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.io.BaseDataReader;
 import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,10 +34,17 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
   private static final Logger LOGGER = Logger.getInstance(TheRXProcessHandler.class);
 
   @NotNull
+  private static final Key SERVICE_KEY = ProcessOutputTypes.STDERR;
+
+  @NotNull
   private final List<String> myInitCommands;
 
   @NotNull
   private final TheRExecutionResultCalculator myResultCalculator;
+
+  private final boolean myPrintIn;
+  private final boolean myPrintOut;
+  private final boolean myPrintErr;
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -51,14 +61,23 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
   @Nullable
   private Reader myErrorReader;
 
+  private int myExecuteCounter;
+
   public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine,
                              @NotNull final List<String> initCommands,
-                             @NotNull final TheRExecutionResultCalculator resultCalculator)
+                             @NotNull final TheRExecutionResultCalculator resultCalculator,
+                             final boolean printIn,
+                             final boolean printOut,
+                             final boolean printErr)
     throws ExecutionException {
     super(commandLine);
 
     myInitCommands = initCommands;
     myResultCalculator = resultCalculator;
+
+    myPrintIn = printIn;
+    myPrintOut = printOut;
+    myPrintErr = printErr;
 
     myOutputBuffer = new StringBuilder();
     myErrorBuffer = new StringBuilder();
@@ -67,6 +86,7 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
 
     myOutputReader = null;
     myErrorReader = null;
+    myExecuteCounter = 0;
   }
 
   @NotNull
@@ -84,6 +104,10 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
           waitForError();
 
           final TheRExecutionResult result = myResultCalculator.calculate(myOutputBuffer, myErrorBuffer.toString());
+
+          myExecuteCounter++;
+
+          printInputAndOutput(command, result);
 
           myOutputBuffer.setLength(0);
           myErrorBuffer.setLength(0);
@@ -161,6 +185,25 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     }
   }
 
+  private void printInputAndOutput(@NotNull final String command, @NotNull final TheRExecutionResult result) {
+    if (myPrintIn) {
+      printInputOrOutput("COMMAND", command);
+    }
+
+    if (myPrintOut) {
+      printInputOrOutput("TYPE", result.getType().toString());
+      printInputOrOutput("OUTPUT", result.getOutput());
+
+      if (result.getType() != TheRExecutionResultType.RESPONSE && !result.getResultRange().isEmpty()) {
+        printInputOrOutput("RESULT", result.getResultRange().substring(result.getOutput()));
+      }
+    }
+
+    if (myPrintErr && !result.getError().isEmpty()) {
+      printInputOrOutput("ERROR", result.getError());
+    }
+  }
+
   @NotNull
   private WinProcess convertToWinProcess(@NotNull final Process process) {
     // copied from com.intellij.execution.process.impl.OSProcessManagerImpl#createWinProcess
@@ -171,6 +214,15 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     else {
       return new WinProcess(process);
     }
+  }
+
+  private void printInputOrOutput(@NotNull final String title, @NotNull final String message) {
+    notifyTextAvailable(title, SERVICE_KEY);
+    notifyTextAvailable(" #", SERVICE_KEY);
+    notifyTextAvailable(Integer.toString(myExecuteCounter), SERVICE_KEY);
+    notifyTextAvailable(":\n", SERVICE_KEY);
+    notifyTextAvailable(message, SERVICE_KEY);
+    notifyTextAvailable("\n\n", SERVICE_KEY);
   }
 
   private class TheRXBaseOutputReader extends BaseOutputReader {
