@@ -6,6 +6,7 @@ import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
@@ -162,6 +163,12 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myCurrentLineNumber = -1;
 
     myDebuggerHandler.setDropFrames(data.myExitingFromCount);
+  }
+
+  protected void handleEmpty(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
+    appendError(result, myOutputReceiver);
+
+    throw new TheRRuntimeException(result.getError());
   }
 
   protected void setCurrentLineNumber(final int currentLineNumber) {

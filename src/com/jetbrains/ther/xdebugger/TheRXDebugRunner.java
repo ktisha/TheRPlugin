@@ -79,11 +79,14 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       false
     );
 
+    final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
+
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
         processHandler,
-        createDebugger(processHandler, new TheRXOutputReceiver(project, processHandler), scriptPath),
+        createDebugger(processHandler, outputReceiver, scriptPath),
+        outputReceiver,
         createResolvingSession(project, scriptPath)
       )
     );
@@ -107,6 +110,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRXProcessHandler processHandler,
                                                          @NotNull final TheRDebugger debugger,
+                                                         @NotNull final TheRXOutputReceiver outputReceiver,
                                                          @NotNull final TheRXResolvingSession resolvingSession) {
     return new XDebugProcessStarter() {
       @NotNull
@@ -116,6 +120,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
           session,
           processHandler,
           debugger,
+          outputReceiver,
           resolvingSession,
           ConcurrencyUtil.newSingleThreadExecutor("TheRDebuggerBackground")
         );

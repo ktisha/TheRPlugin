@@ -35,13 +35,16 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case CONTINUE_TRACE:
         handleContinueTrace(result);
         break;
+      case EMPTY:
+        handleEmpty(result);
+        break;
       default:
         throw new TheRUnexpectedExecutionResultException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
           "expected: " +
-          "[" + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + ", " + CONTINUE_TRACE + "]" +
+          "[" + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + ", " + CONTINUE_TRACE + ", " + EMPTY + "]" +
           "]"
         );
     }

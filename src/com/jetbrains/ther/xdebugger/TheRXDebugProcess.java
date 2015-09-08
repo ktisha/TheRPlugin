@@ -19,6 +19,7 @@ import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.xdebugger.stack.TheRXStack;
@@ -41,6 +42,9 @@ class TheRXDebugProcess extends XDebugProcess {
   private final TheRDebugger myDebugger;
 
   @NotNull
+  private final TheRXOutputReceiver myOutputReceiver;
+
+  @NotNull
   private final TheRXStack myStack;
 
   @NotNull
@@ -58,6 +62,7 @@ class TheRXDebugProcess extends XDebugProcess {
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRXProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
+                           @NotNull final TheRXOutputReceiver outputReceiver,
                            @NotNull final TheRXResolvingSession resolvingSession,
                            @NotNull final ExecutorService executor) {
     super(session);
@@ -65,6 +70,7 @@ class TheRXDebugProcess extends XDebugProcess {
     myProcessHandler = processHandler;
 
     myDebugger = debugger;
+    myOutputReceiver = outputReceiver;
     myStack = new TheRXStack(myDebugger.getStack(), resolvingSession, executor);
     myExecutor = executor;
 
@@ -123,7 +129,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            logException(e);
+            handleException(e);
           }
         }
       }
@@ -144,7 +150,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            logException(e);
+            handleException(e);
           }
         }
       }
@@ -171,7 +177,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            logException(e);
+            handleException(e);
           }
         }
       }
@@ -195,7 +201,7 @@ class TheRXDebugProcess extends XDebugProcess {
             showDebugInformation();
           }
           catch (final TheRDebuggerException e) {
-            logException(e);
+            handleException(e);
           }
         }
       }
@@ -267,7 +273,17 @@ class TheRXDebugProcess extends XDebugProcess {
     }
   }
 
-  private void logException(@NotNull final TheRDebuggerException e) {
+  private void handleException(@NotNull final TheRDebuggerException e) {
+    if (e instanceof TheRRuntimeException) {
+      if (e.getMessage().isEmpty()) { // sometimes error message couldn't be loaded in time
+        myOutputReceiver.receiveError("Debug has been interrupted because of runtime error");
+      }
+
+      getSession().stop();
+
+      return;
+    }
+
     if (myExecutor.isShutdown() && e.getCause() instanceof InterruptedException) {
       return;
     }

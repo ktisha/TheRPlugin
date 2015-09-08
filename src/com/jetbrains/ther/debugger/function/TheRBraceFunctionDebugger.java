@@ -38,13 +38,28 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case RECURSIVE_EXITING_FROM:
         handleRecursiveEndTrace(result);
         break;
+      case EMPTY:
+        handleEmpty(result);
+        break;
       default:
         throw new TheRUnexpectedExecutionResultException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
           "expected: " +
-          "[" + DEBUG_AT + ", " + CONTINUE_TRACE + ", " + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + "]" +
+          "[" +
+          DEBUG_AT +
+          ", " +
+          CONTINUE_TRACE +
+          ", " +
+          EXITING_FROM +
+          ", " +
+          DEBUGGING_IN +
+          ", " +
+          RECURSIVE_EXITING_FROM +
+          ", " +
+          EMPTY +
+          "]" +
           "]"
         );
     }
