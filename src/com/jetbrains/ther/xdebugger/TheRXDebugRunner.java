@@ -79,7 +79,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     );
 
     final Project project = environment.getProject();
-    final String scriptPath = runConfiguration.getScriptName();
+    final String scriptPath = runConfiguration.getScriptPath();
 
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 

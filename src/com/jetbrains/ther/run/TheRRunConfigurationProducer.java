@@ -29,7 +29,7 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
 
     final VirtualFile vFile = script.getVirtualFile();
     if (vFile == null) return false;
-    configuration.setScriptName(vFile.getPath());
+    configuration.setScriptPath(vFile.getPath());
     configuration.setName(configuration.suggestedName());
     return true;
   }
@@ -43,9 +43,9 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
     final VirtualFile virtualFile = script.getVirtualFile();
     if (virtualFile == null) return false;
     if (virtualFile instanceof LightVirtualFile) return false;
-    final String scriptName = configuration.getScriptName();
+    final String scriptPath = configuration.getScriptPath();
     final String path = virtualFile.getPath();
-    return scriptName.equals(path);
+    return scriptPath.equals(path);
   }
 
   private static boolean isAvailable(@Nullable final PsiFile script) {

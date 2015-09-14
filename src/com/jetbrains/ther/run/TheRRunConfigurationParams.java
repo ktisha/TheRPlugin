@@ -7,9 +7,9 @@ import java.util.Map;
 public interface TheRRunConfigurationParams {
 
   @NotNull
-  String getScriptName();
+  String getScriptPath();
 
-  void setScriptName(@NotNull final String scriptName);
+  void setScriptPath(@NotNull final String scriptPath);
 
   @NotNull
   String getScriptParameters();

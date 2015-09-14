@@ -32,7 +32,7 @@ import java.util.Map;
 public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
 
   @NotNull
-  private static final String SCRIPT_NAME = "SCRIPT_NAME";
+  private static final String SCRIPT_PATH = "SCRIPT_PATH";
 
   @NotNull
   private static final String SCRIPT_PARAMETERS = "SCRIPT_PARAMETERS";
@@ -44,7 +44,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private static final String PARENT_ENVS = "PARENT_ENVS";
 
   @NotNull
-  private String myScriptName;
+  private String myScriptPath;
 
   @NotNull
   private String myScriptParameters;
@@ -55,7 +55,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   protected TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
     super(project, configurationFactory);
 
-    myScriptName = "";
+    myScriptPath = "";
     myScriptParameters = "";
     myWorkingDirectory = "";
   }
@@ -75,7 +75,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   public void checkConfiguration() throws RuntimeConfigurationException {
     super.checkConfiguration();
 
-    if (StringUtil.isEmptyOrSpaces(myScriptName)) {
+    if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
       throw new RuntimeConfigurationException("No script specified");
     }
   }
@@ -83,11 +83,11 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   @Nullable
   @Override
   public String suggestedName() {
-    if (StringUtil.isEmptyOrSpaces(myScriptName)) {
+    if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
       return null;
     }
 
-    final String name = new File(myScriptName).getName();
+    final String name = new File(myScriptPath).getName();
     final String extension = TheRFileType.INSTANCE.getDefaultExtension();
     final int dotIndex = name.length() - extension.length() - 1;
 
@@ -100,13 +100,13 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
   @NotNull
   @Override
-  public String getScriptName() {
-    return myScriptName;
+  public String getScriptPath() {
+    return myScriptPath;
   }
 
   @Override
-  public void setScriptName(@NotNull final String scriptName) {
-    myScriptName = scriptName;
+  public void setScriptPath(@NotNull final String scriptPath) {
+    myScriptPath = scriptPath;
   }
 
   @NotNull
@@ -154,7 +154,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
     super.readExternal(element);
 
-    myScriptName = JDOMExternalizerUtil.readField(element, SCRIPT_NAME, "");
+    myScriptPath = JDOMExternalizerUtil.readField(element, SCRIPT_PATH, "");
     myScriptParameters = JDOMExternalizerUtil.readField(element, SCRIPT_PARAMETERS, "");
     myWorkingDirectory = JDOMExternalizerUtil.readField(element, WORKING_DIRECTORY, "");
 
@@ -165,7 +165,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   public void writeExternal(@NotNull final Element element) throws WriteExternalException {
     super.writeExternal(element);
 
-    JDOMExternalizerUtil.writeField(element, SCRIPT_NAME, myScriptName);
+    JDOMExternalizerUtil.writeField(element, SCRIPT_PATH, myScriptPath);
     JDOMExternalizerUtil.writeField(element, SCRIPT_PARAMETERS, myScriptParameters);
     JDOMExternalizerUtil.writeField(element, WORKING_DIRECTORY, myWorkingDirectory);
 
@@ -175,7 +175,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   }
 
   public static void copyParams(@NotNull final TheRRunConfigurationParams source, @NotNull final TheRRunConfigurationParams target) {
-    target.setScriptName(source.getScriptName());
+    target.setScriptPath(source.getScriptPath());
     target.setScriptParameters(source.getScriptParameters());
     target.setWorkingDirectory(source.getWorkingDirectory());
     target.setPassParentEnvs(source.isPassParentEnvs());

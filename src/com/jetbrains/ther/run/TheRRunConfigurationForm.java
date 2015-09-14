@@ -37,13 +37,13 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   @NotNull
   @Override
-  public String getScriptName() {
+  public String getScriptPath() {
     return getPath(myScriptTextField);
   }
 
   @Override
-  public void setScriptName(@NotNull final String scriptName) {
-    setPath(scriptName, myScriptTextField);
+  public void setScriptPath(@NotNull final String scriptPath) {
+    setPath(scriptPath, myScriptTextField);
   }
 
   @NotNull
