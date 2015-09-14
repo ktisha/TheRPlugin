@@ -3,6 +3,7 @@ package com.jetbrains.ther.run;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configuration.AbstractRunConfiguration;
+import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
@@ -17,21 +18,46 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.TheRFileType;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
-  public static final String SCRIPT_NAME = "SCRIPT_NAME";
-  public static final String PARAMETERS = "PARAMETERS";
+
+  @NotNull
+  private static final String SCRIPT_NAME = "SCRIPT_NAME";
+
+  @NotNull
+  private static final String SCRIPT_PARAMETERS = "SCRIPT_PARAMETERS";
+
+  @NotNull
+  private static final String WORKING_DIRECTORY = "WORKING_DIRECTORY";
+
+  @NotNull
+  private static final String PARENT_ENVS = "PARENT_ENVS";
+
+  @NotNull
   private String myScriptName;
+
+  @NotNull
   private String myScriptParameters;
 
-  protected TheRRunConfiguration(Project project, ConfigurationFactory configurationFactory) {
+  @NotNull
+  private String myWorkingDirectory;
+
+  protected TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
     super(project, configurationFactory);
+
+    myScriptName = "";
+    myScriptParameters = "";
+    myWorkingDirectory = "";
   }
 
   @Override
@@ -54,17 +80,25 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     }
   }
 
+  @Nullable
   @Override
   public String suggestedName() {
-    final String scriptName = getScriptName();
-    if (scriptName == null) return null;
-    String name = new File(scriptName).getName();
-    if (StringUtil.endsWithIgnoreCase(name, ".r")) {
-      return name.substring(0, name.length() - 2);
+    if (StringUtil.isEmptyOrSpaces(myScriptName)) {
+      return null;
     }
+
+    final String name = new File(myScriptName).getName();
+    final String extension = TheRFileType.INSTANCE.getDefaultExtension();
+    final int dotIndex = name.length() - extension.length() - 1;
+
+    if (StringUtil.endsWithIgnoreCase(name, extension) && name.charAt(dotIndex) == '.') {
+      return name.substring(0, dotIndex);
+    }
+
     return name;
   }
 
+  @NotNull
   @Override
   public String getScriptName() {
     return myScriptName;
@@ -75,6 +109,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     myScriptName = scriptName;
   }
 
+  @NotNull
   @Override
   public String getScriptParameters() {
     return myScriptParameters;
@@ -85,30 +120,81 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     myScriptParameters = scriptParameters;
   }
 
+  @NotNull
+  @Override
+  public String getWorkingDirectory() {
+    return myWorkingDirectory;
+  }
+
+  @Override
+  public void setWorkingDirectory(@NotNull final String workingDirectory) {
+    myWorkingDirectory = workingDirectory;
+  }
+
+  @NotNull
+  @Override
+  public Map<String, String> getEnvs() {
+    return super.getEnvs();
+  }
+
+  @Override
+  public void setEnvs(@NotNull final Map<String, String> envs) {
+    super.setEnvs(envs);
+  }
+
+  @NotNull
   @Override
   public Collection<Module> getValidModules() {
     return Arrays.asList(ModuleManager.getInstance(getProject()).getModules());
   }
 
   @Override
-  public void readExternal(Element element) throws InvalidDataException {
+  public void readExternal(@NotNull final Element element) throws InvalidDataException {
     PathMacroManager.getInstance(getProject()).expandPaths(element);
+
     super.readExternal(element);
-    myScriptName = JDOMExternalizerUtil.readField(element, SCRIPT_NAME);
-    myScriptParameters = JDOMExternalizerUtil.readField(element, PARAMETERS);
+
+    myScriptName = JDOMExternalizerUtil.readField(element, SCRIPT_NAME, "");
+    myScriptParameters = JDOMExternalizerUtil.readField(element, SCRIPT_PARAMETERS, "");
+    myWorkingDirectory = JDOMExternalizerUtil.readField(element, WORKING_DIRECTORY, "");
+
+    readEnvs(element);
   }
 
   @Override
-  public void writeExternal(Element element) throws WriteExternalException {
+  public void writeExternal(@NotNull final Element element) throws WriteExternalException {
     super.writeExternal(element);
+
     JDOMExternalizerUtil.writeField(element, SCRIPT_NAME, myScriptName);
-    JDOMExternalizerUtil.writeField(element, PARAMETERS, myScriptParameters);
+    JDOMExternalizerUtil.writeField(element, SCRIPT_PARAMETERS, myScriptParameters);
+    JDOMExternalizerUtil.writeField(element, WORKING_DIRECTORY, myWorkingDirectory);
+
+    writeEnvs(element);
+
     PathMacroManager.getInstance(getProject()).collapsePathsRecursively(element);
   }
 
-  public static void copyParams(TheRRunConfigurationParams source, TheRRunConfigurationParams target) {
+  public static void copyParams(@NotNull final TheRRunConfigurationParams source, @NotNull final TheRRunConfigurationParams target) {
     target.setScriptName(source.getScriptName());
     target.setScriptParameters(source.getScriptParameters());
+    target.setWorkingDirectory(source.getWorkingDirectory());
+    target.setPassParentEnvs(source.isPassParentEnvs());
+    target.setEnvs(new HashMap<String, String>(source.getEnvs()));
   }
 
+  private void readEnvs(@NotNull final Element element) {
+    setPassParentEnvs(
+      Boolean.parseBoolean(
+        JDOMExternalizerUtil.readField(element, PARENT_ENVS, "")
+      )
+    );
+
+    EnvironmentVariablesComponent.readExternal(element, getEnvs());
+  }
+
+  private void writeEnvs(@NotNull final Element element) {
+    JDOMExternalizerUtil.writeField(element, PARENT_ENVS, Boolean.toString(isPassParentEnvs()));
+
+    EnvironmentVariablesComponent.writeExternal(element, getEnvs());
+  }
 }

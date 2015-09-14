@@ -10,9 +10,9 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.ui.RawCommandLineEditor;
 import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Map;
 
 public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
@@ -38,12 +38,12 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
   @NotNull
   @Override
   public String getScriptName() {
-    return FileUtil.toSystemIndependentName(myScriptTextField.getText().trim());
+    return getPath(myScriptTextField);
   }
 
   @Override
-  public void setScriptName(@Nullable final String scriptName) {
-    myScriptTextField.setText(scriptName == null ? "" : FileUtil.toSystemDependentName(scriptName));
+  public void setScriptName(@NotNull final String scriptName) {
+    setPath(scriptName, myScriptTextField);
   }
 
   @NotNull
@@ -55,6 +55,38 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
   @Override
   public void setScriptParameters(@NotNull final String scriptParameters) {
     myScriptParametersTextField.setText(scriptParameters);
+  }
+
+  @NotNull
+  @Override
+  public String getWorkingDirectory() {
+    return getPath(myWorkingDirectoryTextField);
+  }
+
+  @Override
+  public void setWorkingDirectory(@NotNull final String workingDirectory) {
+    setPath(workingDirectory, myWorkingDirectoryTextField);
+  }
+
+  @Override
+  public boolean isPassParentEnvs() {
+    return myEnvsComponent.isPassParentEnvs();
+  }
+
+  @Override
+  public void setPassParentEnvs(final boolean passParentEnvs) {
+    myEnvsComponent.setPassParentEnvs(passParentEnvs);
+  }
+
+  @NotNull
+  @Override
+  public Map<String, String> getEnvs() {
+    return myEnvsComponent.getEnvs();
+  }
+
+  @Override
+  public void setEnvs(@NotNull final Map<String, String> envs) {
+    myEnvsComponent.setEnvs(envs);
   }
 
   private void setupScriptTextField(@NotNull final Project project) {
@@ -82,5 +114,14 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
       project,
       FileChooserDescriptorFactory.createSingleFolderDescriptor()
     );
+  }
+
+  @NotNull
+  private String getPath(@NotNull final TextFieldWithBrowseButton textField) {
+    return FileUtil.toSystemIndependentName(textField.getText().trim());
+  }
+
+  private void setPath(@NotNull final String path, @NotNull final TextFieldWithBrowseButton textField) {
+    textField.setText(FileUtil.toSystemDependentName(path));
   }
 }
