@@ -13,7 +13,9 @@ import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ConcurrencyUtil;
+import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
@@ -31,6 +33,7 @@ import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
+import com.jetbrains.ther.run.TheRRunConfigurationParams;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSessionImpl;
 import org.jetbrains.annotations.NotNull;
@@ -66,20 +69,20 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     FileDocumentManager.getInstance().saveAllDocuments();
 
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
+    final TheRRunConfigurationParams runConfigurationParams = (TheRRunConfigurationParams)environment.getRunProfile();
 
     final TheRXProcessHandler processHandler = new TheRXProcessHandler(
       calculateCommandLine(
         interpreterPath,
-        runConfiguration.getWorkingDirectory()
+        runConfigurationParams
       ),
       TheRProcessUtils.getInitCommands(),
       new TheRExecutionResultCalculatorImpl(),
-      Boolean.parseBoolean(runConfiguration.getEnvs().get(PRINT_IO_KEY))
+      Boolean.parseBoolean(runConfigurationParams.getEnvs().get(PRINT_IO_KEY))
     );
 
     final Project project = environment.getProject();
-    final String scriptPath = runConfiguration.getScriptPath();
+    final String scriptPath = runConfigurationParams.getScriptPath();
 
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
@@ -97,14 +100,20 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private GeneralCommandLine calculateCommandLine(@NotNull final String interpreterPath, @Nullable final String workDir) {
+  private GeneralCommandLine calculateCommandLine(@NotNull final String interpreterPath,
+                                                  @NotNull final TheRRunConfigurationParams runConfigurationParams) {
     final List<String> command = new ArrayList<String>();
     command.add(FileUtil.toSystemDependentName(interpreterPath));
     command.addAll(TheRProcessUtils.getStartOptions());
 
+    if (!StringUtil.isEmptyOrSpaces(runConfigurationParams.getScriptArgs())) {
+      command.add("--args");
+      command.addAll(ParametersListUtil.parse(runConfigurationParams.getScriptArgs()));
+    }
+
     final GeneralCommandLine commandLine = new GeneralCommandLine(command);
 
-    commandLine.withWorkDirectory(workDir);
+    commandLine.withWorkDirectory(runConfigurationParams.getWorkingDirectory());
 
     return commandLine;
   }
