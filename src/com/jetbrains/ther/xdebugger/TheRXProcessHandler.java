@@ -14,7 +14,6 @@ import com.intellij.util.io.BaseOutputReader;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
-import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,9 +41,7 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
   @NotNull
   private final TheRExecutionResultCalculator myResultCalculator;
 
-  private final boolean myPrintIn;
-  private final boolean myPrintOut;
-  private final boolean myPrintErr;
+  private final boolean myPrintIO;
 
   @NotNull
   private final StringBuilder myOutputBuffer;
@@ -66,18 +63,13 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
   public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine,
                              @NotNull final List<String> initCommands,
                              @NotNull final TheRExecutionResultCalculator resultCalculator,
-                             final boolean printIn,
-                             final boolean printOut,
-                             final boolean printErr)
+                             final boolean printIO)
     throws ExecutionException {
     super(commandLine);
 
     myInitCommands = initCommands;
     myResultCalculator = resultCalculator;
-
-    myPrintIn = printIn;
-    myPrintOut = printOut;
-    myPrintErr = printErr;
+    myPrintIO = printIO;
 
     myOutputBuffer = new StringBuilder();
     myErrorBuffer = new StringBuilder();
@@ -107,7 +99,7 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
 
           myExecuteCounter++;
 
-          printInputAndOutput(command, result);
+          printIO(command, result);
 
           myOutputBuffer.setLength(0);
           myErrorBuffer.setLength(0);
@@ -185,22 +177,15 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     }
   }
 
-  private void printInputAndOutput(@NotNull final String command, @NotNull final TheRExecutionResult result) {
-    if (myPrintIn) {
-      printInputOrOutput("COMMAND", command);
-    }
+  private void printIO(@NotNull final String command, @NotNull final TheRExecutionResult result) {
+    if (myPrintIO) {
+      printIO("COMMAND", command);
 
-    if (myPrintOut) {
-      printInputOrOutput("TYPE", result.getType().toString());
-      printInputOrOutput("OUTPUT", result.getOutput());
+      printIO("TYPE", result.getType().toString());
+      printIO("OUTPUT", result.getOutput());
+      printIO("RESULT", result.getResultRange().substring(result.getOutput()));
 
-      if (result.getType() != TheRExecutionResultType.RESPONSE && !result.getResultRange().isEmpty()) {
-        printInputOrOutput("RESULT", result.getResultRange().substring(result.getOutput()));
-      }
-    }
-
-    if (myPrintErr && !result.getError().isEmpty()) {
-      printInputOrOutput("ERROR", result.getError());
+      printIO("ERROR", result.getError());
     }
   }
 
@@ -216,7 +201,7 @@ class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor 
     }
   }
 
-  private void printInputOrOutput(@NotNull final String title, @NotNull final String message) {
+  private void printIO(@NotNull final String title, @NotNull final String message) {
     notifyTextAvailable(title, SERVICE_KEY);
     notifyTextAvailable(" #", SERVICE_KEY);
     notifyTextAvailable(Integer.toString(myExecuteCounter), SERVICE_KEY);

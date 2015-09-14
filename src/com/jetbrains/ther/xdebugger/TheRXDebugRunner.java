@@ -46,6 +46,9 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
 
   @NotNull
+  private static final String PRINT_IO_KEY = "ther.debugger.io";
+
+  @NotNull
   @Override
   public String getRunnerId() {
     return THE_R_DEBUG_RUNNER_ID;
@@ -62,22 +65,21 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     throws ExecutionException {
     FileDocumentManager.getInstance().saveAllDocuments();
 
-    final Project project = environment.getProject();
-
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-    final String scriptPath = ((TheRRunConfiguration)environment.getRunProfile()).getScriptName();
+    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
 
     final TheRXProcessHandler processHandler = new TheRXProcessHandler(
       calculateCommandLine(
         interpreterPath,
-        project.getBasePath()
+        runConfiguration.getWorkingDirectory()
       ),
       TheRProcessUtils.getInitCommands(),
       new TheRExecutionResultCalculatorImpl(),
-      false,
-      false,
-      false
+      Boolean.parseBoolean(runConfiguration.getEnvs().get(PRINT_IO_KEY))
     );
+
+    final Project project = environment.getProject();
+    final String scriptPath = runConfiguration.getScriptName();
 
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
