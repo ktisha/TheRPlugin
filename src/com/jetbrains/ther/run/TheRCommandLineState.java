@@ -66,9 +66,9 @@ public class TheRCommandLineState extends CommandLineState {
     if (!StringUtil.isEmptyOrSpaces(scriptPath)) {
       scriptParameters.addParameter(scriptPath);
     }
-    final String parameters = myConfig.getScriptParameters();
-    if (!StringUtil.isEmptyOrSpaces(parameters)) {
-      scriptParameters.addParametersString("--args " + parameters);
+    final String scriptArgs = myConfig.getScriptArgs();
+    if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
+      scriptParameters.addParametersString("--args " + scriptArgs);
     }
   }
 

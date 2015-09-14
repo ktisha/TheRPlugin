@@ -12,9 +12,9 @@ public interface TheRRunConfigurationParams {
   void setScriptPath(@NotNull final String scriptPath);
 
   @NotNull
-  String getScriptParameters();
+  String getScriptArgs();
 
-  void setScriptParameters(@NotNull final String scriptParameters);
+  void setScriptArgs(@NotNull final String scriptArgs);
 
   @NotNull
   String getWorkingDirectory();

@@ -35,7 +35,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private static final String SCRIPT_PATH = "SCRIPT_PATH";
 
   @NotNull
-  private static final String SCRIPT_PARAMETERS = "SCRIPT_PARAMETERS";
+  private static final String SCRIPT_ARGS = "SCRIPT_ARGS";
 
   @NotNull
   private static final String WORKING_DIRECTORY = "WORKING_DIRECTORY";
@@ -47,7 +47,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private String myScriptPath;
 
   @NotNull
-  private String myScriptParameters;
+  private String myScriptArgs;
 
   @NotNull
   private String myWorkingDirectory;
@@ -56,7 +56,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     super(project, configurationFactory);
 
     myScriptPath = "";
-    myScriptParameters = "";
+    myScriptArgs = "";
     myWorkingDirectory = "";
   }
 
@@ -111,13 +111,13 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
   @NotNull
   @Override
-  public String getScriptParameters() {
-    return myScriptParameters;
+  public String getScriptArgs() {
+    return myScriptArgs;
   }
 
   @Override
-  public void setScriptParameters(@NotNull final String scriptParameters) {
-    myScriptParameters = scriptParameters;
+  public void setScriptArgs(@NotNull final String scriptArgs) {
+    myScriptArgs = scriptArgs;
   }
 
   @NotNull
@@ -155,7 +155,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     super.readExternal(element);
 
     myScriptPath = JDOMExternalizerUtil.readField(element, SCRIPT_PATH, "");
-    myScriptParameters = JDOMExternalizerUtil.readField(element, SCRIPT_PARAMETERS, "");
+    myScriptArgs = JDOMExternalizerUtil.readField(element, SCRIPT_ARGS, "");
     myWorkingDirectory = JDOMExternalizerUtil.readField(element, WORKING_DIRECTORY, "");
 
     readEnvs(element);
@@ -166,7 +166,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     super.writeExternal(element);
 
     JDOMExternalizerUtil.writeField(element, SCRIPT_PATH, myScriptPath);
-    JDOMExternalizerUtil.writeField(element, SCRIPT_PARAMETERS, myScriptParameters);
+    JDOMExternalizerUtil.writeField(element, SCRIPT_ARGS, myScriptArgs);
     JDOMExternalizerUtil.writeField(element, WORKING_DIRECTORY, myWorkingDirectory);
 
     writeEnvs(element);
@@ -176,7 +176,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
   public static void copyParams(@NotNull final TheRRunConfigurationParams source, @NotNull final TheRRunConfigurationParams target) {
     target.setScriptPath(source.getScriptPath());
-    target.setScriptParameters(source.getScriptParameters());
+    target.setScriptArgs(source.getScriptArgs());
     target.setWorkingDirectory(source.getWorkingDirectory());
     target.setPassParentEnvs(source.isPassParentEnvs());
     target.setEnvs(new HashMap<String, String>(source.getEnvs()));

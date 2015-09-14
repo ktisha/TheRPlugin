@@ -18,7 +18,7 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   private JPanel myRootPanel;
   private TextFieldWithBrowseButton myScriptTextField;
-  private RawCommandLineEditor myScriptParametersTextField;
+  private RawCommandLineEditor myScriptArgsTextField;
   private TextFieldWithBrowseButton myWorkingDirectoryTextField;
   private EnvironmentVariablesComponent myEnvsComponent;
 
@@ -26,7 +26,7 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
     final Project project = configuration.getProject();
 
     setupScriptTextField(project);
-    setupScriptParametersTextField();
+    setupScriptArgsTextField();
     setupWorkingDirectoryTextField(project);
   }
 
@@ -48,13 +48,13 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   @NotNull
   @Override
-  public String getScriptParameters() {
-    return myScriptParametersTextField.getText().trim();
+  public String getScriptArgs() {
+    return myScriptArgsTextField.getText().trim();
   }
 
   @Override
-  public void setScriptParameters(@NotNull final String scriptParameters) {
-    myScriptParametersTextField.setText(scriptParameters);
+  public void setScriptArgs(@NotNull final String scriptArgs) {
+    myScriptArgsTextField.setText(scriptArgs);
   }
 
   @NotNull
@@ -103,8 +103,8 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
     myScriptTextField.addActionListener(listener);
   }
 
-  private void setupScriptParametersTextField() {
-    myScriptParametersTextField.setDialogCaption("Script Parameters");
+  private void setupScriptArgsTextField() {
+    myScriptArgsTextField.setDialogCaption("Script Args");
   }
 
   private void setupWorkingDirectoryTextField(@NotNull final Project project) {
