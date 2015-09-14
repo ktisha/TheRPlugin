@@ -7,6 +7,8 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.RawCommandLineEditor;
 import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
@@ -98,7 +100,16 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
         project,
         FileChooserDescriptorFactory.createSingleFileDescriptor(TheRFileType.INSTANCE),
         TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-      );
+      ) {
+        @Override
+        protected void onFileChosen(@NotNull final VirtualFile chosenFile) {
+          super.onFileChosen(chosenFile);
+
+          if (StringUtil.isEmptyOrSpaces(getWorkingDirectory())) {
+            setWorkingDirectory(chosenFile.getParent().getPath());
+          }
+        }
+      };
 
     myScriptTextField.addActionListener(listener);
   }

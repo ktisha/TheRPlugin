@@ -39,6 +39,7 @@ import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSessionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,20 +71,12 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
     final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
     final TheRRunConfigurationParams runConfigurationParams = (TheRRunConfigurationParams)environment.getRunProfile();
-
-    final TheRXProcessHandler processHandler = new TheRXProcessHandler(
-      calculateCommandLine(
-        interpreterPath,
-        runConfigurationParams
-      ),
-      TheRProcessUtils.getInitCommands(),
-      new TheRExecutionResultCalculatorImpl(),
-      Boolean.parseBoolean(runConfigurationParams.getEnvs().get(PRINT_IO_KEY))
-    );
-
-    final Project project = environment.getProject();
     final String scriptPath = runConfigurationParams.getScriptPath();
 
+    checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectory());
+
+    final Project project = environment.getProject();
+    final TheRXProcessHandler processHandler = createProcessHandler(interpreterPath, runConfigurationParams);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
@@ -99,23 +92,35 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     return session.getRunContentDescriptor();
   }
 
-  @NotNull
-  private GeneralCommandLine calculateCommandLine(@NotNull final String interpreterPath,
-                                                  @NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final List<String> command = new ArrayList<String>();
-    command.add(FileUtil.toSystemDependentName(interpreterPath));
-    command.addAll(TheRProcessUtils.getStartOptions());
-
-    if (!StringUtil.isEmptyOrSpaces(runConfigurationParams.getScriptArgs())) {
-      command.add("--args");
-      command.addAll(ParametersListUtil.parse(runConfigurationParams.getScriptArgs()));
+  private void checkConfiguration(@NotNull final String interpreterPath,
+                                  @NotNull final String scriptPath,
+                                  @NotNull final String workDirectory) throws ExecutionException {
+    if (StringUtil.isEmptyOrSpaces(interpreterPath)) {
+      throw new ExecutionException("The R interpreter is not specified");
     }
 
-    final GeneralCommandLine commandLine = new GeneralCommandLine(command);
+    if (StringUtil.isEmptyOrSpaces(scriptPath)) {
+      throw new ExecutionException("The R script is not specified");
+    }
 
-    commandLine.withWorkDirectory(runConfigurationParams.getWorkingDirectory());
+    if (StringUtil.isEmptyOrSpaces(workDirectory) && new File(scriptPath).getParent() == null) {
+      throw new ExecutionException("The work directory couldn't be calculated");
+    }
+  }
 
-    return commandLine;
+  @NotNull
+  private TheRXProcessHandler createProcessHandler(@NotNull final String interpreterPath,
+                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams)
+    throws ExecutionException {
+    return new TheRXProcessHandler(
+      calculateCommandLine(
+        calculateCommand(interpreterPath, runConfigurationParams.getScriptArgs()),
+        calculateWorkDirectory(runConfigurationParams)
+      ),
+      TheRProcessUtils.getInitCommands(),
+      new TheRExecutionResultCalculatorImpl(),
+      Boolean.parseBoolean(runConfigurationParams.getEnvs().get(PRINT_IO_KEY))
+    );
   }
 
   @NotNull
@@ -181,6 +186,39 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     catch (final TheRXDebuggerException e) {
       throw new ExecutionException(e);
     }
+  }
+
+  @NotNull
+  private GeneralCommandLine calculateCommandLine(@NotNull final List<String> command,
+                                                  @NotNull final String workDirectory) {
+    final GeneralCommandLine commandLine = new GeneralCommandLine(command);
+    commandLine.withWorkDirectory(workDirectory);
+
+    return commandLine;
+  }
+
+  @NotNull
+  private List<String> calculateCommand(@NotNull final String interpreterPath,
+                                        @NotNull final String scriptArgs) {
+    final List<String> command = new ArrayList<String>();
+
+    command.add(FileUtil.toSystemDependentName(interpreterPath));
+    command.addAll(TheRProcessUtils.getStartOptions());
+
+    if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
+      command.add("--args");
+      command.addAll(ParametersListUtil.parse(scriptArgs));
+    }
+
+    return command;
+  }
+
+  @NotNull
+  private String calculateWorkDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final String specifiedValue = runConfigurationParams.getWorkingDirectory();
+    final String defaultValue = new File(runConfigurationParams.getScriptPath()).getParent();
+
+    return !StringUtil.isEmptyOrSpaces(specifiedValue) ? specifiedValue : defaultValue;
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
