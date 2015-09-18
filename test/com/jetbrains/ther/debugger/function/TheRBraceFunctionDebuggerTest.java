@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.mock.*;
@@ -43,8 +44,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at_1", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -52,8 +53,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
     assertEquals(4, executor.getCounter());
-    assertEquals(Arrays.asList("error_dbg_at_2", "error_ls"), receiver.getErrors());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_dbg_at_2", "error_ls"), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -62,8 +63,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(5, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -93,8 +94,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(0, factory.getCounter());
     assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at_1", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -104,8 +105,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(3, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -116,8 +117,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(4, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -144,8 +145,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -155,8 +156,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -183,8 +184,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -194,8 +195,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -222,8 +223,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLinesCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -234,8 +235,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(3, executor.getCounter());
     assertEquals(3, handler.getDroppedFramesCounter());
     assertEquals(3, handler.getReturnLinesCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -260,8 +261,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
 
     receiver.reset();
     debugger.advance();
@@ -270,8 +271,8 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(3, executor.getCounter());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -296,7 +297,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -305,7 +306,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(7, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(
       Arrays.asList("error_continue", "error_entry", "error_entry", "error_dbg_at", "error_ls"),
       receiver.getErrors()
@@ -318,7 +319,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 4 5 6", debugger.getResult());
     assertEquals(8, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -342,7 +343,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(3, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_ent1", "error_ent2", "error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -380,6 +381,34 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(10, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
+  @Test(expected = TheRRuntimeException.class)
+  public void error() throws TheRDebuggerException {
+    /*
+    if (10 > log(-1)) {
+      print("ok")
+    }
+    */
+
+    final ErrorTheRExecutor executor = new ErrorTheRExecutor();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(2, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error1", "error_ls"), receiver.getErrors());
+
+    debugger.advance();
   }
 
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
@@ -848,6 +877,47 @@ public class TheRBraceFunctionDebuggerTest {
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
           "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class ErrorTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(LS_FUNCTIONS_COMMAND)) {
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
+          "error_ls"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "2: if (10 > log(-1)) {\n" +
+          "    print(\"ok\")\n" +
+          "}\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error1"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
+        return new TheRExecutionResult(
+          "",
+          TheRExecutionResultType.EMPTY,
+          TextRange.EMPTY_RANGE,
+          "Error in if (10 > log(-1)) { : missing value where TRUE/FALSE needed\n" +
+          "In addition: Warning message:\n" +
+          "In log(-1) : NaNs produced"
         );
       }
 

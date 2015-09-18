@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.mock.*;
@@ -40,7 +41,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -50,7 +51,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(2, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -78,7 +79,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(0, factory.getCounter());
     assertEquals(0, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -89,7 +90,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
   }
 
@@ -115,7 +116,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(0, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -126,7 +127,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(2, executor.getCounter());
     assertEquals(3, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -152,7 +153,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(0, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -163,7 +164,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals("[1] 1 2 3", debugger.getResult());
     assertEquals(2, executor.getCounter());
     assertEquals(5, handler.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -190,7 +191,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLineNumberCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -202,7 +203,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(3, handler.getDroppedFramesCounter());
     assertEquals(5, handler.getReturnLineNumberCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -226,7 +227,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -260,7 +261,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -269,7 +270,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertTrue(debugger.hasNext());
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(5, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Arrays.asList("error_continue", "error_entry", "error_entry", "error_ls"), receiver.getErrors());
 
     receiver.reset();
@@ -279,8 +280,36 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 4 5 6", debugger.getResult());
     assertEquals(6, executor.getCounter());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
+  @Test(expected = TheRRuntimeException.class)
+  public void error() throws TheRDebuggerException {
+    /*
+    if (10 > log(-1)) {
+      print("ok")
+    }
+    */
+
+    final ErrorTheRExecutor executor = new ErrorTheRExecutor();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(1, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+
+    debugger.advance();
   }
 
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
@@ -595,6 +624,36 @@ public class TheRUnbraceFunctionDebuggerTest {
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
           "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class ErrorTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(LS_FUNCTIONS_COMMAND)) {
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
+          "error_ls"
+        );
+      }
+
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRExecutionResult(
+          "",
+          TheRExecutionResultType.EMPTY,
+          TextRange.EMPTY_RANGE,
+          "Error in if (10 > log(-1)) { : missing value where TRUE/FALSE needed\n" +
+          "In addition: Warning message:\n" +
+          "In log(-1) : NaNs produced"
         );
       }
 

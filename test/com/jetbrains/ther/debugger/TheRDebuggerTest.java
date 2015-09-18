@@ -29,6 +29,59 @@ import static org.junit.Assert.*;
 public class TheRDebuggerTest {
 
   @Test
+  public void empty() throws TheRDebuggerException {
+    final EmptyTheRExecutor executor = new EmptyTheRExecutor();
+    final MockTheRVarsLoaderFactory loaderFactory = new MockTheRVarsLoaderFactory();
+    final MockTheRDebuggerEvaluatorFactory evaluatorFactory = new MockTheRDebuggerEvaluatorFactory();
+    final MockTheRScriptReader scriptReader = new MockTheRScriptReader(0);
+    final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
+    final MockTheRValueModifierFactory modifierFactory = new MockTheRValueModifierFactory();
+
+    final TheRDebugger debugger = new TheRDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      loaderFactory,
+      evaluatorFactory,
+      scriptReader,
+      outputReceiver,
+      new IllegalTheRExpressionHandler(),
+      modifierFactory,
+      new IllegalTheRValueModifierHandler()
+    );
+
+    assertEquals(0, executor.getCounter());
+    assertEquals(0, loaderFactory.myCounter);
+    assertEquals(0, evaluatorFactory.myCounter);
+    assertFalse(scriptReader.myIsClosed);
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(Collections.emptyList(), outputReceiver.getErrors());
+    assertEquals(0, modifierFactory.myCounter);
+    assertEquals(0, debugger.getStack().size());
+
+    assertFalse(debugger.advance());
+
+    assertEquals(4, executor.getCounter());
+    assertEquals(0, loaderFactory.myCounter);
+    assertEquals(0, evaluatorFactory.myCounter);
+    assertFalse(scriptReader.myIsClosed);
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(Arrays.asList("error1", "error_complete", "error_ls", "error_body"), outputReceiver.getErrors());
+    assertEquals(0, modifierFactory.myCounter);
+    assertEquals(0, debugger.getStack().size());
+
+    debugger.stop();
+
+    assertEquals(4, executor.getCounter());
+    assertEquals(0, loaderFactory.myCounter);
+    assertEquals(0, evaluatorFactory.myCounter);
+    assertTrue(scriptReader.myIsClosed);
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(Arrays.asList("error1", "error_complete", "error_ls", "error_body"), outputReceiver.getErrors());
+    assertEquals(0, modifierFactory.myCounter);
+    assertEquals(0, debugger.getStack().size());
+  }
+
+  @Test
   public void stack1() throws TheRDebuggerException {
     // just `main`
 
@@ -1181,6 +1234,32 @@ public class TheRDebuggerTest {
         TextRange.allOf("[1] " + frameNumber),
         "error" + frameNumber
       );
+    }
+  }
+
+  private static class EmptyTheRExecutor extends MockTheRExecutor {
+
+    public EmptyTheRExecutor() {
+      super(0);
+    }
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (getCounter() < 4) {
+        return super.doExecute(command);
+      }
+      else if (getCounter() == 4) {
+        return new TheRExecutionResult(
+          " \n \n \n ",
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(" \n \n \n "),
+          "error_body"
+        );
+      }
+      else {
+        throw new IllegalStateException("Unexpected command");
+      }
     }
   }
 
