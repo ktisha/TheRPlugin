@@ -65,11 +65,6 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
     }
   }
 
-  @Override
-  protected int initCurrentLine() throws TheRDebuggerException {
-    return loadLineNumber();
-  }
-
   @NotNull
   @Override
   protected TheRExecutionResultType getStartTraceType() {

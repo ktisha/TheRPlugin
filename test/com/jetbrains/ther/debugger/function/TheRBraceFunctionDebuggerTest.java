@@ -322,6 +322,66 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
+  @Test
+  public void loopEntrance() throws TheRDebuggerException {
+    /*
+    `for (i in 1:2)`
+    */
+
+    final LoopEntranceExecutor executor = new LoopEntranceExecutor();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Arrays.asList("error_ent1", "error_ent2", "error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(5, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(7, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_ent2", "error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(9, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(10, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
 
     @NotNull
@@ -727,6 +787,66 @@ public class TheRBraceFunctionDebuggerTest {
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
+          "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class LoopEntranceExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(LS_FUNCTIONS_COMMAND)) {
+        return new TheRExecutionResult(
+          NO_FUNCTIONS_RESULT,
+          TheRExecutionResultType.RESPONSE,
+          TextRange.allOf(NO_FUNCTIONS_RESULT),
+          "error_ls"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: for (i in 1:2) {\n" +
+          "ls()\n" +
+          "}\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_ent1"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 2 || getCounter() == 6)) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: i\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_ent2"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 4 || getCounter() == 8)) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "2: ls()\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_body"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
+        return new TheRExecutionResult(
+          EXITING_FROM + " abc()\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          TextRange.EMPTY_RANGE,
           "error_exit"
         );
       }

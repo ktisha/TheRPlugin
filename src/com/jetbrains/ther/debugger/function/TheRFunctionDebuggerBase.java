@@ -87,35 +87,26 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return myResult;
   }
 
-  protected abstract int initCurrentLine() throws TheRDebuggerException;
-
   protected abstract void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException;
 
   @NotNull
   protected abstract TheRExecutionResultType getStartTraceType();
 
-  protected int loadLineNumber() throws TheRDebuggerException {
-    final TheRExecutionResult result = execute(
-      myExecutor,
-      EXECUTE_AND_STEP_COMMAND,
-      TheRExecutionResultType.DEBUG_AT
+  protected int initCurrentLine() throws TheRDebuggerException {
+    doHandleDebugAt(
+      execute(
+        myExecutor,
+        EXECUTE_AND_STEP_COMMAND,
+        TheRExecutionResultType.DEBUG_AT
+      ),
+      false
     );
 
-    appendError(result, myOutputReceiver);
-
-    return extractLineNumber(result.getOutput(), 0);
+    return myCurrentLineNumber;
   }
 
   protected void handleDebugAt(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    appendResult(result, myOutputReceiver);
-    appendError(result, myOutputReceiver);
-
-    myCurrentLineNumber = extractLineNumber(
-      result.getOutput(),
-      findNextLineAfterResultBegin(result)
-    );
-
-    traceAndDebugFunctions(myExecutor, myOutputReceiver);
+    doHandleDebugAt(result, true);
   }
 
   protected void handleContinueTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
@@ -175,11 +166,30 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     myCurrentLineNumber = currentLineNumber;
   }
 
-  private int extractLineNumber(@NotNull final String text, final int index) {
-    final int lineNumberBegin = index + DEBUG_AT.length();
-    final int lineNumberEnd = text.indexOf(':', lineNumberBegin + 1);
+  private void doHandleDebugAt(@NotNull final TheRExecutionResult result, final boolean enableTraceAndDebug) throws TheRDebuggerException {
+    appendResult(result, myOutputReceiver);
+    appendError(result, myOutputReceiver);
 
-    return Integer.parseInt(text.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
+    final String output = result.getOutput();
+    final int debugAtIndex = findNextLineAfterResultBegin(result);
+
+    if (isLoopEntrance(output, debugAtIndex)) {
+      doHandleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT), enableTraceAndDebug);
+    }
+    else {
+      myCurrentLineNumber = extractLineNumber(output, debugAtIndex);
+
+      if (enableTraceAndDebug) {
+        traceAndDebugFunctions(myExecutor, myOutputReceiver);
+      }
+    }
+  }
+
+  private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
+    final int lineNumberEnd = output.indexOf(':', lineNumberBegin + 1);
+
+    return Integer.parseInt(output.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
   }
 
   private int findNextLineAfterResultBegin(@NotNull final TheRExecutionResult result) {
@@ -192,6 +202,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     }
 
     return index;
+  }
+
+  private boolean isLoopEntrance(@NotNull final String output, final int debugAtIndex) {
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
+    final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
+
+    return output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin);
   }
 
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result) {
