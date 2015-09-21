@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
 
@@ -41,7 +40,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private static final String WORKING_DIRECTORY = "WORKING_DIRECTORY";
 
   @NotNull
-  private static final String PARENT_ENVS = "PARENT_ENVS";
+  private static final String PASS_PARENT_ENVS = "PASS_PARENT_ENVS";
 
   @NotNull
   private String myScriptPath;
@@ -88,11 +87,10 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     }
 
     final String name = new File(myScriptPath).getName();
-    final String extension = TheRFileType.INSTANCE.getDefaultExtension();
-    final int dotIndex = name.length() - extension.length() - 1;
+    final String dotAndExtension = "." + TheRFileType.INSTANCE.getDefaultExtension();
 
-    if (StringUtil.endsWithIgnoreCase(name, extension) && name.charAt(dotIndex) == '.') {
-      return name.substring(0, dotIndex);
+    if (name.length() > dotAndExtension.length() && StringUtil.endsWithIgnoreCase(name, dotAndExtension)) {
+      return name.substring(0, name.length() - dotAndExtension.length());
     }
 
     return name;
@@ -129,17 +127,6 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   @Override
   public void setWorkingDirectory(@NotNull final String workingDirectory) {
     myWorkingDirectory = workingDirectory;
-  }
-
-  @NotNull
-  @Override
-  public Map<String, String> getEnvs() {
-    return super.getEnvs();
-  }
-
-  @Override
-  public void setEnvs(@NotNull final Map<String, String> envs) {
-    super.setEnvs(envs);
   }
 
   @NotNull
@@ -185,7 +172,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private void readEnvs(@NotNull final Element element) {
     setPassParentEnvs(
       Boolean.parseBoolean(
-        JDOMExternalizerUtil.readField(element, PARENT_ENVS, "")
+        JDOMExternalizerUtil.readField(element, PASS_PARENT_ENVS, "")
       )
     );
 
@@ -193,7 +180,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   }
 
   private void writeEnvs(@NotNull final Element element) {
-    JDOMExternalizerUtil.writeField(element, PARENT_ENVS, Boolean.toString(isPassParentEnvs()));
+    JDOMExternalizerUtil.writeField(element, PASS_PARENT_ENVS, Boolean.toString(isPassParentEnvs()));
 
     EnvironmentVariablesComponent.writeExternal(element, getEnvs());
   }

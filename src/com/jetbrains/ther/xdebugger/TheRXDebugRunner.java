@@ -104,7 +104,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     }
 
     if (StringUtil.isEmptyOrSpaces(workDirectory) && new File(scriptPath).getParent() == null) {
-      throw new ExecutionException("The work directory couldn't be calculated");
+      throw new ExecutionException("The working directory couldn't be calculated");
     }
   }
 
@@ -215,10 +215,10 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private String calculateWorkDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final String specifiedValue = runConfigurationParams.getWorkingDirectory();
+    final String workingDirectory = runConfigurationParams.getWorkingDirectory();
     final String defaultValue = new File(runConfigurationParams.getScriptPath()).getParent();
 
-    return !StringUtil.isEmptyOrSpaces(specifiedValue) ? specifiedValue : defaultValue;
+    return !StringUtil.isEmptyOrSpaces(workingDirectory) ? workingDirectory : defaultValue;
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
