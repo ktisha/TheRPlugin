@@ -10,6 +10,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.RawCommandLineEditor;
+import com.intellij.ui.components.JBLabel;
 import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,9 +20,16 @@ import java.util.Map;
 public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   private JPanel myRootPanel;
+
+  private JBLabel myScriptLabel;
   private TextFieldWithBrowseButton myScriptTextField;
+
+  private JBLabel myScriptArgsLabel;
   private RawCommandLineEditor myScriptArgsTextField;
+
+  private JBLabel myWorkingDirectoryLabel;
   private TextFieldWithBrowseButton myWorkingDirectoryTextField;
+
   private EnvironmentVariablesComponent myEnvsComponent;
 
   public TheRRunConfigurationForm(@NotNull final TheRRunConfiguration configuration) {
@@ -30,6 +38,10 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
     setupScriptTextField(project);
     setupScriptArgsTextField();
     setupWorkingDirectoryTextField(project);
+
+    myScriptLabel.setAnchor(myEnvsComponent.getLabel());
+    myScriptArgsLabel.setAnchor(myEnvsComponent.getLabel());
+    myWorkingDirectoryLabel.setAnchor(myEnvsComponent.getLabel());
   }
 
   @NotNull
