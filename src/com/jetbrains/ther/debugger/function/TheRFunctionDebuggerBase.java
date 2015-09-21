@@ -173,7 +173,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final String output = result.getOutput();
     final int debugAtIndex = findNextLineAfterResultBegin(result);
 
-    if (isLoopEntrance(output, debugAtIndex)) {
+    if (isBraceLoopEntrance(output, debugAtIndex)) {
       doHandleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT), enableTraceAndDebug);
     }
     else {
@@ -204,11 +204,12 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return index;
   }
 
-  private boolean isLoopEntrance(@NotNull final String output, final int debugAtIndex) {
+  private boolean isBraceLoopEntrance(@NotNull final String output, final int debugAtIndex) {
     final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
+    final int lines = StringUtil.countNewLines(output);
 
-    return output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin);
+    return lines > 1 && output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin);
   }
 
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result) {
