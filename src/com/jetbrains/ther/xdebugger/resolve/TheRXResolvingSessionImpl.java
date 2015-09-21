@@ -102,15 +102,17 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   private void addEntry(@NotNull final TheRLocation nextLocation) {
-    final TheRXFunctionDescriptor descriptor =
-      myEntries.isEmpty() ? myRoot : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextLocation.getFunctionName());
+    final String nextFunctionName = nextLocation.getFunctionName();
+    final TheRXFunctionDescriptor descriptor = myEntries.isEmpty()
+                                               ? myRoot
+                                               : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
 
-    myEntries.add(
-      new TheRXResolvingSessionEntry(
-        descriptor,
-        nextLocation.getLine()
-      )
-    );
+    final boolean isUnbraceFunction = descriptor != null && nextLocation.getLine() == 0;
+    final int line = isUnbraceFunction
+                     ? descriptor.getStartLine()
+                     : nextLocation.getLine() - 1; // convert 1-based to 0-based
+
+    myEntries.add(new TheRXResolvingSessionEntry(descriptor, line));
   }
 
   @Nullable
@@ -119,7 +121,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
       return null;
     }
 
-    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, entry.myLine - 1); // convert 1-based to 0-based
+    return XDebuggerUtil.getInstance().createPosition(myVirtualFile, entry.myLine);
   }
 
   private void updateCurrentEntry(final int line) {
@@ -129,7 +131,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
       lastIndex,
       new TheRXResolvingSessionEntry(
         myEntries.get(lastIndex).myDescriptor,
-        line
+        line - 1 // convert 1-based to 0-based
       )
     );
   }
