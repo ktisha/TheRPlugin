@@ -107,12 +107,13 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
                                                ? myRoot
                                                : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
 
-    final boolean isUnbraceFunction = descriptor != null && nextLocation.getLine() == 0;
-    final int line = isUnbraceFunction
-                     ? descriptor.getStartLine()
-                     : nextLocation.getLine() - 1; // convert 1-based to 0-based
 
-    myEntries.add(new TheRXResolvingSessionEntry(descriptor, line));
+    myEntries.add(
+      new TheRXResolvingSessionEntry(
+        descriptor,
+        resolveLine(descriptor, nextLocation.getLine())
+      )
+    );
   }
 
   @Nullable
@@ -126,12 +127,13 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
 
   private void updateCurrentEntry(final int line) {
     final int lastIndex = myEntries.size() - 1;
+    final TheRXFunctionDescriptor descriptor = myEntries.get(lastIndex).myDescriptor;
 
     myEntries.set(
       lastIndex,
       new TheRXResolvingSessionEntry(
-        myEntries.get(lastIndex).myDescriptor,
-        line - 1 // convert 1-based to 0-based
+        descriptor,
+        resolveLine(descriptor, line)
       )
     );
   }
@@ -150,6 +152,14 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
     }
 
     return resolveDescriptor(entries, nextFunctionName);
+  }
+
+  private int resolveLine(@Nullable final TheRXFunctionDescriptor descriptor, final int line) {
+    final boolean isUnbraceFunction = descriptor != null && line == 0;
+
+    return isUnbraceFunction
+           ? descriptor.getStartLine()
+           : line - 1; // convert 1-based to 0-based
   }
 
   @Nullable
