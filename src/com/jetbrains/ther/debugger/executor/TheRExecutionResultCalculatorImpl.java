@@ -146,7 +146,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
       return candidate;
     }
 
-    candidate = tryDebugAtUnbrace(lines);
+    candidate = tryUnbraceDebugAt(lines);
 
     if (candidate != null) {
       return candidate;
@@ -336,7 +336,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
   }
 
   @Nullable
-  private static TypeAndResultLineBounds tryDebugAtUnbrace(@NotNull final String[] lines) {
+  private static TypeAndResultLineBounds tryUnbraceDebugAt(@NotNull final String[] lines) {
     if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG + ": ")) {
       return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 3);
     }
