@@ -383,6 +383,21 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
+  public void braceLoopWithFunction() {
+    fail();
+  }
+
+  @Test
+  public void braceLoopWithReturnBefore() {
+    fail();
+  }
+
+  @Test
+  public void braceLoopWithOutputBefore() {
+    fail();
+  }
+
+  @Test
   public void unbraceLoop() throws TheRDebuggerException {
     /*
     `for (i in 1:2) ...`
@@ -413,6 +428,21 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(3, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
+  @Test
+  public void unbraceLoopWithFunction() {
+    fail();
+  }
+
+  @Test
+  public void unbraceLoopWithReturnBefore() {
+    fail();
+  }
+
+  @Test
+  public void unbraceLoopWithOutputBefore() {
+    fail();
   }
 
   @Test(expected = TheRRuntimeException.class)
