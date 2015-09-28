@@ -311,6 +311,85 @@ public class TheRUnbraceFunctionDebuggerTest {
     debugger.advance();
   }
 
+
+  @Test
+  public void loop() throws TheRDebuggerException {
+    /*
+    `for (i in 1:2) ...`
+    */
+
+    final LoopTheRExecutor executor = new LoopTheRExecutor();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(1, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    // debugger handles `EXITING_FROM`
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals("[1] 1\n[1] 2", debugger.getResult());
+    assertEquals(2, executor.getCounter());
+    assertEquals(Collections.singletonList("[1] 1\n[1] 2"), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
+  @Test
+  public void loopWithFunction() throws TheRDebuggerException {
+    /*
+    `for (i in 1:2) d(i)`
+    */
+
+    final LoopWithFunctionTheRExecutor executor = new LoopWithFunctionTheRExecutor();
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger());
+    final UnbraceLoopWithFunctionTheRFunctionDebuggerHandler handler = new UnbraceLoopWithFunctionTheRFunctionDebuggerHandler();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
+      executor,
+      factory,
+      handler,
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(1, executor.getCounter());
+    assertEquals(0, factory.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    // debugger handles `DEBUGGING_IN`,
+    // `d` iterations run with `CONTINUE_TRACE` between them and return `RECURSIVE_EXITING_FROM` in the end
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(2, executor.getCounter());
+    assertEquals(1, factory.getCounter());
+    assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
+  }
+
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
 
     @NotNull
@@ -339,7 +418,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": abc(c(1:10))\n" +
-          "debug: {\n" +
+          DEBUG + ": {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        x + 1\n" +
@@ -518,7 +597,7 @@ public class TheRUnbraceFunctionDebuggerTest {
           EXITING_FROM + " abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
-          "debug: {\n" +
+          DEBUG + ": {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        c(1:3)\n" +
@@ -544,7 +623,7 @@ public class TheRUnbraceFunctionDebuggerTest {
         return new TheRExecutionResult(
           TRACING + " abc() on entry \n" +
           "[1] \"abc\"\n" +
-          "debug: c(4:6)\n" +
+          DEBUG + ": c(4:6)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
@@ -584,6 +663,63 @@ public class TheRUnbraceFunctionDebuggerTest {
       }
 
       throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class LoopTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRExecutionResult(
+          "[1] 1\n[1] 2\n" +
+          EXITING_FROM + " abc()\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          new TextRange(0, 11),
+          "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class LoopWithFunctionTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
+        return new TheRExecutionResult(
+          DEBUGGING_IN + ": d(i)\n" +
+          DEBUG + ": {\n" +
+          "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
+          "    print(i)\n" +
+          "}\n" +
+          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUGGING_IN,
+          TextRange.EMPTY_RANGE,
+          "error_debugging"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class UnbraceLoopWithFunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+
+    private int myCounter = 0;
+
+    @Override
+    public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+      myCounter++;
+    }
+
+    public int getCounter() {
+      return myCounter;
     }
   }
 }
