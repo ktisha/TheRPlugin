@@ -12,7 +12,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 
@@ -219,7 +221,13 @@ public class TheRDebuggerEvaluatorImplTest {
     final String result = "[1] 1 2 3";
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      TheRDebugConstants.DEBUGGING_IN + ": " + expression,
+      TheRDebugConstants.DEBUGGING_IN + ": " + expression + "\n" +
+      DEBUG + ": {\n" +
+      "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
+      "    {\n" +
+      "        print(\"x\")\n" +
+      "    }\n" +
+      "}",
       DEBUGGING_IN,
       TextRange.EMPTY_RANGE,
       error
