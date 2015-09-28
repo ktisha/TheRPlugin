@@ -5,7 +5,6 @@ import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
-import com.jetbrains.ther.debugger.mock.AlwaysSameResultTheRExecutor;
 import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -15,6 +14,7 @@ import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,12 +31,14 @@ public class TheRTraceAndDebugUtilsTest {
 
   @Test
   public void empty() throws TheRDebuggerException {
-    final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      NO_FUNCTIONS_RESULT,
-      TheRExecutionResultType.RESPONSE,
-      TextRange.allOf(NO_FUNCTIONS_RESULT),
-      "error"
-    );
+    final com.jetbrains.ther.debugger.mock.MockTheRExecutor executor = new com.jetbrains.ther.debugger.mock.MockTheRExecutor() {
+      @NotNull
+      @Override
+      protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+        throw new IllegalStateException("Unexpected command");
+      }
+    };
+
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(
@@ -45,8 +47,8 @@ public class TheRTraceAndDebugUtilsTest {
     );
 
     assertEquals(1, executor.getCounter());
-    assertEquals(Collections.singletonList("error"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
   }
 
   @Test
@@ -60,11 +62,11 @@ public class TheRTraceAndDebugUtilsTest {
     );
 
     assertTrue(executor.check());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(
-      Arrays.asList("error_ls_fun", "error_x_e", "error_x_d", "error_y_e", "error_y_d"),
+      Arrays.asList(LS_FUNCTIONS_ERROR, "error_x_e", "error_x_d", "error_y_e", "error_y_d"),
       receiver.getErrors()
     );
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   private static class MockTheRExecutor implements TheRExecutor {
@@ -99,7 +101,7 @@ public class TheRTraceAndDebugUtilsTest {
           output,
           TheRExecutionResultType.RESPONSE,
           TextRange.allOf(output),
-          "error_ls_fun"
+          LS_FUNCTIONS_ERROR
         );
       }
 

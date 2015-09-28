@@ -18,8 +18,8 @@ import java.util.List;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRVarsLoaderImplTest {
 
@@ -40,8 +40,8 @@ public class TheRVarsLoaderImplTest {
     );
 
     assertEquals(1, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -79,11 +79,11 @@ public class TheRVarsLoaderImplTest {
       actual.get(2).getValue()
     );
 
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(
-      Arrays.asList("error_ls", "error_ta", "error_va", "error_t4", "error_vb", "error_t6", "error_vc", "error_t8"),
+      Arrays.asList(LS_FUNCTIONS_ERROR, "error_ta", "error_va", "error_t4", "error_vb", "error_t6", "error_vc", "error_t8"),
       receiver.getErrors()
     );
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -102,8 +102,8 @@ public class TheRVarsLoaderImplTest {
     assertEquals("[1] \"integer\"", actual.get(0).getType());
     assertEquals("[1] 1 2 3", actual.get(0).getValue());
 
-    assertEquals(Arrays.asList("error_ls", "error_ta", "error_dbg_at", "error_va"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList(LS_FUNCTIONS_ERROR, "error_ta", "error_dbg_at", "error_va"), receiver.getErrors());
   }
 
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
@@ -121,7 +121,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          "error_ls"
+          LS_FUNCTIONS_ERROR
         );
       }
 
@@ -201,7 +201,7 @@ public class TheRVarsLoaderImplTest {
           output,
           RESPONSE,
           TextRange.allOf(output),
-          "error_ls"
+          LS_FUNCTIONS_ERROR
         );
       }
 

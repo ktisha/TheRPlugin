@@ -10,8 +10,9 @@ import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRForcedFunctionDebuggerHandlerTest {
 
@@ -41,8 +42,8 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     assertEquals(1, debugger.getCounter());
     assertEquals(1, factory.getCounter());
-    assertTrue(receiver.getErrors().isEmpty());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
     assertEquals(result, handler.getResult());
   }
 
@@ -79,8 +80,8 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(1, factory.getCounter());
-    assertTrue(receiver.getErrors().isEmpty());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
     assertEquals(result, handler.getResult());
   }
 
@@ -116,8 +117,8 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(2, firstFunctionDebugger.getCounter());
     assertEquals(1, factory.getCounter());
-    assertTrue(receiver.getErrors().isEmpty());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
     assertEquals(result, handler.getResult());
   }
 
@@ -159,8 +160,8 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     assertEquals(2, secondFunctionDebugger.getCounter());
     assertEquals(3, firstFunctionDebugger.getCounter());
     assertEquals(1, factory.getCounter());
-    assertTrue(receiver.getErrors().isEmpty());
-    assertTrue(receiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
     assertEquals(result, handler.getResult());
   }
 

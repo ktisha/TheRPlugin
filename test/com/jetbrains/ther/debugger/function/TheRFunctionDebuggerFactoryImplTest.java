@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRFunctionDebuggerFactoryImplTest {
 
@@ -34,8 +34,8 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 1);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(Arrays.asList("error_entry", "error_st", "error_dbg_at", "error_trc"), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(Arrays.asList("error_entry", "error_st", "error_dbg_at", LS_FUNCTIONS_ERROR), outputReceiver.getErrors());
   }
 
   @Test
@@ -51,8 +51,8 @@ public class TheRFunctionDebuggerFactoryImplTest {
     final TheRLocation expected = new TheRLocation("abc", 0);
 
     assertEquals(expected, debugger.getLocation());
-    assertEquals(Arrays.asList("error_entry", "error_st", "error_trc"), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
+    assertEquals(Arrays.asList("error_entry", "error_st", LS_FUNCTIONS_ERROR), outputReceiver.getErrors());
   }
 
   @Test(expected = TheRUnexpectedExecutionResultException.class)
@@ -102,15 +102,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
         );
       }
 
-      if (getCounter() == 4) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_trc"
-        );
-      }
-
       throw new IllegalStateException("Unexpected command");
     }
   }
@@ -137,15 +128,6 @@ public class TheRFunctionDebuggerFactoryImplTest {
           START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
           "error_st"
-        );
-      }
-
-      if (getCounter() == 3) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_trc"
         );
       }
 

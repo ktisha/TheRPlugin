@@ -48,8 +48,8 @@ public class TheRDebuggerStringUtilsTest {
       receiver
     );
 
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -62,7 +62,7 @@ public class TheRDebuggerStringUtilsTest {
     );
 
     assertEquals(Collections.singletonList("output"), receiver.getOutputs());
-    assertTrue(receiver.getErrors().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
   }
 
   @Test
@@ -75,7 +75,7 @@ public class TheRDebuggerStringUtilsTest {
     );
 
     assertEquals(Collections.singletonList("out"), receiver.getOutputs());
-    assertTrue(receiver.getErrors().isEmpty());
+    assertEquals(Collections.emptyList(), receiver.getErrors());
   }
 
   @Test

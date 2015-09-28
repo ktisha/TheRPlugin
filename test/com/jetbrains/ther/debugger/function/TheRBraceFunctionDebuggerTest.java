@@ -15,8 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
 public class TheRBraceFunctionDebuggerTest {
@@ -45,7 +44,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at_1", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at_1", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -54,7 +53,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
     assertEquals(4, executor.getCounter());
     assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at_2", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at_2", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -95,7 +94,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(0, factory.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at_1", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at_1", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -146,7 +145,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -185,7 +184,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(2, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -224,7 +223,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLinesCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -262,7 +261,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -298,7 +297,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -308,7 +307,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(7, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(
-      Arrays.asList("error_continue", "error_entry", "error_entry", "error_dbg_at", "error_ls"),
+      Arrays.asList("error_continue", "error_entry", "error_entry", "error_dbg_at", LS_FUNCTIONS_ERROR),
       receiver.getErrors()
     );
 
@@ -329,7 +328,7 @@ public class TheRBraceFunctionDebuggerTest {
     `for (i in 1:2) { ... }`
     */
 
-    final BraceLoopExecutor executor = new BraceLoopExecutor();
+    final BraceLoopTheRExecutor executor = new BraceLoopTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
@@ -344,7 +343,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(3, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_ent1", "error_ent2", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_ent1", "error_ent2", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -353,7 +352,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
     assertEquals(5, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -362,7 +361,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(7, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_ent2", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_ent2", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -371,7 +370,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
     assertEquals(9, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -404,7 +403,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_ent1", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_ent1", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -439,7 +438,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error1", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error1", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     debugger.advance();
   }
@@ -449,15 +448,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: print(c(1))\n" +
@@ -499,15 +489,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: def()\n" +
@@ -568,15 +549,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
@@ -623,15 +595,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
@@ -677,15 +640,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
@@ -743,15 +697,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
@@ -782,15 +727,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 1 || getCounter() == 6)) {
         return new TheRExecutionResult(
           TheRDebugConstants.DEBUG_AT + "1: c(1:3)\n" +
@@ -857,20 +793,11 @@ public class TheRBraceFunctionDebuggerTest {
     }
   }
 
-  private static class BraceLoopExecutor extends MockTheRExecutor {
+  private static class BraceLoopTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           DEBUG_AT + "1: for (i in 1:2) {\n" +
@@ -922,15 +849,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           DEBUG_AT + "1: for (i in 1:2) print(i)\n" +
@@ -960,15 +878,6 @@ public class TheRBraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           DEBUG_AT + "2: if (10 > log(-1)) {\n" +

@@ -12,7 +12,6 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.PLUS;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRExecutorUtilsTest {
 
@@ -58,8 +57,8 @@ public class TheRExecutorUtilsTest {
     final String result = execute(executor, "def", RESPONSE, receiver);
 
     assertEquals(output, result);
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList(error), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 
   @Test
@@ -78,7 +77,7 @@ public class TheRExecutorUtilsTest {
     assertEquals(RESPONSE, result.getType());
     assertEquals(resultRange, result.getResultRange());
     assertEquals(error, result.getError());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList(error), receiver.getErrors());
-    assertTrue(receiver.getOutputs().isEmpty());
   }
 }

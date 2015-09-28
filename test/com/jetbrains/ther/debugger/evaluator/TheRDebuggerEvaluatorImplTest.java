@@ -15,7 +15,6 @@ import java.util.Collections;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TheRDebuggerEvaluatorImplTest {
 
@@ -134,8 +133,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
@@ -163,8 +162,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(2, executor.getCounter());
     assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(Arrays.asList("abc", "def"), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }
@@ -207,8 +206,8 @@ public class TheRDebuggerEvaluatorImplTest {
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
+    assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(Collections.singletonList(error), outputReceiver.getErrors());
-    assertTrue(outputReceiver.getOutputs().isEmpty());
     assertEquals(1, handler.myCounter);
     assertEquals(expression, handler.myLastExpression);
   }

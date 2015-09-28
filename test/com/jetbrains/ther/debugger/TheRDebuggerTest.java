@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
 public class TheRDebuggerTest {
@@ -65,7 +65,7 @@ public class TheRDebuggerTest {
     assertEquals(0, evaluatorFactory.myCounter);
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
-    assertEquals(Arrays.asList("error1", "error_complete", "error_ls", "error_body"), outputReceiver.getErrors());
+    assertEquals(Arrays.asList("error1", "error_complete", LS_FUNCTIONS_ERROR, "error_body"), outputReceiver.getErrors());
     assertEquals(0, modifierFactory.myCounter);
     assertEquals(0, debugger.getStack().size());
 
@@ -76,7 +76,7 @@ public class TheRDebuggerTest {
     assertEquals(0, evaluatorFactory.myCounter);
     assertTrue(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
-    assertEquals(Arrays.asList("error1", "error_complete", "error_ls", "error_body"), outputReceiver.getErrors());
+    assertEquals(Arrays.asList("error1", "error_complete", LS_FUNCTIONS_ERROR, "error_body"), outputReceiver.getErrors());
     assertEquals(0, modifierFactory.myCounter);
     assertEquals(0, debugger.getStack().size());
   }
@@ -138,7 +138,7 @@ public class TheRDebuggerTest {
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(
-      Arrays.asList("error1", "error2", "error3", "error_complete", "error_ls", "error_body", "error_call", "error0"),
+      Arrays.asList("error1", "error2", "error3", "error_complete", LS_FUNCTIONS_ERROR, "error_body", "error_call", "error0"),
       outputReceiver.getErrors()
     );
     assertEquals(0, expressionHandler.myCounter);
@@ -259,8 +259,10 @@ public class TheRDebuggerTest {
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(
-      Arrays.asList("error1", "error2", "error3", "error4", "error5", "error6", "error7", "error_complete", "error_ls", "error_body",
-                    "error_call", "error0"),
+      Arrays.asList(
+        "error1", "error2", "error3", "error4", "error5", "error6", "error7", "error_complete", LS_FUNCTIONS_ERROR, "error_body",
+        "error_call", "error0"
+      ),
       outputReceiver.getErrors()
     );
     assertEquals(0, expressionHandler.myCounter);
@@ -445,8 +447,10 @@ public class TheRDebuggerTest {
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(
-      Arrays.asList("error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error11",
-                    "error_complete", "error_ls", "error_body", "error_call", "error0"),
+      Arrays.asList(
+        "error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error11", "error_complete",
+        LS_FUNCTIONS_ERROR, "error_body", "error_call", "error0"
+      ),
       outputReceiver.getErrors()
     );
     assertEquals(0, expressionHandler.myCounter);
@@ -696,8 +700,10 @@ public class TheRDebuggerTest {
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(
-      Arrays.asList("error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error_complete",
-                    "error_ls", "error_body", "error_call", "error0"),
+      Arrays.asList(
+        "error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error_complete",
+        LS_FUNCTIONS_ERROR, "error_body", "error_call", "error0"
+      ),
       outputReceiver.getErrors()
     );
     assertEquals(0, expressionHandler.myCounter);
@@ -935,8 +941,10 @@ public class TheRDebuggerTest {
     assertFalse(scriptReader.myIsClosed);
     assertEquals(Collections.emptyList(), outputReceiver.getOutputs());
     assertEquals(
-      Arrays.asList("error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error11",
-                    "error12", "error13", "error14", "error_complete", "error_ls", "error_body", "error_call", "error0"),
+      Arrays.asList(
+        "error1", "error2", "error3", "error4", "error5", "error6", "error7", "error8", "error9", "error10", "error11", "error12",
+        "error13", "error14", "error_complete", LS_FUNCTIONS_ERROR, "error_body", "error_call", "error0"
+      ),
       outputReceiver.getErrors()
     );
     assertEquals(0, expressionHandler.myCounter);
@@ -1196,15 +1204,6 @@ public class TheRDebuggerTest {
           TheRExecutionResultType.EMPTY,
           TextRange.EMPTY_RANGE,
           "error_complete"
-        );
-      }
-
-      if (getCounter() == myScriptLength + 3) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
         );
       }
 

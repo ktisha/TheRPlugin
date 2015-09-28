@@ -15,8 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND;
-import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT;
+import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
 public class TheRUnbraceFunctionDebuggerTest {
@@ -42,7 +41,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -80,7 +79,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(0, factory.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -117,7 +116,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -154,7 +153,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(1, executor.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -192,7 +191,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(0, handler.getDroppedFramesCounter());
     assertEquals(0, handler.getReturnLineNumberCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -228,7 +227,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -262,7 +261,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -271,7 +270,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(5, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_continue", "error_entry", "error_entry", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_continue", "error_entry", "error_entry", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -307,7 +306,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     debugger.advance();
   }
@@ -317,15 +316,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           EXITING_FROM + " abc(c(1:10))\n" +
@@ -346,15 +336,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": abc(c(1:10))\n" +
@@ -394,15 +375,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
@@ -439,15 +411,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           EXITING_FROM + " abc(c(1:10))\n" +
@@ -483,15 +446,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
@@ -539,15 +493,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           "[1] 1 2 3\n" +
@@ -568,15 +513,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
           EXITING_FROM + " abc()\n" +
@@ -636,16 +572,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(LS_FUNCTIONS_COMMAND)) {
-        return new TheRExecutionResult(
-          NO_FUNCTIONS_RESULT,
-          TheRExecutionResultType.RESPONSE,
-          TextRange.allOf(NO_FUNCTIONS_RESULT),
-          "error_ls"
-        );
-      }
-
-
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
           "",
