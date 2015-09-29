@@ -11,21 +11,13 @@ import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TheRDebuggerStringUtilsTest {
 
   @Test
   public void emptyErrorAppending() {
     appendError(
-      new TheRExecutionResult("", TheRExecutionResultType.EMPTY, TextRange.EMPTY_RANGE, ""),
-      new IllegalTheROutputReceiver()
-    );
-  }
-
-  @Test
-  public void emptyOutputAppending() {
-    appendOutput(
       new TheRExecutionResult("", TheRExecutionResultType.EMPTY, TextRange.EMPTY_RANGE, ""),
       new IllegalTheROutputReceiver()
     );
@@ -50,19 +42,6 @@ public class TheRDebuggerStringUtilsTest {
 
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
-  }
-
-  @Test
-  public void ordinaryOutputAppending() {
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    appendOutput(
-      new TheRExecutionResult("output", TheRExecutionResultType.RESPONSE, TextRange.allOf("output"), ""),
-      receiver
-    );
-
-    assertEquals(Collections.singletonList("output"), receiver.getOutputs());
-    assertEquals(Collections.emptyList(), receiver.getErrors());
   }
 
   @Test
@@ -105,26 +84,6 @@ public class TheRDebuggerStringUtilsTest {
         "<" + ENVIRONMENT + ": 0xfffffff>"
       )
     );
-  }
-
-  @Test
-  public void commentChecking() {
-    assertTrue(isCommentOrSpaces(" # abc "));
-  }
-
-  @Test
-  public void spacesChecking() {
-    assertTrue(isCommentOrSpaces("  "));
-  }
-
-  @Test
-  public void nullChecking() {
-    assertFalse(isCommentOrSpaces(null));
-  }
-
-  @Test
-  public void ordinaryChecking() {
-    assertFalse(isCommentOrSpaces(" abc "));
   }
 
   @Test

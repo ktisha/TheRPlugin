@@ -169,9 +169,6 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         new TheRValueModifierHandlerImpl()
       );
     }
-    catch (final TheRDebuggerException e) {
-      throw new ExecutionException(e);
-    }
     catch (final IOException e) {
       throw new ExecutionException(e);
     }

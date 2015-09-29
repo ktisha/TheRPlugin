@@ -82,7 +82,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheROutputReceiver outputReceiver,
                       @NotNull final TheRExpressionHandler expressionHandler,
                       @NotNull final TheRValueModifierFactory modifierFactory,
-                      @NotNull final TheRValueModifierHandler modifierHandler) throws TheRDebuggerException {
+                      @NotNull final TheRValueModifierHandler modifierHandler) {
     myExecutor = executor;
     myDebuggerFactory = debuggerFactory;
     myLoaderFactory = loaderFactory;

@@ -315,7 +315,7 @@ public class TheRUnbraceFunctionDebuggerTest {
   @Test
   public void loop() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) ...`
+    for (i in 1:2) ...
     */
 
     final LoopTheRExecutor executor = new LoopTheRExecutor();
@@ -351,7 +351,7 @@ public class TheRUnbraceFunctionDebuggerTest {
   @Test
   public void loopWithFunction() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) d(i)`
+    for (i in 1:2) d(i)
     */
 
     final LoopWithFunctionTheRExecutor executor = new LoopWithFunctionTheRExecutor();

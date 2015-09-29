@@ -325,7 +325,7 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void braceLoop() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) { ... }`
+    for (i in 1:2) { ... }
     */
 
     braceLoop("");
@@ -334,10 +334,8 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void braceLoopWithOutputBefore() throws TheRDebuggerException {
     /*
-    `
     print(1)
     for (i in 1:2) { ... }
-    `
     */
 
     braceLoop("[1] 1 2 3\n[4] 4 5 6\n");
@@ -346,7 +344,7 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void braceLoopWithFunction() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) { d(i) }`
+    for (i in 1:2) { d(i) }
     */
 
     final BraceLoopWithFunctionTheRExecutor executor = new BraceLoopWithFunctionTheRExecutor();
@@ -429,7 +427,7 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void unbraceLoop() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) ...`
+    for (i in 1:2) ...
     */
 
     unbraceLoop("");
@@ -438,10 +436,8 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void unbraceLoopWithOutputBefore() throws TheRDebuggerException {
     /*
-    `
     print(1)
     for (i in 1:2) ...
-    `
     */
 
     unbraceLoop("[1] 1 2 3\n[4] 4 5 6\n");
@@ -450,7 +446,7 @@ public class TheRBraceFunctionDebuggerTest {
   @Test
   public void unbraceLoopWithFunction() throws TheRDebuggerException {
     /*
-    `for (i in 1:2) d(i)`
+    for (i in 1:2) d(i)
     */
 
     final UnbraceLoopWithFunctionTheRExecutor executor = new UnbraceLoopWithFunctionTheRExecutor();

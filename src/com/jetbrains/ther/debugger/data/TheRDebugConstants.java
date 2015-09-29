@@ -103,8 +103,6 @@ public final class TheRDebugConstants {
 
   // language
 
-  public static final char COMMENT_SYMBOL = '#';
-
   @NotNull
   public static final String CLOSURE = "closure";
 

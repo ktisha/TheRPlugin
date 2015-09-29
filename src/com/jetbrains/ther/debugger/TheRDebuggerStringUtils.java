@@ -4,9 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.COMMENT_SYMBOL;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
 
 public final class TheRDebuggerStringUtils {
@@ -31,14 +29,6 @@ public final class TheRDebuggerStringUtils {
     }
   }
 
-  public static void appendOutput(@NotNull final TheRExecutionResult result, @NotNull final TheROutputReceiver receiver) {
-    final String output = result.getOutput();
-
-    if (!output.isEmpty()) {
-      receiver.receiveOutput(output);
-    }
-  }
-
   @NotNull
   public static String handleFunctionValue(@NotNull final String functionValue) {
     final int lastLineBegin = findLastLineBegin(functionValue);
@@ -52,22 +42,6 @@ public final class TheRDebuggerStringUtils {
     else {
       return functionValue;
     }
-  }
-
-  public static boolean isCommentOrSpaces(@Nullable final CharSequence line) {
-    if (line == null) {
-      return false;
-    }
-
-    for (int i = 0; i < line.length(); i++) {
-      if (StringUtil.isWhiteSpace(line.charAt(i))) {
-        continue;
-      }
-
-      return line.charAt(i) == COMMENT_SYMBOL;
-    }
-
-    return true;
   }
 
   public static int findNextLineBegin(@NotNull final CharSequence sequence, final int index) {
