@@ -107,6 +107,18 @@ public class TheRExecutionResultCalculatorImplTest {
   }
 
   @Test
+  public void calculateUnbraceDebugAtWithOutput() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      "[1] 1 2 3\n" +
+      DEBUG + ": x <- c(1)",
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      DEBUG_AT,
+      "[1] 1 2 3"
+    );
+  }
+
+  @Test
   public void calculateDebugAtWithOutput() {
     check(
       EXECUTE_AND_STEP_COMMAND,

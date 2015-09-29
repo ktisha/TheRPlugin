@@ -338,7 +338,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
   @Nullable
   private static TypeAndResultLineBounds tryUnbraceDebugAt(@NotNull final String[] lines) {
     if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG + ": ")) {
-      return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 3);
+      return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 2);
     }
     else {
       return null;
