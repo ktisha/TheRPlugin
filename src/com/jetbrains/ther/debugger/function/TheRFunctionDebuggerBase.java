@@ -207,9 +207,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private boolean isBraceLoopEntrance(@NotNull final String output, final int debugAtIndex) {
     final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
-    final int lines = StringUtil.countNewLines(output);
+    final int lines = StringUtil.countNewLines(output.substring(loopEntranceBegin));
 
-    return lines > 1 && output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin);
+    return lines > 1 && (output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin));
   }
 
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result) {
