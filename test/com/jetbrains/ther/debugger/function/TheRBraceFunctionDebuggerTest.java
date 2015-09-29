@@ -383,8 +383,86 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void braceLoopWithFunction() {
-    fail();
+  public void braceLoopWithFunction() throws TheRDebuggerException {
+    /*
+    `for (i in 1:2) { d(i) }`
+    */
+
+    final BraceLoopWithFunctionTheRExecutor executor = new BraceLoopWithFunctionTheRExecutor();
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger());
+    final BraceLoopWithFunctionTheRFunctionDebuggerHandler handler = new BraceLoopWithFunctionTheRFunctionDebuggerHandler();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      factory,
+      handler,
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertEquals(0, factory.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_ent1", "error_ent2", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(5, executor.getCounter());
+    assertEquals(0, factory.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(6, executor.getCounter());
+    assertEquals(1, factory.getCounter());
+    assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_dbg_in"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(8, executor.getCounter());
+    assertEquals(1, factory.getCounter());
+    assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 1), debugger.getLocation());
+    assertEquals(9, executor.getCounter());
+    assertEquals(2, factory.getCounter());
+    assertEquals(2, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_dbg_in"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(10, executor.getCounter());
+    assertEquals(2, factory.getCounter());
+    assertEquals(2, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -403,7 +481,7 @@ public class TheRBraceFunctionDebuggerTest {
     `for (i in 1:2) ...`
     */
 
-    final UnbraceLoopExecutor executor = new UnbraceLoopExecutor();
+    final UnbraceLoopTheRExecutor executor = new UnbraceLoopTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
@@ -431,8 +509,56 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void unbraceLoopWithFunction() {
-    fail();
+  public void unbraceLoopWithFunction() throws TheRDebuggerException {
+    /*
+    `for (i in 1:2) d(i)`
+    */
+
+    final UnbraceLoopWithFunctionTheRExecutor executor = new UnbraceLoopWithFunctionTheRExecutor();
+    final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger());
+    final UnbraceLoopWithFunctionTheRFunctionDebuggerHandler handler = new UnbraceLoopWithFunctionTheRFunctionDebuggerHandler();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      factory,
+      handler,
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(2, executor.getCounter());
+    assertEquals(0, factory.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_ent", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    // debugger handles `DEBUGGING_IN`,
+    // `d` iterations run with `CONTINUE_TRACE` between them
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertEquals(1, factory.getCounter());
+    assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_dbg_in"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(4, executor.getCounter());
+    assertEquals(1, factory.getCounter());
+    assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   @Test
@@ -874,7 +1000,83 @@ public class TheRBraceFunctionDebuggerTest {
     }
   }
 
-  private static class UnbraceLoopExecutor extends MockTheRExecutor {
+  private static class BraceLoopWithFunctionTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: for (i in 1:2) {\n" +
+          "    d(i)\n" +
+          "}\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_ent1"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: i\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_ent2"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 4 || getCounter() == 7)) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "2: d(i)\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_body"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 6 || getCounter() == 9)) {
+        return new TheRExecutionResult(
+          DEBUGGING_IN + ": d(i)\n" +
+          DEBUG + ": print(i)\n" +
+          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUGGING_IN,
+          TextRange.EMPTY_RANGE,
+          "error_dbg_in"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
+        return new TheRExecutionResult(
+          EXITING_FROM + " f()\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          TextRange.EMPTY_RANGE,
+          "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class BraceLoopWithFunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+
+    private int myCounter = 0;
+
+    @Override
+    public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+      myCounter++;
+    }
+
+    public int getCounter() {
+      return myCounter;
+    }
+  }
+
+  private static class UnbraceLoopTheRExecutor extends MockTheRExecutor {
 
     @NotNull
     @Override
@@ -900,6 +1102,59 @@ public class TheRBraceFunctionDebuggerTest {
       }
 
       throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class UnbraceLoopWithFunctionTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: for (i in 1:2) d(i)",
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_ent"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
+        return new TheRExecutionResult(
+          DEBUGGING_IN + ": d(i)\n" +
+          DEBUG + ": print(i)\n" +
+          BROWSE_PREFIX + "4" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUGGING_IN,
+          TextRange.EMPTY_RANGE,
+          "error_dbg_in"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
+        return new TheRExecutionResult(
+          EXITING_FROM + " f()\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          TextRange.EMPTY_RANGE,
+          "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class UnbraceLoopWithFunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+
+    private int myCounter = 0;
+
+    @Override
+    public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
+      myCounter++;
+    }
+
+    public int getCounter() {
+      return myCounter;
     }
   }
 
