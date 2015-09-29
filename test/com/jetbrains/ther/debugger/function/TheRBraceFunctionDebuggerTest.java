@@ -427,11 +427,6 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void braceLoopWithReturnBefore() {
-    fail();
-  }
-
-  @Test
   public void unbraceLoop() throws TheRDebuggerException {
     /*
     `for (i in 1:2) ...`
@@ -506,8 +501,27 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void unbraceLoopWithReturnBefore() {
-    fail();
+  public void exitingFromWithBraceLoopAfter() throws TheRDebuggerException {
+    /*
+    abc() {
+      print(1)
+    }
+    for (i in 1:2) { ... }
+    */
+
+    exitingFromWithLoopAfter(true);
+  }
+
+  @Test
+  public void exitingFromWithUnbraceLoopAfter() throws TheRDebuggerException {
+    /*
+    abc() {
+      print(1)
+    }
+    for (i in 1:2) ...
+    */
+
+    exitingFromWithLoopAfter(false);
   }
 
   @Test(expected = TheRRuntimeException.class)
@@ -619,6 +633,37 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(3, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+  }
+
+  private void exitingFromWithLoopAfter(final boolean isBrace) throws TheRDebuggerException {
+    final ExitingFromWithLoopAfterTheRExecutor executor = new ExitingFromWithLoopAfterTheRExecutor(isBrace);
+    final ExitingFromWithLoopAfterTheRFunctionDebuggerHandler handler = new ExitingFromWithLoopAfterTheRFunctionDebuggerHandler();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      handler,
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(2, executor.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(isBrace ? 4 : 3, executor.getCounter());
+    assertEquals(2, handler.getCounter());
+    assertEquals(Collections.singletonList("[1] 1"), receiver.getOutputs());
+    assertEquals(isBrace ? Arrays.asList("error_exit", "error_loop") : Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
@@ -1189,6 +1234,75 @@ public class TheRBraceFunctionDebuggerTest {
     @Override
     public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
       myCounter++;
+    }
+
+    public int getCounter() {
+      return myCounter;
+    }
+  }
+
+  private static class ExitingFromWithLoopAfterTheRExecutor extends MockTheRExecutor {
+
+    private final boolean myIsBrace;
+
+    public ExitingFromWithLoopAfterTheRExecutor(final boolean isBrace) {
+      myIsBrace = isBrace;
+    }
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "1: print(1)\n" +
+          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_body"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
+        final String debugAt = myIsBrace
+                               ?
+                               DEBUG_AT + "3: for (i in 1:2) {\n" +
+                               "    print(i)\n" +
+                               "}"
+                               :
+                               DEBUG_AT + "3: for (i in 1:2) print(i)";
+
+        return new TheRExecutionResult(
+          "[1] 1\n" +
+          EXITING_FROM + " d()\n" +
+          debugAt + "\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          new TextRange(0, 5),
+          "error_exit"
+        );
+      }
+
+      if (myIsBrace && command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "3: i\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_loop"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
+    }
+  }
+
+  private static class ExitingFromWithLoopAfterTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+
+    private int myCounter = 0;
+
+    @Override
+    public void setReturnLineNumber(final int lineNumber) {
+      myCounter += lineNumber;
     }
 
     public int getCounter() {

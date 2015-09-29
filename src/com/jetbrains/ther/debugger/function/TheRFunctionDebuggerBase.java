@@ -120,13 +120,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     traceAndDebugFunctions(myExecutor, myOutputReceiver);
   }
 
-  protected void handleEndTrace(@NotNull final TheRExecutionResult result) {
+  protected void handleEndTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
     handleEndTraceResult(result);
     appendError(result, myOutputReceiver);
 
     final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM);
 
-    handleEndTraceReturnLineNumber(result, lastExitingFromEntry);
+    handleEndTraceReturnLine(result, lastExitingFromEntry);
 
     myCurrentLineNumber = -1;
   }
@@ -143,13 +143,13 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     );
   }
 
-  protected void handleRecursiveEndTrace(@NotNull final TheRExecutionResult result) {
+  protected void handleRecursiveEndTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
     handleEndTraceResult(result);
     appendError(result, myOutputReceiver);
 
     final RecursiveEndTraceData data = calculateRecursiveEndTraceData(result);
 
-    handleEndTraceReturnLineNumber(result, data.myLastExitingFrom);
+    handleEndTraceReturnLine(result, data.myLastExitingFrom);
 
     myCurrentLineNumber = -1;
 
@@ -240,11 +240,17 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return new RecursiveEndTraceData(lastEntry, count);
   }
 
-  private void handleEndTraceReturnLineNumber(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
-    final int returnLineNumber = extractLineNumberIfPossible(
-      result,
-      findDebugAtIndexInEndTrace(result, lastExitingFrom)
-    );
+  private void handleEndTraceReturnLine(@NotNull final TheRExecutionResult result, final int lastExitingFrom) throws TheRDebuggerException {
+    final int debugAtIndex = findDebugAtIndexInEndTrace(result, lastExitingFrom);
+
+    if (result.getOutput().startsWith(DEBUG_AT, debugAtIndex) && isBraceLoopEntrance(result.getOutput(), debugAtIndex)) {
+      doHandleDebugAt(
+        execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT),
+        false
+      );
+    }
+
+    final int returnLineNumber = extractLineNumberIfPossible(result, debugAtIndex);
 
     if (returnLineNumber != -1) {
       myDebuggerHandler.setReturnLineNumber(returnLineNumber);
