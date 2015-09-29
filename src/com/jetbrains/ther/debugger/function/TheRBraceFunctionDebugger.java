@@ -23,23 +23,23 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
     switch (result.getType()) {
-      case DEBUG_AT:
-        handleDebugAt(result);
-        break;
       case CONTINUE_TRACE:
         handleContinueTrace(result);
         break;
-      case EXITING_FROM:
-        handleEndTrace(result);
+      case DEBUG_AT:
+        handleDebugAt(result);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn(result);
         break;
-      case RECURSIVE_EXITING_FROM:
-        handleRecursiveEndTrace(result);
-        break;
       case EMPTY:
         handleEmpty(result);
+        break;
+      case EXITING_FROM:
+        handleEndTrace(result);
+        break;
+      case RECURSIVE_EXITING_FROM:
+        handleRecursiveEndTrace(result);
         break;
       default:
         throw new TheRUnexpectedExecutionResultException(
@@ -48,17 +48,17 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "actual: " + result.getType() + ", " +
           "expected: " +
           "[" +
-          DEBUG_AT +
-          ", " +
           CONTINUE_TRACE +
           ", " +
-          EXITING_FROM +
+          DEBUG_AT +
           ", " +
           DEBUGGING_IN +
           ", " +
-          RECURSIVE_EXITING_FROM +
-          ", " +
           EMPTY +
+          ", " +
+          EXITING_FROM +
+          ", " +
+          RECURSIVE_EXITING_FROM +
           "]" +
           "]"
         );

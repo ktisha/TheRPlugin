@@ -23,20 +23,20 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   @Override
   protected void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
     switch (result.getType()) {
-      case EXITING_FROM:
-        handleEndTrace(result);
+      case CONTINUE_TRACE:
+        handleContinueTrace(result);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn(result);
         break;
-      case RECURSIVE_EXITING_FROM:
-        handleRecursiveEndTrace(result);
-        break;
-      case CONTINUE_TRACE:
-        handleContinueTrace(result);
-        break;
       case EMPTY:
         handleEmpty(result);
+        break;
+      case EXITING_FROM:
+        handleEndTrace(result);
+        break;
+      case RECURSIVE_EXITING_FROM:
+        handleRecursiveEndTrace(result);
         break;
       default:
         throw new TheRUnexpectedExecutionResultException(
@@ -44,7 +44,7 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "[" +
           "actual: " + result.getType() + ", " +
           "expected: " +
-          "[" + EXITING_FROM + ", " + DEBUGGING_IN + ", " + RECURSIVE_EXITING_FROM + ", " + CONTINUE_TRACE + ", " + EMPTY + "]" +
+          "[" + CONTINUE_TRACE + ", " + DEBUGGING_IN + ", " + EMPTY + ", " + EXITING_FROM + ", " + RECURSIVE_EXITING_FROM + "]" +
           "]"
         );
     }
