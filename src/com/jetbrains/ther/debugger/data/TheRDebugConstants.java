@@ -34,9 +34,6 @@ public final class TheRDebugConstants {
   public static final String KEEP_SOURCE_COMMAND = "options(keep.source=TRUE)";
 
   @NotNull
-  public static final String NOP_COMMAND = "#";
-
-  @NotNull
   public static final String LS_COMMAND = "ls";
 
   @NotNull

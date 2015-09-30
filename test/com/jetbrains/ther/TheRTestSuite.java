@@ -3,7 +3,6 @@ package com.jetbrains.ther;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtilsTest;
 import com.jetbrains.ther.debugger.TheRDebuggerTest;
 import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandlerTest;
-import com.jetbrains.ther.debugger.TheRScriptReaderImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImplTest;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImplTest;
@@ -81,7 +80,6 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRDebuggerTest.class);
     addJUnit4Test(suite, TheRDebuggerStringUtilsTest.class);
     addJUnit4Test(suite, TheRForcedFunctionDebuggerHandlerTest.class);
-    addJUnit4Test(suite, TheRScriptReaderImplTest.class);
   }
 
   private static void addXDebuggerTests(@NotNull final TestSuite suite) {

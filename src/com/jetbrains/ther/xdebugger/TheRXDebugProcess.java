@@ -233,7 +233,6 @@ class TheRXDebugProcess extends XDebugProcess {
 
   @Override
   public void stop() {
-    myDebugger.stop();
     myExecutor.shutdownNow();
   }
 

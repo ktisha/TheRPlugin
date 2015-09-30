@@ -21,7 +21,6 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
-import com.jetbrains.ther.debugger.TheRScriptReaderImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -39,7 +38,9 @@ import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSessionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +163,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         new TheRFunctionDebuggerFactoryImpl(),
         new TheRVarsLoaderFactoryImpl(processHandler, outputReceiver),
         new TheRDebuggerEvaluatorFactoryImpl(),
-        new TheRScriptReaderImpl(scriptPath),
+        new BufferedReader(new FileReader(scriptPath)),
         outputReceiver,
         new TheRExpressionHandlerImpl(),
         new TheRValueModifierFactoryImpl(),

@@ -17,6 +17,7 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +46,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   private final TheRDebuggerEvaluatorFactory myEvaluatorFactory;
 
   @NotNull
-  private final TheRScriptReader myScriptReader;
+  private final BufferedReader myScriptReader;
 
   @NotNull
   private final TheROutputReceiver myOutputReceiver;
@@ -78,7 +79,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
                       @NotNull final TheRVarsLoaderFactory loaderFactory,
                       @NotNull final TheRDebuggerEvaluatorFactory evaluatorFactory,
-                      @NotNull final TheRScriptReader scriptReader,
+                      @NotNull final BufferedReader scriptReader,
                       @NotNull final TheROutputReceiver outputReceiver,
                       @NotNull final TheRExpressionHandler expressionHandler,
                       @NotNull final TheRValueModifierFactory modifierFactory,
@@ -115,15 +116,6 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   @NotNull
   public List<TheRStackFrame> getStack() {
     return myUnmodifiableStack;
-  }
-
-  public void stop() {
-    try {
-      myScriptReader.close();
-    }
-    catch (final IOException e) {
-      LOGGER.warn(e);
-    }
   }
 
   @Override
@@ -171,6 +163,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myIsRunning = true;
 
     submitMainFunction();
+    closeReader();
 
     traceAndDebugFunctions(myExecutor, myOutputReceiver);
 
@@ -231,16 +224,10 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     execute(myExecutor, MAIN_FUNCTION_NAME + " <- function() {", PLUS, myOutputReceiver);
 
     try {
-      myScriptReader.advance();
+      String command;
 
-      while (myScriptReader.getCurrentLine().getNumber() != -1) {
-        final String command = myScriptReader.getCurrentLine().getText();
-
-        assert command != null;
-
+      while ((command = myScriptReader.readLine()) != null) {
         execute(myExecutor, command, PLUS, myOutputReceiver);
-
-        myScriptReader.advance();
       }
     }
     catch (final IOException e) {
@@ -248,6 +235,15 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     }
 
     execute(myExecutor, "}", EMPTY, myOutputReceiver);
+  }
+
+  private void closeReader() {
+    try {
+      myScriptReader.close();
+    }
+    catch (final IOException e) {
+      LOGGER.warn(e);
+    }
   }
 
   @NotNull
