@@ -27,7 +27,7 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
         handleContinueTrace(result);
         break;
       case DEBUG_AT:
-        handleDebugAt(result);
+        handleDebugAt(result, true, true);
         break;
       case DEBUGGING_IN:
         handleDebuggingIn(result);
@@ -48,16 +48,11 @@ class TheRBraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "actual: " + result.getType() + ", " +
           "expected: " +
           "[" +
-          CONTINUE_TRACE +
-          ", " +
-          DEBUG_AT +
-          ", " +
-          DEBUGGING_IN +
-          ", " +
-          EMPTY +
-          ", " +
-          EXITING_FROM +
-          ", " +
+          CONTINUE_TRACE + ", " +
+          DEBUG_AT + ", " +
+          DEBUGGING_IN + ", " +
+          EMPTY + ", " +
+          EXITING_FROM + ", " +
           RECURSIVE_EXITING_FROM +
           "]" +
           "]"

@@ -97,14 +97,34 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         EXECUTE_AND_STEP_COMMAND,
         TheRExecutionResultType.DEBUG_AT
       ),
-      false
+      false,
+      true
     );
 
     return myCurrentLineNumber;
   }
 
-  protected void handleDebugAt(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    handleDebugAt(result, true);
+  protected void handleDebugAt(@NotNull final TheRExecutionResult result,
+                               final boolean enableTraceAndDebug,
+                               final boolean extractLineNumber) throws TheRDebuggerException {
+    appendResult(result, myOutputReceiver);
+    appendError(result, myOutputReceiver);
+
+    final String output = result.getOutput();
+    final int debugAtIndex = findNextLineAfterResult(result);
+
+    if (isBraceLoopEntrance(output, debugAtIndex)) {
+      handleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT), enableTraceAndDebug, true);
+    }
+    else {
+      if (extractLineNumber) {
+        myCurrentLineNumber = extractLineNumber(output, debugAtIndex);
+      }
+
+      if (enableTraceAndDebug) {
+        traceAndDebugFunctions(myExecutor, myOutputReceiver);
+      }
+    }
   }
 
   protected void handleContinueTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
@@ -162,25 +182,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   protected void setCurrentLineNumber(final int currentLineNumber) {
     myCurrentLineNumber = currentLineNumber;
-  }
-
-  private void handleDebugAt(@NotNull final TheRExecutionResult result, final boolean enableTraceAndDebug) throws TheRDebuggerException {
-    appendResult(result, myOutputReceiver);
-    appendError(result, myOutputReceiver);
-
-    final String output = result.getOutput();
-    final int debugAtIndex = findNextLineAfterResult(result);
-
-    if (isBraceLoopEntrance(output, debugAtIndex)) {
-      handleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT), enableTraceAndDebug);
-    }
-    else {
-      myCurrentLineNumber = extractLineNumber(output, debugAtIndex);
-
-      if (enableTraceAndDebug) {
-        traceAndDebugFunctions(myExecutor, myOutputReceiver);
-      }
-    }
   }
 
   private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
@@ -246,7 +247,8 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       if (isBraceLoopEntrance(output, debugAtIndex)) {
         handleDebugAt(
           execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT),
-          false
+          false,
+          true
         );
       }
 

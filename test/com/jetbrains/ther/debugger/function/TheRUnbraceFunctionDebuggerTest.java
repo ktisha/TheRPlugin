@@ -356,7 +356,7 @@ public class TheRUnbraceFunctionDebuggerTest {
 
     final LoopWithFunctionTheRExecutor executor = new LoopWithFunctionTheRExecutor();
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(new IllegalTheRFunctionDebugger());
-    final UnbraceLoopWithFunctionTheRFunctionDebuggerHandler handler = new UnbraceLoopWithFunctionTheRFunctionDebuggerHandler();
+    final LoopWithFunctionTheRFunctionDebuggerHandler handler = new LoopWithFunctionTheRFunctionDebuggerHandler();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
@@ -388,6 +388,48 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(1, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
+  }
+
+  @Test
+  public void ifStatement() throws TheRDebuggerException {
+    /*
+    if (i > 5) print(i) else print(i + 1)
+    */
+
+    final IfStatementTheRExecutor executor = new IfStatementTheRExecutor();
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      new IllegalTheRFunctionDebuggerHandler(),
+      receiver,
+      "abc"
+    );
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(1, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(4, executor.getCounter());
+    assertEquals(Collections.singletonList("[1] 2"), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
@@ -709,7 +751,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     }
   }
 
-  private static class UnbraceLoopWithFunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
+  private static class LoopWithFunctionTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
 
     private int myCounter = 0;
 
@@ -720,6 +762,36 @@ public class TheRUnbraceFunctionDebuggerTest {
 
     public int getCounter() {
       return myCounter;
+    }
+  }
+
+  private static class IfStatementTheRExecutor extends MockTheRExecutor {
+
+    @NotNull
+    @Override
+    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRExecutionResult(
+          DEBUG_AT + "2: print(i + 1)\n" +
+          BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_body"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
+        return new TheRExecutionResult(
+          "[1] 2\n" +
+          EXITING_FROM + " f(1)\n" +
+          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+          TheRExecutionResultType.EXITING_FROM,
+          new TextRange(0, 5),
+          "error_exit"
+        );
+      }
+
+      throw new IllegalStateException("Unexpected command");
     }
   }
 }

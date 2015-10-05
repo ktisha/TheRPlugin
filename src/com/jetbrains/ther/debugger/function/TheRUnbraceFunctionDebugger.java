@@ -26,6 +26,9 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
       case CONTINUE_TRACE:
         handleContinueTrace(result);
         break;
+      case DEBUG_AT:
+        handleDebugAt(result, true, false);
+        break;
       case DEBUGGING_IN:
         handleDebuggingIn(result);
         break;
@@ -44,7 +47,14 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
           "[" +
           "actual: " + result.getType() + ", " +
           "expected: " +
-          "[" + CONTINUE_TRACE + ", " + DEBUGGING_IN + ", " + EMPTY + ", " + EXITING_FROM + ", " + RECURSIVE_EXITING_FROM + "]" +
+          "[" +
+          CONTINUE_TRACE + ", " +
+          DEBUG_AT + ", " +
+          DEBUGGING_IN + ", " +
+          EMPTY + ", " +
+          EXITING_FROM + ", " +
+          RECURSIVE_EXITING_FROM +
+          "]" +
           "]"
         );
     }
