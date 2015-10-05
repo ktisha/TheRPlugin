@@ -3,16 +3,20 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
@@ -72,7 +76,44 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       throw new IllegalStateException("Advance could be called only if hasNext returns true");
     }
 
-    handleExecutionResult(myExecutor.execute(EXECUTE_AND_STEP_COMMAND));
+    final TheRExecutionResult result = myExecutor.execute(EXECUTE_AND_STEP_COMMAND);
+
+    switch (result.getType()) {
+      case CONTINUE_TRACE:
+        handleContinueTrace(result);
+        break;
+      case DEBUG_AT:
+        handleDebugAt(result);
+        break;
+      case DEBUGGING_IN:
+        handleDebuggingIn(result);
+        break;
+      case EMPTY:
+        handleEmpty(result);
+        break;
+      case EXITING_FROM:
+        handleEndTrace(result);
+        break;
+      case RECURSIVE_EXITING_FROM:
+        handleRecursiveEndTrace(result);
+        break;
+      default:
+        throw new TheRUnexpectedExecutionResultException(
+          "Actual type is not the same as expected: " +
+          "[" +
+          "actual: " + result.getType() + ", " +
+          "expected: " +
+          "[" +
+          CONTINUE_TRACE + ", " +
+          DEBUG_AT + ", " +
+          DEBUGGING_IN + ", " +
+          EMPTY + ", " +
+          TheRExecutionResultType.EXITING_FROM + ", " +
+          RECURSIVE_EXITING_FROM +
+          "]" +
+          "]"
+        );
+    }
   }
 
   @NotNull
@@ -85,7 +126,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     return myResult;
   }
 
-  protected abstract void handleExecutionResult(@NotNull final TheRExecutionResult result) throws TheRDebuggerException;
+  protected abstract void handleDebugAt(@NotNull final TheRExecutionResult result) throws TheRDebuggerException;
 
   @NotNull
   protected abstract TheRExecutionResultType getStartTraceType();
@@ -95,7 +136,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
       execute(
         myExecutor,
         EXECUTE_AND_STEP_COMMAND,
-        TheRExecutionResultType.DEBUG_AT
+        DEBUG_AT
       ),
       false,
       true
@@ -114,7 +155,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final int debugAtIndex = findNextLineAfterResult(result);
 
     if (isBraceLoopEntrance(output, debugAtIndex)) {
-      handleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT), enableTraceAndDebug, true);
+      handleDebugAt(execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT), enableTraceAndDebug, true);
     }
     else {
       if (extractLineNumber) {
@@ -131,7 +172,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     handleEndTraceResult(result);
     appendError(result, myOutputReceiver);
 
-    execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT, myOutputReceiver);
+    execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT, myOutputReceiver);
     execute(myExecutor, EXECUTE_AND_STEP_COMMAND, getStartTraceType(), myOutputReceiver);
 
     myCurrentLineNumber = initCurrentLine();
@@ -185,7 +226,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
+    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT.length();
     final int lineNumberEnd = output.indexOf(':', lineNumberBegin + 1);
 
     return Integer.parseInt(output.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
@@ -204,7 +245,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private boolean isBraceLoopEntrance(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + DEBUG_AT.length();
+    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT.length();
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
     final int lines = StringUtil.countNewLines(output.substring(loopEntranceBegin));
 
@@ -243,10 +284,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final String output = result.getOutput();
     final int debugAtIndex = findDebugAtIndexInEndTraceReturn(result, lastExitingFrom);
 
-    if (output.startsWith(DEBUG_AT, debugAtIndex)) {
+    if (output.startsWith(TheRDebugConstants.DEBUG_AT, debugAtIndex)) {
       if (isBraceLoopEntrance(output, debugAtIndex)) {
         handleDebugAt(
-          execute(myExecutor, EXECUTE_AND_STEP_COMMAND, TheRExecutionResultType.DEBUG_AT),
+          execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT),
           false,
           true
         );
