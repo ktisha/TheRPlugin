@@ -105,4 +105,11 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String FUNCTION_TYPE = "[1] \"" + CLOSURE + "\"";
+
+  @NotNull
+  public static final String FOR_LOOP_PREFIX = "for";
+
+  @NotNull
+  public static final String WHILE_LOOP_PREFIX = "while";
+
 }

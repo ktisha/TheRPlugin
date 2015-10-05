@@ -14,9 +14,11 @@ import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
+import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
@@ -249,7 +251,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
     final int lines = StringUtil.countNewLines(output.substring(loopEntranceBegin));
 
-    return lines > 1 && (output.startsWith("for", loopEntranceBegin) || output.startsWith("while", loopEntranceBegin));
+    return lines > 1 && (
+      output.startsWith(FOR_LOOP_PREFIX, loopEntranceBegin) ||
+      output.startsWith(WHILE_LOOP_PREFIX, loopEntranceBegin)
+    );
   }
 
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result) {
