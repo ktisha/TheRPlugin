@@ -131,16 +131,13 @@ public class TheRPsiUtils {
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     if (path == null) return null;
     final String assigneeText = assignee.getText().replaceAll("\"", "");
-    GeneralCommandLine commandLine = new GeneralCommandLine(path, "--slave",  "-f ", helperPath, " --args ", assigneeText);
+    final GeneralCommandLine commandLine = new GeneralCommandLine(path, "--slave",  "-f ", helperPath, " --args ", assigneeText);
     try {
       final Process process = commandLine.createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       final String stdout = output.getStdout();
-      if (stdout.startsWith("No documentation")) {
-        return null;
-      }
-      return stdout;
+      return stdout.startsWith("No documentation") ? null : stdout;
     }
     catch (ExecutionException e) {
       LOG.error(e);
