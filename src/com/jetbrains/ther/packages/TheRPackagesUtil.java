@@ -83,6 +83,12 @@ public final class TheRPackagesUtil {
         installedPackages.add(theRPackage);
       }
     }
+    Collections.sort(installedPackages, new Comparator<InstalledPackage>() {
+      @Override
+      public int compare(InstalledPackage o1, InstalledPackage o2) {
+        return StringUtil.compare(o1.getName(), o2.getName(), true);
+      }
+    });
     return installedPackages;
   }
 
@@ -93,7 +99,7 @@ public final class TheRPackagesUtil {
   public static List<RepoPackage> getOrLoadPackages() {
     Map<String, String> nameVersionMap = getPackages();
     if (nameVersionMap.isEmpty()) {
-      getAvailablePackages();
+      loadAvailablePackages();
       nameVersionMap = getPackages();
     }
     return versionMapToPackageList(nameVersionMap);
@@ -105,6 +111,12 @@ public final class TheRPackagesUtil {
       final String[] splitted = entry.getValue().split(ARGUMENT_DELIMETER);
       packages.add(new RepoPackage(entry.getKey(), splitted[1], splitted[0]));
     }
+    //Collections.sort(packages, new Comparator<RepoPackage>() {
+    //  @Override
+    //  public int compare(RepoPackage o1, RepoPackage o2) {
+    //    return o1.getName().compareTo(o2.getName());
+    //  }
+    //});
     return packages;
   }
 
@@ -168,7 +180,7 @@ public final class TheRPackagesUtil {
   }
 
   @Nullable
-  public static List<RepoPackage> getAvailablePackages() {
+  public static List<RepoPackage> loadAvailablePackages() {
     final List<String> args = getHelperRepositoryArguments();
     final TheRRunResult result = runHelperWithArgs(R_ALL_PACKAGES, args.toArray(new String[args.size()]));
     if (result == null || result.getExitCode() != 0) {

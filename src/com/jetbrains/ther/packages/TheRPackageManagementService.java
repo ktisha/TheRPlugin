@@ -82,7 +82,7 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public List<RepoPackage> reloadAllPackages() {
-    return TheRPackagesUtil.getAvailablePackages();
+    return TheRPackagesUtil.loadAvailablePackages();
   }
 
   @Override
