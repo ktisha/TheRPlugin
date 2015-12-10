@@ -1,5 +1,6 @@
 package com.jetbrains.ther;
 
+import com.google.common.collect.Lists;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,15 +99,21 @@ public class TheRPsiUtils {
     return null;
   }
 
-  public static String getHelpForFunction(PsiElement assignee, String packageName) {
-    File file = TheRHelpersLocator.getHelperFile("r-help.r");
+  public static String getHelpForFunction(@NotNull final PsiElement assignee, @Nullable final String packageName) {
+    final String helpHelper = packageName != null ? "r-help.r" : "r-help-without-package.r";
+    final File file = TheRHelpersLocator.getHelperFile(helpHelper);
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    String helperPath = file.getAbsolutePath();
-    final Process process;
+    final String helperPath = file.getAbsolutePath();
     try {
-      String assigneeText =
-        assignee.getText().replaceAll("\"", "");
-      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + packageName + " " + assigneeText);
+      String assigneeText = assignee.getText().replaceAll("\"", "");
+      final ArrayList<String> arguments = Lists.newArrayList(path, "--slave", "-f ", helperPath, " --args ");
+      if (packageName != null) {
+        arguments.add(packageName);
+      }
+      arguments.add(assigneeText);
+
+      final GeneralCommandLine commandLine = new GeneralCommandLine(arguments);
+      final Process process = commandLine.createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       String stdout = output.getStdout();
@@ -116,35 +122,12 @@ public class TheRPsiUtils {
       }
       return stdout;
     }
-    catch (IOException e) {
-      LOG.error(e);
-    }
-    return null;
-  }
-
-  /**
-   * No package loading. Use only for documentation.
-   */
-  @Nullable
-  public static String getHelpForFunction(@NotNull PsiElement assignee) {
-    final String helperPath = TheRHelpersLocator.getHelperPath("r-help-without-package.r");
-    final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    if (path == null) return null;
-    final String assigneeText = assignee.getText().replaceAll("\"", "");
-    final GeneralCommandLine commandLine = new GeneralCommandLine(path, "--slave",  "-f ", helperPath, " --args ", assigneeText);
-    try {
-      final Process process = commandLine.createProcess();
-      final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-      final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
-      final String stdout = output.getStdout();
-      return stdout.startsWith("No documentation") ? null : stdout;
-    }
     catch (ExecutionException e) {
       LOG.error(e);
     }
-
     return null;
   }
+
   @NotNull
   public static <T extends TheRPsiElement> T[] getAllChildrenOfType(@NotNull PsiElement element, @NotNull Class<T> aClass) {
     List<T> result = new SmartList<T>();

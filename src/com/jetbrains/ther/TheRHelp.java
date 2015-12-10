@@ -1,5 +1,7 @@
 package com.jetbrains.ther;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TheRHelp {
   public String myDescription;
   public String myArguments;
@@ -7,8 +9,8 @@ public class TheRHelp {
   public String myUsage;
   public String myExamples;
 
-  public TheRHelp(String documentationText) {
-    String[] lines = documentationText.split("\n");
+  public TheRHelp(@NotNull final String documentationText) {
+    final String[] lines = documentationText.split("\n");
     String section = null;
     StringBuilder sectionText = null;
     for (String line : lines) {
