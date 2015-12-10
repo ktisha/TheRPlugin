@@ -47,7 +47,7 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @NotNull
   public List<TheRDefaultRepository> getDefaultRepositories() {
-    return Lists.newArrayList(TheRPackagesUtil.getDeafaultRepositories()); //TODO Caching of this value
+    return Lists.newArrayList(TheRPackagesUtil.getDefaultRepositories()); //TODO Caching of this value
   }
 
   public List<String> getMirrors() {
