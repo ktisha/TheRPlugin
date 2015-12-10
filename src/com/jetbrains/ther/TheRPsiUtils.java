@@ -21,7 +21,7 @@ import java.util.List;
 
 public class TheRPsiUtils {
   private static final Logger LOG = Logger.getInstance(TheRPsiUtils.class);
-  private static final int MINUTE = 60 * 1000;
+  public static final int MINUTE = 60 * 1000;
 
   public static List<TheRExpression> getParametersExpressions(List<TheRParameter> parameters) {
     List<TheRExpression> parametersExpressions = new ArrayList<TheRExpression>();

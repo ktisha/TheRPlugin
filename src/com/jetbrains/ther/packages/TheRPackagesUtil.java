@@ -10,10 +10,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.CatchingConsumer;
-import com.intellij.util.text.DateFormatUtil;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.RepoPackage;
 import com.jetbrains.ther.TheRHelpersLocator;
+import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +55,7 @@ public final class TheRPackagesUtil {
     try {
       final Process process = new GeneralCommandLine(path, "--slave", "-f", helperPath).createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-      final ProcessOutput output = processHandler.runProcess((int)(5 * DateFormatUtil.MINUTE));
+      final ProcessOutput output = processHandler.runProcess(5 * TheRPsiUtils.MINUTE);
       if (output.getExitCode() != 0) {
         LOG.error("Failed to run script. Exit code: " + output.getExitCode());
         LOG.error(output.getStderrLines());
@@ -229,7 +229,7 @@ public final class TheRPackagesUtil {
     final Process process = new GeneralCommandLine(arguments).createProcess();
 
     final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-    final ProcessOutput output = processHandler.runProcess((int)(5 * DateFormatUtil.MINUTE));
+    final ProcessOutput output = processHandler.runProcess(5 * TheRPsiUtils.MINUTE);
     if (output.getExitCode() != 0) {
       throw new TheRExecutionException("Can't remove package", StringUtil.join(arguments, " "), output.getStdout(),
                                        output.getStderr(), output.getExitCode());
@@ -291,7 +291,7 @@ public final class TheRPackagesUtil {
     try {
       final Process process = new GeneralCommandLine(command).createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
-      final ProcessOutput output = processHandler.runProcess((int)(5 * DateFormatUtil.MINUTE));
+      final ProcessOutput output = processHandler.runProcess(5 * TheRPsiUtils.MINUTE);
       if (output.getExitCode() != 0) {
         LOG.error("Failed to run script. Exit code: " + output.getExitCode());
         LOG.error(output.getStderrLines());
