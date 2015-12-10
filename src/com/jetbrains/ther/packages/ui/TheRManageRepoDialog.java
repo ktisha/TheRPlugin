@@ -42,8 +42,8 @@ public class TheRManageRepoDialog extends DialogWrapper {
 
     setTitle("Manage Repositories");
     myController = controller;
-    final DefaultListModel<TheRRepository> defaultRepoModel = new DefaultListModel<TheRRepository>();
-    final DefaultListModel<TheRRepository> enabledRepoModel = new DefaultListModel<TheRRepository>();
+    final DefaultListModel defaultRepoModel = new DefaultListModel();
+    final DefaultListModel enabledRepoModel = new DefaultListModel();
     myDefaultRepos = controller.getDefaultRepositories();
     for (TheRDefaultRepository repository : myDefaultRepos) {
       defaultRepoModel.addElement(repository);
@@ -125,7 +125,7 @@ public class TheRManageRepoDialog extends DialogWrapper {
     myRemoveButton.setEnabled(false);
   }
 
-  private void initButtons(final DefaultListModel<TheRRepository> enabledRepoModel, final DefaultListModel<TheRRepository> defaultRepoModel) {
+  private void initButtons(final DefaultListModel enabledRepoModel, final DefaultListModel defaultRepoModel) {
 
     myAddButton.addActionListener(new ActionListener() {
       @Override
