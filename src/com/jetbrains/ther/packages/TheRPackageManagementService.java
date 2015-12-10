@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.intellij.execution.ExecutionException;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.CatchingConsumer;
+import com.intellij.util.containers.ContainerUtil;
 import com.intellij.webcore.packaging.InstalledPackage;
 import com.intellij.webcore.packaging.PackageManagementService;
 import com.intellij.webcore.packaging.RepoPackage;
@@ -93,7 +94,6 @@ public class TheRPackageManagementService extends PackageManagementService {
   @Override
   public void installPackage(final RepoPackage repoPackage, String version, boolean forceUpgrade, String extraOptions,
                              final Listener listener, boolean installToUser) {
-
     final TheRPackageTaskManager manager = new TheRPackageTaskManager(myProject, new TheRPackageTaskManager.TaskListener() {
       @Override
       public void started() {
@@ -105,7 +105,13 @@ public class TheRPackageManagementService extends PackageManagementService {
         listener.operationFinished(repoPackage.getName(), toErrorDescription(exceptions));
       }
     });
-    manager.install(repoPackage);
+
+    if (forceUpgrade) {
+      manager.update(repoPackage);
+    }
+    else {
+      manager.install(repoPackage);
+    }
   }
 
   @Override
@@ -132,6 +138,7 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   @Override
   public void fetchPackageVersions(String s, CatchingConsumer<List<String>, Exception> consumer) {
+    consumer.consume(ContainerUtil.<String>emptyList());
   }
 
   @Override

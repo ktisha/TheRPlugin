@@ -31,6 +31,7 @@ public final class TheRPackagesUtil {
   public static final String R_INSTALLED_PACKAGES = "r-packages/r-packages-installed.r";
   public static final String R_ALL_PACKAGES = "r-packages/r-packages-all.r";
   public static final String R_INSTALL_PACKAGE = "r-packages/r-packages-install.r";
+  public static final String R_UPDATE_PACKAGE = "r-packages/r-packages-update.r";
   public static final String ARGUMENT_DELIMETER = " ";
   public static final String R_PACKAGES_DEFAULT_REPOS = "r-packages/r-packages-default-repos.r";
   public static final String R_PACKAGES_DETAILS = "r-packages/r-packages-details.r";
@@ -207,6 +208,21 @@ public final class TheRPackagesUtil {
     List<String> args = getHelperRepositoryArguments();
     args.add(0, repoPackage.getName());
     final TheRRunResult result = runHelperWithArgs(R_INSTALL_PACKAGE, args.toArray(new String[args.size()]));
+    if (result == null) {
+      throw new ExecutionException("Please, specify path to the R executable.");
+    }
+    final String stderr = result.getStdErr();
+    if (!stderr.contains(String.format("DONE (%s)", repoPackage.getName()))) {
+      throw new TheRExecutionException("Some error during the installation", result.getCommand(), result.getStdOut(), result.getStdErr(),
+                                       result.getExitCode());
+    }
+  }
+
+  public static void updatePackage(@NotNull RepoPackage repoPackage)
+    throws ExecutionException {
+    List<String> args = getHelperRepositoryArguments();
+    args.add(0, repoPackage.getName());
+    final TheRRunResult result = runHelperWithArgs(R_UPDATE_PACKAGE, args.toArray(new String[args.size()]));
     if (result == null) {
       throw new ExecutionException("Please, specify path to the R executable.");
     }

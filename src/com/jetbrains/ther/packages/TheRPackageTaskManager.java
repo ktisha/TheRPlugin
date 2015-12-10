@@ -39,6 +39,10 @@ public class TheRPackageTaskManager {
     ProgressManager.getInstance().run(new InstallTask(myProject, myListener, pkg));
   }
 
+  public void update(@NotNull final RepoPackage pkg) {
+    ProgressManager.getInstance().run(new UpdateTask(myProject, myListener, pkg));
+  }
+
   public void uninstall(@NotNull final List<InstalledPackage> installedPackages) {
     ProgressManager.getInstance().run(new UninstallTask(myProject, myListener, installedPackages));
   }
@@ -166,6 +170,48 @@ public class TheRPackageTaskManager {
     @Override
     protected String getFailureTitle() {
       return "Install package failed";
+    }
+  }
+
+  public static class UpdateTask extends PackagingTask {
+    final RepoPackage myPackage;
+
+    UpdateTask(@NotNull final  Project project,
+                @NotNull final TaskListener listener,
+                @NotNull final RepoPackage repoPackage) {
+      super(project, "Update package", listener);
+      myPackage = repoPackage;
+    }
+
+    @NotNull
+    @Override
+    protected List<ExecutionException> runTask(@NotNull ProgressIndicator indicator) {
+      final List<ExecutionException> exceptions = new ArrayList<ExecutionException>();
+      try {
+        TheRPackagesUtil.updatePackage(myPackage);
+      }
+      catch (ExecutionException e) {
+        exceptions.add(e);
+      }
+      return exceptions;
+    }
+
+    @NotNull
+    @Override
+    protected String getSuccessTitle() {
+      return "Package updated successfully";
+    }
+
+    @NotNull
+    @Override
+    protected String getSuccessDescription() {
+      return "Updated package " + myPackage.getName();
+    }
+
+    @NotNull
+    @Override
+    protected String getFailureTitle() {
+      return "Update package failed";
     }
   }
 
