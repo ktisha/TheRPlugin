@@ -137,8 +137,7 @@ public class TheRPsiImplUtil {
 
   @Nullable
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
-
-    final TheRBlockExpression blockExpression = (TheRBlockExpression)functionExpression.getLastChild();
+    final TheRBlockExpression blockExpression = PsiTreeUtil.findChildOfType(functionExpression, TheRBlockExpression.class);
     if (blockExpression == null) return null;
 
     final List<PsiComment> comments = new ArrayList<PsiComment>();

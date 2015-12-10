@@ -127,15 +127,14 @@ public class TheRPsiUtils {
   public static String getHelpForFunction(@NotNull PsiElement assignee) {
     File file = TheRHelpersLocator.getHelperFile("r-help-without-package.r");
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    String helperPath = file.getAbsolutePath();
-    final Process process;
+    final String helperPath = file.getAbsolutePath();
     try {
-      String assigneeText =
+      final String assigneeText =
         assignee.getText().replaceAll("\"", "");
-      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
+      final Process process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
-      String stdout = output.getStdout();
+      final String stdout = output.getStdout();
       if (stdout.startsWith("No documentation")) {
         return null;
       }
