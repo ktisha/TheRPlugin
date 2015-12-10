@@ -4,7 +4,6 @@ package com.jetbrains.ther.packages;
 public class TheRRepository {
   private final String myUrl;
 
-
   public TheRRepository(String url) {
     this.myUrl = url;
   }

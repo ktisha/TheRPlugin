@@ -19,7 +19,6 @@ import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +68,7 @@ public final class TheRPackagesUtil {
     return null;
   }
 
-  public static List<InstalledPackage> getInstalledPackages() throws IOException {
+  public static List<InstalledPackage> getInstalledPackages() {
     final ArrayList<InstalledPackage> installedPackages = Lists.newArrayList();
     final String stdout = getHelperOutput(R_INSTALLED_PACKAGES);
     if (stdout == null) {
@@ -91,7 +90,7 @@ public final class TheRPackagesUtil {
     return TheRPackageService.getInstance().allPackages;
   }
 
-  public static List<RepoPackage> getOrLoadPackages() throws IOException {
+  public static List<RepoPackage> getOrLoadPackages() {
     Map<String, String> nameVersionMap = getPackages();
     if (nameVersionMap.isEmpty()) {
       getAvailablePackages();
@@ -169,7 +168,7 @@ public final class TheRPackagesUtil {
   }
 
   @Nullable
-  public static List<RepoPackage> getAvailablePackages() throws IOException {
+  public static List<RepoPackage> getAvailablePackages() {
     final List<String> args = getHelperRepositoryArguments();
     final TheRRunResult result = runHelperWithArgs(R_ALL_PACKAGES, args.toArray(new String[args.size()]));
     if (result == null || result.getExitCode() != 0) {

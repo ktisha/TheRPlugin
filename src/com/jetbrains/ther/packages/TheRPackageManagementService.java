@@ -10,7 +10,6 @@ import com.intellij.webcore.packaging.RepoPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -63,8 +62,8 @@ public class TheRPackageManagementService extends PackageManagementService {
   }
 
   public void setRepositories(List<TheRRepository> repositories) {
-    List<String> userRepositories = Lists.newArrayList();
-    List<Integer> defaultRepositories = Lists.newArrayList();
+    final List<String> userRepositories = Lists.newArrayList();
+    final List<Integer> defaultRepositories = Lists.newArrayList();
     for (TheRRepository repository : repositories) {
       if (repository instanceof TheRDefaultRepository) {
         defaultRepositories.add(((TheRDefaultRepository)repository).getIndex());
@@ -77,17 +76,17 @@ public class TheRPackageManagementService extends PackageManagementService {
   }
 
   @Override
-  public List<RepoPackage> getAllPackages() throws IOException {
+  public List<RepoPackage> getAllPackages() {
     return TheRPackagesUtil.getOrLoadPackages();
   }
 
   @Override
-  public List<RepoPackage> reloadAllPackages() throws IOException {
+  public List<RepoPackage> reloadAllPackages() {
     return TheRPackagesUtil.getAvailablePackages();
   }
 
   @Override
-  public Collection<InstalledPackage> getInstalledPackages() throws IOException {
+  public Collection<InstalledPackage> getInstalledPackages() {
     return TheRPackagesUtil.getInstalledPackages();
   }
 

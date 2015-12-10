@@ -15,20 +15,16 @@ import javax.swing.*;
  */
 public class TheRPackagesToolWindowFactory implements ToolWindowFactory {
 
-  public TheRPackagesToolWindowFactory() {
-
-
-  }
+  public TheRPackagesToolWindowFactory() {}
 
   @Override
-  public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-
-    PackagesNotificationPanel notificationPanel = new PackagesNotificationPanel();
-    TheRInstalledPackagesPanel packagesPanel = new TheRInstalledPackagesPanel(project, notificationPanel);
+  public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
+    final PackagesNotificationPanel notificationPanel = new PackagesNotificationPanel();
+    final TheRInstalledPackagesPanel packagesPanel = new TheRInstalledPackagesPanel(project, notificationPanel);
     packagesPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
     packagesPanel.updatePackages(new TheRPackageManagementService(project));
-    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-    Content content = contentFactory.createContent(packagesPanel, "", false);
+    final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+    final Content content = contentFactory.createContent(packagesPanel, "", false);
     toolWindow.getContentManager().addContent(content);
   }
 }

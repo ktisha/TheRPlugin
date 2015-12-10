@@ -12,8 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * @author avesloguzova
  */
 public class TheRInstalledPackagesPanel extends InstalledPackagesPanel {
-  public TheRInstalledPackagesPanel(Project project,
-                                    PackagesNotificationPanel area) {
+  public TheRInstalledPackagesPanel(@NotNull final Project project, @NotNull final PackagesNotificationPanel area) {
     super(project, area);
   }
 

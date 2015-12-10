@@ -13,7 +13,6 @@
       <sourceFolder url="file://$MODULE_DIR$/testData" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
       <excludeFolder url="file://$MODULE_DIR$/out/test" />
-      <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

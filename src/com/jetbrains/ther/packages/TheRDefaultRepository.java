@@ -6,7 +6,6 @@ public class TheRDefaultRepository extends TheRRepository {
 
   public TheRDefaultRepository(String url, int index) {
     super(url);
-
     myIndex = index;
   }
 

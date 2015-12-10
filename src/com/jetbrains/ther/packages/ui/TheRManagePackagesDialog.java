@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.webcore.packaging.ManagePackagesDialog;
 import com.intellij.webcore.packaging.PackageManagementService;
 import com.jetbrains.ther.packages.TheRPackageManagementService;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,11 +13,10 @@ import java.awt.event.ActionListener;
 
 
 public class TheRManagePackagesDialog extends ManagePackagesDialog {
-  public TheRManagePackagesDialog(final Project project,
-                                  final PackageManagementService packageManagementService,
-                                  PackageManagementService.Listener packageListener) {
+  public TheRManagePackagesDialog(@NotNull final Project project, @NotNull final PackageManagementService packageManagementService,
+                                  @NotNull PackageManagementService.Listener packageListener) {
     super(project, packageManagementService, packageListener);
-    JComponent panel = createCenterPanel();
+    final JComponent panel = createCenterPanel();
     replaceListeners(panel != null ? panel.getComponents() : new Component[0], project, packageManagementService);
   }
 

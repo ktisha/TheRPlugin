@@ -11,8 +11,8 @@ public class TheRExecutionException extends ExecutionException {
   @NotNull private final String myStderr;
   private final int myExitCode;
 
-  TheRExecutionException(@NotNull String message, @NotNull String command,
-                         @NotNull String stdout, @NotNull String stderr, int exitCode) {
+  TheRExecutionException(@NotNull final String message, @NotNull final String command,
+                         @NotNull final String stdout, @NotNull final String stderr, int exitCode) {
     super(message);
     myCommand = command;
     myStdout = stdout;

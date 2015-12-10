@@ -42,8 +42,8 @@ public class TheRManageRepoDialog extends DialogWrapper {
 
     setTitle("Manage Repositories");
     myController = controller;
-    final DefaultListModel defaultRepoModel = new DefaultListModel();
-    final DefaultListModel enabledRepoModel = new DefaultListModel();
+    final DefaultListModel<TheRRepository> defaultRepoModel = new DefaultListModel<TheRRepository>();
+    final DefaultListModel<TheRRepository> enabledRepoModel = new DefaultListModel<TheRRepository>();
     myDefaultRepos = controller.getDefaultRepositories();
     for (TheRDefaultRepository repository : myDefaultRepos) {
       defaultRepoModel.addElement(repository);
@@ -59,7 +59,6 @@ public class TheRManageRepoDialog extends DialogWrapper {
         enabledRepoModel.addElement(new TheRRepository(repoUrl));
       }
     }
-
 
     myEnabledList = new JBList(enabledRepoModel);
     myDefaultList = new JBList(defaultRepoModel);
@@ -87,7 +86,6 @@ public class TheRManageRepoDialog extends DialogWrapper {
     myDefaultList.addListSelectionListener(new ListSelectionListener() {
       @Override
       public void valueChanged(ListSelectionEvent e) {
-        Object o = myDefaultList.getSelectedValue();
         myEnabledList.clearSelection();
         myButtonToEnabled.setEnabled(true);
         myButtonToDefault.setEnabled(false);
@@ -127,13 +125,12 @@ public class TheRManageRepoDialog extends DialogWrapper {
     myRemoveButton.setEnabled(false);
   }
 
-  private void initButtons(final DefaultListModel enabledRepoModel, final DefaultListModel defaultRepoModel) {
+  private void initButtons(final DefaultListModel<TheRRepository> enabledRepoModel, final DefaultListModel<TheRRepository> defaultRepoModel) {
 
     myAddButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         String url = Messages.showInputDialog("Please input repository URL", "Repository URL", null);
-        TheRRepository tmp = new TheRRepository(url);
         if (!enabledRepoModel.contains(url) && !StringUtil.isEmptyOrSpaces(url)) {
           enabledRepoModel.addElement(new TheRRepository(url));
           setButtonsToDisable();
@@ -165,7 +162,7 @@ public class TheRManageRepoDialog extends DialogWrapper {
               return true;
             }
           });
-        if (!StringUtil.isEmptyOrSpaces(url) && !oldValue.equals(url)) {
+        if (!StringUtil.isEmptyOrSpaces(url) && !oldValue.getUrl().equals(url)) {
           enabledRepoModel.addElement(new TheRRepository(url));
           enabledRepoModel.removeElement(oldValue);
         }
