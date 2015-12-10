@@ -12,6 +12,9 @@ import com.jetbrains.ther.psi.references.TheRReferenceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Alefas
  * @since 27/01/15.
@@ -132,27 +135,27 @@ public class TheRPsiImplUtil {
     return new TheRReferenceImpl(referenceExpression);
   }
 
+  @Nullable
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
-    final TheRAssignmentStatement statement = PsiTreeUtil.getParentOfType(functionExpression, TheRAssignmentStatement.class);
-    if (statement == null) return null;
+    final TheRBlockExpression blockExpression = PsiTreeUtil.findChildOfType(functionExpression, TheRBlockExpression.class);
+    if (blockExpression == null) return null;
 
-    PsiComment comment = null;
-    for (PsiElement sibling = statement.getPrevSibling(); sibling != null && !(sibling instanceof TheRExpression);
-         sibling = sibling.getPrevSibling()) {
+    final List<PsiComment> comments = new ArrayList<PsiComment>();
+    for (PsiElement sibling = blockExpression.getFirstChild(); sibling != null && !(sibling instanceof TheRExpression);
+         sibling = sibling.getNextSibling()) {
       if (sibling instanceof PsiComment) {
-        comment = (PsiComment)sibling;
+        comments.add((PsiComment)sibling);
       }
     }
-
-    if (comment == null) return null;
-    return getCommentText(comment);
+    if (comments.isEmpty()) return null;
+    return getCommentText(comments);
   }
-
-  private static String getCommentText(@NotNull final PsiComment comment) {
+  @NotNull
+  private static String getCommentText(@NotNull final List<PsiComment> comments) {
     final StringBuilder stringBuilder = new StringBuilder();
-    final String[] strings = StringUtil.splitByLines(comment.getText());
-    for (String string : strings) {
-      stringBuilder.append(StringUtil.trimStart(string, "# "));
+    for (PsiComment comment : comments) {
+      String string = comment.getText();
+      stringBuilder.append(StringUtil.trimStart(string, "#")).append("\n");
     }
     return stringBuilder.toString();
   }
