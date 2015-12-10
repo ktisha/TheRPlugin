@@ -1,5 +1,7 @@
 package com.jetbrains.ther;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
@@ -125,13 +127,14 @@ public class TheRPsiUtils {
    */
   @Nullable
   public static String getHelpForFunction(@NotNull PsiElement assignee) {
-    File file = TheRHelpersLocator.getHelperFile("r-help-without-package.r");
+    final String helperPath = TheRHelpersLocator.getHelperPath("r-help-without-package.r");
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    final String helperPath = file.getAbsolutePath();
+    if (path == null) return null;
+    final String assigneeText = assignee.getText().replaceAll("\"", "");
+    GeneralCommandLine commandLine = new GeneralCommandLine(path, "--slave",  "-f ", helperPath, " --args ", assigneeText);
+    final Process process;
     try {
-      final String assigneeText =
-        assignee.getText().replaceAll("\"", "");
-      final Process process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + assigneeText);
+      process = commandLine.createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       final String stdout = output.getStdout();
@@ -140,9 +143,10 @@ public class TheRPsiUtils {
       }
       return stdout;
     }
-    catch (IOException e) {
+    catch (ExecutionException e) {
       LOG.error(e);
     }
+
     return null;
   }
   @NotNull
