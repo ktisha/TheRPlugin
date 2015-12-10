@@ -18,7 +18,6 @@ import com.intellij.webcore.packaging.PackageManagementService;
 import com.intellij.webcore.packaging.PackagesNotificationPanel;
 import com.intellij.webcore.packaging.RepoPackage;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.event.HyperlinkEvent;
 import java.util.ArrayList;
@@ -31,56 +30,54 @@ public class TheRPackageTaskManager {
   private final Project myProject;
   private final TaskListener myListener;
 
-  TheRPackageTaskManager(@Nullable Project project, @NotNull TaskListener listener) {
+  TheRPackageTaskManager(@NotNull final Project project, @NotNull final TaskListener listener) {
     myProject = project;
     myListener = listener;
   }
 
-  public void install(RepoPackage pkg) {
+  public void install(@NotNull final RepoPackage pkg) {
     ProgressManager.getInstance().run(new InstallTask(myProject, myListener, pkg));
   }
 
-  public void uninstall(List<InstalledPackage> installedPackages) {
+  public void uninstall(@NotNull final List<InstalledPackage> installedPackages) {
     ProgressManager.getInstance().run(new UninstallTask(myProject, myListener, installedPackages));
   }
 
   public interface TaskListener {
     void started();
 
-    void finished(List<ExecutionException> exceptions);
+    void finished(@NotNull final List<ExecutionException> exceptions);
   }
 
   public abstract static class PackagingTask extends Task.Backgroundable {
 
     private static final String PACKAGING_GROUP_ID = "Packaging";
-    private TaskListener myListener;
+    @NotNull private TaskListener myListener;
 
-    PackagingTask(@Nullable Project project, @NotNull String title, @NotNull TaskListener listener) {
+    PackagingTask(@NotNull final Project project, @NotNull final String title, @NotNull final TaskListener listener) {
       super(project, title);
       myListener = listener;
     }
 
     @Override
-    public void run(@NotNull ProgressIndicator indicator) {
+    public void run(@NotNull final ProgressIndicator indicator) {
       taskStarted(indicator);
       taskFinished(runTask(indicator));
     }
 
-    protected void taskStarted(@NotNull ProgressIndicator indicator) {
+    protected void taskStarted(@NotNull final ProgressIndicator indicator) {
       final Notification[] notifications =
         NotificationsManager.getNotificationsManager().getNotificationsOfType(Notification.class, getProject());
       for (Notification notification : notifications) {
         notification.expire();
       }
       indicator.setText(getTitle() + "...");
-      if (myListener != null) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
           @Override
           public void run() {
             myListener.started();
           }
         });
-      }
     }
 
     protected void taskFinished(@NotNull final List<ExecutionException> exceptions) {
@@ -97,7 +94,6 @@ public class TheRPackageTaskManager {
             @Override
             public void hyperlinkUpdate(@NotNull Notification notification,
                                         @NotNull HyperlinkEvent event) {
-              assert myProject != null;
               final String title = StringUtil.capitalizeWords(getFailureTitle(), true);
               PackagesNotificationPanel.showError(title, description);
             }
@@ -109,9 +105,7 @@ public class TheRPackageTaskManager {
       ApplicationManager.getApplication().invokeLater(new Runnable() {
         @Override
         public void run() {
-          if (myListener != null) {
-            myListener.finished(exceptions);
-          }
+          myListener.finished(exceptions);
           final Notification notification = notificationRef.get();
           if (notification != null) {
             notification.notify(myProject);
@@ -134,12 +128,12 @@ public class TheRPackageTaskManager {
   }
 
   public static class InstallTask extends PackagingTask {
-    RepoPackage myPackage;
+    final RepoPackage myPackage;
 
-    InstallTask(@Nullable Project project,
-                @NotNull TaskListener listener,
-                @NotNull RepoPackage repoPackage) {
-      super(project, "Install packages", listener);//TODO add title
+    InstallTask(@NotNull final  Project project,
+                @NotNull final TaskListener listener,
+                @NotNull final RepoPackage repoPackage) {
+      super(project, "Install package", listener);
       myPackage = repoPackage;
     }
 
@@ -147,7 +141,6 @@ public class TheRPackageTaskManager {
     @Override
     protected List<ExecutionException> runTask(@NotNull ProgressIndicator indicator) {
       final List<ExecutionException> exceptions = new ArrayList<ExecutionException>();
-
       try {
         TheRPackagesUtil.installPackage(myPackage);
       }
@@ -179,9 +172,9 @@ public class TheRPackageTaskManager {
   public static class UninstallTask extends PackagingTask {
     private List<InstalledPackage> myPackages;
 
-    UninstallTask(@Nullable Project project,
-                  @NotNull TaskListener listener,
-                  @NotNull List<InstalledPackage> packages) {
+    UninstallTask(@NotNull final Project project,
+                  @NotNull final TaskListener listener,
+                  @NotNull final List<InstalledPackage> packages) {
       super(project, "Uninstall packages", listener);
       myPackages = packages;
     }
@@ -190,7 +183,6 @@ public class TheRPackageTaskManager {
     @Override
     protected List<ExecutionException> runTask(@NotNull ProgressIndicator indicator) {
       final List<ExecutionException> exceptions = new ArrayList<ExecutionException>();
-
       try {
         TheRPackagesUtil.uninstallPackage(myPackages);
       }

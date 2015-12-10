@@ -19,9 +19,9 @@ import java.util.List;
  */
 public class TheRPackageManagementService extends PackageManagementService {
 
-  private final Project myProject;
+  @NotNull private final Project myProject;
 
-  public TheRPackageManagementService(Project project) {
+  public TheRPackageManagementService(@NotNull final Project project) {
     myProject = project;
   }
 
@@ -102,7 +102,7 @@ public class TheRPackageManagementService extends PackageManagementService {
       }
 
       @Override
-      public void finished(List<ExecutionException> exceptions) {
+      public void finished(@NotNull final List<ExecutionException> exceptions) {
         listener.operationFinished(repoPackage.getName(), toErrorDescription(exceptions));
       }
     });
@@ -124,7 +124,7 @@ public class TheRPackageManagementService extends PackageManagementService {
       }
 
       @Override
-      public void finished(List<ExecutionException> exceptions) {
+      public void finished(@NotNull final List<ExecutionException> exceptions) {
         listener.operationFinished(packageName, toErrorDescription(exceptions));
       }
     });
