@@ -132,9 +132,8 @@ public class TheRPsiUtils {
     if (path == null) return null;
     final String assigneeText = assignee.getText().replaceAll("\"", "");
     GeneralCommandLine commandLine = new GeneralCommandLine(path, "--slave",  "-f ", helperPath, " --args ", assigneeText);
-    final Process process;
     try {
-      process = commandLine.createProcess();
+      final Process process = commandLine.createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       final String stdout = output.getStdout();
