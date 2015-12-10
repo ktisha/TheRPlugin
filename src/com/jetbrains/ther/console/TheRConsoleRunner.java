@@ -22,7 +22,7 @@ public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<Language
 
   @Override
   protected LanguageConsoleView createConsoleView() {
-    return (LanguageConsoleView)new LanguageConsoleImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
+    return new LanguageConsoleImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
   }
 
   private String getInterpreterPath() throws ExecutionException {

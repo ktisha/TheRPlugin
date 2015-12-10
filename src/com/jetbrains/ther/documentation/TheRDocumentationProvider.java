@@ -22,7 +22,7 @@ public class TheRDocumentationProvider extends AbstractDocumentationProvider {
         break;
       }
     }
-    final String helpText = TheRPsiUtils.getHelpForFunction(element);
+    final String helpText = TheRPsiUtils.getHelpForFunction(element, null);
     if (helpText == null) {
       return null;
     }

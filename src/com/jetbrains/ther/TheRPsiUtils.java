@@ -99,13 +99,16 @@ public class TheRPsiUtils {
     return null;
   }
 
+  /**
+   * If packageName parameter equals null we do not load package
+   */
   public static String getHelpForFunction(@NotNull final PsiElement assignee, @Nullable final String packageName) {
     final String helpHelper = packageName != null ? "r-help.r" : "r-help-without-package.r";
     final File file = TheRHelpersLocator.getHelperFile(helpHelper);
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
     final String helperPath = file.getAbsolutePath();
     try {
-      String assigneeText = assignee.getText().replaceAll("\"", "");
+      final String assigneeText = assignee.getText().replaceAll("\"", "");
       final ArrayList<String> arguments = Lists.newArrayList(path, "--slave", "-f ", helperPath, " --args ");
       if (packageName != null) {
         arguments.add(packageName);
