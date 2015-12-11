@@ -16,9 +16,20 @@ import com.jetbrains.ther.TheRHelpersLocator;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.TheRUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,12 +46,14 @@ public final class TheRPackagesUtil {
   public static final String ARGUMENT_DELIMETER = " ";
   public static final String R_PACKAGES_DEFAULT_REPOS = "r-packages/r-packages-default-repos.r";
   public static final String R_PACKAGES_DETAILS = "r-packages/r-packages-details.r";
+  @NonNls public static final String CRAN_URL = "https://cran.r-project.org/web/packages/available_packages_by_name.html";
 
   private static final Pattern urlPattern = Pattern.compile("\".+\"");
   private static final Logger LOG = Logger.getInstance(TheRPackagesUtil.class.getName());
 
   private static final Set<String> basePackages = Sets.newHashSet("base", "utils", "stats", "datasets", "graphics",
       "grDevices", "grid", "methods", "tools", "parallel", "compiler", "splines", "tcltk", "stats4");
+  private static TreeMap<String, String> namesToDetails;
 
   public static boolean isPackageBase(@NotNull final InstalledPackage pkg) {
     return basePackages.contains(pkg.getName());
@@ -112,12 +125,6 @@ public final class TheRPackagesUtil {
       final String[] splitted = entry.getValue().split(ARGUMENT_DELIMETER);
       packages.add(new RepoPackage(entry.getKey(), splitted[1], splitted[0]));
     }
-    //Collections.sort(packages, new Comparator<RepoPackage>() {
-    //  @Override
-    //  public int compare(RepoPackage o1, RepoPackage o2) {
-    //    return o1.getName().compareTo(o2.getName());
-    //  }
-    //});
     return packages;
   }
 
@@ -200,6 +207,12 @@ public final class TheRPackagesUtil {
         packageList.add(repoPackage);
       }
     }
+    try {
+      getPackageDetails();
+    }
+    catch (IOException e) {
+      LOG.warn("Couldn't get package details");
+    }
     return packageList;
   }
 
@@ -258,7 +271,7 @@ public final class TheRPackagesUtil {
       public void run() {
         try {
           final String details = loadPackageDetails(packageName);
-          consumer.consume(formatDetails(details));
+          consumer.consume(formatDetails(packageName, details));
         }
         catch (ExecutionException e) {
           consumer.consume(e);
@@ -267,12 +280,24 @@ public final class TheRPackagesUtil {
     });
   }
 
-  private static String formatDetails(@NotNull final String details) {
-    final String[] splittedString = details.split("\n");
-    final StringBuilder builder = new StringBuilder();
-    for (String string : splittedString) {
-      builder.append(string);
-      builder.append("<br>");
+  private static String formatDetails(@NotNull final String packageName, @NotNull final String details) {
+    final String[] splittedString = details.split("\t");
+    StringBuilder builder = new StringBuilder("<html><head>    <style type=\"text/css\">        " +
+                                              "p {            font-family: Arial,serif; font-size: 12pt; margin: 2px 2px        }    " +
+                                              "</style></head><body style=\"font-family: Arial,serif; font-size: 12pt; margin: 5px 5px;\">");
+    if (namesToDetails.containsKey(packageName)) {
+      builder.append(namesToDetails.get(packageName));
+      builder.append("<br/>");
+    }
+    if (splittedString.length == 3) {
+      builder.append("<h4>Version</h4>");
+      builder.append(splittedString[0]);
+      builder.append("<br/>");
+      builder.append("<h4>Depends</h4>");
+      builder.append(splittedString[1]);
+      builder.append("<br/>");
+      builder.append("<h4>Repository</h4>");
+      builder.append(splittedString[2]);
     }
     return builder.toString();
   }
@@ -339,6 +364,56 @@ public final class TheRPackagesUtil {
     return args;
   }
 
+  public static Map<String, String> getPackageDetails() throws IOException {
+    if (namesToDetails != null) return namesToDetails;
+    namesToDetails = new TreeMap<String, String>();
+    final HTMLEditorKit.ParserCallback callback = new HTMLEditorKit.ParserCallback() {
+      public boolean inTable;
+      HTML.Tag myTag;
+      String myPackageName;
+
+      @Override
+      public void handleStartTag(HTML.Tag tag,
+                                 MutableAttributeSet set,
+                                 int i) {
+        myTag = tag;
+        if ("table".equals(myTag.toString())) {
+          inTable = true;
+        }
+      }
+
+      @Override
+      public void handleText(char[] data, int pos) {
+        if (myTag != null && "a".equals(myTag.toString()) && inTable && myPackageName == null) {
+          myPackageName = String.valueOf(data);
+        }
+        else if (myTag != null && "td".equals(myTag.toString())) {
+          namesToDetails.put(myPackageName, String.valueOf(data));
+          myPackageName = null;
+        }
+      }
+    };
+
+    try {
+      final URL repositoryUrl = new URL(CRAN_URL);
+      final InputStream is = repositoryUrl.openStream();
+      final Reader reader = new InputStreamReader(is);
+      try {
+        new ParserDelegator().parse(reader, callback, true);
+      }
+      catch (IOException e) {
+        LOG.warn(e);
+      }
+      finally {
+        reader.close();
+      }
+    }
+    catch (MalformedURLException e) {
+      LOG.warn(e);
+    }
+
+    return namesToDetails;
+  }
 
   public static class TheRRunResult {
     private final String myCommand;

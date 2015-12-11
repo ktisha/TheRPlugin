@@ -29,10 +29,12 @@ public class TheRInstalledPackagesPanel extends InstalledPackagesPanel {
   @NotNull
   protected ManagePackagesDialog createManagePackagesDialog() {
     return new TheRManagePackagesDialog(this.myProject, this.myPackageManagementService, new PackageManagementService.Listener() {
+      @Override
       public void operationStarted(String packageName) {
         myPackagesTable.setPaintBusy(true);
       }
 
+      @Override
       public void operationFinished(String packageName, @Nullable PackageManagementService.ErrorDescription errorDescription) {
         myNotificationArea.showResult(packageName, errorDescription);
         myPackagesTable.clearSelection();

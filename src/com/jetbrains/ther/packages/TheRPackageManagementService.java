@@ -40,6 +40,7 @@ public class TheRPackageManagementService extends PackageManagementService {
     return null;
   }
 
+  @Override
   @NotNull
   public List<String> getAllRepositories() {
     return TheRPackagesUtil.getEnabledRepositories(); //TODO Caching of this value
@@ -142,7 +143,7 @@ public class TheRPackageManagementService extends PackageManagementService {
   }
 
   @Override
-  public void fetchPackageDetails(String s, CatchingConsumer<String, Exception> consumer) {
-    TheRPackagesUtil.fetchPackageDetails(s, consumer);
+  public void fetchPackageDetails(String packageName, CatchingConsumer<String, Exception> consumer) {
+    TheRPackagesUtil.fetchPackageDetails(packageName, consumer);
   }
 }
