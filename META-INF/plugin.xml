@@ -5,14 +5,19 @@
   <vendor email="kt@jetbrains.com">JetBrains</vendor>
 
   <description><![CDATA[
-      It's first approach to the scientific IDE.
-      We decided to start with the R language.
+      The R plugin for PyCharm and IntelliJ provides smart editing for R scripts.
+
+It includes syntax-highlighting editor that supports direct code execution, integrated console, builtin visual debugger, package manager and more.
       ]]></description>
 
   <change-notes><![CDATA[
           <ul>
           <li> Lexer-based syntax highlighting </li>
           <li> Parser </li>
+          <li> Interactive console </li>
+          <li> Builtin help </li>
+          <li> Package manager</li>
+          <li> Debugger</li>
           </ul>
       ]]>
   </change-notes>
@@ -47,6 +52,8 @@
     <projectConfigurable instance="com.jetbrains.ther.interpreter.TheRInterpreterConfigurable"/>
     <applicationService serviceInterface="com.jetbrains.ther.interpreter.TheRInterpreterService"
                         serviceImplementation="com.jetbrains.ther.interpreter.TheRInterpreterService"/>
+    <applicationService serviceInterface="com.jetbrains.ther.packages.TheRPackageService"
+                        serviceImplementation="com.jetbrains.ther.packages.TheRPackageService"/>
     <directoryProjectConfigurator implementation="com.jetbrains.ther.interpreter.TheRInterpreterConfigurator" id="interpreter"
                                   order="after PlatformProjectConfigurator"/>
     <stubIndex implementation="com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex"/>
@@ -58,6 +65,8 @@
     <configurationType implementation="com.jetbrains.ther.run.TheRConfigurationType"/>
     <runConfigurationProducer implementation="com.jetbrains.ther.run.TheRRunConfigurationProducer"/>
     <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
+    <programRunner implementation="com.jetbrains.ther.xdebugger.TheRXDebugRunner"/>
+    <xdebugger.breakpointType implementation="com.jetbrains.ther.xdebugger.TheRXLineBreakpointType"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
     <!--localInspection language="TheR" shortName="RUnusedInspection" displayName="R Unused Inspection" enabledByDefault="true" level="WARNING"
@@ -65,5 +74,7 @@
     <!--localInspection language="TheR" shortName="RUnresolvedReferenceInspection" displayName="R Unresolved Reference Inspection" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRUnresolvedReferenceInspection" groupKey=""/-->
     <lang.findUsagesProvider implementationClass="com.jetbrains.ther.TheRFindUsagesProvider" language="TheR"/>
+    <toolWindow id="Packages" anchor="right" factoryClass="com.jetbrains.ther.packages.TheRPackagesToolWindowFactory"/>
+    <documentationProvider implementation="com.jetbrains.ther.documentation.TheRDocumentationProvider"/>
   </extensions>
 </idea-plugin>

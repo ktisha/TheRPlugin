@@ -32,5 +32,6 @@ public class TheRBaseElementImpl<T extends StubElement> extends StubBasedPsiElem
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
+    visitor.visitElement(this);
   }
 }

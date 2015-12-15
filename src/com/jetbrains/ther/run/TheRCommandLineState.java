@@ -62,13 +62,13 @@ public class TheRCommandLineState extends CommandLineState {
     exeOptions.addParametersString("-f");
 
     final ParamsGroup scriptParameters = parametersList.addParamsGroup(GROUP_SCRIPT);
-    final String scriptName = myConfig.getScriptName();
-    if (!StringUtil.isEmptyOrSpaces(scriptName)) {
-      scriptParameters.addParameter(scriptName);
+    final String scriptPath = myConfig.getScriptPath();
+    if (!StringUtil.isEmptyOrSpaces(scriptPath)) {
+      scriptParameters.addParameter(scriptPath);
     }
-    final String parameters = myConfig.getScriptParameters();
-    if (!StringUtil.isEmptyOrSpaces(parameters)) {
-      scriptParameters.addParametersString("--args " + parameters);
+    final String scriptArgs = myConfig.getScriptArgs();
+    if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
+      scriptParameters.addParametersString("--args " + scriptArgs);
     }
   }
 

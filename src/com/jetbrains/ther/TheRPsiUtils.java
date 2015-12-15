@@ -1,5 +1,8 @@
 package com.jetbrains.ther;
 
+import com.google.common.collect.Lists;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
@@ -30,7 +33,7 @@ import java.util.*;
 
 public class TheRPsiUtils {
   private static final Logger LOG = Logger.getInstance(TheRPsiUtils.class);
-  private static final int MINUTE = 60 * 1000;
+  public static final int MINUTE = 60 * 1000;
 
   public static List<TheRExpression> getParametersExpressions(List<TheRParameter> parameters) {
     List<TheRExpression> parametersExpressions = new ArrayList<TheRExpression>();
@@ -102,7 +105,6 @@ public class TheRPsiUtils {
     return null;
   }
 
-
   public static boolean containsTripleDot(List<TheRParameter> formalArguments) {
     for (TheRParameter parameter : formalArguments) {
       if (parameter.getText().equals("...")) {
@@ -120,15 +122,24 @@ public class TheRPsiUtils {
     return null;
   }
 
-  public static String getHelpForFunction(PsiElement assignee, String packageName) {
-    File file = TheRHelpersLocator.getHelperFile("r-help.r");
+  /**
+   * If packageName parameter equals null we do not load package
+   */
+  public static String getHelpForFunction(@NotNull final PsiElement assignee, @Nullable final String packageName) {
+    final String helpHelper = packageName != null ? "r-help.r" : "r-help-without-package.r";
+    final File file = TheRHelpersLocator.getHelperFile(helpHelper);
     final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    String helperPath = file.getAbsolutePath();
-    final Process process;
+    final String helperPath = file.getAbsolutePath();
     try {
-      String assigneeText =
-        assignee.getText().replaceAll("\"", "");
-      process = Runtime.getRuntime().exec(path + " --slave -f " + helperPath + " --args " + packageName + " " + assigneeText);
+      final String assigneeText = assignee.getText().replaceAll("\"", "");
+      final ArrayList<String> arguments = Lists.newArrayList(path, "--slave", "-f ", helperPath, " --args ");
+      if (packageName != null) {
+        arguments.add(packageName);
+      }
+      arguments.add(assigneeText);
+
+      final GeneralCommandLine commandLine = new GeneralCommandLine(arguments);
+      final Process process = commandLine.createProcess();
       final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
       final ProcessOutput output = processHandler.runProcess(MINUTE * 5);
       String stdout = output.getStdout();
@@ -137,7 +148,7 @@ public class TheRPsiUtils {
       }
       return stdout;
     }
-    catch (IOException e) {
+    catch (ExecutionException e) {
       LOG.error(e);
     }
     return null;
