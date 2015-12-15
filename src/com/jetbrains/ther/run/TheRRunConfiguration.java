@@ -2,16 +2,10 @@ package com.jetbrains.ther.run;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
@@ -24,11 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
+public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
 
   @NotNull
   private static final String SCRIPT_PATH = "SCRIPT_PATH";
@@ -51,8 +45,12 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   @NotNull
   private String myWorkingDirectory;
 
+  private final Map<String, String> myEnvs = new LinkedHashMap<String, String>();
+  private boolean myPassParentEnvs = true;
+
+
   protected TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
-    super(project, configurationFactory);
+    super(project, configurationFactory, "");
 
     myScriptPath = "";
     myScriptArgs = "";
@@ -79,8 +77,8 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     }
   }
 
-  @Nullable
   @Override
+  @Nullable
   public String suggestedName() {
     if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
       return null;
@@ -129,10 +127,27 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     myWorkingDirectory = workingDirectory;
   }
 
-  @NotNull
+
   @Override
-  public Collection<Module> getValidModules() {
-    return Arrays.asList(ModuleManager.getInstance(getProject()).getModules());
+  @NotNull
+  public Map<String, String> getEnvs() {
+    return myEnvs;
+  }
+
+  @Override
+  public void setEnvs(@NotNull final Map<String, String> envs) {
+    myEnvs.clear();
+    myEnvs.putAll(envs);
+  }
+
+  @Override
+  public boolean isPassParentEnvs() {
+    return myPassParentEnvs;
+  }
+
+  @Override
+  public void setPassParentEnvs(final boolean passParentEnvs) {
+    myPassParentEnvs = passParentEnvs;
   }
 
   @Override

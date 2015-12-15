@@ -1,11 +1,8 @@
 package com.jetbrains.ther.run;
 
-import com.intellij.compiler.options.CompileStepBeforeRun;
-import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 
 public class TheRConfigurationType extends ConfigurationTypeBase {
@@ -32,16 +29,11 @@ public class TheRConfigurationType extends ConfigurationTypeBase {
       super(configurationType);
     }
 
+    @NotNull
     @Override
     public RunConfiguration createTemplateConfiguration(@NotNull final Project project) {
       return new TheRRunConfiguration(project, this);
     }
 
-    @Override
-    public void configureBeforeRunTaskDefaults(@NotNull final Key<? extends BeforeRunTask> providerID, @NotNull final BeforeRunTask task) {
-      if (task instanceof CompileStepBeforeRun.MakeBeforeRunTask) {
-        task.setEnabled(false);
-      }
-    }
   }
 }
