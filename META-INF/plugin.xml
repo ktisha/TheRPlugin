@@ -14,6 +14,10 @@ It includes syntax-highlighting editor that supports direct code execution, inte
           <ul>
           <li> Lexer-based syntax highlighting </li>
           <li> Parser </li>
+          <li> Interactive console </li>
+          <li> Builtin help </li>
+          <li> Package manager</li>
+          <li> Debugger</li>
           </ul>
       ]]>
   </change-notes>
