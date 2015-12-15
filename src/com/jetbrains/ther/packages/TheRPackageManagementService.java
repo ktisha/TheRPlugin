@@ -43,7 +43,14 @@ public class TheRPackageManagementService extends PackageManagementService {
   @Override
   @NotNull
   public List<String> getAllRepositories() {
-    return TheRPackagesUtil.getEnabledRepositories(); //TODO Caching of this value
+    final TheRPackageService service = TheRPackageService.getInstance();
+    final List<TheRDefaultRepository> defaultRepositories = getDefaultRepositories();
+    final List<String> result = Lists.newArrayList();
+    for (TheRDefaultRepository repository : defaultRepositories) {
+      result.add(repository.getUrl());
+    }
+    result.addAll(service.userRepositories);
+    return result;
   }
 
   @NotNull
@@ -65,10 +72,10 @@ public class TheRPackageManagementService extends PackageManagementService {
 
   public void setRepositories(List<TheRRepository> repositories) {
     final List<String> userRepositories = Lists.newArrayList();
-    final List<Integer> defaultRepositories = Lists.newArrayList();
+    final List<String> defaultRepositories = Lists.newArrayList();
     for (TheRRepository repository : repositories) {
       if (repository instanceof TheRDefaultRepository) {
-        defaultRepositories.add(((TheRDefaultRepository)repository).getIndex());
+        defaultRepositories.add(repository.getUrl());
       }
       else {
         userRepositories.add(repository.getUrl());

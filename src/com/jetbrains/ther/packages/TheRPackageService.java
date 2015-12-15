@@ -21,8 +21,8 @@ public class TheRPackageService implements PersistentStateComponent<TheRPackageS
 
   public Map<String, String> allPackages = ContainerUtil.newConcurrentMap();
   public int CRANMirror = 1;
-  public List<Integer> defaultRepos = Lists.newArrayList();
-  public List<String> userRepos = Lists.newArrayList();
+  public List<String> enabledRepositories = Lists.newArrayList();
+  public List<String> userRepositories = Lists.newArrayList();
 
   public static TheRPackageService getInstance() {
     return ServiceManager.getService(TheRPackageService.class);

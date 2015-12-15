@@ -128,13 +128,13 @@ public final class TheRPackagesUtil {
     return packages;
   }
 
-  public static void setRepositories(@NotNull final List<Integer> defaultRepositories,
+  public static void setRepositories(@NotNull final List<String> defaultRepositories,
                                      @NotNull final List<String> userRepositories) {
     TheRPackageService service = TheRPackageService.getInstance();
-    service.defaultRepos.clear();
-    service.defaultRepos.addAll(defaultRepositories);
-    service.userRepos.clear();
-    service.userRepos.addAll(userRepositories);
+    service.enabledRepositories.clear();
+    service.enabledRepositories.addAll(defaultRepositories);
+    service.userRepositories.clear();
+    service.userRepositories.addAll(userRepositories);
   }
 
   @NotNull
@@ -154,19 +154,6 @@ public final class TheRPackagesUtil {
     }
     return repos;
   }
-
-  @NotNull
-  public static List<String> getEnabledRepositories() {
-    final TheRPackageService service = TheRPackageService.getInstance();
-    final List<TheRDefaultRepository> defaultRepo = getDefaultRepositories();
-    final List<String> result = Lists.newArrayList();
-    result.addAll(service.userRepos);
-    for (Integer i : service.defaultRepos) {
-      result.add(defaultRepo.get(i - 1).getUrl());
-    }
-    return result;
-  }
-
 
   @NotNull
   public static List<String> getCRANMirrors() {
@@ -350,17 +337,20 @@ public final class TheRPackagesUtil {
     final TheRPackageService service = TheRPackageService.getInstance();
     final List<String> args = Lists.newArrayList();
     args.add(String.valueOf(service.CRANMirror + 1));
-    if (service.defaultRepos.size() > 0) {
-      args.add(String.valueOf(service.defaultRepos.size()));
-      for (Integer repository : service.defaultRepos) {
-        args.add(String.valueOf(repository));
+    if (service.enabledRepositories.size() > 0) {
+      args.add(String.valueOf(service.enabledRepositories.size()));
+      for (String repository : service.enabledRepositories) {
+        for (TheRDefaultRepository defaultRepository : getDefaultRepositories()) {
+          if (defaultRepository.getUrl().equals(repository))
+            args.add(String.valueOf(defaultRepository.getIndex()));
+        }
       }
     }
     else {
       args.add(String.valueOf(1));
       args.add(String.valueOf(1));
     }
-    args.addAll(service.userRepos);
+    args.addAll(service.userRepositories);
     return args;
   }
 
