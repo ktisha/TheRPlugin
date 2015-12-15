@@ -9,13 +9,13 @@ public final class TheRDebugConstants {
   public static final String LINE_SEPARATOR = LineSeparator.getSystemLineSeparator().getSeparatorString();
 
   @NotNull
-  public static final String SERVICE_FUNCTION_PREFIX = "intellij_ther_";
+  public static final String SERVICE_FUNCTION_PREFIX = "jetbrains_ther_";
 
   @NotNull
   public static final String SERVICE_ENTER_FUNCTION_SUFFIX = "_enter";
 
   @NotNull
-  public static final String MAIN_FUNCTION_NAME = "intellij_ther_main";
+  public static final String MAIN_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "main";
 
   // interpreter parameters
 

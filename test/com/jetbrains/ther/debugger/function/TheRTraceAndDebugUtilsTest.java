@@ -84,8 +84,8 @@ public class TheRTraceAndDebugUtilsTest {
     @NotNull
     @Override
     public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
-      final String xEnterFunctionName = "intellij_ther_x_enter";
-      final String yEnterFunctionName = "intellij_ther_y_enter";
+      final String xEnterFunctionName = "jetbrains_ther_x_enter";
+      final String yEnterFunctionName = "jetbrains_ther_y_enter";
 
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         myLsExecuted++;
