@@ -1,59 +1,47 @@
 package com.jetbrains.ther.run;
 
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.execution.configurations.ConfigurationTypeUtil;
-import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.compiler.options.CompileStepBeforeRun;
+import com.intellij.execution.BeforeRunTask;
+import com.intellij.execution.configurations.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
-import org.jetbrains.annotations.NonNls;
+import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+public class TheRConfigurationType extends ConfigurationTypeBase {
 
-public class TheRConfigurationType implements ConfigurationType {
+  public TheRConfigurationType() {
+    super(
+      "TheRConfigurationType",
+      "R",
+      "R run configuration",
+      IconLoader.getIcon("/icons/Rlogo.png")
+    );
 
-  private final TheRConfigurationFactory myFactory = new TheRConfigurationFactory(this);
+    addFactory(new TheRConfigurationFactory(this));
+  }
 
+  @NotNull
   public static TheRConfigurationType getInstance() {
     return ConfigurationTypeUtil.findConfigurationType(TheRConfigurationType.class);
   }
 
   private static class TheRConfigurationFactory extends ConfigurationFactory {
-    protected TheRConfigurationFactory(ConfigurationType configurationType) {
+
+    public TheRConfigurationFactory(@NotNull final ConfigurationType configurationType) {
       super(configurationType);
     }
 
     @Override
-    public RunConfiguration createTemplateConfiguration(Project project) {
+    public RunConfiguration createTemplateConfiguration(@NotNull final Project project) {
       return new TheRRunConfiguration(project, this);
     }
-  }
 
-  @Override
-  public String getDisplayName() {
-    return "R script";
-  }
-
-  @Override
-  public String getConfigurationTypeDescription() {
-    return "The R run configuration";
-  }
-
-  @Override
-  public Icon getIcon() {
-    return IconLoader.getIcon("/icons/Rlogo.png");
-  }
-
-  @Override
-  public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[]{myFactory};
-  }
-
-  @Override
-  @NotNull
-  @NonNls
-  public String getId() {
-    return "TheRConfigurationType";
+    @Override
+    public void configureBeforeRunTaskDefaults(@NotNull final Key<? extends BeforeRunTask> providerID, @NotNull final BeforeRunTask task) {
+      if (task instanceof CompileStepBeforeRun.MakeBeforeRunTask) {
+        task.setEnabled(false);
+      }
+    }
   }
 }

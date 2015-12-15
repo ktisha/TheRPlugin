@@ -2,13 +2,32 @@ package com.jetbrains.ther.run;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 public interface TheRRunConfigurationParams {
-  String getScriptName();
 
-  void setScriptName(@NotNull final String scriptName);
+  @NotNull
+  String getScriptPath();
 
-  String getScriptParameters();
+  void setScriptPath(@NotNull final String scriptPath);
 
-  void setScriptParameters(@NotNull final String scriptParameters);
+  @NotNull
+  String getScriptArgs();
+
+  void setScriptArgs(@NotNull final String scriptArgs);
+
+  @NotNull
+  String getWorkingDirectory();
+
+  void setWorkingDirectory(@NotNull final String workingDirectory);
+
+  boolean isPassParentEnvs();
+
+  void setPassParentEnvs(final boolean passParentEnvs);
+
+  @NotNull
+  Map<String, String> getEnvs();
+
+  void setEnvs(@NotNull final Map<String, String> envs);
 }
 
