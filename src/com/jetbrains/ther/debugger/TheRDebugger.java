@@ -73,7 +73,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
   private int myDropFrames;
 
-  private boolean myIsRunning;
+  private boolean myIsStarted;
 
   public TheRDebugger(@NotNull final TheRExecutor executor,
                       @NotNull final TheRFunctionDebuggerFactory debuggerFactory,
@@ -101,15 +101,15 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
 
     myReturnLineNumber = -1;
     myDropFrames = 1;
-    myIsRunning = false;
+    myIsStarted = false;
   }
 
   public boolean advance() throws TheRDebuggerException {
-    if (!myIsRunning) {
-      return startDebugging();
+    if (!myIsStarted) {
+      return prepareDebug();
     }
     else {
-      return continueDebugging();
+      return continueDebug();
     }
   }
 
@@ -159,8 +159,8 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myDropFrames = number;
   }
 
-  private boolean startDebugging() throws TheRDebuggerException {
-    myIsRunning = true;
+  private boolean prepareDebug() throws TheRDebuggerException {
+    myIsStarted = true;
 
     submitMainFunction();
     closeReader();
@@ -184,7 +184,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     return topDebugger().hasNext();
   }
 
-  private boolean continueDebugging() throws TheRDebuggerException {
+  private boolean continueDebug() throws TheRDebuggerException {
     topDebugger().advance(); // Don't forget that advance could append new debugger
 
     while (!topDebugger().hasNext()) {
