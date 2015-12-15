@@ -5,8 +5,9 @@
   <vendor email="kt@jetbrains.com">JetBrains</vendor>
 
   <description><![CDATA[
-      It's first approach to the scientific IDE.
-      We decided to start with the R language.
+      The R plugin for PyCharm and IntelliJ provides smart editing for R scripts.
+
+It includes syntax-highlighting editor that supports direct code execution, integrated console, builtin visual debugger, package manager and more.
       ]]></description>
 
   <change-notes><![CDATA[
