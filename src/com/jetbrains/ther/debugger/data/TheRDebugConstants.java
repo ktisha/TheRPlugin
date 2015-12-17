@@ -17,6 +17,12 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String MAIN_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "main";
 
+  @NotNull
+  public static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
+
+  @NotNull
+  public static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
+
   // interpreter parameters
 
   @NotNull
@@ -32,6 +38,16 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String KEEP_SOURCE_COMMAND = "options(keep.source=TRUE)";
+
+  @NotNull
+  public static final String LOAD_LIB_COMMAND = "dyn.load";
+
+  @NotNull
+  public static final String DEFINE_DEVICE_FUNCTION_COMMAND =
+    DEVICE_FUNCTION_NAME + " <- function() {.Call(\"" + DEVICE_FUNCTION_NAME + "\")}";
+
+  @NotNull
+  public static final String SETUP_DEVICE_COMMAND = "options(device=\"" + DEVICE_FUNCTION_NAME + "\")";
 
   @NotNull
   public static final String LS_COMMAND = "ls";
@@ -111,5 +127,4 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String WHILE_LOOP_PREFIX = "while";
-
 }

@@ -41,10 +41,7 @@ public class TheRTraceAndDebugUtilsTest {
 
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
-    traceAndDebugFunctions(
-      executor,
-      receiver
-    );
+    traceAndDebugFunctions(executor, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
@@ -56,10 +53,7 @@ public class TheRTraceAndDebugUtilsTest {
     final MockTheRExecutor executor = new MockTheRExecutor();
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
-    traceAndDebugFunctions(
-      executor,
-      receiver
-    );
+    traceAndDebugFunctions(executor, receiver);
 
     assertTrue(executor.check());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
@@ -95,6 +89,8 @@ public class TheRTraceAndDebugUtilsTest {
                               "$" + xEnterFunctionName + "\n" +
                               FUNCTION_TYPE + "\n\n" +
                               "$y\n" +
+                              FUNCTION_TYPE + "\n\n" +
+                              "$" + DEVICE_FUNCTION_NAME + "\n" +
                               FUNCTION_TYPE;
 
         return new TheRExecutionResult(
@@ -118,8 +114,7 @@ public class TheRTraceAndDebugUtilsTest {
         );
       }
 
-      if (command
-        .equals(TRACE_COMMAND + "(x, " + xEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
+      if (command.equals(TRACE_COMMAND + "(x, " + xEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
         if (myXEnterExecuted < 1) throw new IllegalStateException("Trace should be called after enter");
 
         myXTraceExecuted++;
@@ -158,8 +153,7 @@ public class TheRTraceAndDebugUtilsTest {
         );
       }
 
-      if (command
-        .equals(TRACE_COMMAND + "(y, " + yEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
+      if (command.equals(TRACE_COMMAND + "(y, " + yEnterFunctionName + ", where = " + ENVIRONMENT + "())")) {
         if (myYEnterExecuted < 1) throw new IllegalStateException("Trace should be called after enter");
 
         myYTraceExecuted++;
