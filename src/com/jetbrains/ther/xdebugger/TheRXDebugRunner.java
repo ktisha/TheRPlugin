@@ -21,6 +21,7 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -44,6 +45,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.lang.Boolean.parseBoolean;
 
 public class TheRXDebugRunner extends GenericProgramRunner {
 
@@ -51,7 +55,10 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
 
   @NotNull
-  private static final String PRINT_IO_KEY = "ther.debugger.io";
+  private static final String IO_KEY = "ther.debugger.io";
+
+  @NotNull
+  private static final String DEVICE_KEY = "ther.debugger.device";
 
   @NotNull
   @Override
@@ -116,11 +123,11 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     return new TheRXProcessHandler(
       calculateCommandLine(
         calculateCommand(interpreterPath, runConfigurationParams.getScriptArgs()),
-        calculateWorkDirectory(runConfigurationParams)
+        calculateWorkingDirectory(runConfigurationParams)
       ),
-      TheRProcessUtils.getInitCommands(),
+      calculateInitCommands(runConfigurationParams),
       new TheRExecutionResultCalculatorImpl(),
-      Boolean.parseBoolean(runConfigurationParams.getEnvs().get(PRINT_IO_KEY))
+      parseBoolean(runConfigurationParams.getEnvs().get(IO_KEY))
     );
   }
 
@@ -212,11 +219,28 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private String calculateWorkDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+  private String calculateWorkingDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
     final String workingDirectory = runConfigurationParams.getWorkingDirectory();
     final String defaultValue = new File(runConfigurationParams.getScriptPath()).getParent();
 
     return !StringUtil.isEmptyOrSpaces(workingDirectory) ? workingDirectory : defaultValue;
+  }
+
+  @NotNull
+  private List<String> calculateInitCommands(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final String libPath = calculateWorkingDirectory(runConfigurationParams); // TODO [xdbg][update]
+
+    if (isDeviceEnabled(runConfigurationParams) && new File(libPath, TheRDebugConstants.DEVICE_LIB_NAME).canRead()) {
+      final List<String> result = new ArrayList<String>();
+
+      result.addAll(TheRProcessUtils.getInitCommands());
+      result.addAll(TheRProcessUtils.getInitDeviceCommands(libPath));
+
+      return result;
+    }
+    else {
+      return TheRProcessUtils.getInitCommands();
+    }
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
@@ -226,5 +250,11 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     catch (final TheRDebuggerException e) {
       throw new ExecutionException(e);
     }
+  }
+
+  private boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final Map<String, String> envs = runConfigurationParams.getEnvs();
+
+    return !envs.containsKey(DEVICE_KEY) || parseBoolean(envs.get(DEVICE_KEY));
   }
 }
