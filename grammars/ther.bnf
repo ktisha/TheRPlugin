@@ -104,8 +104,8 @@ right_assign_expression ::= expression ('->' | '->>') nl* expression { elementTy
 private tilde_group ::= unary_tilde_expression | tilde_expression
 unary_tilde_expression ::= '~' nl* expression { elementType=prefix_expression }
 tilde_expression ::= expression '~' nl* expression { elementType=binary_expression }
-or_expression ::= expression ('|' | '||') nl* expression { elementType=binary_expression }
-and_expression ::= expression ('&' | '&&') nl* expression { elementType=binary_expression }
+or_expression ::= expression nl* ('|' | '||') nl* expression { elementType=binary_expression }
+and_expression ::= expression nl* ('&' | '&&') nl* expression { elementType=binary_expression }
 unary_not_expression ::= '!' nl* expression  { elementType=prefix_expression }
 compare_expression ::= expression ('>' | '>=' | '<' | '<=' | '==' | '!=') nl* expression { elementType=binary_expression }
 plusminus_expression ::= expression ('+' | '-') nl* expression { elementType=binary_expression }
@@ -153,7 +153,7 @@ call_expression ::= expression argument_list
 parameter ::= (identifier '=' expression) | identifier | '...' {
   methods = [ getNameNode getName setName]
 }
-parameter_list ::= ('(' ')') | ('(' parameter nl* (',' nl* parameter nl*)* ')')
+parameter_list ::= ('(' ')') | ('(' nl* parameter nl* (',' nl* parameter nl*)* ')')
 function_expression ::= function parameter_list nl* expression {
 methods = [ getDocStringValue]
 }
