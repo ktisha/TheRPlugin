@@ -17,6 +17,10 @@ public class TheRHighlightingLexerTest extends TestCase {
     doTest("1", "numeric");
   }
 
+  public void testZeroNumeric() {
+    doTest("01234", "numeric");
+  }
+
   public void testNumeric10() {
     doTest("10", "numeric");
   }
