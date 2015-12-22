@@ -15,13 +15,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ConcurrencyUtil;
+import com.intellij.util.PathUtil;
 import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
@@ -61,6 +61,12 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   private static final String DEVICE_KEY = "ther.debugger.device";
 
   @NotNull
+  private static final String LIB_DIR_NAME = "libs";
+
+  @NotNull
+  private static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
+
+  @NotNull
   @Override
   public String getRunnerId() {
     return THE_R_DEBUG_RUNNER_ID;
@@ -84,7 +90,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectory());
 
     final Project project = environment.getProject();
-    final TheRXProcessHandler processHandler = createProcessHandler(interpreterPath, runConfigurationParams);
+    final TheRXProcessHandler processHandler = createProcessHandler(interpreterPath, runConfigurationParams, project);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
@@ -118,14 +124,15 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private TheRXProcessHandler createProcessHandler(@NotNull final String interpreterPath,
-                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams)
+                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams,
+                                                   @NotNull final Project project)
     throws ExecutionException {
     return new TheRXProcessHandler(
       calculateCommandLine(
         calculateCommand(interpreterPath, runConfigurationParams.getScriptArgs()),
         calculateWorkingDirectory(runConfigurationParams)
       ),
-      calculateInitCommands(runConfigurationParams),
+      calculateInitCommands(runConfigurationParams, project),
       new TheRExecutionResultCalculatorImpl(),
       parseBoolean(runConfigurationParams.getEnvs().get(IO_KEY))
     );
@@ -227,20 +234,26 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final String libPath = calculateWorkingDirectory(runConfigurationParams); // TODO [xdbg][update]
+  private List<String> calculateInitCommands(@NotNull final TheRRunConfigurationParams runConfigurationParams,
+                                             @NotNull final Project project) {
+    if (isDeviceEnabled(runConfigurationParams)) {
+      final String lib = getLib(DEVICE_LIB_NAME);
 
-    if (isDeviceEnabled(runConfigurationParams) && new File(libPath, TheRDebugConstants.DEVICE_LIB_NAME).canRead()) {
-      final List<String> result = new ArrayList<String>();
+      if (lib != null) {
+        final String snapshotDir = getSnapshotDir(project);
 
-      result.addAll(TheRProcessUtils.getInitCommands());
-      result.addAll(TheRProcessUtils.getInitDeviceCommands(libPath));
+        if (snapshotDir != null) {
+          final List<String> result = new ArrayList<String>();
 
-      return result;
+          result.addAll(TheRProcessUtils.getInitCommands());
+          result.addAll(TheRProcessUtils.getInitDeviceCommands(lib, snapshotDir));
+
+          return result;
+        }
+      }
     }
-    else {
-      return TheRProcessUtils.getInitCommands();
-    }
+
+    return TheRProcessUtils.getInitCommands();
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
@@ -256,5 +269,34 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final Map<String, String> envs = runConfigurationParams.getEnvs();
 
     return !envs.containsKey(DEVICE_KEY) || parseBoolean(envs.get(DEVICE_KEY));
+  }
+
+  @Nullable
+  private String getLib(@NotNull final String libName) {
+    final File pluginDir = new File(PathUtil.getJarPathForClass(getClass()));
+    final File libDir = new File(pluginDir, LIB_DIR_NAME);
+    final File libFile = new File(libDir, libName);
+
+    if (!libFile.canRead()) {
+      return null;
+    }
+
+    return libFile.getAbsolutePath();
+  }
+
+  @Nullable
+  private String getSnapshotDir(@NotNull final Project project) {
+    final File dotIdeaDir = new File(project.getBasePath(), ".idea");
+    final File snapshotDir = new File(dotIdeaDir, "snapshots");
+
+    if (!(snapshotDir.exists() || snapshotDir.mkdirs())) {
+      return null;
+    }
+
+    if (!snapshotDir.canWrite()) {
+      return null;
+    }
+
+    return snapshotDir.getAbsolutePath();
   }
 }

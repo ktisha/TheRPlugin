@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.executor;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,10 +20,10 @@ public final class TheRProcessUtils {
   }
 
   @NotNull
-  public static List<String> getInitDeviceCommands(@NotNull final String libPath) {
+  public static List<String> getInitDeviceCommands(@NotNull final String libPath, @NotNull final String snapshotDirPath) {
     return Arrays.asList(
-      LOAD_LIB_COMMAND + "(\"" + libPath + File.separator + DEVICE_LIB_NAME + "\")",
-      DEFINE_DEVICE_FUNCTION_COMMAND,
+      LOAD_LIB_COMMAND + "(\"" + libPath + "\")",
+      DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDirPath + "\") }",
       SETUP_DEVICE_COMMAND
     );
   }
