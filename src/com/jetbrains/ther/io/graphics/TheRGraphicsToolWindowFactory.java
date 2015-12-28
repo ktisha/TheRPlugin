@@ -1,7 +1,6 @@
 package com.jetbrains.ther.io.graphics;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -13,11 +12,13 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
   @Override
   public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
     final ContentManager contentManager = toolWindow.getContentManager();
-    final TheRGraphicsToolWindow graphicsToolWindow = new TheRGraphicsToolWindow(project);
 
-    final Content content = contentManager.getFactory().createContent(graphicsToolWindow, null, false);
+    final Content content = contentManager.getFactory().createContent(
+      new TheRGraphicsToolWindow(new TheRGraphicsState(project)),
+      null,
+      false
+    );
+
     contentManager.addContent(content);
-
-    Disposer.register(project, graphicsToolWindow);
   }
 }

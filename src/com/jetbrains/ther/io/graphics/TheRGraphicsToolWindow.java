@@ -1,11 +1,19 @@
 package com.jetbrains.ther.io.graphics;
 
-import com.intellij.openapi.Disposable;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.NotNull;
 
-class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable, TheRGraphicsToolbar.Listener {
+class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphicsToolbar.Listener {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRGraphicsToolWindow.class);
+
+  @NotNull
+  private static final String ATTEMPT_TO_OPEN_UNAVAILABLE_NEXT_SNAPSHOT = "Attempt to open next snapshot which is unavailable";
+
+  @NotNull
+  private static final String ATTEMPT_TO_OPEN_UNAVAILABLE_PREVIOUS_SNAPSHOT = "Attempt to open previous snapshot which is unavailable";
 
   @NotNull
   private final TheRGraphicsState myState;
@@ -13,10 +21,10 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable
   @NotNull
   private final TheRGraphicsPanel myPanel;
 
-  public TheRGraphicsToolWindow(@NotNull final Project project) {
+  public TheRGraphicsToolWindow(@NotNull final TheRGraphicsState state) {
     super(true, true);
 
-    myState = new TheRGraphicsState(project);
+    myState = state;
     myPanel = new TheRGraphicsPanel(myState);
 
     setToolbar(new TheRGraphicsToolbar(myState, this).getToolbar());
@@ -24,14 +32,12 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable
   }
 
   @Override
-  public void dispose() {
-    myState.dispose();
-  }
-
-  @Override
   public void next() {
     if (myState.hasNext()) {
       myPanel.showNext();
+    }
+    else {
+      LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_NEXT_SNAPSHOT);
     }
   }
 
@@ -39,6 +45,9 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable
   public void previous() {
     if (myState.hasPrevious()) {
       myPanel.showPrevious();
+    }
+    else {
+      LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_PREVIOUS_SNAPSHOT);
     }
   }
 }

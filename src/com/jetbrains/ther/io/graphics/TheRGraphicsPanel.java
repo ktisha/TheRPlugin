@@ -19,7 +19,7 @@ class TheRGraphicsPanel {
   private static final String NEXT_GRAPHICS_COULD_NOT_BE_LOADED = "Next graphics couldn't be loaded";
 
   @NotNull
-  private static final String PREVIOUS_GRAPHICS_COULDNOT_BE_LOADED = "Previous graphics couldn't be loaded";
+  private static final String PREVIOUS_GRAPHICS_COULD_NOT_BE_LOADED = "Previous graphics couldn't be loaded";
 
   @NotNull
   private final TheRGraphicsState myState;
@@ -71,7 +71,7 @@ class TheRGraphicsPanel {
       myLabel.setIcon(new ImageIcon(image));
     }
     catch (final IOException e) {
-      final String text = next ? NEXT_GRAPHICS_COULD_NOT_BE_LOADED : PREVIOUS_GRAPHICS_COULDNOT_BE_LOADED;
+      final String text = next ? NEXT_GRAPHICS_COULD_NOT_BE_LOADED : PREVIOUS_GRAPHICS_COULD_NOT_BE_LOADED;
 
       myLabel.setText(text);
 

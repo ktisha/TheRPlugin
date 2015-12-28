@@ -19,13 +19,16 @@ import java.util.TreeSet;
 
 import static com.jetbrains.ther.io.graphics.TheRGraphicsUtils.*;
 
-public class TheRGraphicsState implements Disposable {
+class TheRGraphicsState implements Disposable {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsState.class);
 
   @NotNull
   private static final String STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS = "Started to listen for new snapshots";
+
+  @NotNull
+  private static final String UPDATED_CURRENT_SNAPSHOT_ID = "Updated current snapshot id";
 
   @NotNull
   private static final String NO_NEXT_SNAPSHOT = "No next snapshot";
@@ -35,6 +38,15 @@ public class TheRGraphicsState implements Disposable {
 
   @NotNull
   private static final String SNAPSHOT_IS_NOT_FOUND = "Snapshot is not found";
+
+  @NotNull
+  private static final String OPENED_SNAPSHOT = "Opened snapshot";
+
+  @NotNull
+  private static final String SNAPSHOT_IS_NOT_READABLE = "Snapshot is not readable";
+
+  @NotNull
+  private static final String NEW_SNAPSHOT_ID = "New snapshot id";
 
   @NotNull
   private final TreeSet<Integer> mySnapshotIds;
@@ -96,11 +108,17 @@ public class TheRGraphicsState implements Disposable {
     }
 
     myCurrentId = newCurrentId;
+
+    LOGGER.debug(UPDATED_CURRENT_SNAPSHOT_ID + ": " + myCurrentId);
   }
 
   @NotNull
   private BufferedImage current() throws IOException {
-    final InputStream stream = currentFile().getInputStream();
+    final VirtualFile file = currentFile();
+
+    LOGGER.debug(OPENED_SNAPSHOT + ": " + file.getPath());
+
+    final InputStream stream = file.getInputStream();
 
     try {
       return loadImage(stream);
@@ -134,7 +152,7 @@ public class TheRGraphicsState implements Disposable {
     final BufferedImage image = ImageIO.read(stream);
 
     if (image == null) {
-      throw new IllegalStateException(); // TODO [ui][msg]
+      throw new IllegalStateException(SNAPSHOT_IS_NOT_READABLE);
     }
 
     return image; // TODO [ui][resize]
@@ -150,7 +168,11 @@ public class TheRGraphicsState implements Disposable {
       final String fileName = file.getName();
 
       if (isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false)) {
-        mySnapshotIds.add(extractSnapshotId(fileName));
+        final int snapshotId = extractSnapshotId(fileName);
+
+        mySnapshotIds.add(snapshotId);
+
+        LOGGER.debug(NEW_SNAPSHOT_ID + ": " + snapshotId);
       }
     }
   }
