@@ -22,7 +22,7 @@ class TheRGraphicsPanel {
   private static final String PREVIOUS_GRAPHICS_COULDNOT_BE_LOADED = "Previous graphics couldn't be loaded";
 
   @NotNull
-  private final TheRGraphicsToolWindowState myState;
+  private final TheRGraphicsState myState;
 
   @NotNull
   private final JPanel myPanel;
@@ -30,7 +30,7 @@ class TheRGraphicsPanel {
   @NotNull
   private final JLabel myLabel;
 
-  public TheRGraphicsPanel(@NotNull final TheRGraphicsToolWindowState state) {
+  public TheRGraphicsPanel(@NotNull final TheRGraphicsState state) {
     myState = state;
 
     myPanel = new JPanel();

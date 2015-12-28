@@ -21,7 +21,7 @@ class TheRGraphicsToolbar {
   @NotNull
   private final JPanel myToolbar;
 
-  public TheRGraphicsToolbar(@NotNull final TheRGraphicsToolWindowState state, @NotNull final Listener listener) {
+  public TheRGraphicsToolbar(@NotNull final TheRGraphicsState state, @NotNull final Listener listener) {
     myToolbar = createToolbar(state, listener);
   }
 
@@ -31,7 +31,7 @@ class TheRGraphicsToolbar {
   }
 
   @NotNull
-  private static JPanel createToolbar(@NotNull final TheRGraphicsToolWindowState state, @NotNull final Listener listener) {
+  private static JPanel createToolbar(@NotNull final TheRGraphicsState state, @NotNull final Listener listener) {
     final DefaultActionGroup actionGroup = new DefaultActionGroup();
 
     actionGroup.add(new PreviousGraphicsAction(state, listener));
@@ -52,12 +52,12 @@ class TheRGraphicsToolbar {
   private static class PreviousGraphicsAction extends AnAction {
 
     @NotNull
-    private final TheRGraphicsToolWindowState myState;
+    private final TheRGraphicsState myState;
 
     @NotNull
     private final Listener myListener;
 
-    public PreviousGraphicsAction(@NotNull final TheRGraphicsToolWindowState state, @NotNull final Listener listener) {
+    public PreviousGraphicsAction(@NotNull final TheRGraphicsState state, @NotNull final Listener listener) {
       super(PREVIOUS_GRAPHICS_ACTION_TEXT, PREVIOUS_GRAPHICS_ACTION_TEXT, AllIcons.Actions.Back);
 
       myState = state;
@@ -82,12 +82,12 @@ class TheRGraphicsToolbar {
   private static class NextGraphicsAction extends AnAction {
 
     @NotNull
-    private final TheRGraphicsToolWindowState myState;
+    private final TheRGraphicsState myState;
 
     @NotNull
     private final Listener myListener;
 
-    public NextGraphicsAction(@NotNull final TheRGraphicsToolWindowState state, @NotNull final Listener listener) {
+    public NextGraphicsAction(@NotNull final TheRGraphicsState state, @NotNull final Listener listener) {
       super(NEXT_GRAPHICS_ACTION_TEXT, NEXT_GRAPHICS_ACTION_TEXT, AllIcons.Actions.Forward);
 
       myState = state;

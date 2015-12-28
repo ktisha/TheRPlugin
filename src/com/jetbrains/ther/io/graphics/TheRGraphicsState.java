@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class TheRGraphicsToolWindowState implements Disposable {
+public class TheRGraphicsState implements Disposable {
 
   @NotNull
   private final List<VirtualFile> mySnapshotFiles;
@@ -24,7 +24,7 @@ public class TheRGraphicsToolWindowState implements Disposable {
 
   private int myCurrentIndex;
 
-  public TheRGraphicsToolWindowState(@NotNull final Project project) {
+  public TheRGraphicsState(@NotNull final Project project) {
     mySnapshotFiles = new ArrayList<VirtualFile>();
 
     final VirtualFile snapshotDir = getSnapshotDir(project);

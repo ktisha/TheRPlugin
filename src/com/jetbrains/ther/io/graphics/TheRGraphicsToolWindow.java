@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable, TheRGraphicsToolbar.Listener {
 
   @NotNull
-  private final TheRGraphicsToolWindowState myState;
+  private final TheRGraphicsState myState;
 
   @NotNull
   private final TheRGraphicsPanel myPanel;
@@ -16,7 +16,7 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements Disposable
   public TheRGraphicsToolWindow(@NotNull final Project project) {
     super(true, true);
 
-    myState = new TheRGraphicsToolWindowState(project);
+    myState = new TheRGraphicsState(project);
     myPanel = new TheRGraphicsPanel(myState);
 
     setToolbar(new TheRGraphicsToolbar(myState, this).getToolbar());
