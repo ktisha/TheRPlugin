@@ -58,7 +58,7 @@ class TheRGraphicsState implements Disposable {
 
   public TheRGraphicsState(@NotNull final Project project) {
     mySnapshotIds = new TreeSet<Integer>();
-    mySnapshotDir = getSnapshotDir(project);
+    mySnapshotDir = getOrCreateSnapshotDir(project);
 
     myCurrentId = -1;
 
@@ -168,7 +168,7 @@ class TheRGraphicsState implements Disposable {
       final String fileName = file.getName();
 
       if (isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false)) {
-        final int snapshotId = extractSnapshotId(fileName);
+        final int snapshotId = calculateSnapshotId(fileName);
 
         mySnapshotIds.add(snapshotId);
 
