@@ -1,4 +1,4 @@
-package com.jetbrains.ther.xdebugger;
+package com.jetbrains.ther.io.graphics;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
@@ -16,7 +16,7 @@ import java.util.Map;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static java.lang.Boolean.parseBoolean;
 
-public class TheRXGraphicsManager {
+public class TheRGraphicsUtils {
 
   @NotNull
   private static final String DEVICE_KEY = "ther.debugger.device";
@@ -76,7 +76,7 @@ public class TheRXGraphicsManager {
 
   @Nullable
   private static String getLibPath(@NotNull final String libName) {
-    final File pluginDir = new File(PathUtil.getJarPathForClass(TheRXGraphicsManager.class));
+    final File pluginDir = new File(PathUtil.getJarPathForClass(TheRGraphicsUtils.class));
     final File libDir = new File(pluginDir, LIB_DIR_NAME);
     final File libFile = new File(libDir, libName);
 

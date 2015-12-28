@@ -31,6 +31,7 @@ import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.io.graphics.TheRGraphicsUtils;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import com.jetbrains.ther.run.TheRRunConfigurationParams;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
@@ -226,7 +227,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final List<String> result = new ArrayList<String>();
 
     result.addAll(TheRProcessUtils.getInitCommands());
-    result.addAll(TheRXGraphicsManager.calculateInitCommands(project, runConfigurationParams));
+    result.addAll(TheRGraphicsUtils.calculateInitCommands(project, runConfigurationParams));
 
     return result;
   }
