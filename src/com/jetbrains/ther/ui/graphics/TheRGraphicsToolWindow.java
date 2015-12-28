@@ -1,4 +1,4 @@
-package com.jetbrains.ther.io.graphics;
+package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;

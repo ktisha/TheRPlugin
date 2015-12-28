@@ -1,4 +1,4 @@
-package com.jetbrains.ther.io.graphics;
+package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
-import static com.jetbrains.ther.io.graphics.TheRGraphicsUtils.*;
+import static com.jetbrains.ther.ui.graphics.TheRGraphicsUtils.*;
 
 class TheRGraphicsState implements Disposable {
 
