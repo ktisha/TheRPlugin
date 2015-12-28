@@ -15,7 +15,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ConcurrencyUtil;
-import com.intellij.util.PathUtil;
 import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
@@ -45,7 +44,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -56,15 +54,6 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private static final String IO_KEY = "ther.debugger.io";
-
-  @NotNull
-  private static final String DEVICE_KEY = "ther.debugger.device";
-
-  @NotNull
-  private static final String LIB_DIR_NAME = "libs";
-
-  @NotNull
-  private static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
 
   @NotNull
   @Override
@@ -90,7 +79,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectory());
 
     final Project project = environment.getProject();
-    final TheRXProcessHandler processHandler = createProcessHandler(interpreterPath, runConfigurationParams, project);
+    final TheRXProcessHandler processHandler = createProcessHandler(project, interpreterPath, runConfigurationParams);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
@@ -108,7 +97,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   private void checkConfiguration(@NotNull final String interpreterPath,
                                   @NotNull final String scriptPath,
-                                  @NotNull final String workDirectory) throws ExecutionException {
+                                  @NotNull final String workingDirectoryPath) throws ExecutionException {
     if (StringUtil.isEmptyOrSpaces(interpreterPath)) {
       throw new ExecutionException("The R interpreter is not specified");
     }
@@ -117,22 +106,22 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       throw new ExecutionException("The R script is not specified");
     }
 
-    if (StringUtil.isEmptyOrSpaces(workDirectory) && new File(scriptPath).getParent() == null) {
+    if (StringUtil.isEmptyOrSpaces(workingDirectoryPath) && new File(scriptPath).getParent() == null) {
       throw new ExecutionException("The working directory couldn't be calculated");
     }
   }
 
   @NotNull
-  private TheRXProcessHandler createProcessHandler(@NotNull final String interpreterPath,
-                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams,
-                                                   @NotNull final Project project)
+  private TheRXProcessHandler createProcessHandler(@NotNull final Project project,
+                                                   @NotNull final String interpreterPath,
+                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams)
     throws ExecutionException {
     return new TheRXProcessHandler(
       calculateCommandLine(
         calculateCommand(interpreterPath, runConfigurationParams.getScriptArgs()),
-        calculateWorkingDirectory(runConfigurationParams)
+        calculateWorkingDirectoryPath(runConfigurationParams)
       ),
-      calculateInitCommands(runConfigurationParams, project),
+      calculateInitCommands(project, runConfigurationParams),
       new TheRExecutionResultCalculatorImpl(),
       parseBoolean(runConfigurationParams.getEnvs().get(IO_KEY))
     );
@@ -169,8 +158,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   @NotNull
   private TheRDebugger createDebugger(@NotNull final TheRXProcessHandler processHandler,
                                       @NotNull final TheRXOutputReceiver outputReceiver,
-                                      @NotNull final String scriptPath)
-    throws ExecutionException {
+                                      @NotNull final String scriptPath) throws ExecutionException {
     try {
       return new TheRDebugger(
         processHandler,
@@ -201,10 +189,9 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private GeneralCommandLine calculateCommandLine(@NotNull final List<String> command,
-                                                  @NotNull final String workDirectory) {
+  private GeneralCommandLine calculateCommandLine(@NotNull final List<String> command, @NotNull final String workingDirectoryPath) {
     final GeneralCommandLine commandLine = new GeneralCommandLine(command);
-    commandLine.withWorkDirectory(workDirectory);
+    commandLine.withWorkDirectory(workingDirectoryPath);
 
     return commandLine;
   }
@@ -226,34 +213,22 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private String calculateWorkingDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final String workingDirectory = runConfigurationParams.getWorkingDirectory();
-    final String defaultValue = new File(runConfigurationParams.getScriptPath()).getParent();
+  private String calculateWorkingDirectoryPath(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final String workingDirectoryPath = runConfigurationParams.getWorkingDirectory();
+    final String defaultPath = new File(runConfigurationParams.getScriptPath()).getParent();
 
-    return !StringUtil.isEmptyOrSpaces(workingDirectory) ? workingDirectory : defaultValue;
+    return !StringUtil.isEmptyOrSpaces(workingDirectoryPath) ? workingDirectoryPath : defaultPath;
   }
 
   @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfigurationParams runConfigurationParams,
-                                             @NotNull final Project project) {
-    if (isDeviceEnabled(runConfigurationParams)) {
-      final String lib = getLib(DEVICE_LIB_NAME);
+  private List<String> calculateInitCommands(@NotNull final Project project,
+                                             @NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final List<String> result = new ArrayList<String>();
 
-      if (lib != null) {
-        final String snapshotDir = getSnapshotDir(project);
+    result.addAll(TheRProcessUtils.getInitCommands());
+    result.addAll(TheRXGraphicsManager.calculateInitCommands(project, runConfigurationParams));
 
-        if (snapshotDir != null) {
-          final List<String> result = new ArrayList<String>();
-
-          result.addAll(TheRProcessUtils.getInitCommands());
-          result.addAll(TheRProcessUtils.getInitDeviceCommands(lib, snapshotDir));
-
-          return result;
-        }
-      }
-    }
-
-    return TheRProcessUtils.getInitCommands();
+    return result;
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
@@ -263,40 +238,5 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     catch (final TheRDebuggerException e) {
       throw new ExecutionException(e);
     }
-  }
-
-  private boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final Map<String, String> envs = runConfigurationParams.getEnvs();
-
-    return !envs.containsKey(DEVICE_KEY) || parseBoolean(envs.get(DEVICE_KEY));
-  }
-
-  @Nullable
-  private String getLib(@NotNull final String libName) {
-    final File pluginDir = new File(PathUtil.getJarPathForClass(getClass()));
-    final File libDir = new File(pluginDir, LIB_DIR_NAME);
-    final File libFile = new File(libDir, libName);
-
-    if (!libFile.canRead()) {
-      return null;
-    }
-
-    return libFile.getAbsolutePath();
-  }
-
-  @Nullable
-  private String getSnapshotDir(@NotNull final Project project) {
-    final File dotIdeaDir = new File(project.getBasePath(), ".idea");
-    final File snapshotDir = new File(dotIdeaDir, "snapshots");
-
-    if (!(snapshotDir.exists() || snapshotDir.mkdirs())) {
-      return null;
-    }
-
-    if (!snapshotDir.canWrite()) {
-      return null;
-    }
-
-    return snapshotDir.getAbsolutePath();
   }
 }
