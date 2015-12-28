@@ -1,120 +1,156 @@
 package com.jetbrains.ther.io.graphics;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectCoreUtil;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.impl.BulkVirtualFileListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
 import java.util.NoSuchElementException;
+import java.util.TreeSet;
+
+import static com.jetbrains.ther.io.graphics.TheRGraphicsUtils.*;
 
 public class TheRGraphicsState implements Disposable {
 
   @NotNull
-  private final List<VirtualFile> mySnapshotFiles;
+  private static final Logger LOGGER = Logger.getInstance(TheRGraphicsState.class);
+
+  @NotNull
+  private static final String STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS = "Started to listen for new snapshots";
+
+  @NotNull
+  private static final String NO_NEXT_SNAPSHOT = "No next snapshot";
+
+  @NotNull
+  private static final String NO_PREVIOUS_SNAPSHOT = "No previous snapshot";
+
+  @NotNull
+  private static final String SNAPSHOT_IS_NOT_FOUND = "Snapshot is not found";
+
+  @NotNull
+  private final TreeSet<Integer> mySnapshotIds;
 
   @Nullable
-  private final VirtualFileAdapter myVirtualFileListener;
+  private final VirtualFile mySnapshotDir;
 
-  private int myCurrentIndex;
+  private int myCurrentId;
 
   public TheRGraphicsState(@NotNull final Project project) {
-    mySnapshotFiles = new ArrayList<VirtualFile>();
+    mySnapshotIds = new TreeSet<Integer>();
+    mySnapshotDir = getSnapshotDir(project);
 
-    final VirtualFile snapshotDir = getSnapshotDir(project);
+    myCurrentId = -1;
 
-    if (snapshotDir != null) {
-      myVirtualFileListener = new SnapshotDirListener(snapshotDir);
+    if (mySnapshotDir != null) {
+      Disposer.register(project, this);
 
-      VirtualFileManager.getInstance().addVirtualFileListener(myVirtualFileListener);
+      project.getMessageBus().connect(this).subscribe(
+        VirtualFileManager.VFS_CHANGES,
+        new BulkVirtualFileListenerAdapter(new SnapshotDirListener())
+      );
+
+      LOGGER.info(STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS + ": " + mySnapshotDir.getPath());
     }
-    else {
-      myVirtualFileListener = null;
-    }
-
-    myCurrentIndex = -1;
   }
 
   public boolean hasNext() {
-    return myCurrentIndex < mySnapshotFiles.size() - 1;
+    return mySnapshotIds.higher(myCurrentId) != null;
   }
 
   public boolean hasPrevious() {
-    return myCurrentIndex > 0;
+    return mySnapshotIds.lower(myCurrentId) != null;
   }
 
+  @NotNull
   public BufferedImage next() throws IOException {
-    if (!hasNext()) {
-      throw new NoSuchElementException(); // todo msg
-    }
+    updateCurrentId(true);
 
-    myCurrentIndex++;
-
-    return ImageIO.read(mySnapshotFiles.get(myCurrentIndex).getInputStream()); // todo resize
+    return current();
   }
 
+  @NotNull
   public BufferedImage previous() throws IOException {
-    if (!hasPrevious()) {
-      throw new NoSuchElementException(); // todo msg
-    }
+    updateCurrentId(false);
 
-    myCurrentIndex--;
-
-    return ImageIO.read(mySnapshotFiles.get(myCurrentIndex).getInputStream()); // todo resize
+    return current();
   }
 
   @Override
   public void dispose() {
-    if (myVirtualFileListener != null) {
-      VirtualFileManager.getInstance().removeVirtualFileListener(myVirtualFileListener);
+  }
+
+  private void updateCurrentId(final boolean next) {
+    final Integer newCurrentId = next ? mySnapshotIds.higher(myCurrentId) : mySnapshotIds.lower(myCurrentId);
+
+    if (newCurrentId == null) {
+      throw new NoSuchElementException(next ? NO_NEXT_SNAPSHOT : NO_PREVIOUS_SNAPSHOT);
+    }
+
+    myCurrentId = newCurrentId;
+  }
+
+  @NotNull
+  private BufferedImage current() throws IOException {
+    final InputStream stream = currentFile().getInputStream();
+
+    try {
+      return loadImage(stream);
+    }
+    finally {
+      try {
+        stream.close();
+      }
+      catch (final IOException e) {
+        LOGGER.warn(e);
+      }
     }
   }
 
-  @Nullable
-  private VirtualFile getSnapshotDir(@NotNull final Project project) {
-    final VirtualFile dotIdeaDir = project.getBaseDir().findChild(ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR);
+  @NotNull
+  private VirtualFile currentFile() throws FileNotFoundException {
+    assert mySnapshotDir != null;
 
-    if (dotIdeaDir == null) {
-      return null;
+    final String snapshotName = calculateSnapshotName(myCurrentId);
+    final VirtualFile currentSnapshot = mySnapshotDir.findChild(snapshotName);
+
+    if (currentSnapshot == null) {
+      throw new FileNotFoundException(SNAPSHOT_IS_NOT_FOUND + ": " + snapshotName);
     }
 
-    final VirtualFile snapshotDir = dotIdeaDir.findChild("snapshots");
+    return currentSnapshot;
+  }
 
-    if (snapshotDir != null) {
-      return snapshotDir;
+  @NotNull
+  private BufferedImage loadImage(@NotNull final InputStream stream) throws IOException {
+    final BufferedImage image = ImageIO.read(stream);
+
+    if (image == null) {
+      throw new IllegalStateException(); // TODO [ui][msg]
     }
 
-    try {
-      return dotIdeaDir.createChildDirectory(this, "snapshots");
-    }
-    catch (final IOException e) {
-      // todo log
-
-      return null;
-    }
+    return image; // TODO [ui][resize]
   }
 
   private class SnapshotDirListener extends VirtualFileAdapter {
 
-    @NotNull
-    private final VirtualFile mySnapshotDir;
-
-    public SnapshotDirListener(@NotNull final VirtualFile snapshotDir) {
-      mySnapshotDir = snapshotDir;
-    }
-
     @Override
     public void fileCreated(@NotNull final VirtualFileEvent event) {
-      final VirtualFile file = event.getFile();
+      assert mySnapshotDir != null;
 
-      if ("png".equals(file.getExtension()) && VfsUtilCore.isAncestor(mySnapshotDir, file, false)) {
-        mySnapshotFiles.add(file);
+      final VirtualFile file = event.getFile();
+      final String fileName = file.getName();
+
+      if (isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false)) {
+        mySnapshotIds.add(extractSnapshotId(fileName));
       }
     }
   }
