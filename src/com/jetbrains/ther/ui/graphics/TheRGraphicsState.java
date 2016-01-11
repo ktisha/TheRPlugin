@@ -1,9 +1,7 @@
 package com.jetbrains.ther.ui.graphics;
 
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.*;
 import com.intellij.openapi.vfs.impl.BulkVirtualFileListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -14,21 +12,20 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 import static com.jetbrains.ther.ui.graphics.TheRGraphicsUtils.*;
 
-class TheRGraphicsState implements Disposable {
+class TheRGraphicsState {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsState.class);
 
   @NotNull
   private static final String STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS = "Started to listen for new snapshots";
-
-  @NotNull
-  private static final String UPDATED_CURRENT_SNAPSHOT_ID = "Updated current snapshot id";
 
   @NotNull
   private static final String NO_NEXT_SNAPSHOT = "No next snapshot";
@@ -40,13 +37,25 @@ class TheRGraphicsState implements Disposable {
   private static final String SNAPSHOT_IS_NOT_FOUND = "Snapshot is not found";
 
   @NotNull
-  private static final String OPENED_SNAPSHOT = "Opened snapshot";
+  private static final String SNAPSHOT_COULD_NOT_BE_ENCODED = "Snapshot couldn't be encoded";
 
   @NotNull
-  private static final String SNAPSHOT_IS_NOT_READABLE = "Snapshot is not readable";
+  private static final String REMOVED_SNAPSHOT_AS_RENAMED = "Removed snapshot (as renamed)";
 
   @NotNull
-  private static final String NEW_SNAPSHOT_ID = "New snapshot id";
+  private static final String UPDATED_CURRENT_SNAPSHOT = "Updated current snapshot";
+
+  @NotNull
+  private static final String UPDATED_SNAPSHOT = "Updated snapshot";
+
+  @NotNull
+  private static final String CREATED_SNAPSHOT = "Created snapshot";
+
+  @NotNull
+  private static final String REMOVED_SNAPSHOT = "Removed snapshot";
+
+  @NotNull
+  private static final String REMOVED_SNAPSHOT_AS_MOVED = "Removed snapshot (as moved)";
 
   @NotNull
   private final TreeSet<Integer> mySnapshotIds;
@@ -54,24 +63,34 @@ class TheRGraphicsState implements Disposable {
   @Nullable
   private final VirtualFile mySnapshotDir;
 
+  @NotNull
+  private final List<Listener> myListeners;
+
   private int myCurrentId;
 
   public TheRGraphicsState(@NotNull final Project project) {
     mySnapshotIds = new TreeSet<Integer>();
     mySnapshotDir = getOrCreateSnapshotDir(project);
+    myListeners = new ArrayList<Listener>();
 
     myCurrentId = -1;
 
     if (mySnapshotDir != null) {
-      Disposer.register(project, this);
-
-      project.getMessageBus().connect(this).subscribe(
+      project.getMessageBus().connect(project).subscribe(
         VirtualFileManager.VFS_CHANGES,
         new BulkVirtualFileListenerAdapter(new SnapshotDirListener())
       );
 
       LOGGER.info(STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS + ": " + mySnapshotDir.getPath());
     }
+  }
+
+  public void addListener(@NotNull final Listener listener) {
+    myListeners.add(listener);
+  }
+
+  public void removeListener(@NotNull final Listener listener) {
+    myListeners.remove(listener);
   }
 
   public boolean hasNext() {
@@ -96,29 +115,9 @@ class TheRGraphicsState implements Disposable {
     return current();
   }
 
-  @Override
-  public void dispose() {
-  }
-
-  private void updateCurrentId(final boolean next) {
-    final Integer newCurrentId = next ? mySnapshotIds.higher(myCurrentId) : mySnapshotIds.lower(myCurrentId);
-
-    if (newCurrentId == null) {
-      throw new NoSuchElementException(next ? NO_NEXT_SNAPSHOT : NO_PREVIOUS_SNAPSHOT);
-    }
-
-    myCurrentId = newCurrentId;
-
-    LOGGER.debug(UPDATED_CURRENT_SNAPSHOT_ID + ": " + myCurrentId);
-  }
-
   @NotNull
-  private BufferedImage current() throws IOException {
-    final VirtualFile file = currentFile();
-
-    LOGGER.debug(OPENED_SNAPSHOT + ": " + file.getPath());
-
-    final InputStream stream = file.getInputStream();
+  public BufferedImage current() throws IOException {
+    final InputStream stream = currentFile().getInputStream();
 
     try {
       return loadImage(stream);
@@ -131,6 +130,16 @@ class TheRGraphicsState implements Disposable {
         LOGGER.warn(e);
       }
     }
+  }
+
+  private void updateCurrentId(final boolean next) {
+    final Integer newCurrentId = next ? mySnapshotIds.higher(myCurrentId) : mySnapshotIds.lower(myCurrentId);
+
+    if (newCurrentId == null) {
+      throw new NoSuchElementException(next ? NO_NEXT_SNAPSHOT : NO_PREVIOUS_SNAPSHOT);
+    }
+
+    myCurrentId = newCurrentId;
   }
 
   @NotNull
@@ -152,28 +161,93 @@ class TheRGraphicsState implements Disposable {
     final BufferedImage image = ImageIO.read(stream);
 
     if (image == null) {
-      throw new IllegalStateException(SNAPSHOT_IS_NOT_READABLE);
+      throw new IllegalStateException(SNAPSHOT_COULD_NOT_BE_ENCODED);
     }
 
     return image; // TODO [ui][resize]
   }
 
+  interface Listener {
+
+    void currentUpdate();
+  }
+
   private class SnapshotDirListener extends VirtualFileAdapter {
 
     @Override
+    public void contentsChanged(@NotNull final VirtualFileEvent event) {
+      if (isSnapshotEvent(event)) {
+        final int snapshotId = calculateSnapshotId(event.getFileName());
+
+        if (myCurrentId == snapshotId) {
+          LOGGER.debug(UPDATED_CURRENT_SNAPSHOT + ": " + snapshotId);
+
+          for (final Listener listener : myListeners) {
+            listener.currentUpdate();
+          }
+        }
+        else {
+          LOGGER.debug(UPDATED_SNAPSHOT + ": " + snapshotId);
+        }
+      }
+    }
+
+    @Override
     public void fileCreated(@NotNull final VirtualFileEvent event) {
+      if (isSnapshotEvent(event)) {
+        final int snapshotId = calculateSnapshotId(event.getFileName());
+
+        if (mySnapshotIds.add(snapshotId)) {
+          LOGGER.debug(CREATED_SNAPSHOT + ": " + snapshotId);
+        }
+      }
+    }
+
+    @Override
+    public void fileDeleted(@NotNull final VirtualFileEvent event) {
+      if (isSnapshotEvent(event)) {
+        final int snapshotId = calculateSnapshotId(event.getFileName());
+
+        if (mySnapshotIds.remove(snapshotId)) {
+          LOGGER.info(REMOVED_SNAPSHOT + ": " + snapshotId);
+        }
+      }
+    }
+
+    @Override
+    public void fileCopied(@NotNull final VirtualFileCopyEvent event) {
+      // ignore
+    }
+
+    @Override
+    public void beforePropertyChange(@NotNull final VirtualFilePropertyEvent event) {
+      if (event.getPropertyName().equals(VirtualFile.PROP_NAME) && isSnapshotEvent(event)) {
+        final int snapshotId = calculateSnapshotId((String)event.getOldValue());
+
+        if (mySnapshotIds.remove(snapshotId)) {
+          LOGGER.info(REMOVED_SNAPSHOT_AS_RENAMED + ": " + snapshotId);
+        }
+      }
+    }
+
+    @Override
+    public void beforeFileMovement(@NotNull final VirtualFileMoveEvent event) {
+      if (isSnapshotEvent(event)) {
+        final int snapshotId = calculateSnapshotId(event.getFileName());
+
+        if (mySnapshotIds.remove(snapshotId)) {
+          LOGGER.info(REMOVED_SNAPSHOT_AS_MOVED + ": " + snapshotId);
+        }
+      }
+    }
+
+    private boolean isSnapshotEvent(@NotNull final VirtualFileEvent event) {
       assert mySnapshotDir != null;
 
       final VirtualFile file = event.getFile();
       final String fileName = file.getName();
 
-      if (isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false)) {
-        final int snapshotId = calculateSnapshotId(fileName);
-
-        mySnapshotIds.add(snapshotId);
-
-        LOGGER.debug(NEW_SNAPSHOT_ID + ": " + snapshotId);
-      }
+      return isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false);
     }
   }
 }
