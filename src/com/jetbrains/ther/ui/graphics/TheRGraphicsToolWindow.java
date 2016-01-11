@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.NotNull;
 
-class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphicsToolbar.Listener {
+class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsToolWindow.class);
@@ -27,27 +27,40 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphi
     myState = state;
     myPanel = new TheRGraphicsPanel(myState);
 
-    setToolbar(new TheRGraphicsToolbar(myState, this).getToolbar());
+    setToolbar(new TheRGraphicsToolbar(myState, new ToolbarListener()).getToolbar());
     setContent(myPanel.getPanel());
+
+    myState.addListener(new StateListener());
   }
 
-  @Override
-  public void next() {
-    if (myState.hasNext()) {
-      myPanel.showNext();
+  private class ToolbarListener implements TheRGraphicsToolbar.Listener {
+
+    @Override
+    public void next() {
+      if (myState.hasNext()) {
+        myPanel.showNext();
+      }
+      else {
+        LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_NEXT_SNAPSHOT);
+      }
     }
-    else {
-      LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_NEXT_SNAPSHOT);
+
+    @Override
+    public void previous() {
+      if (myState.hasPrevious()) {
+        myPanel.showPrevious();
+      }
+      else {
+        LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_PREVIOUS_SNAPSHOT);
+      }
     }
   }
 
-  @Override
-  public void previous() {
-    if (myState.hasPrevious()) {
-      myPanel.showPrevious();
-    }
-    else {
-      LOGGER.warn(ATTEMPT_TO_OPEN_UNAVAILABLE_PREVIOUS_SNAPSHOT);
+  private class StateListener implements TheRGraphicsState.Listener {
+
+    @Override
+    public void currentUpdate() {
+      myPanel.updateCurrent();
     }
   }
 }
