@@ -16,6 +16,9 @@ class TheRGraphicsPanel {
   private static final String NO_GRAPHICS = "No graphics";
 
   @NotNull
+  private static final String CURRENT_GRAPHICS_COULD_NOT_BE_RELOADED = "Current graphics couldn't be reloaded";
+
+  @NotNull
   private static final String NEXT_GRAPHICS_COULD_NOT_BE_LOADED = "Next graphics couldn't be loaded";
 
   @NotNull
@@ -41,11 +44,15 @@ class TheRGraphicsPanel {
   }
 
   public void showNext() {
-    show(true);
+    handleGraphicsAction(GraphicsAction.NEXT);
   }
 
   public void showPrevious() {
-    show(false);
+    handleGraphicsAction(GraphicsAction.PREVIOUS);
+  }
+
+  public void updateCurrent() {
+    handleGraphicsAction(GraphicsAction.CURRENT);
   }
 
   @NotNull
@@ -55,27 +62,55 @@ class TheRGraphicsPanel {
 
   private void initLabel() {
     if (myState.hasNext()) {
-      show(true);
+      handleGraphicsAction(GraphicsAction.NEXT);
     }
     else {
       myLabel.setText(NO_GRAPHICS);
     }
   }
 
-  private void show(final boolean next) {
+  private void handleGraphicsAction(@NotNull final GraphicsAction action) {
     myLabel.setText("");
 
     try {
-      final BufferedImage image = next ? myState.next() : myState.previous();
-
-      myLabel.setIcon(new ImageIcon(image));
+      myLabel.setIcon(new ImageIcon(loadLabelImage(action)));
     }
     catch (final IOException e) {
-      final String text = next ? NEXT_GRAPHICS_COULD_NOT_BE_LOADED : PREVIOUS_GRAPHICS_COULD_NOT_BE_LOADED;
-
-      myLabel.setText(text);
+      myLabel.setText(calculateLabelText(action));
 
       LOGGER.error(e);
     }
+  }
+
+  @NotNull
+  private BufferedImage loadLabelImage(@NotNull final GraphicsAction action) throws IOException {
+    switch (action) {
+      case NEXT:
+        return myState.next();
+      case CURRENT:
+        return myState.current();
+      case PREVIOUS:
+        return myState.previous();
+      default:
+        throw new IllegalArgumentException("Unexpected graphics action: " + action);
+    }
+  }
+
+  @NotNull
+  private String calculateLabelText(@NotNull final GraphicsAction action) {
+    switch (action) {
+      case NEXT:
+        return NEXT_GRAPHICS_COULD_NOT_BE_LOADED;
+      case CURRENT:
+        return CURRENT_GRAPHICS_COULD_NOT_BE_RELOADED;
+      case PREVIOUS:
+        return PREVIOUS_GRAPHICS_COULD_NOT_BE_LOADED;
+      default:
+        throw new IllegalArgumentException("Unexpected graphics action: " + action);
+    }
+  }
+
+  private enum GraphicsAction {
+    NEXT, CURRENT, PREVIOUS
   }
 }
