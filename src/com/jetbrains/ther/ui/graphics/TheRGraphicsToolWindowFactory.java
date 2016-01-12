@@ -1,6 +1,7 @@
 package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -13,8 +14,10 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
   public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
     final ContentManager contentManager = toolWindow.getContentManager();
 
+    final VirtualFile snapshotDir = TheRGraphicsUtils.getOrCreateSnapshotDir(project);
+
     final Content content = contentManager.getFactory().createContent(
-      new TheRGraphicsToolWindow(new TheRGraphicsState(project)),
+      new TheRGraphicsToolWindow(project, snapshotDir, new TheRGraphicsState(snapshotDir)), // TODO [ui][upd]
       null,
       false
     );
