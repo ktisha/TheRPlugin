@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-import static com.jetbrains.ther.ui.graphics.TheRGraphicsUtils.isSnapshotName;
-
 public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
   @NotNull
@@ -110,12 +108,14 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
     @Override
     public void contentsChanged(@NotNull final VirtualFileEvent event) {
-      if (isSnapshotEvent(event)) {
+      final VirtualFile file = event.getFile();
+
+      if (myState.isSnapshot(file)) {
         LOGGER.debug(
           String.format(UPDATED_SNAPSHOT, event.getFileName())
         );
 
-        if (myState.isCurrent(event.getFile())) {
+        if (myState.isCurrent(file)) {
           myPanel.refresh();
         }
       }
@@ -123,15 +123,19 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
     @Override
     public void fileCreated(@NotNull final VirtualFileEvent event) {
-      if (isSnapshotEvent(event)) {
-        myState.add(event.getFile());
+      final VirtualFile file = event.getFile();
+
+      if (myState.isSnapshot(file)) {
+        myState.add(file);
       }
     }
 
     @Override
     public void fileDeleted(@NotNull final VirtualFileEvent event) {
-      if (isSnapshotEvent(event)) {
-        myState.remove(event.getFile());
+      final VirtualFile file = event.getFile();
+
+      if (myState.isSnapshot(file)) {
+        myState.remove(file);
       }
     }
 
@@ -142,31 +146,28 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
     @Override
     public void beforePropertyChange(@NotNull final VirtualFilePropertyEvent event) {
-      if (event.getPropertyName().equals(VirtualFile.PROP_NAME) && isSnapshotEvent(event)) {
+      final VirtualFile file = event.getFile();
+
+      if (event.getPropertyName().equals(VirtualFile.PROP_NAME) && myState.isSnapshot(file)) {
         LOGGER.warn(
           String.format(RENAMED_SNAPSHOT_WILL_BE_REMOVED, event.getFileName())
         );
 
-        myState.remove(event.getFile());
+        myState.remove(file);
       }
     }
 
     @Override
     public void beforeFileMovement(@NotNull final VirtualFileMoveEvent event) {
-      if (isSnapshotEvent(event)) {
+      final VirtualFile file = event.getFile();
+
+      if (myState.isSnapshot(file)) {
         LOGGER.warn(
           String.format(MOVED_SNAPSHOT_WILL_BE_REMOVED, event.getFileName())
         );
 
-        myState.remove(event.getFile());
+        myState.remove(file);
       }
-    }
-
-    private boolean isSnapshotEvent(@NotNull final VirtualFileEvent event) {
-      final VirtualFile file = event.getFile();
-      final String fileName = file.getName();
-
-      return isSnapshotName(fileName) && VfsUtilCore.isAncestor(mySnapshotDir, file, false);
     }
   }
 }

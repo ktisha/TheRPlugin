@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static java.lang.Boolean.parseBoolean;
@@ -63,12 +61,6 @@ public class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created";
 
   @NotNull
-  private static final Pattern SNAPSHOT_NAME_PATTERN = Pattern.compile("^snapshot_(\\d+)\\.png$");
-
-  @NotNull
-  private static final String SNAPSHOT_NAME_FORMAT = "snapshot_%d.png";
-
-  @NotNull
   public static List<String> calculateInitCommands(@NotNull final Project project,
                                                    @NotNull final TheRRunConfigurationParams runConfigurationParams) {
     if (isDeviceEnabled(runConfigurationParams)) {
@@ -94,7 +86,7 @@ public class TheRGraphicsUtils {
   }
 
   @Nullable
-  public static VirtualFile getOrCreateSnapshotDir(@NotNull final Project project) {
+  static VirtualFile getOrCreateSnapshotDir(@NotNull final Project project) {
     final VirtualFile dotIdeaDir = project.getBaseDir().findChild(ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR);
 
     if (dotIdeaDir != null) {
@@ -105,30 +97,6 @@ public class TheRGraphicsUtils {
 
       return null;
     }
-  }
-
-  public static boolean isSnapshotName(@NotNull final String name) {
-    return SNAPSHOT_NAME_PATTERN.matcher(name).matches();
-  }
-
-  public static int calculateSnapshotId(@NotNull final String snapshotName) {
-    final Matcher matcher = SNAPSHOT_NAME_PATTERN.matcher(snapshotName);
-
-    if (matcher.find()) {
-      return Integer.parseInt(matcher.group(1));
-    }
-    else {
-      throw new IllegalArgumentException(); // TODO [ui][msg]
-    }
-  }
-
-  @NotNull
-  public static String calculateSnapshotName(final int snapshotId) {
-    return String.format(SNAPSHOT_NAME_FORMAT, snapshotId);
-  }
-
-  public static void removeSnapshots() {
-    // TODO [ui][impl]
   }
 
   private static boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {

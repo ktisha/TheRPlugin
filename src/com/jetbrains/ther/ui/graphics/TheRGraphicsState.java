@@ -1,6 +1,7 @@
 package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,14 +12,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
-
-import static com.jetbrains.ther.ui.graphics.TheRGraphicsUtils.calculateSnapshotId;
-import static com.jetbrains.ther.ui.graphics.TheRGraphicsUtils.calculateSnapshotName;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class TheRGraphicsState {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsState.class);
+
+  @NotNull
+  private static final Pattern SNAPSHOT_NAME_PATTERN = Pattern.compile("^snapshot_(\\d+)\\.png$");
 
   @NotNull
   private static final String SNAPSHOT_COULD_NOT_BE_ENCODED = "Snapshot couldn't be encoded [name: %s]";
@@ -49,6 +52,12 @@ class TheRGraphicsState {
 
   @NotNull
   private static final String SNAPSHOT_IS_NOT_FOUND = "Snapshot is not found [name: %s]";
+
+  @NotNull
+  private static final String ILLEGAL_SNAPSHOT_NAME = "Illegal snapshot name [name: %s]";
+
+  @NotNull
+  private static final String SNAPSHOT_NAME_FORMAT = "snapshot_%d.png";
 
   @NotNull
   private final TreeSet<Integer> mySnapshotIds;
@@ -109,6 +118,10 @@ class TheRGraphicsState {
         LOGGER.warn(e);
       }
     }
+  }
+
+  public boolean isSnapshot(@NotNull final VirtualFile file) {
+    return SNAPSHOT_NAME_PATTERN.matcher(file.getName()).matches() && VfsUtilCore.isAncestor(mySnapshotDir, file, false);
   }
 
   public boolean isCurrent(@NotNull final VirtualFile file) {
@@ -179,5 +192,23 @@ class TheRGraphicsState {
     }
 
     return result;
+  }
+
+  private int calculateSnapshotId(@NotNull final String snapshotName) {
+    final Matcher matcher = SNAPSHOT_NAME_PATTERN.matcher(snapshotName);
+
+    if (matcher.find()) {
+      return Integer.parseInt(matcher.group(1));
+    }
+    else {
+      throw new IllegalArgumentException(
+        String.format(ILLEGAL_SNAPSHOT_NAME, snapshotName)
+      );
+    }
+  }
+
+  @NotNull
+  private String calculateSnapshotName(final int snapshotId) {
+    return String.format(SNAPSHOT_NAME_FORMAT, snapshotId);
   }
 }
