@@ -11,10 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static java.lang.Boolean.parseBoolean;
@@ -23,6 +20,9 @@ public class TheRGraphicsUtils {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsUtils.class);
+
+  @NotNull
+  private static final Map<String, TheRGraphicsState> GRAPHICS_STATES = new HashMap<String, TheRGraphicsState>();
 
   @NotNull
   private static final String DEVICE_ENV_KEY = "ther.debugger.device";
@@ -103,6 +103,17 @@ public class TheRGraphicsUtils {
 
       return null;
     }
+  }
+
+  @NotNull
+  public static TheRGraphicsState getGraphicsState(@NotNull final VirtualFile snapshotDir) {
+    final String snapshotDirPath = snapshotDir.getPath();
+
+    if (!GRAPHICS_STATES.containsKey(snapshotDirPath)) {
+      GRAPHICS_STATES.put(snapshotDirPath, new TheRGraphicsStateImpl(snapshotDir));
+    }
+
+    return GRAPHICS_STATES.get(snapshotDirPath);
   }
 
   private static boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {

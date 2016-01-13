@@ -31,7 +31,7 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
       return new TheRGraphicsEmptyToolWindow("Snapshot directory is not available");
     }
     else {
-      return new TheRGraphicsToolWindow(project, snapshotDir, new TheRGraphicsStateImpl(snapshotDir));
+      return new TheRGraphicsToolWindow(project, snapshotDir, TheRGraphicsUtils.getGraphicsState(snapshotDir));
     }
   }
 }
