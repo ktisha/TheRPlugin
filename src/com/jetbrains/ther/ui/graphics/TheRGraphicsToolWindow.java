@@ -4,7 +4,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.impl.BulkVirtualFileListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,12 +25,6 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
   @NotNull
   private static final String UPDATED_SNAPSHOT = "Updated snapshot [name: %s]";
-
-  @NotNull
-  private static final String RENAMED_SNAPSHOT_WILL_BE_REMOVED = "Renamed snapshot will be removed from tool window [name: %s]";
-
-  @NotNull
-  private static final String MOVED_SNAPSHOT_WILL_BE_REMOVED = "Moved snapshot will be removed from tool window [name: %s]";
 
   @NotNull
   private final VirtualFile mySnapshotDir;
@@ -54,7 +50,7 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
 
     project.getMessageBus().connect(project).subscribe(
       VirtualFileManager.VFS_CHANGES,
-      new BulkVirtualFileListenerAdapter(new SnapshotDirListener())
+      new BulkVirtualFileListenerAdapter(new DirListener())
     );
 
     LOGGER.info(
@@ -104,7 +100,11 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
     }
   }
 
-  private class SnapshotDirListener extends VirtualFileAdapter {
+  private class DirListener extends TheRGraphicsListener {
+
+    public DirListener() {
+      super(myState);
+    }
 
     @Override
     public void contentsChanged(@NotNull final VirtualFileEvent event) {
@@ -118,55 +118,6 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
         if (myState.isCurrent(file)) {
           myPanel.refresh();
         }
-      }
-    }
-
-    @Override
-    public void fileCreated(@NotNull final VirtualFileEvent event) {
-      final VirtualFile file = event.getFile();
-
-      if (myState.isSnapshot(file)) {
-        myState.add(file);
-      }
-    }
-
-    @Override
-    public void fileDeleted(@NotNull final VirtualFileEvent event) {
-      final VirtualFile file = event.getFile();
-
-      if (myState.isSnapshot(file)) {
-        myState.remove(file);
-      }
-    }
-
-    @Override
-    public void fileCopied(@NotNull final VirtualFileCopyEvent event) {
-      // ignore
-    }
-
-    @Override
-    public void beforePropertyChange(@NotNull final VirtualFilePropertyEvent event) {
-      final VirtualFile file = event.getFile();
-
-      if (event.getPropertyName().equals(VirtualFile.PROP_NAME) && myState.isSnapshot(file)) {
-        LOGGER.warn(
-          String.format(RENAMED_SNAPSHOT_WILL_BE_REMOVED, event.getFileName())
-        );
-
-        myState.remove(file);
-      }
-    }
-
-    @Override
-    public void beforeFileMovement(@NotNull final VirtualFileMoveEvent event) {
-      final VirtualFile file = event.getFile();
-
-      if (myState.isSnapshot(file)) {
-        LOGGER.warn(
-          String.format(MOVED_SNAPSHOT_WILL_BE_REMOVED, event.getFileName())
-        );
-
-        myState.remove(file);
       }
     }
   }
