@@ -20,6 +20,7 @@ import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
 import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsListenerTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackFrameTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackTest;
@@ -54,6 +55,7 @@ public class TheRTestSuite extends TestCase {
   private static void addJUnit4Tests(@NotNull final TestSuite suite) {
     addDebuggerTests(suite);
     addXDebuggerTests(suite);
+    addUiTests(suite);
   }
 
   private static void addDebuggerTests(@NotNull final TestSuite suite) {
@@ -88,6 +90,11 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRXStackFrameTest.class);
     addJUnit4Test(suite, TheRXStackTest.class);
     addJUnit4Test(suite, TheRXSuspendContextTest.class);
+  }
+
+  private static void addUiTests(@NotNull final TestSuite suite) {
+    // graphics
+    addJUnit4Test(suite, TheRGraphicsListenerTest.class);
   }
 
   private static void addJUnit4Test(@NotNull final TestSuite suite, @NotNull final Class<?> cls) {
