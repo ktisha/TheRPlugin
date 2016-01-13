@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.impl.BulkVirtualFileListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
@@ -115,9 +116,23 @@ public class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
           String.format(UPDATED_SNAPSHOT, event.getFileName())
         );
 
-        if (myState.isCurrent(file)) {
+        if (isCurrentSnapshot(file)) {
           myPanel.refresh();
         }
+      }
+    }
+
+    private boolean isCurrentSnapshot(@NotNull final VirtualFile file) {
+      try {
+        final String currentName = myState.current().getName();
+        final String name = file.getName();
+
+        return currentName.equals(name);
+      }
+      catch (final FileNotFoundException e) {
+        LOGGER.error(e);
+
+        return false;
       }
     }
   }

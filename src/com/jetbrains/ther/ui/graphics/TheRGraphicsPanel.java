@@ -1,10 +1,14 @@
 package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 class TheRGraphicsPanel {
 
@@ -22,6 +26,12 @@ class TheRGraphicsPanel {
 
   @NotNull
   private static final String PANEL_HAS_BEEN_RESET = "Panel has been reset";
+
+  @NotNull
+  private static final String SNAPSHOT_COULD_NOT_BE_ENCODED = "Snapshot couldn't be encoded [name: %s]";
+
+  @NotNull
+  private static final String SNAPSHOT_HAS_BEEN_LOADED = "Snapshot has been loaded [name: %s]";
 
   @NotNull
   private final TheRGraphicsState myState;
@@ -45,7 +55,7 @@ class TheRGraphicsPanel {
     myLabel.setText(null);
 
     try {
-      myLabel.setIcon(new ImageIcon(myState.current()));
+      myLabel.setIcon(new ImageIcon(loadCurrentGraphics()));
 
       LOGGER.debug(PANEL_HAS_BEEN_REFRESHED);
     }
@@ -67,5 +77,35 @@ class TheRGraphicsPanel {
   @NotNull
   public JPanel getPanel() {
     return myPanel;
+  }
+
+  @NotNull
+  private BufferedImage loadCurrentGraphics() throws IOException {
+    final VirtualFile file = myState.current();
+    final InputStream stream = file.getInputStream();
+
+    try {
+      final BufferedImage image = ImageIO.read(stream);
+
+      if (image == null) {
+        throw new IllegalStateException(
+          String.format(SNAPSHOT_COULD_NOT_BE_ENCODED, file.getName())
+        );
+      }
+
+      LOGGER.debug(
+        String.format(SNAPSHOT_HAS_BEEN_LOADED, file.getName())
+      );
+
+      return image; // TODO [ui][resize]
+    }
+    finally {
+      try {
+        stream.close();
+      }
+      catch (final IOException e) {
+        LOGGER.warn(e);
+      }
+    }
   }
 }
