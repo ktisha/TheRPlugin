@@ -25,40 +25,40 @@ public class TheRGraphicsUtils {
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsUtils.class);
 
   @NotNull
-  private static final String DEVICE_KEY = "ther.debugger.device";
+  private static final String DEVICE_ENV_KEY = "ther.debugger.device";
 
   @NotNull
   private static final String DEVICE_IS_DISABLED = "Device is disabled";
 
   @NotNull
-  private static final String LIB_DIR_NAME = "libs";
-
-  @NotNull
   private static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
 
   @NotNull
-  private static final String LIB_IS_NOT_FOUND = "Lib is not found";
+  private static final String LIB_DIR_NAME = "libs";
 
   @NotNull
-  private static final String LIB_IS_NOT_READABLE = "Lib is not readable";
+  private static final String LIB_IS_NOT_FOUND = "Lib is not found [path: %s]";
 
   @NotNull
-  private static final String DOT_IDEA_DIR_IS_NOT_FOUND = ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR + " is not found";
+  private static final String LIB_IS_NOT_READABLE = "Lib is not readable [path: %s]";
+
+  @NotNull
+  private static final String PROJECT_DIR_IS_NOT_FOUND = "Project dir is not found [path: %s]";
 
   @NotNull
   private static final String SNAPSHOT_DIR_NAME = "snapshots";
 
   @NotNull
-  private static final String SNAPSHOT_DIR_IS_NOT_FOUND = "Snapshot dir is not found";
+  private static final String SNAPSHOT_DIR_IS_NOT_FOUND = "Snapshot dir is not found [path: %s]";
 
   @NotNull
-  private static final String SNAPSHOT_DIR_IS_FOUND = "Snapshot dir is found";
+  private static final String SNAPSHOT_DIR_IS_FOUND = "Snapshot dir is found [path: %s]";
 
   @NotNull
-  private static final String SNAPSHOT_DIR_IS_NOT_WRITABLE = "Snapshot dir is not writable";
+  private static final String SNAPSHOT_DIR_IS_NOT_WRITABLE = "Snapshot dir is not writable [path: %s]";
 
   @NotNull
-  private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created";
+  private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
   public static List<String> calculateInitCommands(@NotNull final Project project,
@@ -67,7 +67,7 @@ public class TheRGraphicsUtils {
       final String libPath = getLibPath(DEVICE_LIB_NAME);
 
       if (libPath != null) {
-        final VirtualFile snapshotDir = getOrCreateSnapshotDir(project);
+        final VirtualFile snapshotDir = findOrCreateSnapshotDir(project);
 
         if (snapshotDir != null) {
           return Arrays.asList(
@@ -86,14 +86,20 @@ public class TheRGraphicsUtils {
   }
 
   @Nullable
-  static VirtualFile getOrCreateSnapshotDir(@NotNull final Project project) {
-    final VirtualFile dotIdeaDir = project.getBaseDir().findChild(ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR);
+  public static VirtualFile findOrCreateSnapshotDir(@NotNull final Project project) {
+    final String projectDirName = ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR;
+    final VirtualFile dotIdeaDir = project.getBaseDir().findChild(projectDirName);
 
     if (dotIdeaDir != null) {
-      return getOrCreateSnapshotDir(dotIdeaDir);
+      return findOrCreateSnapshotDir(dotIdeaDir);
     }
     else {
-      LOGGER.warn(DOT_IDEA_DIR_IS_NOT_FOUND);
+      LOGGER.warn(
+        String.format(
+          PROJECT_DIR_IS_NOT_FOUND,
+          new File(project.getBasePath(), projectDirName).getAbsolutePath()
+        )
+      );
 
       return null;
     }
@@ -102,7 +108,7 @@ public class TheRGraphicsUtils {
   private static boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
     final Map<String, String> envs = runConfigurationParams.getEnvs();
 
-    return !envs.containsKey(DEVICE_KEY) || parseBoolean(envs.get(DEVICE_KEY));
+    return !envs.containsKey(DEVICE_ENV_KEY) || parseBoolean(envs.get(DEVICE_ENV_KEY));
   }
 
   @Nullable
@@ -110,31 +116,41 @@ public class TheRGraphicsUtils {
     final File pluginDir = new File(PathUtil.getJarPathForClass(TheRGraphicsUtils.class));
     final File libDir = new File(pluginDir, LIB_DIR_NAME);
     final File libFile = new File(libDir, libName);
+    final String absolutePath = libFile.getAbsolutePath();
 
     if (!libFile.exists()) {
-      LOGGER.warn(LIB_IS_NOT_FOUND + ": " + libFile.getPath());
+      LOGGER.warn(
+        String.format(LIB_IS_NOT_FOUND, absolutePath)
+      );
 
       return null;
     }
 
     if (!libFile.canRead()) {
-      LOGGER.warn(LIB_IS_NOT_READABLE + ": " + libFile.getPath());
+      LOGGER.warn(
+        String.format(LIB_IS_NOT_READABLE, absolutePath)
+      );
 
       return null;
     }
 
-    return libFile.getAbsolutePath();
+    return absolutePath;
   }
 
   @Nullable
-  private static VirtualFile getOrCreateSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
+  private static VirtualFile findOrCreateSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
     final VirtualFile snapshotDir = dotIdeaDir.findChild(SNAPSHOT_DIR_NAME);
 
     if (snapshotDir != null) {
       return checkSnapshotDir(snapshotDir);
     }
     else {
-      LOGGER.info(SNAPSHOT_DIR_IS_NOT_FOUND);
+      LOGGER.info(
+        String.format(
+          SNAPSHOT_DIR_IS_NOT_FOUND,
+          new File(dotIdeaDir.getPath(), SNAPSHOT_DIR_NAME).getAbsolutePath()
+        )
+      );
 
       return createSnapshotDir(dotIdeaDir);
     }
@@ -145,12 +161,16 @@ public class TheRGraphicsUtils {
     final String snapshotDirPath = snapshotDir.getPath();
 
     if (snapshotDir.isWritable()) {
-      LOGGER.info(SNAPSHOT_DIR_IS_FOUND + ": " + snapshotDirPath);
+      LOGGER.info(
+        String.format(SNAPSHOT_DIR_IS_FOUND, snapshotDirPath)
+      );
 
       return snapshotDir;
     }
     else {
-      LOGGER.warn(SNAPSHOT_DIR_IS_NOT_WRITABLE + ": " + snapshotDirPath);
+      LOGGER.warn(
+        String.format(SNAPSHOT_DIR_IS_NOT_WRITABLE, snapshotDirPath)
+      );
 
       return null;
     }
@@ -161,7 +181,9 @@ public class TheRGraphicsUtils {
     try {
       final VirtualFile snapshotDir = dotIdeaDir.createChildDirectory(new TheRGraphicsUtils(), SNAPSHOT_DIR_NAME);
 
-      LOGGER.info(SNAPSHOT_DIR_HAS_BEEN_CREATED + ": " + snapshotDir.getPath());
+      LOGGER.info(
+        String.format(SNAPSHOT_DIR_HAS_BEEN_CREATED, snapshotDir.getPath())
+      );
 
       return snapshotDir;
     }

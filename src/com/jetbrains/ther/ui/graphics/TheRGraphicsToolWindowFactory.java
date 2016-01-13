@@ -17,7 +17,7 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
     final ContentManager contentManager = toolWindow.getContentManager();
 
     final Content content = contentManager.getFactory().createContent(
-      createToolWindow(project, TheRGraphicsUtils.getOrCreateSnapshotDir(project)),
+      createToolWindow(project, TheRGraphicsUtils.findOrCreateSnapshotDir(project)),
       null,
       false
     );
