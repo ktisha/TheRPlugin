@@ -18,11 +18,17 @@ public interface TheRGraphicsState {
   @NotNull
   VirtualFile current() throws FileNotFoundException;
 
-  boolean isSnapshot(@NotNull final VirtualFile file);
-
-  void add(@NotNull final VirtualFile file);
-
-  void remove(@NotNull final VirtualFile file);
+  void sync();
 
   void reset();
+
+  void addListener(@NotNull final Listener listener);
+
+  void removeListener(@NotNull final Listener listener);
+
+  interface Listener {
+    void onReset();
+
+    void onUpdate();
+  }
 }
