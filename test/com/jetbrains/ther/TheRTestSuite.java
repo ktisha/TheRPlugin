@@ -21,6 +21,7 @@ import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
 import com.jetbrains.ther.ui.graphics.TheRGraphicsListenerTest;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsPanelTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackFrameTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackTest;
@@ -95,6 +96,7 @@ public class TheRTestSuite extends TestCase {
   private static void addUiTests(@NotNull final TestSuite suite) {
     // graphics
     addJUnit4Test(suite, TheRGraphicsListenerTest.class);
+    addJUnit4Test(suite, TheRGraphicsPanelTest.class);
   }
 
   private static void addJUnit4Test(@NotNull final TestSuite suite, @NotNull final Class<?> cls) {

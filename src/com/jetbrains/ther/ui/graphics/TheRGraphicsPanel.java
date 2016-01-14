@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-class TheRGraphicsPanel {
+class TheRGraphicsPanel implements TheRGraphicsState.Listener {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsPanel.class);
@@ -49,12 +49,27 @@ class TheRGraphicsPanel {
 
     myPanel = new JPanel();
     myPanel.add(myLabel);
+
+    myState.addListener(this);
   }
 
-  public void refresh() {
-    myLabel.setText(null);
+  @NotNull
+  public JPanel getPanel() {
+    return myPanel;
+  }
 
+  @Override
+  public void onReset() {
+    myLabel.setIcon(null);
+    myLabel.setText(NO_GRAPHICS);
+
+    LOGGER.debug(PANEL_HAS_BEEN_RESET);
+  }
+
+  @Override
+  public void onUpdate() {
     try {
+      myLabel.setText(null);
       myLabel.setIcon(new ImageIcon(loadCurrentGraphics()));
 
       LOGGER.debug(PANEL_HAS_BEEN_REFRESHED);
@@ -65,18 +80,6 @@ class TheRGraphicsPanel {
 
       LOGGER.error(e);
     }
-  }
-
-  public void reset() {
-    myLabel.setIcon(null);
-    myLabel.setText(NO_GRAPHICS);
-
-    LOGGER.debug(PANEL_HAS_BEEN_RESET);
-  }
-
-  @NotNull
-  public JPanel getPanel() {
-    return myPanel;
   }
 
   @NotNull
