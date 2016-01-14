@@ -17,7 +17,7 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
     final ContentManager contentManager = toolWindow.getContentManager();
 
     final Content content = contentManager.getFactory().createContent(
-      createToolWindow(project, TheRGraphicsUtils.findOrCreateSnapshotDir(project)),
+      createToolWindow(TheRGraphicsUtils.findOrCreateSnapshotDir(project)),
       null,
       false
     );
@@ -26,12 +26,12 @@ public class TheRGraphicsToolWindowFactory implements ToolWindowFactory {
   }
 
   @NotNull
-  private SimpleToolWindowPanel createToolWindow(@NotNull final Project project, @Nullable final VirtualFile snapshotDir) {
+  private SimpleToolWindowPanel createToolWindow(@Nullable final VirtualFile snapshotDir) {
     if (snapshotDir == null) {
       return new TheRGraphicsEmptyToolWindow("Snapshot directory is not available");
     }
     else {
-      return new TheRGraphicsToolWindow(project, snapshotDir, TheRGraphicsUtils.getGraphicsState(snapshotDir));
+      return new TheRGraphicsToolWindow(TheRGraphicsUtils.getGraphicsState(snapshotDir));
     }
   }
 }
