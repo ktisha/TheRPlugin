@@ -21,6 +21,7 @@ import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
 import com.jetbrains.ther.ui.graphics.TheRGraphicsPanelTest;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsStateImplTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackFrameTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXStackTest;
@@ -37,25 +38,18 @@ public class TheRTestSuite extends TestCase {
   public static Test suite() {
     final TestSuite suite = new TestSuite("AllTest");
 
-    addJUnit3Tests(suite);
-    addJUnit4Tests(suite);
-
-    return suite;
-  }
-
-  private static void addJUnit3Tests(@NotNull final TestSuite suite) {
     suite.addTestSuite(TheRTypeCheckerInspectionTest.class);
     suite.addTestSuite(TheRUnresolvedReferenceInspectionTest.class);
     suite.addTestSuite(TheRUnusedInspectionTest.class);
     suite.addTestSuite(TheRHighlightingLexerTest.class);
     suite.addTestSuite(TheRParsingTest.class);
     suite.addTestSuite(TheRRenameTest.class);
-  }
 
-  private static void addJUnit4Tests(@NotNull final TestSuite suite) {
     addDebuggerTests(suite);
     addXDebuggerTests(suite);
     addUiTests(suite);
+
+    return suite;
   }
 
   private static void addDebuggerTests(@NotNull final TestSuite suite) {
@@ -95,6 +89,7 @@ public class TheRTestSuite extends TestCase {
   private static void addUiTests(@NotNull final TestSuite suite) {
     // graphics
     addJUnit4Test(suite, TheRGraphicsPanelTest.class);
+    suite.addTestSuite(TheRGraphicsStateImplTest.class);
   }
 
   private static void addJUnit4Test(@NotNull final TestSuite suite, @NotNull final Class<?> cls) {

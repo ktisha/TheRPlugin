@@ -22,6 +22,9 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   private static final String STARTED_TO_LISTEN_FOR_NEW_SNAPSHOTS = "Started to listen for new snapshots [dir: %s]";
 
   @NotNull
+  private static final String CURRENT_SNAPSHOT_WAS_NOT_SET = "Current snapshot wasn't set";
+
+  @NotNull
   private static final String SNAPSHOT_IS_NOT_FOUND = "Snapshot is not found [name: %s]";
 
   @NotNull
@@ -117,6 +120,10 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   @Override
   @NotNull
   public VirtualFile current() throws FileNotFoundException {
+    if (myCurrentId == -1) {
+      throw new NoSuchElementException(CURRENT_SNAPSHOT_WAS_NOT_SET);
+    }
+
     final String name = calculateSnapshotName(myCurrentId);
     final VirtualFile result = mySnapshotDir.findChild(name);
 
@@ -130,8 +137,8 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   }
 
   @Override
-  public void sync() {
-    mySnapshotDir.refresh(true, true);
+  public void refresh(final boolean asynchronous) {
+    mySnapshotDir.refresh(asynchronous, true);
   }
 
   @Override
@@ -213,6 +220,18 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
     final int id = calculateSnapshotId(name);
 
     if (mySnapshotIds.remove(id)) {
+      if (id == myCurrentId) {
+        if (hasPrevious()) {
+          previous();
+        }
+        else if (hasNext()) {
+          next();
+        }
+        else {
+          reset();
+        }
+      }
+
       LOGGER.info(
         String.format(SNAPSHOT_HAS_BEEN_REMOVED, id, name)
       );
