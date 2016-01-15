@@ -60,6 +60,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
 
     myState.addListener(listener);
@@ -78,6 +79,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
 
     Disposer.dispose(myState);
@@ -86,6 +88,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
     assertEquals(file, myState.current());
@@ -98,14 +101,17 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(2, myState.size());
     assertNext(file1);
     assertNext(file2);
 
     myState.addListener(listener);
 
     file1.setBinaryContent("abc".getBytes());
+
     myState.refresh(false);
 
+    assertEquals(2, myState.size());
     verifyZeroInteractions(listener);
   }
 
@@ -121,6 +127,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
 
     file.setBinaryContent("abc".getBytes());
+
     myState.refresh(false);
 
     assertStateIsEmpty();
@@ -138,6 +145,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
 
     file.setBinaryContent("abc".getBytes());
+
     myState.refresh(false);
 
     assertStateIsEmpty();
@@ -150,15 +158,20 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
 
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
     file.setBinaryContent("abc".getBytes());
+
     myState.refresh(false);
 
     verify(listener, times(1)).onUpdate();
+    assertEquals(1, myState.size());
+
+    verifyNoMoreInteractions(listener);
   }
 
   public void testCreateAnotherSnapshot() throws IOException {
@@ -192,14 +205,17 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(2, myState.size());
     assertNext(file1);
-
     assertTrue(myState.hasNext());
 
     myState.addListener(listener);
 
     file2.delete(this);
 
+    myState.refresh(false);
+
+    assertEquals(1, myState.size());
     assertFalse(myState.hasNext());
     verifyZeroInteractions(listener);
   }
@@ -211,8 +227,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(2, myState.size());
     assertNext(file1);
-
     assertTrue(myState.hasNext());
 
     myState.addListener(listener);
@@ -223,6 +239,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.refresh(false);
 
     verify(listener, times(1)).onUpdate();
+    assertEquals(1, myState.size());
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
     assertEquals(file2, myState.current());
@@ -237,9 +254,9 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(2, myState.size());
     assertNext(file1);
     assertNext(file2);
-
     assertTrue(myState.hasPrevious());
 
     myState.addListener(listener);
@@ -250,6 +267,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.refresh(false);
 
     verify(listener, times(1)).onUpdate();
+    assertEquals(1, myState.size());
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
     assertEquals(file1, myState.current());
@@ -263,8 +281,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
-
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
 
@@ -287,8 +305,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
-
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
 
@@ -311,8 +329,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
-
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
 
@@ -338,8 +356,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertNext(file);
-
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
 
@@ -349,6 +367,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
+    assertEquals(1, myState.size());
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
     assertEquals(file, myState.current());
@@ -364,8 +383,8 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
+    assertEquals(1, myState.size());
     assertNext(file);
-
     verify(listener, times(1)).onUpdate();
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
@@ -382,6 +401,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
   }
 
   private void assertStateIsEmpty() throws FileNotFoundException {
+    assertEquals(0, myState.size());
     assertFalse(myState.hasPrevious());
     assertFalse(myState.hasNext());
 

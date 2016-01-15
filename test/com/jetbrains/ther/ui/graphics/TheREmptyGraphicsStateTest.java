@@ -6,8 +6,7 @@ import org.mockito.Mockito;
 import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class TheREmptyGraphicsStateTest {
@@ -18,6 +17,7 @@ public class TheREmptyGraphicsStateTest {
 
     assertFalse(state.hasNext());
     assertFalse(state.hasPrevious());
+    assertEquals(0, state.size());
 
     state.current();
   }

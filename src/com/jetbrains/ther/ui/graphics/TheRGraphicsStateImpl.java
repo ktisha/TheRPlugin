@@ -146,6 +146,11 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   }
 
   @Override
+  public int size() {
+    return mySnapshotIds.size();
+  }
+
+  @Override
   public void refresh(final boolean asynchronous) {
     mySnapshotDir.refresh(asynchronous, true);
   }

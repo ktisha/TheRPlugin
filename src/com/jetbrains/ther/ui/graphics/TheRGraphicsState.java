@@ -18,6 +18,8 @@ public interface TheRGraphicsState {
   @NotNull
   VirtualFile current() throws FileNotFoundException;
 
+  int size();
+
   void refresh(final boolean asynchronous);
 
   void reset();

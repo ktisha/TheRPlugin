@@ -46,6 +46,11 @@ public class TheREmptyGraphicsState implements TheRGraphicsState {
   }
 
   @Override
+  public int size() {
+    return 0;
+  }
+
+  @Override
   public void refresh(final boolean asynchronous) {
   }
 
