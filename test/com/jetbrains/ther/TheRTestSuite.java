@@ -20,6 +20,7 @@ import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
 import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
+import com.jetbrains.ther.ui.graphics.TheREmptyGraphicsStateTest;
 import com.jetbrains.ther.ui.graphics.TheRGraphicsPanelTest;
 import com.jetbrains.ther.ui.graphics.TheRGraphicsStateImplTest;
 import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
@@ -88,6 +89,7 @@ public class TheRTestSuite extends TestCase {
 
   private static void addUiTests(@NotNull final TestSuite suite) {
     // graphics
+    addJUnit4Test(suite, TheREmptyGraphicsStateTest.class);
     addJUnit4Test(suite, TheRGraphicsPanelTest.class);
     suite.addTestSuite(TheRGraphicsStateImplTest.class);
   }

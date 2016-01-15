@@ -3,6 +3,7 @@ package com.jetbrains.ther.ui.graphics;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
 import com.jetbrains.ther.run.TheRRunConfigurationParams;
@@ -16,7 +17,7 @@ import java.util.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static java.lang.Boolean.parseBoolean;
 
-public class TheRGraphicsUtils {
+public final class TheRGraphicsUtils {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRGraphicsUtils.class);
@@ -28,7 +29,7 @@ public class TheRGraphicsUtils {
   private static final String DEVICE_ENV_KEY = "ther.debugger.device";
 
   @NotNull
-  private static final String DEVICE_IS_DISABLED = "Device is disabled";
+  private static final String DEVICE_IS_DISABLED = "Device is disabled [script: %s]";
 
   @NotNull
   private static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
@@ -67,7 +68,7 @@ public class TheRGraphicsUtils {
       final String libPath = getLibPath(DEVICE_LIB_NAME);
 
       if (libPath != null) {
-        final VirtualFile snapshotDir = findOrCreateSnapshotDir(project);
+        final VirtualFile snapshotDir = getSnapshotDir(project);
 
         if (snapshotDir != null) {
           return Arrays.asList(
@@ -79,38 +80,29 @@ public class TheRGraphicsUtils {
       }
     }
     else {
-      LOGGER.warn(DEVICE_IS_DISABLED);
+      LOGGER.warn(
+        String.format(DEVICE_IS_DISABLED, runConfigurationParams.getScriptPath())
+      );
     }
 
     return Collections.emptyList();
   }
 
-  @Nullable
-  public static VirtualFile findOrCreateSnapshotDir(@NotNull final Project project) {
-    final String projectDirName = ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR;
-    final VirtualFile dotIdeaDir = project.getBaseDir().findChild(projectDirName);
-
-    if (dotIdeaDir != null) {
-      return findOrCreateSnapshotDir(dotIdeaDir);
-    }
-    else {
-      LOGGER.warn(
-        String.format(
-          PROJECT_DIR_IS_NOT_FOUND,
-          new File(project.getBasePath(), projectDirName).getAbsolutePath()
-        )
-      );
-
-      return null;
-    }
-  }
-
   @NotNull
-  public static TheRGraphicsState getGraphicsState(@NotNull final VirtualFile snapshotDir) {
+  public static TheRGraphicsState getGraphicsState(@NotNull final Project project) {
+    final VirtualFile snapshotDir = getSnapshotDir(project);
+
+    if (snapshotDir == null) {
+      return new TheREmptyGraphicsState();
+    }
+
     final String snapshotDirPath = snapshotDir.getPath();
 
     if (!GRAPHICS_STATES.containsKey(snapshotDirPath)) {
-      GRAPHICS_STATES.put(snapshotDirPath, new TheRGraphicsStateImpl(snapshotDir));
+      final TheRGraphicsStateImpl state = new TheRGraphicsStateImpl(snapshotDir);
+      Disposer.register(project, state);
+
+      GRAPHICS_STATES.put(snapshotDirPath, state);
     }
 
     return GRAPHICS_STATES.get(snapshotDirPath);
@@ -149,7 +141,27 @@ public class TheRGraphicsUtils {
   }
 
   @Nullable
-  private static VirtualFile findOrCreateSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
+  private static VirtualFile getSnapshotDir(@NotNull final Project project) {
+    final String projectDirName = ProjectCoreUtil.DIRECTORY_BASED_PROJECT_DIR;
+    final VirtualFile dotIdeaDir = project.getBaseDir().findChild(projectDirName);
+
+    if (dotIdeaDir != null) {
+      return getSnapshotDir(dotIdeaDir);
+    }
+    else {
+      LOGGER.warn(
+        String.format(
+          PROJECT_DIR_IS_NOT_FOUND,
+          new File(project.getBasePath(), projectDirName).getAbsolutePath()
+        )
+      );
+
+      return null;
+    }
+  }
+
+  @Nullable
+  private static VirtualFile getSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
     final VirtualFile snapshotDir = dotIdeaDir.findChild(SNAPSHOT_DIR_NAME);
 
     if (snapshotDir != null) {
