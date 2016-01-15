@@ -19,13 +19,13 @@ class TheRGraphicsPanel implements TheRGraphicsState.Listener {
   private static final String NO_GRAPHICS = "No graphics";
 
   @NotNull
-  private static final String PANEL_HAS_BEEN_REFRESHED = "Panel has been refreshed";
+  private static final String PANEL_HAS_BEEN_RESET = "Panel has been reset";
+
+  @NotNull
+  private static final String PANEL_HAS_BEEN_UPDATED = "Panel has been updated";
 
   @NotNull
   private static final String GRAPHICS_COULD_NOT_BE_LOADED = "Graphics couldn't be loaded";
-
-  @NotNull
-  private static final String PANEL_HAS_BEEN_RESET = "Panel has been reset";
 
   @NotNull
   private static final String SNAPSHOT_COULD_NOT_BE_ENCODED = "Snapshot couldn't be encoded [name: %s]";
@@ -72,7 +72,7 @@ class TheRGraphicsPanel implements TheRGraphicsState.Listener {
       myLabel.setText(null);
       myLabel.setIcon(new ImageIcon(loadCurrentGraphics()));
 
-      LOGGER.debug(PANEL_HAS_BEEN_REFRESHED);
+      LOGGER.debug(PANEL_HAS_BEEN_UPDATED);
     }
     catch (final IOException e) {
       myLabel.setIcon(null);
