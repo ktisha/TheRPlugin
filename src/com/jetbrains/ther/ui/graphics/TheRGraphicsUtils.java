@@ -1,5 +1,6 @@
 package com.jetbrains.ther.ui.graphics;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
@@ -100,7 +101,17 @@ public final class TheRGraphicsUtils {
 
     if (!GRAPHICS_STATES.containsKey(snapshotDirPath)) {
       final TheRGraphicsStateImpl state = new TheRGraphicsStateImpl(snapshotDir);
+
       Disposer.register(project, state);
+      Disposer.register(
+        state,
+        new Disposable() {
+          @Override
+          public void dispose() {
+            GRAPHICS_STATES.remove(snapshotDirPath);
+          }
+        }
+      );
 
       GRAPHICS_STATES.put(snapshotDirPath, state);
     }
