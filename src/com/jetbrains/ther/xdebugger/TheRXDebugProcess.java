@@ -21,6 +21,7 @@ import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsUtils;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.xdebugger.stack.TheRXStack;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,12 @@ class TheRXDebugProcess extends XDebugProcess {
   @NotNull
   private final ConsoleView myConsole;
 
+  @NotNull
+  private final TheRXDebuggerEditorsProvider myEditorsProvider;
+
+  @NotNull
+  private final XBreakpointHandler[] myBreakpointHandlers;
+
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRXProcessHandler processHandler,
                            @NotNull final TheRDebugger debugger,
@@ -78,6 +85,9 @@ class TheRXDebugProcess extends XDebugProcess {
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
 
     myConsole = (ConsoleView)super.createConsole();
+
+    myEditorsProvider = new TheRXDebuggerEditorsProvider();
+    myBreakpointHandlers = new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
   }
 
   @NotNull
@@ -89,17 +99,19 @@ class TheRXDebugProcess extends XDebugProcess {
   @NotNull
   @Override
   public XDebuggerEditorsProvider getEditorsProvider() {
-    return new TheRXDebuggerEditorsProvider();
+    return myEditorsProvider;
   }
 
   @NotNull
   @Override
   public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    return new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
+    return myBreakpointHandlers;
   }
 
   @Override
   public void sessionInitialized() {
+    TheRGraphicsUtils.getGraphicsState(getSession().getProject()).reset();
+
     resume();
   }
 
@@ -270,6 +282,8 @@ class TheRXDebugProcess extends XDebugProcess {
 
       myTempBreakpoints.remove(wrapper);
     }
+
+    TheRGraphicsUtils.getGraphicsState(getSession().getProject()).refresh(true);
   }
 
   private void handleException(@NotNull final TheRDebuggerException e) {
