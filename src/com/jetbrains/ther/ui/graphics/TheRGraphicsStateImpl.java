@@ -239,6 +239,12 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
       LOGGER.info(
         String.format(SNAPSHOT_HAS_BEEN_ADDED, id, name, mySnapshotDirPath)
       );
+
+      if (size() == 1) {
+        for (final Listener listener : myListeners) {
+          listener.onStarted();
+        }
+      }
     }
   }
 

@@ -174,6 +174,24 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     verifyNoMoreInteractions(listener);
   }
 
+  public void testCreateSnapshot() throws FileNotFoundException {
+    final TheRGraphicsState.Listener listener = mock(TheRGraphicsState.Listener.class);
+
+    myState.addListener(listener);
+    verifyZeroInteractions(listener);
+
+    final VirtualFile file = createChildData(mySnapshotDir, "snapshot_1.png");
+
+    myState.refresh(false);
+
+    verify(listener, times(1)).onStarted();
+    assertEquals(1, myState.size());
+    assertNext(file);
+    verify(listener, times(1)).onUpdate();
+
+    verifyNoMoreInteractions(listener);
+  }
+
   public void testCreateAnotherSnapshot() throws IOException {
     final TheRGraphicsState.Listener listener = mock(TheRGraphicsState.Listener.class);
     myState.addListener(listener);

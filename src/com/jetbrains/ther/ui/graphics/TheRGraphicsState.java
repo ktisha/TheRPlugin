@@ -29,8 +29,10 @@ public interface TheRGraphicsState {
   void removeListener(@NotNull final Listener listener);
 
   interface Listener {
-    void onReset();
+    void onStarted();
 
     void onUpdate();
+
+    void onReset();
   }
 }
