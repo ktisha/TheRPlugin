@@ -1,11 +1,13 @@
 package com.jetbrains.ther.ui.graphics;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -186,6 +188,22 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
 
   @Override
   public void dispose() {
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          for (final VirtualFile file : mySnapshotDir.getChildren()) {
+            try {
+              file.delete(TheRGraphicsStateImpl.this);
+            }
+            catch (final IOException e) {
+              LOGGER.warn(e);
+            }
+          }
+        }
+      }
+    );
+
     LOGGER.info(
       String.format(STATE_HAS_BEEN_DISPOSED, mySnapshotDirPath)
     );

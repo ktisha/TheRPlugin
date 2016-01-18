@@ -95,7 +95,13 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
-    assertSizePreviousCurrentNext(1, false, file, false);
+    try {
+      assertSizePreviousCurrentNext(1, false, file, false);
+
+      fail(file.getPath() + " was found but should be removed");
+    }
+    catch (final FileNotFoundException ignore) {
+    }
   }
 
   public void testUpdateSnapshot() throws IOException {
