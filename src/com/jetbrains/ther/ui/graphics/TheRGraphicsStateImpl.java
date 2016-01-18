@@ -115,6 +115,11 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   }
 
   @Override
+  public boolean hasCurrent() {
+    return myCurrentId != -1;
+  }
+
+  @Override
   public void next() {
     advance(true);
   }

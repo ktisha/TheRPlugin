@@ -30,6 +30,11 @@ public class TheREmptyGraphicsState implements TheRGraphicsState {
   }
 
   @Override
+  public boolean hasCurrent() {
+    return false;
+  }
+
+  @Override
   public void next() {
     throw new NoSuchElementException(NO_SNAPSHOTS);
   }

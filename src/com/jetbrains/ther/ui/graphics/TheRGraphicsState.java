@@ -11,6 +11,8 @@ public interface TheRGraphicsState {
 
   boolean hasPrevious();
 
+  boolean hasCurrent();
+
   void next();
 
   void previous();

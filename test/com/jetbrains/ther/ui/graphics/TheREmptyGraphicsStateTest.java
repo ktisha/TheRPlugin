@@ -17,6 +17,7 @@ public class TheREmptyGraphicsStateTest {
 
     assertFalse(state.hasNext());
     assertFalse(state.hasPrevious());
+    assertFalse(state.hasCurrent());
     assertEquals(0, state.size());
 
     state.current();
@@ -54,6 +55,7 @@ public class TheREmptyGraphicsStateTest {
     state.reset();
 
     verify(listener, times(1)).onReset();
+    verifyNoMoreInteractions(listener);
   }
 
   @Test
