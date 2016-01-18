@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
 import com.jetbrains.ther.run.TheRRunConfigurationParams;
@@ -33,7 +34,7 @@ public final class TheRGraphicsUtils {
   private static final String DEVICE_IS_DISABLED = "Device is disabled [script: %s]";
 
   @NotNull
-  private static final String DEVICE_LIB_NAME = "libtherplugin_device.so";
+  private static final String DEVICE_LIB_NAME = String.format("libtherplugin_device%s.so", SystemInfo.is32Bit ? "32" : "64");
 
   @NotNull
   private static final String LIB_DIR_NAME = "libs";
