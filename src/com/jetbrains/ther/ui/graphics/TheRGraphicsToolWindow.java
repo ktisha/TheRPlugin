@@ -3,18 +3,39 @@ package com.jetbrains.ther.ui.graphics;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.NotNull;
 
-class TheRGraphicsToolWindow extends SimpleToolWindowPanel {
+class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphicsState.Listener {
 
   @NotNull
   private final TheRGraphicsState myState;
+
+  @NotNull
+  private final TheRGraphicsPanel myPanel;
 
   public TheRGraphicsToolWindow(@NotNull final TheRGraphicsState state) {
     super(true, true);
 
     myState = state;
+    myPanel = new TheRGraphicsPanel(myState);
 
     setToolbar(new TheRGraphicsToolbar(myState, new ToolbarListener()).getToolbar());
-    setContent(new TheRGraphicsPanel(myState).getPanel());
+    setContent(myPanel.getPanel());
+
+    myState.addListener(this);
+  }
+
+  @Override
+  public void onStarted() {
+    myState.next();
+  }
+
+  @Override
+  public void onUpdate() {
+    myPanel.refresh();
+  }
+
+  @Override
+  public void onReset() {
+    myPanel.reset();
   }
 
   private class ToolbarListener implements TheRGraphicsToolbar.Listener {

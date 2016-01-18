@@ -22,10 +22,8 @@ public class TheRGraphicsPanelTest {
 
     final TheRGraphicsPanel panel = new TheRGraphicsPanel(state);
 
-    verify(state, times(1)).addListener(panel);
-
     try {
-      panel.onUpdate();
+      panel.refresh();
     }
     catch (final AssertionError ignore) {
       /*
@@ -47,10 +45,8 @@ public class TheRGraphicsPanelTest {
 
     final TheRGraphicsPanel panel = new TheRGraphicsPanel(state);
 
-    verify(state, times(1)).addListener(panel);
-
     try {
-      panel.onUpdate();
+      panel.refresh();
 
       fail();
     }
@@ -68,10 +64,8 @@ public class TheRGraphicsPanelTest {
 
     final TheRGraphicsPanel panel = new TheRGraphicsPanel(state);
 
-    verify(state, times(1)).addListener(panel);
-
     try {
-      panel.onUpdate();
+      panel.refresh();
     }
     catch (final AssertionError ignore) {
       /*
@@ -83,7 +77,7 @@ public class TheRGraphicsPanelTest {
 
     verify(state, times(1)).current();
 
-    panel.onReset();
+    panel.reset();
 
     verifyNoMoreInteractions(state);
   }
