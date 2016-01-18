@@ -15,7 +15,16 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphi
     super(true, true);
 
     myState = state;
+
+    if (!myState.hasCurrent() && myState.hasNext()) {
+      myState.next();
+    }
+
     myPanel = new TheRGraphicsPanel(myState);
+
+    if (myState.hasCurrent()) {
+      myPanel.refresh();
+    }
 
     setToolbar(new TheRGraphicsToolbar(myState, new ToolbarListener()).getToolbar());
     setContent(myPanel.getPanel());
