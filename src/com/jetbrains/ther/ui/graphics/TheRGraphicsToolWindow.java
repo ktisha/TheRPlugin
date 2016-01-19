@@ -16,8 +16,10 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphi
 
     myState = state;
 
-    if (!myState.hasCurrent() && myState.hasNext()) {
-      myState.next();
+    if (!myState.hasCurrent()) {
+      while (myState.hasNext()) {
+        myState.next();
+      }
     }
 
     myPanel = new TheRGraphicsPanel(myState);
@@ -33,12 +35,12 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphi
   }
 
   @Override
-  public void onStarted() {
+  public void onAdd() {
     myState.next();
   }
 
   @Override
-  public void onUpdate() {
+  public void onCurrentChange() {
     myPanel.refresh();
   }
 

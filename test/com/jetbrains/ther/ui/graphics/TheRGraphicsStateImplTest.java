@@ -190,7 +190,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
-    verify(listener, times(1)).onUpdate();
+    verify(listener, times(1)).onCurrentChange();
     assertSizePreviousCurrentNext(1, false, file, false);
 
     verifyNoMoreInteractions(listener);
@@ -206,13 +206,20 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
-    verify(listener, times(1)).onStarted();
+    verify(listener, times(1)).onAdd();
     assertSizePreviousCurrentNext(1, false, null, true);
 
     myState.next();
 
-    verify(listener, times(1)).onUpdate();
+    verify(listener, times(1)).onCurrentChange();
     assertSizePreviousCurrentNext(1, false, file, false);
+
+    createChildData(mySnapshotDir, "snapshot_2.png");
+
+    myState.refresh(false);
+
+    verify(listener, times(2)).onAdd();
+    assertSizePreviousCurrentNext(2, false, file, true);
 
     verifyNoMoreInteractions(listener);
   }
@@ -289,7 +296,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
-    verify(listener, times(1)).onUpdate();
+    verify(listener, times(1)).onCurrentChange();
     assertSizePreviousCurrentNext(1, false, file2, false);
 
     verifyNoMoreInteractions(listener);
@@ -319,7 +326,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.refresh(false);
 
-    verify(listener, times(1)).onUpdate();
+    verify(listener, times(1)).onCurrentChange();
     assertSizePreviousCurrentNext(1, false, file1, false);
 
     verifyNoMoreInteractions(listener);
@@ -439,7 +446,7 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.next();
 
-    verify(listener, times(1)).onUpdate();
+    verify(listener, times(1)).onCurrentChange();
     assertSizePreviousCurrentNext(1, false, file, false);
 
     myState.removeListener(listener);

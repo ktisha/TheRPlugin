@@ -248,7 +248,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
     myCurrentId = newCurrentId;
 
     for (final Listener listener : myListeners) {
-      listener.onUpdate();
+      listener.onCurrentChange();
     }
   }
 
@@ -270,10 +270,8 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
         String.format(SNAPSHOT_HAS_BEEN_ADDED, name, mySnapshotDirPath)
       );
 
-      if (size() == 1) {
-        for (final Listener listener : myListeners) {
-          listener.onStarted();
-        }
+      for (final Listener listener : myListeners) {
+        listener.onAdd();
       }
     }
   }
@@ -331,7 +329,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
 
         if (myCurrentId == calculateSnapshotId(name)) {
           for (final Listener listener : myListeners) {
-            listener.onUpdate();
+            listener.onCurrentChange();
           }
         }
       }
