@@ -33,6 +33,9 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   private static final String STATE_HAS_BEEN_RESET = "State has been reset [dir: %s]";
 
   @NotNull
+  private static final String FILE_HAS_BEEN_REMOVED = "File has been removed [name: %s, dir: %s]";
+
+  @NotNull
   private static final String STATE_HAS_BEEN_DISPOSED = "State has been disposed [dir: %s]";
 
   @NotNull
@@ -45,10 +48,10 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   private static final String NO_PREVIOUS_SNAPSHOT_BEFORE_CURRENT = "No previous snapshot before current [current: %s, dir: %s]";
 
   @NotNull
-  private static final String MOVED_FORWARD = "Moved forward [old: %d, new: %d, dir: %s]";
+  private static final String MOVED_FORWARD = "Moved forward [previous: %s, current: %s, dir: %s]";
 
   @NotNull
-  private static final String MOVED_BACKWARD = "Moved backward [old: %d, new: %d, dir: %s]";
+  private static final String MOVED_BACKWARD = "Moved backward [previous: %s, current: %s, dir: %s]";
 
   @NotNull
   private static final String SNAPSHOT_NAME_FORMAT = "snapshot_%d.png";
@@ -57,10 +60,10 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   private static final Pattern SNAPSHOT_NAME_PATTERN = Pattern.compile("^snapshot_(\\d+)\\.png$");
 
   @NotNull
-  private static final String SNAPSHOT_HAS_BEEN_ADDED = "Snapshot has been added [id: %d, name: %s, dir: %s]";
+  private static final String SNAPSHOT_HAS_BEEN_ADDED = "Snapshot has been added to the state [name: %s, dir: %s]";
 
   @NotNull
-  private static final String SNAPSHOT_HAS_BEEN_REMOVED = "Snapshot has been removed [id: %d, name: %s, dir: %s]";
+  private static final String SNAPSHOT_HAS_BEEN_REMOVED = "Snapshot has been removed from the state [name: %s, dir: %s]";
 
   @NotNull
   private static final String ILLEGAL_SNAPSHOT_NAME = "Illegal snapshot name [name: %s]";
@@ -69,10 +72,10 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   private static final String UPDATED_SNAPSHOT = "Updated snapshot [name: %s, dir: %s]";
 
   @NotNull
-  private static final String RENAMED_SNAPSHOT_WILL_BE_REMOVED = "Renamed snapshot will be removed [name: %s, dir: %s]";
+  private static final String RENAMED_SNAPSHOT_WILL_BE_REMOVED = "Renamed snapshot will be removed from the state [name: %s, dir: %s]";
 
   @NotNull
-  private static final String MOVED_SNAPSHOT_WILL_BE_REMOVED = "Moved snapshot will be removed [name: %s, dir: %s]";
+  private static final String MOVED_SNAPSHOT_WILL_BE_REMOVED = "Moved snapshot will be removed from the state [name: %s, dir: %s]";
 
   @NotNull
   private final TreeSet<Integer> mySnapshotIds;
@@ -134,7 +137,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
   @Override
   @NotNull
   public VirtualFile current() throws FileNotFoundException {
-    if (myCurrentId == -1) {
+    if (!hasCurrent()) {
       throw new NoSuchElementException(
         String.format(CURRENT_SNAPSHOT_WAS_NOT_SET, mySnapshotDirPath)
       );
@@ -195,6 +198,10 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
           for (final VirtualFile file : mySnapshotDir.getChildren()) {
             try {
               file.delete(TheRGraphicsStateImpl.this);
+
+              LOGGER.debug(
+                String.format(FILE_HAS_BEEN_REMOVED, file.getName(), mySnapshotDirPath)
+              );
             }
             catch (final IOException e) {
               LOGGER.warn(e);
@@ -213,7 +220,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
     final Integer newCurrentId = forward ? mySnapshotIds.higher(myCurrentId) : mySnapshotIds.lower(myCurrentId);
 
     if (newCurrentId == null) {
-      if (myCurrentId == -1) {
+      if (!hasCurrent()) {
         throw new NoSuchElementException(
           String.format(NO_SNAPSHOTS, mySnapshotDirPath)
         );
@@ -232,8 +239,8 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
     LOGGER.debug(
       String.format(
         forward ? MOVED_FORWARD : MOVED_BACKWARD,
-        myCurrentId,
-        newCurrentId,
+        calculateSnapshotName(myCurrentId),
+        calculateSnapshotName(newCurrentId),
         mySnapshotDirPath
       )
     );
@@ -260,7 +267,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
 
     if (mySnapshotIds.add(id)) {
       LOGGER.info(
-        String.format(SNAPSHOT_HAS_BEEN_ADDED, id, name, mySnapshotDirPath)
+        String.format(SNAPSHOT_HAS_BEEN_ADDED, name, mySnapshotDirPath)
       );
 
       if (size() == 1) {
@@ -289,7 +296,7 @@ class TheRGraphicsStateImpl implements TheRGraphicsState, Disposable {
       }
 
       LOGGER.info(
-        String.format(SNAPSHOT_HAS_BEEN_REMOVED, id, name, mySnapshotDirPath)
+        String.format(SNAPSHOT_HAS_BEEN_REMOVED, name, mySnapshotDirPath)
       );
     }
   }
