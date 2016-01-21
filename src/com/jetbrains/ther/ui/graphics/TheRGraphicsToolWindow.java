@@ -36,7 +36,9 @@ class TheRGraphicsToolWindow extends SimpleToolWindowPanel implements TheRGraphi
 
   @Override
   public void onAdd() {
-    myState.next();
+    if (myState.hasNext()) {
+      myState.next();
+    }
   }
 
   @Override
