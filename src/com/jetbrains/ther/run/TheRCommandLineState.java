@@ -5,18 +5,31 @@ import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.configurations.ParamsGroup;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.containers.HashMap;
+import com.jetbrains.ther.TheRFileType;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class TheRCommandLineState extends CommandLineState {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRCommandLineState.class);
+
   public static final String GROUP_EXE_OPTIONS = "Exe Options";
   public static final String GROUP_SCRIPT = "Script";
   private final TheRRunConfiguration myConfig;
@@ -29,9 +42,19 @@ public class TheRCommandLineState extends CommandLineState {
   @NotNull
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
-    final GeneralCommandLine commandLine = generateCommandLine();
-    final ProcessHandler processHandler = TheRProcessHandler.createProcessHandler(commandLine);
+    TheRGraphicsUtils.getGraphicsState(myConfig.getProject()).reset();
+
+    final ProcessHandler processHandler = TheRProcessHandler.createProcessHandler(generateCommandLine());
+
     ProcessTerminatedListener.attach(processHandler);
+    processHandler.addProcessListener(
+      new ProcessAdapter() {
+        @Override
+        public void processTerminated(final ProcessEvent event) {
+          TheRGraphicsUtils.getGraphicsState(myConfig.getProject()).refresh(false);
+        }
+      }
+    );
 
     return processHandler;
   }
@@ -64,7 +87,7 @@ public class TheRCommandLineState extends CommandLineState {
     final ParamsGroup scriptParameters = parametersList.addParamsGroup(GROUP_SCRIPT);
     final String scriptPath = myConfig.getScriptPath();
     if (!StringUtil.isEmptyOrSpaces(scriptPath)) {
-      scriptParameters.addParameter(scriptPath);
+      scriptParameters.addParameter(calculateUpdatedScriptPath(scriptPath));
     }
     final String scriptArgs = myConfig.getScriptArgs();
     if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
@@ -78,6 +101,41 @@ public class TheRCommandLineState extends CommandLineState {
     commandLine.getEnvironment().clear();
     commandLine.getEnvironment().putAll(env);
     commandLine.setPassParentEnvironment(myConfig.isPassParentEnvs());
+  }
 
+  @NotNull
+  private String calculateUpdatedScriptPath(@NotNull final String originalScriptPath) {
+    final List<String> initCommands = TheRGraphicsUtils.calculateInitCommands(myConfig.getProject(), myConfig);
+
+    if (initCommands.isEmpty()) {
+      return originalScriptPath;
+    }
+
+    try {
+      return createUpdatedScript(originalScriptPath, initCommands).getAbsolutePath();
+    }
+    catch (final IOException e) {
+      LOGGER.warn(e);
+
+      return originalScriptPath;
+    }
+  }
+
+  @NotNull
+  private File createUpdatedScript(@NotNull final String originalScriptPath,
+                                   @NotNull final List<String> initCommands) throws IOException {
+    final File originalScriptFile = new File(originalScriptPath);
+    final String originalScriptName = originalScriptFile.getName();
+
+    final File updatedScriptFile = FileUtil.createTempFile(originalScriptName, "." + TheRFileType.INSTANCE.getDefaultExtension(), true);
+
+    for (final String command : initCommands) {
+      FileUtil.appendToFile(updatedScriptFile, command);
+      FileUtil.appendToFile(updatedScriptFile, TheRDebugConstants.LINE_SEPARATOR);
+    }
+
+    FileUtil.appendToFile(updatedScriptFile, FileUtil.loadFile(originalScriptFile));
+
+    return updatedScriptFile;
   }
 }
