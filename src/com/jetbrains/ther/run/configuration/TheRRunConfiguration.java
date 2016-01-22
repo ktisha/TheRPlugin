@@ -2,10 +2,16 @@ package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
-import com.intellij.execution.configurations.*;
+import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
@@ -46,11 +52,12 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   @NotNull
   private String myWorkingDirectory;
 
+  @NotNull
   private final Map<String, String> myEnvs = new LinkedHashMap<String, String>();
+
   private boolean myPassParentEnvs = true;
 
-
-  protected TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
+  TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
     super(project, configurationFactory, "");
 
     myScriptPath = "";
@@ -71,8 +78,6 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
 
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
-    super.checkConfiguration();
-
     if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
       throw new RuntimeConfigurationException("No script specified");
     }
@@ -182,7 +187,7 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
     target.setScriptArgs(source.getScriptArgs());
     target.setWorkingDirectory(source.getWorkingDirectory());
     target.setPassParentEnvs(source.isPassParentEnvs());
-    target.setEnvs(new HashMap<String, String>(source.getEnvs()));
+    target.setEnvs(Collections.unmodifiableMap(source.getEnvs()));
   }
 
   private void readEnvs(@NotNull final Element element) {
