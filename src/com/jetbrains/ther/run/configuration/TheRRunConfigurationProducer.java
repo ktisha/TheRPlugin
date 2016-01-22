@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRRunConfiguration> {
 
   public TheRRunConfigurationProducer() {
-    super(TheRRunConfigurationType.getInstance().getConfigurationFactories()[0]);
+    super(TheRRunConfigurationType.getInstance().getMainFactory());
   }
 
   @Override

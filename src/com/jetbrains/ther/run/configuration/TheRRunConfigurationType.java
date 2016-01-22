@@ -23,6 +23,11 @@ public class TheRRunConfigurationType extends ConfigurationTypeBase {
     return ConfigurationTypeUtil.findConfigurationType(TheRRunConfigurationType.class);
   }
 
+  @NotNull
+  public ConfigurationFactory getMainFactory() {
+    return getConfigurationFactories()[0];
+  }
+
   private static class TheRConfigurationFactory extends ConfigurationFactory {
 
     public TheRConfigurationFactory(@NotNull final ConfigurationType configurationType) {
