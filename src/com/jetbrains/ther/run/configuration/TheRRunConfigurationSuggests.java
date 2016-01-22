@@ -33,4 +33,16 @@ public final class TheRRunConfigurationSuggests {
 
     return new File(scriptPath).getParent();
   }
+
+  public static void setSuggestedWorkingDirectoryPathIfNotSpecified(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    if (!StringUtil.isEmptyOrSpaces(runConfigurationParams.getWorkingDirectory())) {
+      return;
+    }
+
+    final String suggestedWorkingDirectoryPath = TheRRunConfigurationSuggests.suggestedWorkingDirectoryPath(runConfigurationParams);
+
+    if (suggestedWorkingDirectoryPath != null) {
+      runConfigurationParams.setWorkingDirectory(suggestedWorkingDirectoryPath);
+    }
+  }
 }

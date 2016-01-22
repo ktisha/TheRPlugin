@@ -29,14 +29,8 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
     }
 
     configuration.setName(TheRRunConfigurationSuggests.suggestedName(configuration));
-
     configuration.setScriptPath(scriptVirtualFile.getPath());
-
-    final String suggestedWorkingDirectoryPath = TheRRunConfigurationSuggests.suggestedWorkingDirectoryPath(configuration);
-
-    if (suggestedWorkingDirectoryPath != null) {
-      configuration.setWorkingDirectory(suggestedWorkingDirectoryPath);
-    }
+    TheRRunConfigurationSuggests.setSuggestedWorkingDirectoryPathIfNotSpecified(configuration);
 
     return true;
   }
