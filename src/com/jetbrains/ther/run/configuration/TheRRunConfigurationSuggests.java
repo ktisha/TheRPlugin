@@ -24,4 +24,13 @@ public final class TheRRunConfigurationSuggests {
 
     return name;
   }
+
+  @Nullable
+  public static String suggestedWorkingDirectoryPath(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final String scriptPath = runConfigurationParams.getScriptPath();
+
+    if (StringUtil.isEmptyOrSpaces(scriptPath)) return null;
+
+    return new File(scriptPath).getParent();
+  }
 }
