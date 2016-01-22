@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
@@ -13,6 +13,7 @@ import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.TheRFileType;
+import com.jetbrains.ther.run.TheRCommandLineState;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -3,6 +3,7 @@ package com.jetbrains.ther.run;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.DefaultProgramRunner;
+import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

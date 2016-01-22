@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.Location;
 import com.intellij.execution.actions.ConfigurationContext;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRRunConfiguration> {
 
   public TheRRunConfigurationProducer() {
-    super(TheRConfigurationType.getInstance().getConfigurationFactories()[0]);
+    super(TheRRunConfigurationType.getInstance().getConfigurationFactories()[0]);
   }
 
   @Override

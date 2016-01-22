@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;

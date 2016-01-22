@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;

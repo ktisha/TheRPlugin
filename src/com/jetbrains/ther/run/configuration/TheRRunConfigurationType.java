@@ -1,15 +1,15 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.configurations.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRConfigurationType extends ConfigurationTypeBase {
+public class TheRRunConfigurationType extends ConfigurationTypeBase {
 
-  public TheRConfigurationType() {
+  public TheRRunConfigurationType() {
     super(
-      "TheRConfigurationType",
+      "TheRRunConfigurationType",
       "R",
       "R run configuration",
       IconLoader.getIcon("/icons/Rlogo.png")
@@ -19,8 +19,8 @@ public class TheRConfigurationType extends ConfigurationTypeBase {
   }
 
   @NotNull
-  public static TheRConfigurationType getInstance() {
-    return ConfigurationTypeUtil.findConfigurationType(TheRConfigurationType.class);
+  public static TheRRunConfigurationType getInstance() {
+    return ConfigurationTypeUtil.findConfigurationType(TheRRunConfigurationType.class);
   }
 
   private static class TheRConfigurationFactory extends ConfigurationFactory {

@@ -63,8 +63,8 @@ It includes syntax-highlighting editor that supports direct code execution, inte
     <treeStructureProvider implementation="com.jetbrains.ther.projectView.TheRTreeStructureProvider"/>
     <quoteHandler className="com.jetbrains.ther.completion.TheRQuoteHandler" fileType="The R"/>
 
-    <configurationType implementation="com.jetbrains.ther.run.TheRConfigurationType"/>
-    <runConfigurationProducer implementation="com.jetbrains.ther.run.TheRRunConfigurationProducer"/>
+    <configurationType implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationType"/>
+    <runConfigurationProducer implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationProducer"/>
     <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
     <programRunner implementation="com.jetbrains.ther.xdebugger.TheRXDebugRunner"/>
     <xdebugger.breakpointType implementation="com.jetbrains.ther.xdebugger.TheRXLineBreakpointType"/>

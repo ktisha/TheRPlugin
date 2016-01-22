@@ -1,4 +1,4 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.configuration;
 
 import org.jetbrains.annotations.NotNull;
 
