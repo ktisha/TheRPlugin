@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.components.JBLabel;
@@ -21,27 +20,27 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   private JPanel myRootPanel;
 
-  private JBLabel myScriptLabel;
-  private TextFieldWithBrowseButton myScriptTextField;
+  private JBLabel myScriptPathLabel;
+  private TextFieldWithBrowseButton myScriptPathField;
 
   private JBLabel myScriptArgsLabel;
-  private RawCommandLineEditor myScriptArgsTextField;
+  private RawCommandLineEditor myScriptArgsField;
 
-  private JBLabel myWorkingDirectoryLabel;
-  private TextFieldWithBrowseButton myWorkingDirectoryTextField;
+  private JBLabel myWorkingDirectoryPathLabel;
+  private TextFieldWithBrowseButton myWorkingDirectoryPathField;
 
   private EnvironmentVariablesComponent myEnvsComponent;
 
   public TheRRunConfigurationForm(@NotNull final TheRRunConfiguration configuration) {
     final Project project = configuration.getProject();
 
-    setupScriptTextField(project);
-    setupScriptArgsTextField();
-    setupWorkingDirectoryTextField(project);
+    setupScriptPathField(project);
+    setupScriptArgsField();
+    setupWorkingDirectoryPathField(project);
 
-    myScriptLabel.setAnchor(myEnvsComponent.getLabel());
+    myScriptPathLabel.setAnchor(myEnvsComponent.getLabel());
     myScriptArgsLabel.setAnchor(myEnvsComponent.getLabel());
-    myWorkingDirectoryLabel.setAnchor(myEnvsComponent.getLabel());
+    myWorkingDirectoryPathLabel.setAnchor(myEnvsComponent.getLabel());
   }
 
   @NotNull
@@ -52,34 +51,34 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
   @NotNull
   @Override
   public String getScriptPath() {
-    return getPath(myScriptTextField);
+    return getPath(myScriptPathField);
   }
 
   @Override
   public void setScriptPath(@NotNull final String scriptPath) {
-    setPath(scriptPath, myScriptTextField);
+    setPath(myScriptPathField, scriptPath);
   }
 
   @NotNull
   @Override
   public String getScriptArgs() {
-    return myScriptArgsTextField.getText().trim();
+    return myScriptArgsField.getText().trim();
   }
 
   @Override
   public void setScriptArgs(@NotNull final String scriptArgs) {
-    myScriptArgsTextField.setText(scriptArgs);
+    myScriptArgsField.setText(scriptArgs);
   }
 
   @NotNull
   @Override
   public String getWorkingDirectory() {
-    return getPath(myWorkingDirectoryTextField);
+    return getPath(myWorkingDirectoryPathField);
   }
 
   @Override
   public void setWorkingDirectory(@NotNull final String workingDirectory) {
-    setPath(workingDirectory, myWorkingDirectoryTextField);
+    setPath(myWorkingDirectoryPathField, workingDirectory);
   }
 
   @Override
@@ -103,12 +102,12 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
     myEnvsComponent.setEnvs(envs);
   }
 
-  private void setupScriptTextField(@NotNull final Project project) {
+  private void setupScriptPathField(@NotNull final Project project) {
     final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> listener =
       new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
         "Select Script",
         "",
-        myScriptTextField,
+        myScriptPathField,
         project,
         FileChooserDescriptorFactory.createSingleFileDescriptor(TheRFileType.INSTANCE),
         TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
@@ -117,21 +116,19 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
         protected void onFileChosen(@NotNull final VirtualFile chosenFile) {
           super.onFileChosen(chosenFile);
 
-          if (StringUtil.isEmptyOrSpaces(getWorkingDirectory())) {
-            setWorkingDirectory(chosenFile.getParent().getPath());
-          }
+          TheRRunConfigurationSuggests.setSuggestedWorkingDirectoryPathIfNotSpecified(TheRRunConfigurationForm.this);
         }
       };
 
-    myScriptTextField.addActionListener(listener);
+    myScriptPathField.addActionListener(listener);
   }
 
-  private void setupScriptArgsTextField() {
-    myScriptArgsTextField.setDialogCaption("Script Args");
+  private void setupScriptArgsField() {
+    myScriptArgsField.setDialogCaption("Script Args");
   }
 
-  private void setupWorkingDirectoryTextField(@NotNull final Project project) {
-    myWorkingDirectoryTextField.addBrowseFolderListener(
+  private void setupWorkingDirectoryPathField(@NotNull final Project project) {
+    myWorkingDirectoryPathField.addBrowseFolderListener(
       "Select Working Directory",
       "",
       project,
@@ -140,11 +137,11 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
   }
 
   @NotNull
-  private String getPath(@NotNull final TextFieldWithBrowseButton textField) {
-    return FileUtil.toSystemIndependentName(textField.getText().trim());
+  private String getPath(@NotNull final TextFieldWithBrowseButton field) {
+    return FileUtil.toSystemIndependentName(field.getText().trim());
   }
 
-  private void setPath(@NotNull final String path, @NotNull final TextFieldWithBrowseButton textField) {
-    textField.setText(FileUtil.toSystemDependentName(path));
+  private void setPath(@NotNull final TextFieldWithBrowseButton field, @NotNull final String path) {
+    field.setText(FileUtil.toSystemDependentName(path));
   }
 }
