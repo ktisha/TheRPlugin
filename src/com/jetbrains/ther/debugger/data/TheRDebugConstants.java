@@ -17,9 +17,6 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String MAIN_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "main";
 
-  @NotNull
-  public static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
-
   // interpreter parameters
 
   @NotNull
@@ -38,9 +35,6 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String LOAD_LIB_COMMAND = "dyn.load";
-
-  @NotNull
-  public static final String SETUP_DEVICE_COMMAND = "options(device=\"" + DEVICE_FUNCTION_NAME + "\")";
 
   @NotNull
   public static final String LS_COMMAND = "ls";

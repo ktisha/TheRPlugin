@@ -50,18 +50,13 @@ public final class TheRTraceAndDebugUtils {
   private static void traceAndDebugFunction(@NotNull final TheRExecutor executor,
                                             @NotNull final TheROutputReceiver receiver,
                                             @NotNull final String functionName) throws TheRDebuggerException {
-    if (isServiceFunction(functionName)) {
+    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX)) {
       return;
     }
 
     execute(executor, enterFunction(functionName), EMPTY, receiver);
     execute(executor, traceCommand(functionName), RESPONSE);
     execute(executor, debugCommand(functionName), EMPTY, receiver);
-  }
-
-  private static boolean isServiceFunction(@NotNull final String functionName) {
-    return (functionName.startsWith(SERVICE_FUNCTION_PREFIX) && functionName.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX))
-           || functionName.equals(DEVICE_FUNCTION_NAME);
   }
 
   @NotNull

@@ -16,7 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LOAD_LIB_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
 import static java.lang.Boolean.parseBoolean;
 
 public final class TheRGraphicsUtils {
@@ -35,6 +36,12 @@ public final class TheRGraphicsUtils {
 
   @NotNull
   private static final String DEVICE_LIB_NAME = String.format("libtherplugin_device%s.so", SystemInfo.is32Bit ? "32" : "64");
+
+  @NotNull
+  private static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
+
+  @NotNull
+  private static final String SETUP_DEVICE_COMMAND = "options(device=\"" + DEVICE_FUNCTION_NAME + "\")";
 
   @NotNull
   private static final String LIB_DIR_NAME = "libs";

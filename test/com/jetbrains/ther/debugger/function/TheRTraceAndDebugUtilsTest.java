@@ -78,8 +78,10 @@ public class TheRTraceAndDebugUtilsTest {
     @NotNull
     @Override
     public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
-      final String xEnterFunctionName = "jetbrains_ther_x_enter";
-      final String yEnterFunctionName = "jetbrains_ther_y_enter";
+      final String xEnterFunctionName = SERVICE_FUNCTION_PREFIX + "x" + SERVICE_ENTER_FUNCTION_SUFFIX;
+      final String yEnterFunctionName = SERVICE_FUNCTION_PREFIX + "y" + SERVICE_ENTER_FUNCTION_SUFFIX;
+      ;
+      final String deviceFunctionName = SERVICE_FUNCTION_PREFIX + "device_init";
 
       if (command.equals(LS_FUNCTIONS_COMMAND)) {
         myLsExecuted++;
@@ -90,7 +92,7 @@ public class TheRTraceAndDebugUtilsTest {
                               FUNCTION_TYPE + "\n\n" +
                               "$y\n" +
                               FUNCTION_TYPE + "\n\n" +
-                              "$" + DEVICE_FUNCTION_NAME + "\n" +
+                              "$" + deviceFunctionName + "\n" +
                               FUNCTION_TYPE;
 
         return new TheRExecutionResult(
