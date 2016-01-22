@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
+public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
 
   @NotNull
   private static final String SCRIPT_PATH = "SCRIPT_PATH";
@@ -86,18 +86,7 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   @Override
   @Nullable
   public String suggestedName() {
-    if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
-      return null;
-    }
-
-    final String name = new File(myScriptPath).getName();
-    final String dotAndExtension = "." + TheRFileType.INSTANCE.getDefaultExtension();
-
-    if (name.length() > dotAndExtension.length() && StringUtil.endsWithIgnoreCase(name, dotAndExtension)) {
-      return name.substring(0, name.length() - dotAndExtension.length());
-    }
-
-    return name;
+    return TheRRunConfigurationSuggests.suggestedName(this);
   }
 
   @NotNull
@@ -132,7 +121,6 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   public void setWorkingDirectory(@NotNull final String workingDirectory) {
     myWorkingDirectory = workingDirectory;
   }
-
 
   @Override
   @NotNull
