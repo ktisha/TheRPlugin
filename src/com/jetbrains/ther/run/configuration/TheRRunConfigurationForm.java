@@ -72,13 +72,13 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   @NotNull
   @Override
-  public String getWorkingDirectory() {
+  public String getWorkingDirectoryPath() {
     return getPath(myWorkingDirectoryPathField);
   }
 
   @Override
-  public void setWorkingDirectory(@NotNull final String workingDirectory) {
-    setPath(myWorkingDirectoryPathField, workingDirectory);
+  public void setWorkingDirectoryPath(@NotNull final String workingDirectoryPath) {
+    setPath(myWorkingDirectoryPathField, workingDirectoryPath);
   }
 
   @Override

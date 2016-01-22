@@ -35,14 +35,14 @@ public final class TheRRunConfigurationSuggests {
   }
 
   public static void setSuggestedWorkingDirectoryPathIfNotSpecified(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    if (!StringUtil.isEmptyOrSpaces(runConfigurationParams.getWorkingDirectory())) {
+    if (!StringUtil.isEmptyOrSpaces(runConfigurationParams.getWorkingDirectoryPath())) {
       return;
     }
 
     final String suggestedWorkingDirectoryPath = TheRRunConfigurationSuggests.suggestedWorkingDirectoryPath(runConfigurationParams);
 
     if (suggestedWorkingDirectoryPath != null) {
-      runConfigurationParams.setWorkingDirectory(suggestedWorkingDirectoryPath);
+      runConfigurationParams.setWorkingDirectoryPath(suggestedWorkingDirectoryPath);
     }
   }
 }

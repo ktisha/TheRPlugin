@@ -45,7 +45,7 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
     }
 
     final String configurationScriptPath = configuration.getScriptPath();
-    final String configurationWorkingDirectoryPath = configuration.getWorkingDirectory();
+    final String configurationWorkingDirectoryPath = configuration.getWorkingDirectoryPath();
 
     final String contextScriptPath = scriptVirtualFile.getPath();
     final String contextWorkingDirectoryPath = TheRRunConfigurationSuggests.suggestedWorkingDirectoryPath(configuration);

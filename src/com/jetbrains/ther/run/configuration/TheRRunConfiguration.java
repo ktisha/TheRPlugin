@@ -38,7 +38,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private static final String SCRIPT_ARGS = "SCRIPT_ARGS";
 
   @NotNull
-  private static final String WORKING_DIRECTORY = "WORKING_DIRECTORY";
+  private static final String WORKING_DIRECTORY_PATH = "WORKING_DIRECTORY_PATH";
 
   @NotNull
   private static final String PASS_PARENT_ENVS = "PASS_PARENT_ENVS";
@@ -50,7 +50,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private String myScriptArgs;
 
   @NotNull
-  private String myWorkingDirectory;
+  private String myWorkingDirectoryPath;
 
   @NotNull
   private final Map<String, String> myEnvs = new LinkedHashMap<String, String>();
@@ -62,7 +62,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
     myScriptPath = "";
     myScriptArgs = "";
-    myWorkingDirectory = "";
+    myWorkingDirectoryPath = "";
   }
 
   @Override
@@ -113,13 +113,13 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
   @NotNull
   @Override
-  public String getWorkingDirectory() {
-    return myWorkingDirectory;
+  public String getWorkingDirectoryPath() {
+    return myWorkingDirectoryPath;
   }
 
   @Override
-  public void setWorkingDirectory(@NotNull final String workingDirectory) {
-    myWorkingDirectory = workingDirectory;
+  public void setWorkingDirectoryPath(@NotNull final String workingDirectoryPath) {
+    myWorkingDirectoryPath = workingDirectoryPath;
   }
 
   @Override
@@ -152,7 +152,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
     myScriptPath = JDOMExternalizerUtil.readField(element, SCRIPT_PATH, "");
     myScriptArgs = JDOMExternalizerUtil.readField(element, SCRIPT_ARGS, "");
-    myWorkingDirectory = JDOMExternalizerUtil.readField(element, WORKING_DIRECTORY, "");
+    myWorkingDirectoryPath = JDOMExternalizerUtil.readField(element, WORKING_DIRECTORY_PATH, "");
 
     readEnvs(element);
   }
@@ -163,7 +163,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
     JDOMExternalizerUtil.writeField(element, SCRIPT_PATH, myScriptPath);
     JDOMExternalizerUtil.writeField(element, SCRIPT_ARGS, myScriptArgs);
-    JDOMExternalizerUtil.writeField(element, WORKING_DIRECTORY, myWorkingDirectory);
+    JDOMExternalizerUtil.writeField(element, WORKING_DIRECTORY_PATH, myWorkingDirectoryPath);
 
     writeEnvs(element);
 
@@ -173,7 +173,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   public static void copyParams(@NotNull final TheRRunConfigurationParams source, @NotNull final TheRRunConfigurationParams target) {
     target.setScriptPath(source.getScriptPath());
     target.setScriptArgs(source.getScriptArgs());
-    target.setWorkingDirectory(source.getWorkingDirectory());
+    target.setWorkingDirectoryPath(source.getWorkingDirectoryPath());
     target.setPassParentEnvs(source.isPassParentEnvs());
     target.setEnvs(Collections.unmodifiableMap(source.getEnvs()));
   }

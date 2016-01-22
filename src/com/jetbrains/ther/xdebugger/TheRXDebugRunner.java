@@ -77,7 +77,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     final TheRRunConfigurationParams runConfigurationParams = (TheRRunConfigurationParams)environment.getRunProfile();
     final String scriptPath = runConfigurationParams.getScriptPath();
 
-    checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectory());
+    checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectoryPath());
 
     final Project project = environment.getProject();
     final TheRXProcessHandler processHandler = createProcessHandler(project, interpreterPath, runConfigurationParams);
@@ -215,7 +215,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private String calculateWorkingDirectoryPath(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final String workingDirectoryPath = runConfigurationParams.getWorkingDirectory();
+    final String workingDirectoryPath = runConfigurationParams.getWorkingDirectoryPath();
     final String defaultPath = new File(runConfigurationParams.getScriptPath()).getParent();
 
     return !StringUtil.isEmptyOrSpaces(workingDirectoryPath) ? workingDirectoryPath : defaultPath;

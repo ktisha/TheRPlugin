@@ -17,9 +17,9 @@ public interface TheRRunConfigurationParams {
   void setScriptArgs(@NotNull final String scriptArgs);
 
   @NotNull
-  String getWorkingDirectory();
+  String getWorkingDirectoryPath();
 
-  void setWorkingDirectory(@NotNull final String workingDirectory);
+  void setWorkingDirectoryPath(@NotNull final String workingDirectoryPath);
 
   boolean isPassParentEnvs();
 
