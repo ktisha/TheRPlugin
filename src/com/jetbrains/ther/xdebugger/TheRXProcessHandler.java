@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
-class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
+public class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRXProcessHandler.class);
