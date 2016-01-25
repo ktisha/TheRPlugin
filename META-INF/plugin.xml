@@ -68,6 +68,7 @@ It includes syntax-highlighting editor that supports direct code execution, inte
     <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
     <programRunner implementation="com.jetbrains.ther.xdebugger.TheRXDebugRunner"/>
     <xdebugger.breakpointType implementation="com.jetbrains.ther.xdebugger.TheRXLineBreakpointType"/>
+    <toolWindow id="The R Graphics" anchor="right" factoryClass="com.jetbrains.ther.ui.graphics.TheRGraphicsToolWindowFactory"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
     <!--localInspection language="TheR" shortName="RUnusedInspection" displayName="R Unused Inspection" enabledByDefault="true" level="WARNING"

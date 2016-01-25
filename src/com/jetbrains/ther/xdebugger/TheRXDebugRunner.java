@@ -33,6 +33,7 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.TheRRunConfiguration;
 import com.jetbrains.ther.run.TheRRunConfigurationParams;
+import com.jetbrains.ther.ui.graphics.TheRGraphicsUtils;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.xdebugger.resolve.TheRXResolvingSessionImpl;
 import org.jetbrains.annotations.NotNull;
@@ -45,13 +46,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Boolean.parseBoolean;
+
 public class TheRXDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
 
   @NotNull
-  private static final String PRINT_IO_KEY = "ther.debugger.io";
+  private static final String IO_KEY = "ther.debugger.io";
 
   @NotNull
   @Override
@@ -77,7 +80,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     checkConfiguration(interpreterPath, scriptPath, runConfigurationParams.getWorkingDirectory());
 
     final Project project = environment.getProject();
-    final TheRXProcessHandler processHandler = createProcessHandler(interpreterPath, runConfigurationParams);
+    final TheRXProcessHandler processHandler = createProcessHandler(project, interpreterPath, runConfigurationParams);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
@@ -95,7 +98,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
   private void checkConfiguration(@NotNull final String interpreterPath,
                                   @NotNull final String scriptPath,
-                                  @NotNull final String workDirectory) throws ExecutionException {
+                                  @NotNull final String workingDirectoryPath) throws ExecutionException {
     if (StringUtil.isEmptyOrSpaces(interpreterPath)) {
       throw new ExecutionException("The R interpreter is not specified");
     }
@@ -104,23 +107,24 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       throw new ExecutionException("The R script is not specified");
     }
 
-    if (StringUtil.isEmptyOrSpaces(workDirectory) && new File(scriptPath).getParent() == null) {
+    if (StringUtil.isEmptyOrSpaces(workingDirectoryPath) && new File(scriptPath).getParent() == null) {
       throw new ExecutionException("The working directory couldn't be calculated");
     }
   }
 
   @NotNull
-  private TheRXProcessHandler createProcessHandler(@NotNull final String interpreterPath,
+  private TheRXProcessHandler createProcessHandler(@NotNull final Project project,
+                                                   @NotNull final String interpreterPath,
                                                    @NotNull final TheRRunConfigurationParams runConfigurationParams)
     throws ExecutionException {
     return new TheRXProcessHandler(
       calculateCommandLine(
         calculateCommand(interpreterPath, runConfigurationParams.getScriptArgs()),
-        calculateWorkDirectory(runConfigurationParams)
+        calculateWorkingDirectoryPath(runConfigurationParams)
       ),
-      TheRProcessUtils.getInitCommands(),
+      calculateInitCommands(project, runConfigurationParams),
       new TheRExecutionResultCalculatorImpl(),
-      Boolean.parseBoolean(runConfigurationParams.getEnvs().get(PRINT_IO_KEY))
+      parseBoolean(runConfigurationParams.getEnvs().get(IO_KEY))
     );
   }
 
@@ -155,8 +159,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   @NotNull
   private TheRDebugger createDebugger(@NotNull final TheRXProcessHandler processHandler,
                                       @NotNull final TheRXOutputReceiver outputReceiver,
-                                      @NotNull final String scriptPath)
-    throws ExecutionException {
+                                      @NotNull final String scriptPath) throws ExecutionException {
     try {
       return new TheRDebugger(
         processHandler,
@@ -187,10 +190,9 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private GeneralCommandLine calculateCommandLine(@NotNull final List<String> command,
-                                                  @NotNull final String workDirectory) {
+  private GeneralCommandLine calculateCommandLine(@NotNull final List<String> command, @NotNull final String workingDirectoryPath) {
     final GeneralCommandLine commandLine = new GeneralCommandLine(command);
-    commandLine.withWorkDirectory(workDirectory);
+    commandLine.withWorkDirectory(workingDirectoryPath);
 
     return commandLine;
   }
@@ -212,11 +214,22 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private String calculateWorkDirectory(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final String workingDirectory = runConfigurationParams.getWorkingDirectory();
-    final String defaultValue = new File(runConfigurationParams.getScriptPath()).getParent();
+  private String calculateWorkingDirectoryPath(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final String workingDirectoryPath = runConfigurationParams.getWorkingDirectory();
+    final String defaultPath = new File(runConfigurationParams.getScriptPath()).getParent();
 
-    return !StringUtil.isEmptyOrSpaces(workingDirectory) ? workingDirectory : defaultValue;
+    return !StringUtil.isEmptyOrSpaces(workingDirectoryPath) ? workingDirectoryPath : defaultPath;
+  }
+
+  @NotNull
+  private List<String> calculateInitCommands(@NotNull final Project project,
+                                             @NotNull final TheRRunConfigurationParams runConfigurationParams) {
+    final List<String> result = new ArrayList<String>();
+
+    result.addAll(TheRProcessUtils.getInitCommands());
+    result.addAll(TheRGraphicsUtils.calculateInitCommands(project, runConfigurationParams));
+
+    return result;
   }
 
   private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {

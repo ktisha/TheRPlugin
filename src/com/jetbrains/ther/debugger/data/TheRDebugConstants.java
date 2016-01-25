@@ -34,6 +34,9 @@ public final class TheRDebugConstants {
   public static final String KEEP_SOURCE_COMMAND = "options(keep.source=TRUE)";
 
   @NotNull
+  public static final String LOAD_LIB_COMMAND = "dyn.load";
+
+  @NotNull
   public static final String LS_COMMAND = "ls";
 
   @NotNull
@@ -111,5 +114,4 @@ public final class TheRDebugConstants {
 
   @NotNull
   public static final String WHILE_LOOP_PREFIX = "while";
-
 }
