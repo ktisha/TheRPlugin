@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
+// TODO [run][test]
 class TheRRunConfigurationEditor extends SettingsEditor<TheRRunConfiguration> {
 
   private TheRRunConfigurationForm myForm;

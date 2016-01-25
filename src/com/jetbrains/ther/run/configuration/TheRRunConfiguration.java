@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+// TODO [run][test]
 public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
 
   @NotNull
@@ -82,6 +83,8 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
     if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
       throw new RuntimeConfigurationException("No script specified");
     }
+
+    // TODO [run][upd]
   }
 
   @Override

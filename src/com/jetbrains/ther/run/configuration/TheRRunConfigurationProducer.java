@@ -12,6 +12,7 @@ import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO [run][test]
 public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRRunConfiguration> {
 
   public TheRRunConfigurationProducer() {

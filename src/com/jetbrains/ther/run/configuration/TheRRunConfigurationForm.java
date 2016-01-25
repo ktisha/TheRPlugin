@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.util.Map;
 
+// TODO [run][test]
 public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   private JPanel myRootPanel;

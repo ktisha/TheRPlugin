@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public interface TheRRunConfigurationParams {
+interface TheRRunConfigurationParams {
 
   @NotNull
   String getScriptPath();
@@ -21,13 +21,13 @@ public interface TheRRunConfigurationParams {
 
   void setWorkingDirectoryPath(@NotNull final String workingDirectoryPath);
 
-  boolean isPassParentEnvs();
-
-  void setPassParentEnvs(final boolean passParentEnvs);
-
   @NotNull
   Map<String, String> getEnvs();
 
   void setEnvs(@NotNull final Map<String, String> envs);
+
+  boolean isPassParentEnvs();
+
+  void setPassParentEnvs(final boolean passParentEnvs);
 }
 

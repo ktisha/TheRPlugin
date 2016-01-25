@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 
+// TODO [run][test]
 public class TheRRunConfigurationType extends ConfigurationTypeBase {
 
   public TheRRunConfigurationType() {
