@@ -1,9 +1,7 @@
 package com.jetbrains.ther.debugger.mock;
 
-import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
-import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,12 +21,7 @@ public abstract class MockTheRExecutor implements TheRExecutor {
     myCounter++;
 
     if (useNoFunctionsResult() && command.equals(LS_FUNCTIONS_COMMAND)) {
-      return new TheRExecutionResult(
-        NO_FUNCTIONS_RESULT,
-        TheRExecutionResultType.RESPONSE,
-        TextRange.allOf(NO_FUNCTIONS_RESULT),
-        LS_FUNCTIONS_ERROR
-      );
+      return NO_FUNCTIONS_RESULT;
     }
 
     return doExecute(command);

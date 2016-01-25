@@ -50,7 +50,7 @@ public final class TheRTraceAndDebugUtils {
   private static void traceAndDebugFunction(@NotNull final TheRExecutor executor,
                                             @NotNull final TheROutputReceiver receiver,
                                             @NotNull final String functionName) throws TheRDebuggerException {
-    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX)) {
+    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX) && !functionName.equals(MAIN_FUNCTION_NAME)) {
       return;
     }
 
