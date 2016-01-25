@@ -3,6 +3,7 @@ package com.jetbrains.ther.interpreter;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
@@ -22,9 +23,11 @@ import com.intellij.openapi.roots.impl.OrderEntryUtil;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.jetbrains.ther.TheRHelpersLocator;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +35,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheRInterpreterConfigurable implements SearchableConfigurable, Configurable.NoScroll{
+public class TheRInterpreterConfigurable implements SearchableConfigurable, Configurable.NoScroll {
+  private static final Logger LOG = Logger.getInstance(TheRInterpreterConfigurable.class);
   private JPanel myMainPanel;
   private final Project myProject;
   private final TextFieldWithBrowseButton myInterpreterField;
@@ -60,7 +66,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
 
     final GridBagConstraints c = new GridBagConstraints();
     c.fill = GridBagConstraints.HORIZONTAL;
-    c.insets = new Insets(2,2,2,2);
+    c.insets = new Insets(2, 2, 2, 2);
     c.anchor = GridBagConstraints.NORTH;
 
     c.gridx = 0;
@@ -140,8 +146,9 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
       }
       if (!StringUtil.isEmptyOrSpaces(sourcesPath)) {
         final ArrayList<String> paths = getSourcePaths(sourcesPath);
-        if (!paths.isEmpty())
+        if (!paths.isEmpty()) {
           attachLibrary(paths);
+        }
       }
     }
 
@@ -157,22 +164,43 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
     application.invokeLater(new Runnable() {
       @Override
       public void run() {
-        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Updating skeletons", false) {
-          @Override
-          public void run(@NotNull ProgressIndicator indicator) {
-
-            final TheRSkeletonGenerator generator = new TheRSkeletonGenerator();
-            generator.runSkeletonGeneration();
-          }});
 
         application.runWriteAction(new Runnable() {
           @Override
           public void run() {
             // add all paths to library
-            final String path = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
-            generateLibrary(THE_R_SKELETONS, path, modelsProvider);
-            final String userSkeletonsPath =  TheRHelpersLocator.getHelperPath("r-user-skeletons");
+            final String skeletonLibraryPath = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
+            File skeletonLibDir = new File(skeletonLibraryPath);
+            if (!skeletonLibDir.exists()) {
+              if (!skeletonLibDir.mkdir()) {
+                LOG.error("Failed to create skeleton dir");
+                return;
+              }
+            }
+            String skeletons = TheRHelpersLocator.getHelperPath("r-skeletons");
+            File pregeneratedSkeletonsDir = new File(skeletons);
+            if (!pregeneratedSkeletonsDir.exists()) {
+              LOG.info("Pre-generated skeletons not found");
+            } else {
+              try {
+                FileUtil.copyDirContent(pregeneratedSkeletonsDir, skeletonLibDir);
+              }
+              catch (IOException e) {
+                LOG.error(e);
+              }
+            }
+            generateLibrary(THE_R_SKELETONS, skeletonLibraryPath, modelsProvider);
+            final String userSkeletonsPath = TheRHelpersLocator.getHelperPath("r-user-skeletons");
             generateLibrary(The_R_USER_SKELETONS, userSkeletonsPath, modelsProvider);
+          }
+        });
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Updating skeletons", false) {
+          @Override
+          public void run(@NotNull ProgressIndicator indicator) {
+            VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
+            //TODO: run my brand new action
+            TheRSkeletonGenerator.runSkeletonGeneration();
           }
         });
       }
@@ -206,8 +234,9 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
         final VirtualFile[] children = libFile.getChildren();
         for (VirtualFile child : children) {
           final VirtualFile rDirectory = child.findFileByRelativePath("R");
-          if (rDirectory != null)
+          if (rDirectory != null) {
             paths.add(rDirectory.getPath());
+          }
         }
       }
     }
@@ -278,9 +307,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
           modelsProvider.commitModuleModifiableModel(modifiableModel);
         }
       }
-
     });
-
   }
 
   private static void fillLibrary(@NotNull final Library lib, @NotNull final List<String> paths) {
@@ -294,10 +321,9 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
         modifiableModel.addRoot(pathEntry, OrderRootType.CLASSES);
       }
       else {
-        modifiableModel.addRoot("file://"+dir, OrderRootType.CLASSES);
+        modifiableModel.addRoot("file://" + dir, OrderRootType.CLASSES);
       }
     }
     modifiableModel.commit();
   }
-
 }

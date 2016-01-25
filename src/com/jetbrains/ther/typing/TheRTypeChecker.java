@@ -4,6 +4,9 @@ import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
 import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.psi.api.TheRFunctionExpression;
 import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.typing.types.TheRFunctionType;
+import com.jetbrains.ther.typing.types.TheRType;
+import com.jetbrains.ther.typing.types.TheRUnionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,11 +18,9 @@ public class TheRTypeChecker {
   public static void checkTypes(List<TheRExpression> arguments, TheRFunctionExpression functionExpression) throws MatchingException {
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
-
-    matchTypes(arguments, functionExpression, matchedParams, matchedByTripleDot);
-
     TheRFunctionType functionType = (TheRFunctionType)TheRTypeProvider.getType(functionExpression);
     assert functionType != null;
+    matchArgs(arguments, functionExpression, matchedParams, matchedByTripleDot, functionType);
     for (Map.Entry<TheRExpression, TheRParameter> entry : matchedParams.entrySet()) {
       TheRParameter parameter = entry.getValue();
       TheRType paramType = TheRTypeProvider.getParamType(parameter, functionType);
@@ -28,23 +29,31 @@ public class TheRTypeChecker {
       }
       TheRType argType = TheRTypeProvider.getType(entry.getKey());
       if (argType != null && !argType.equals(TheRType.UNKNOWN)) {
-        if (!argType.getName().equals(paramType.getName())) {
-          throw new MatchingException(parameter.getText() + " expected to be of type " + paramType.getName() +
-                                      ", found type " + argType.getName());
+        if (!matchTypes(paramType, argType)) {
+          throw new MatchingException(parameter.getText() + " expected to be of type " + paramType +
+                                      ", found type " + argType);
         }
       }
     }
   }
 
-  public static void matchTypes(List<TheRExpression> arguments,
-                                TheRFunctionExpression function,
-                                Map<TheRExpression, TheRParameter> matchedParams,
-                                List<TheRExpression> matchedByTripleDot) throws MatchingException {
+  public static boolean matchTypes(TheRType type, TheRType replacementType) {
+    if (type instanceof TheRUnionType) {
+      return ((TheRUnionType) type).contains(replacementType);
+    }
+    return type.equals(replacementType) || TheRTypeProvider.isSubtype(type, replacementType);
+  }
+
+  public static void matchArgs(List<TheRExpression> arguments,
+                               TheRFunctionExpression function,
+                               Map<TheRExpression, TheRParameter> matchedParams,
+                               List<TheRExpression> matchedByTripleDot,
+                               TheRFunctionType functionType) throws MatchingException {
     ArrayList<TheRParameter> formalArguments = new ArrayList<TheRParameter>(function.getParameterList().getParameterList());
     ArrayList<TheRExpression> suppliedArguments = new ArrayList<TheRExpression>(arguments);
     exactMatching(formalArguments, suppliedArguments, matchedParams);
     partialMatching(formalArguments, suppliedArguments, matchedParams);
-    positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot);
+    positionalMatching(formalArguments, suppliedArguments, matchedParams, matchedByTripleDot, functionType);
   }
 
   static void partialMatching(ArrayList<TheRParameter> formalArguments,
@@ -62,7 +71,8 @@ public class TheRTypeChecker {
   static void positionalMatching(List<TheRParameter> formalArguments,
                                  List<TheRExpression> suppliedArguments,
                                  Map<TheRExpression, TheRParameter> matchedParams,
-                                 List<TheRExpression> matchedByTripleDot) throws MatchingException {
+                                 List<TheRExpression> matchedByTripleDot,
+                                 TheRFunctionType functionType) throws MatchingException {
     List<TheRExpression> matchedArguments = new ArrayList<TheRExpression>();
     List<TheRParameter> matchedParameter = new ArrayList<TheRParameter>();
     int suppliedSize = suppliedArguments.size();
@@ -75,7 +85,6 @@ public class TheRTypeChecker {
       }
       if (i >= suppliedSize) {
         break;
-        //throw new MatchingException(generateMissingArgErrorMessage(formalArguments, i));
       }
       TheRExpression arg = suppliedArguments.get(i);
       matchedArguments.add(arg);
@@ -104,28 +113,21 @@ public class TheRTypeChecker {
       }
     }
     if (!unmatched.isEmpty()) {
-      throw new MatchingException(generateMissingArgErrorMessage(unmatched, 0));
+      unmatched.removeAll(functionType.getOptionalParams());
+      if (!unmatched.isEmpty()) {
+        throw new MatchingException(generateMissingArgErrorMessage(unmatched, 0));
+      }
     }
 
     if (!suppliedArguments.isEmpty()) {
       checkUnmatchedArgs(suppliedArguments);
     }
-
-    //for (TheRExpression expression : matchedArguments) {
-    //  suppliedArguments.remove(expression);
-    //}
-    ////if (matchedArguments.size() != suppliedSize && !TheRPsiUtils.containsTripleDot(formalArguments)) {
-    ////  checkUnmatchedArgs(suppliedArguments);
-    ////}
-    ////if (TheRPsiUtils.containsTripleDot(formalArguments)) {
-    ////  matchedByTripleDot.addAll(suppliedArguments);
-    ////}
   }
 
   private static String generateMissingArgErrorMessage(List<TheRParameter> parameters, int i) {
     String noDefaultMessage = " missing, with no default";
     if (i == parameters.size() - 1) {
-      return "argument \'" + parameters.get(i).getText() + "\" is" + noDefaultMessage;
+      return "argument \'" + parameters.get(i).getText() + "\' is" + noDefaultMessage;
     }
     StringBuilder stringBuilder = new StringBuilder("arguments ");
     while (i < parameters.size()) {

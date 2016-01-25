@@ -8,12 +8,10 @@ import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TheRTypeProvider {
 
@@ -33,7 +31,7 @@ public class TheRTypeProvider {
       return TheRCharacterType.INSTANCE;
     }
     if (element instanceof TheRNumericLiteralExpression) {
-      return TheRNumericType.INSTANCE;
+      return getNumericType((TheRNumericLiteralExpression)element);
     }
     if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
@@ -66,7 +64,40 @@ public class TheRTypeProvider {
         }
       }
     }
+    if (element instanceof TheRBlockExpression) {
+      TheRBlockExpression blockExpression = (TheRBlockExpression)element;
+      List<TheRExpression> expressionList = blockExpression.getExpressionList();
+      if (!expressionList.isEmpty()) {
+        TheRExpression lastExpression = expressionList.get(expressionList.size() - 1);
+        return TheRTypeProvider.getType(lastExpression);
+      }
+    }
+
+    if (element instanceof  TheRIfStatement) {
+      TheRIfStatement ifStatement = (TheRIfStatement)element;
+      List<TheRExpression> expressions = ifStatement.getExpressionList();
+      if (expressions.size() > 1) {
+        Set<TheRType> types = new HashSet<TheRType>();
+        for (int i = 1; i < expressions.size(); i++) {
+          TheRType type = getType(expressions.get(i));
+          if (type != TheRType.UNKNOWN) {
+            types.add(type);
+          }
+        }
+        return TheRUnionType.create(types);
+      }
+    }
     return TheRType.UNKNOWN;
+  }
+
+  private static TheRType getNumericType(TheRNumericLiteralExpression expression) {
+    if (expression.getInteger() != null) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (expression.getComplex() != null) {
+      return TheRComplexType.INSTANCE;
+    }
+    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
   }
 
   private static TheRType getCallExpressionType(TheRCallExpression element) {
@@ -85,7 +116,7 @@ public class TheRTypeProvider {
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     try {
-      TheRTypeChecker.matchTypes(arguments, function, matchedParams, matchedByTripleDot);
+      TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot, functionType);
     }
     catch (MatchingException e) {
       return TheRType.UNKNOWN;
@@ -142,7 +173,8 @@ public class TheRTypeProvider {
     if (type != null) {
       return type;
     }
-    type = guessTypeFromFunctionBody(parameter);
+    //TODO: uncomment this
+    //type = guessTypeFromFunctionBody(parameter);
     if (type != null) {
       return type;
     }
@@ -171,7 +203,7 @@ public class TheRTypeProvider {
             }
             ruleType = env.getType(variableName);
           }
-          if (!ruleType.equals(exprConf.getType())) {
+          if (!TheRTypeChecker.matchTypes(ruleType, exprConf.getType())) {
             continue rulefor;
           }
         }
@@ -234,6 +266,10 @@ public class TheRTypeProvider {
     if (typeName.equals("logical")) {
       return TheRLogicalType.INSTANCE;
     }
+    if (typeName.equals("complex")) {
+      return TheRComplexType.INSTANCE;
+    }
+    //we need to return null in this case to create type variable
     return null;
   }
 
@@ -251,5 +287,38 @@ public class TheRTypeProvider {
       }
     }
     return TheRType.UNKNOWN;
+  }
+
+  public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {
+    TheRExpression expression = functionExpression.getExpression();
+    if (expression == null) {
+      return TheRType.UNKNOWN;
+    }
+    Set<TheRType> types = new HashSet<TheRType>();
+    TheRType type = getType(expression);
+    if (type != TheRType.UNKNOWN) {
+      types.add(type);
+    }
+    collectReturnTypes(functionExpression, types);
+    return TheRUnionType.create(types);
+  }
+
+  private static void collectReturnTypes(TheRFunctionExpression functionExpression, Set<TheRType> types) {
+    TheRCallExpression[] calls = TheRPsiUtils.getAllChildrenOfType(functionExpression, TheRCallExpression.class);
+    for (TheRCallExpression callExpression : calls) {
+      if (TheRPsiUtils.isReturn(callExpression)) {
+        List<TheRExpression> args = callExpression.getArgumentList().getExpressionList();
+        if (args.size() == 1) {
+          TheRType rType = TheRTypeProvider.getType(args.iterator().next());
+          if (rType != null && rType != TheRType.UNKNOWN) {
+            types.add(rType);
+          }
+        }
+      }
+    }
+  }
+
+  public static boolean isSubtype(TheRType subType, TheRType type) {
+    return type.getClass().isAssignableFrom(subType.getClass());
   }
 }

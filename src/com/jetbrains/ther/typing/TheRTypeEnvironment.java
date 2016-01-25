@@ -1,5 +1,7 @@
 package com.jetbrains.ther.typing;
 
+import com.jetbrains.ther.typing.types.TheRType;
+
 import java.util.HashMap;
 import java.util.Map;
 

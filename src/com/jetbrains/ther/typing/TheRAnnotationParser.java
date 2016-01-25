@@ -4,9 +4,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.psi.api.TheRExpression;
+import com.jetbrains.ther.typing.types.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +25,7 @@ public class TheRAnnotationParser {
   public static final Pattern COMMA_PATTERN = Pattern.compile(",");
   public static final Pattern EQUALS_PATTERN = Pattern.compile("=");
   public static final Pattern MAX_PATTERN = Pattern.compile("max\\((.*)\\)");
+  private static final String OPTIONAL_TAG = "optional";
   private TheRFunctionType myType;
 
   public TheRAnnotationParser(TheRFunctionType type) {
@@ -53,6 +57,17 @@ public class TheRAnnotationParser {
     if (tagName.equals(RULE_TAG)) {
       parseRule(line);
     }
+
+    if (tagName.equals(OPTIONAL_TAG)) {
+      parseOptional(line);
+    }
+  }
+
+  private void parseOptional(Substring line) {
+    List<Substring> optionalParams = line.split(COMMA_PATTERN);
+    for (Substring param : optionalParams) {
+      myType.setOptional(param.getValue().trim());
+    }
   }
 
   private void parseRule(Substring line) {
@@ -80,7 +95,7 @@ public class TheRAnnotationParser {
       }
       return new TheRMaxType(typesList);
     }
-    TheRType type = TheRTypeProvider.findTypeByName(typeName);
+    TheRType type = createType(typeName);
     return type != null ? type : new TheRTypeVariable(typeName);
   }
 
@@ -128,7 +143,7 @@ public class TheRAnnotationParser {
 
   private void parseReturn(Substring line) {
     String typeName = line.trim().getValue();
-    TheRType type = TheRTypeProvider.findTypeByName(typeName);
+    TheRType type = createType(typeName);
     if (type != null && type != TheRType.UNKNOWN) {
       myType.setReturnType(type);
     }
@@ -141,10 +156,25 @@ public class TheRAnnotationParser {
     }
     Substring parameterName = split.get(0).trim();
     Substring typeName = split.get(1).trim();
-    TheRType type = TheRTypeProvider.findTypeByName(typeName.getValue());
-    if (type != TheRType.UNKNOWN) {
+    TheRType type = createType(typeName.getValue());
+    if (type != null && type != TheRType.UNKNOWN) {
       myType.addParameterType(parameterName.getValue(), type);
     }
+  }
+
+  private TheRType createType(String typeName) {
+    String[] typeNames = typeName.split("\\|");
+    Set<TheRType> types = new HashSet<TheRType>();
+    for (String name : typeNames) {
+      TheRType type = TheRTypeProvider.findTypeByName(name.trim());
+      if (type == null) {
+        return null;
+      }
+      if (type != TheRType.UNKNOWN) {
+        types.add(type);
+      }
+    }
+    return TheRUnionType.create(types);
   }
 
 }

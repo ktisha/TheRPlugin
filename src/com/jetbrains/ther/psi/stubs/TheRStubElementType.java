@@ -15,11 +15,6 @@ public abstract class TheRStubElementType<StubT extends StubElement, PsiT extend
     super(debugName, TheRFileType.INSTANCE.getLanguage());
   }
 
-  @Override
-  public String toString() {
-    return "TheR:" + super.toString();
-  }
-
   public abstract PsiElement createElement(@NotNull final ASTNode node);
 
   @Override

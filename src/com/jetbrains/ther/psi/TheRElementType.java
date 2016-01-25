@@ -23,11 +23,6 @@ public class TheRElementType extends IElementType {
     myPsiElementClass = psiElementClass;
   }
 
-  @Override
-  public String toString() {
-    return "TheR:" + super.toString();
-  }
-
   @NotNull
   public PsiElement createElement(@NotNull final ASTNode node) {
     if (myPsiElementClass == null) {

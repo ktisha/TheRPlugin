@@ -1,15 +1,15 @@
 TheRFile:Binary.r
-  TheR:THE_R_BINARY_EXPRESSION
-    TheR:THE_R_BINARY_EXPRESSION
-      TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
-        PsiElement(TheR:numeric)('1')
+  THE_R_BINARY_EXPRESSION
+    THE_R_BINARY_EXPRESSION
+      THE_R_NUMERIC_LITERAL_EXPRESSION
+        PsiElement(numeric)('1')
       PsiWhiteSpace(' ')
-      PsiElement(TheR:*)('*')
+      PsiElement(*)('*')
       PsiWhiteSpace(' ')
-      TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
-        PsiElement(TheR:numeric)('2')
+      THE_R_NUMERIC_LITERAL_EXPRESSION
+        PsiElement(numeric)('2')
     PsiWhiteSpace(' ')
-    PsiElement(TheR:+)('+')
+    PsiElement(+)('+')
     PsiWhiteSpace(' ')
-    TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
-      PsiElement(TheR:numeric)('3')
+    THE_R_NUMERIC_LITERAL_EXPRESSION
+      PsiElement(numeric)('3')

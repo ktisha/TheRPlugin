@@ -3,6 +3,7 @@ package com.jetbrains.ther.typing;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.jetbrains.ther.psi.api.TheRPsiElement;
+import com.jetbrains.ther.typing.types.TheRType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,16 +43,21 @@ public class TheRTypeContext {
     if (type != null) {
       if (type instanceof TheREvaluatingNowType) {
         cacheLock.unlock();
+        evaluatingType = (TheREvaluatingNowType)type;
         try {
           //noinspection SynchronizationOnLocalVariableOrMethodParameter
-          synchronized (type) {
-            type.wait();
+          synchronized (evaluatingType) {
+            if (evaluatingType.isNotRecursive()) {
+              while (!evaluatingType.isReady()) {
+                evaluatingType.wait(5000);
+              }
+            }
           }
         }
         catch (InterruptedException e) {
           //
         }
-        return ((TheREvaluatingNowType)type).getResult();
+        return evaluatingType.getResult();
       }
       cacheLock.unlock();
       return type;
@@ -68,6 +74,13 @@ public class TheRTypeContext {
 
   private static class TheREvaluatingNowType extends TheRType {
     private TheRType myResult;
+    private volatile boolean myReady;
+    private final long myThreadId;
+
+    private TheREvaluatingNowType() {
+      myResult = TheRType.UNKNOWN;
+      myThreadId = Thread.currentThread().getId();
+    }
 
     @Override
     public String getName() {
@@ -80,7 +93,16 @@ public class TheRTypeContext {
 
     public synchronized void setResult(TheRType result) {
       myResult = result;
+      myReady = true;
       notifyAll();
+    }
+
+    public boolean isReady() {
+      return myReady;
+    }
+
+    public boolean isNotRecursive() {
+      return Thread.currentThread().getId() != myThreadId;
     }
   }
 }

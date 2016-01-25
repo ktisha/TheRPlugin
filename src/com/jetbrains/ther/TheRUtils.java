@@ -1,26 +1,27 @@
 package com.jetbrains.ther;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.DocumentUtil;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
-import com.jetbrains.ther.packages.TheRPackage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public class TheRUtils {
   private static final Logger LOG = Logger.getInstance(TheRUtils.class.getName());
 
-  private TheRUtils(){}
+  private TheRUtils() {
+  }
 
   public static Set<String> getLibraryPathes(@NotNull final String intepreterPath) {
     final Set<String> libPaths = Sets.newHashSet();
@@ -46,25 +47,6 @@ public class TheRUtils {
     final String[] splitOutput = StringUtil.splitByLines(stdout);
     Collections.addAll(libPaths, splitOutput);
     return libPaths;
-  }
-
-  public static List<TheRPackage> getInstalledPackages() {
-    final ArrayList<TheRPackage> installedPackages = Lists.newArrayList();
-    final String path = TheRInterpreterService.getInstance().getInterpreterPath();
-    // .packages(all = TRUE)
-    final ProcessOutput output = getSuccessProcessOutput("installed.packages()[,c(\"LibPath\", \"Version\")]", path);
-    if (output == null) return installedPackages;
-
-    String stdout = output.getStdout();
-    final String[] splittedOutput = StringUtil.splitByLines(stdout);
-    for (String line : splittedOutput) {
-      final List<String> packageAttributes = StringUtil.split(line, "\t");
-      if (packageAttributes.size() == 3) {
-        final TheRPackage theRPackage = new TheRPackage(packageAttributes.get(0), packageAttributes.get(1), packageAttributes.get(2));
-        installedPackages.add(theRPackage);
-      }
-    }
-    return installedPackages;
   }
 
   @Nullable
@@ -105,5 +87,23 @@ public class TheRUtils {
                "Exception occurred: " + e.getMessage());
     }
     return null;
+  }
+
+  public static void appendToDocument(@NotNull final Document document, final String text) {
+    DocumentUtil.writeInRunUndoTransparentAction(new Runnable() {
+      @Override
+      public void run() {
+        document.insertString(document.getTextLength(), text);
+      }
+    });
+  }
+
+  public static void saveDocument(@NotNull final Document document) {
+    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      @Override
+      public void run() {
+        FileDocumentManager.getInstance().saveDocument(document);
+      }
+    });
   }
 }

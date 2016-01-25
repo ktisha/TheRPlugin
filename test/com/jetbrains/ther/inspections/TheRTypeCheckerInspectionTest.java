@@ -24,6 +24,18 @@ public class TheRTypeCheckerInspectionTest extends TheRInspectionTest {
     doTest("test4.R");
   }
 
+  public void testGuessReturnFromBody() {
+    doTest("test5.r");
+  }
+
+  public void testIfElseType() {
+    doTest("test6.r");
+  }
+
+  public void testOptional() {
+    doTest("test-optional.r");
+  }
+
   @Override
   protected String getTestDataPath() {
     return super.getTestDataPath() + "/typing/";
