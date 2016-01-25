@@ -1,14 +1,11 @@
-package com.jetbrains.ther.run;
+package com.jetbrains.ther.run.run;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.configurations.ParamsGroup;
-import com.intellij.execution.process.ProcessAdapter;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.process.ProcessTerminatedListener;
+import com.intellij.execution.process.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
@@ -26,16 +23,16 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class TheRCommandLineState extends CommandLineState {
+public class TheRRunCommandLineState extends CommandLineState {
 
   @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRCommandLineState.class);
+  private static final Logger LOGGER = Logger.getInstance(TheRRunCommandLineState.class);
 
   public static final String GROUP_EXE_OPTIONS = "Exe Options";
   public static final String GROUP_SCRIPT = "Script";
   private final TheRRunConfiguration myConfig;
 
-  public TheRCommandLineState(@NotNull final TheRRunConfiguration runConfiguration, @NotNull final ExecutionEnvironment env) {
+  public TheRRunCommandLineState(@NotNull final TheRRunConfiguration runConfiguration, @NotNull final ExecutionEnvironment env) {
     super(env);
     myConfig = runConfiguration;
   }
@@ -45,7 +42,7 @@ public class TheRCommandLineState extends CommandLineState {
   protected ProcessHandler startProcess() throws ExecutionException {
     TheRGraphicsUtils.getGraphicsState(myConfig.getProject()).reset();
 
-    final ProcessHandler processHandler = TheRProcessHandler.createProcessHandler(generateCommandLine());
+    final ProcessHandler processHandler = new KillableColoredProcessHandler(generateCommandLine());
 
     ProcessTerminatedListener.attach(processHandler);
     processHandler.addProcessListener(

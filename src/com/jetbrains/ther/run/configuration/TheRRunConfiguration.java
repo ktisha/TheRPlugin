@@ -67,7 +67,7 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
 
   @Override
   public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) throws ExecutionException {
-    return new TheRCommandLineState(this, env);
+    return new TheRRunCommandLineState(this, env);
   }
 
   @NotNull
