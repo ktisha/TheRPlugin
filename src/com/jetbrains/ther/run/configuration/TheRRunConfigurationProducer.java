@@ -28,9 +28,10 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
       return false;
     }
 
-    configuration.setName(TheRRunConfigurationSuggests.suggestedName(configuration));
     configuration.setScriptPath(scriptVirtualFile.getPath());
+
     TheRRunConfigurationSuggests.setSuggestedWorkingDirectoryPathIfNotSpecified(configuration);
+    configuration.setName(TheRRunConfigurationSuggests.suggestedName(configuration));
 
     return true;
   }
