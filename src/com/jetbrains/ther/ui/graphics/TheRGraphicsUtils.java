@@ -8,7 +8,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
-import com.jetbrains.ther.run.configuration.TheRRunConfigurationParams;
+import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,13 +71,12 @@ public final class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
-  public static List<String> calculateInitCommands(@NotNull final Project project,
-                                                   @NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    if (isDeviceEnabled(runConfigurationParams)) {
+  public static List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
+    if (isDeviceEnabled(runConfiguration)) {
       final String libPath = getLibPath(DEVICE_LIB_NAME);
 
       if (libPath != null) {
-        final VirtualFile snapshotDir = getSnapshotDir(project);
+        final VirtualFile snapshotDir = getSnapshotDir(runConfiguration.getProject());
 
         if (snapshotDir != null) {
           return Arrays.asList(
@@ -90,7 +89,7 @@ public final class TheRGraphicsUtils {
     }
     else {
       LOGGER.warn(
-        String.format(DEVICE_IS_DISABLED, runConfigurationParams.getScriptPath())
+        String.format(DEVICE_IS_DISABLED, runConfiguration.getScriptPath())
       );
     }
 
@@ -127,8 +126,8 @@ public final class TheRGraphicsUtils {
     return GRAPHICS_STATES.get(snapshotDirPath);
   }
 
-  private static boolean isDeviceEnabled(@NotNull final TheRRunConfigurationParams runConfigurationParams) {
-    final Map<String, String> envs = runConfigurationParams.getEnvs();
+  private static boolean isDeviceEnabled(@NotNull final TheRRunConfiguration runConfiguration) {
+    final Map<String, String> envs = runConfiguration.getEnvs();
 
     return !envs.containsKey(DEVICE_ENV_KEY) || parseBoolean(envs.get(DEVICE_ENV_KEY));
   }

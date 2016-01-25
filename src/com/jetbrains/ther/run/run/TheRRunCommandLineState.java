@@ -103,7 +103,7 @@ public class TheRRunCommandLineState extends CommandLineState {
 
   @NotNull
   private String calculateUpdatedScriptPath(@NotNull final String originalScriptPath) {
-    final List<String> initCommands = TheRGraphicsUtils.calculateInitCommands(myConfig.getProject(), myConfig);
+    final List<String> initCommands = TheRGraphicsUtils.calculateInitCommands(myConfig);
 
     if (initCommands.isEmpty()) {
       return originalScriptPath;
