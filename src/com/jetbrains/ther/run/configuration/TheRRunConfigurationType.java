@@ -39,6 +39,5 @@ public class TheRRunConfigurationType extends ConfigurationTypeBase {
     public RunConfiguration createTemplateConfiguration(@NotNull final Project project) {
       return new TheRRunConfiguration(project, this);
     }
-
   }
 }

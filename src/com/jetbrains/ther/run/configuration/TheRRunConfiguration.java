@@ -2,34 +2,26 @@ package com.jetbrains.ther.run.configuration;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.TheRFileType;
-import com.jetbrains.ther.run.TheRCommandLineState;
+import com.jetbrains.ther.run.run.TheRRunCommandLineState;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TheRRunConfiguration extends AbstractRunConfiguration implements TheRRunConfigurationParams {
+public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
 
   @NotNull
   private static final String SCRIPT_PATH = "SCRIPT_PATH";
@@ -53,9 +45,9 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
   private String myWorkingDirectoryPath;
 
   @NotNull
-  private final Map<String, String> myEnvs = new LinkedHashMap<String, String>();
+  private final Map<String, String> myEnvs;
 
-  private boolean myPassParentEnvs = true;
+  private boolean myPassParentEnvs;
 
   TheRRunConfiguration(@NotNull final Project project, @NotNull final ConfigurationFactory configurationFactory) {
     super(project, configurationFactory, "");
@@ -63,6 +55,8 @@ public class TheRRunConfiguration extends AbstractRunConfiguration implements Th
     myScriptPath = "";
     myScriptArgs = "";
     myWorkingDirectoryPath = "";
+    myEnvs = new LinkedHashMap<String, String>();
+    myPassParentEnvs = true;
   }
 
   @Override
