@@ -65,6 +65,7 @@ It includes syntax-highlighting editor that supports direct code execution, inte
 
     <configurationType implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationType"/>
     <runConfigurationProducer implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationProducer"/>
+    <programRunner implementation="com.jetbrains.ther.run.run.TheRRunRunner"/>
     <programRunner implementation="com.jetbrains.ther.run.debug.TheRDebugRunner"/>
     <xdebugger.breakpointType implementation="com.jetbrains.ther.run.debug.TheRLineBreakpointType"/>
     <toolWindow id="The R Graphics" anchor="right" factoryClass="com.jetbrains.ther.run.graphics.TheRGraphicsToolWindowFactory"/>

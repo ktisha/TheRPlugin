@@ -72,6 +72,12 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String BODY_COMMAND = "body";
 
+  @NotNull
+  public static final String SOURCE_COMMAND = "source";
+
+  @NotNull
+  public static final String QUIT_COMMAND = "q()";
+
   // responses
 
   @NotNull

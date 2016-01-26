@@ -68,7 +68,7 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
       return new TheRDebugCommandLineState(env, this);
     }
     else {
-      return new TheRRunCommandLineState(this, env);
+      return new TheRRunCommandLineState(env, this);
     }
   }
 
