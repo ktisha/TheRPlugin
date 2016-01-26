@@ -22,7 +22,7 @@ import org.jvnet.winp.WinProcess;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.concurrent.Future;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
@@ -34,9 +34,6 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
   @NotNull
   private static final Key SERVICE_KEY = ProcessOutputTypes.STDERR;
-
-  @NotNull
-  private final List<String> myInitCommands;
 
   @NotNull
   private final TheRExecutionResultCalculator myResultCalculator;
@@ -52,6 +49,9 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   @NotNull
   private final OutputStreamWriter myWriter;
 
+  @NotNull
+  private final LinkedList<Listener> myListeners;
+
   @Nullable
   private Reader myOutputReader;
 
@@ -61,13 +61,11 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   private int myExecuteCounter;
 
   public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine,
-                             @NotNull final List<String> initCommands,
                              @NotNull final TheRExecutionResultCalculator resultCalculator,
                              final boolean printIO)
     throws ExecutionException {
     super(commandLine);
 
-    myInitCommands = initCommands;
     myResultCalculator = resultCalculator;
     myPrintIO = printIO;
 
@@ -75,6 +73,8 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
     myErrorBuffer = new StringBuilder();
 
     myWriter = new OutputStreamWriter(getProcess().getOutputStream());
+
+    myListeners = new LinkedList<Listener>();
 
     myOutputReader = null;
     myErrorReader = null;
@@ -116,12 +116,21 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
     }
   }
 
-  public void start() throws TheRDebuggerException {
+  @Override
+  public void startNotify() {
     super.startNotify();
 
-    for (final String initCommand : myInitCommands) {
-      execute(initCommand);
+    for (final Listener listener : myListeners) {
+      listener.onInitialized();
     }
+  }
+
+  public void addListener(@NotNull final Listener listener) {
+    myListeners.add(listener);
+  }
+
+  public void removeListener(@NotNull final Listener listener) {
+    myListeners.remove(listener);
   }
 
   @NotNull
@@ -208,6 +217,11 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
     notifyTextAvailable(":\n", SERVICE_KEY);
     notifyTextAvailable(message, SERVICE_KEY);
     notifyTextAvailable("\n\n", SERVICE_KEY);
+  }
+
+  public interface Listener {
+
+    void onInitialized();
   }
 
   private class TheRXBaseOutputReader extends BaseOutputReader {
