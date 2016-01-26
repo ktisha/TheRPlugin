@@ -9,7 +9,7 @@ import com.jetbrains.ther.TheRFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProviderBase {
+class TheREditorsProvider extends XDebuggerEditorsProviderBase {
 
   @NotNull
   private static final String FRAGMENT_NAME = "fragment.r";
@@ -25,6 +25,6 @@ class TheRXDebuggerEditorsProvider extends XDebuggerEditorsProviderBase {
                                                  @NotNull final String text,
                                                  @Nullable final PsiElement context,
                                                  final boolean isPhysical) {
-    return new TheRXCodeFragment(project, FRAGMENT_NAME, text);
+    return new TheRCodeFragment(project, FRAGMENT_NAME, text);
   }
 }

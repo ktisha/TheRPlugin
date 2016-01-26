@@ -9,7 +9,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
+public class TheRLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
 
   @NotNull
   private static final String ID = "the-r-line";
@@ -18,9 +18,9 @@ public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProp
   private static final String TITLE = "The R breakpoints";
 
   @NotNull
-  private final TheRXDebuggerEditorsProvider myProvider = new TheRXDebuggerEditorsProvider();
+  private final TheRDebuggerEditorsProvider myProvider = new TheRDebuggerEditorsProvider();
 
-  public TheRXLineBreakpointType() {
+  public TheRLineBreakpointType() {
     super(ID, TITLE);
   }
 
@@ -32,7 +32,7 @@ public class TheRXLineBreakpointType extends XLineBreakpointType<XBreakpointProp
 
   @Override
   public boolean canPutAt(@NotNull final VirtualFile file, final int line, @NotNull final Project project) {
-    return TheRXBreakpointUtils.canPutAt(project, file, line);
+    return TheRBreakpointUtils.canPutAt(project, file, line);
   }
 
   @Nullable

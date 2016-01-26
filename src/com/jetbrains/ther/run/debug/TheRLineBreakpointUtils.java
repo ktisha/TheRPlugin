@@ -12,7 +12,7 @@ import com.jetbrains.ther.parsing.TheRElementTypes;
 import org.jetbrains.annotations.NotNull;
 
 // TODO [xdbg][test]
-final class TheRXBreakpointUtils {
+final class TheRLineBreakpointUtils {
 
   public static boolean canPutAt(@NotNull final Project project, @NotNull final VirtualFile file, final int line) {
     return isTheRFile(file) && isStoppable(file, line, project);

@@ -7,7 +7,6 @@ import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.GenericProgramRunner;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -39,15 +38,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheRXDebugRunner extends GenericProgramRunner {
+public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
-  private static final String THE_R_DEBUG_RUNNER_ID = "TheRDebugRunner";
+  private static final String RUNNER_ID = "TheRDebugRunner";
+
+  @NotNull
+  private static final String EXECUTOR_NAME = "TheRDebugBackground";
 
   @NotNull
   @Override
   public String getRunnerId() {
-    return THE_R_DEBUG_RUNNER_ID;
+    return RUNNER_ID;
   }
 
   @Override
@@ -63,7 +65,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
 
     final Project project = environment.getProject();
 
-    final TheRXProcessHandler processHandler = getProcessHandler(state, environment);
+    final TheRXProcessHandler processHandler = startProcessHandler(state, environment);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
 
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
@@ -84,10 +86,10 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRXProcessHandler getProcessHandler(@NotNull final RunProfileState state, @NotNull final ExecutionEnvironment environment)
+  private TheRXProcessHandler startProcessHandler(@NotNull final RunProfileState state, @NotNull final ExecutionEnvironment environment)
     throws ExecutionException {
-    final TheRDebugCommandLineState debugCommandLineState = (TheRDebugCommandLineState)state;
-    final ExecutionResult executionResult = debugCommandLineState.execute(environment.getExecutor(), this);
+    final TheRDebugCommandLineState commandLineState = (TheRDebugCommandLineState)state;
+    final ExecutionResult executionResult = commandLineState.execute(environment.getExecutor(), this);
 
     return (TheRXProcessHandler)executionResult.getProcessHandler();
   }
@@ -102,19 +104,15 @@ public class TheRXDebugRunner extends GenericProgramRunner {
       @NotNull
       @Override
       public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
-        final TheRXDebugProcess debugProcess = new TheRXDebugProcess(
+        return new TheRDebugProcess(
           session,
           processHandler,
           initCommands,
           debugger,
           outputReceiver,
           resolvingSession,
-          ConcurrencyUtil.newSingleThreadExecutor("TheRDebuggerBackground")
+          ConcurrencyUtil.newSingleThreadExecutor(EXECUTOR_NAME)
         );
-
-        ((ConsoleView)debugProcess.createConsole()).attachToProcess(processHandler);
-
-        return debugProcess;
       }
     };
   }
@@ -147,7 +145,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     try {
       return new TheRXResolvingSessionImpl(project, scriptPath);
     }
-    catch (final TheRXDebuggerException e) {
+    catch (final TheRDebugException e) {
       throw new ExecutionException(e);
     }
   }

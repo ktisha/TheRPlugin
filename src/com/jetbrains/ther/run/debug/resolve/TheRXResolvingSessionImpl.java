@@ -11,7 +11,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.run.debug.TheRXDebuggerException;
+import com.jetbrains.ther.run.debug.TheRDebugException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +31,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   @NotNull
   private final List<TheRXResolvingSessionEntry> myEntries;
 
-  public TheRXResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws TheRXDebuggerException {
+  public TheRXResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws TheRDebugException {
     myVirtualFile = findVirtualFile(scriptPath);
     myRoot = calculateRoot(project, findPsiFile(project, myVirtualFile));
     myEntries = new ArrayList<TheRXResolvingSessionEntry>();
@@ -65,26 +65,26 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   @NotNull
-  private VirtualFile findVirtualFile(@NotNull final String scriptPath) throws TheRXDebuggerException {
+  private VirtualFile findVirtualFile(@NotNull final String scriptPath) throws TheRDebugException {
     final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(scriptPath);
 
-    if (virtualFile == null) throw new TheRXDebuggerException(scriptPath + " is not found");
+    if (virtualFile == null) throw new TheRDebugException(scriptPath + " is not found");
 
     return virtualFile;
   }
 
   @NotNull
-  private PsiFile findPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws TheRXDebuggerException {
+  private PsiFile findPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws TheRDebugException {
     final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
 
-    if (psiFile == null) throw new TheRXDebuggerException(virtualFile.getName() + " couldn't be loaded");
+    if (psiFile == null) throw new TheRDebugException(virtualFile.getName() + " couldn't be loaded");
 
     return psiFile;
   }
 
   @NotNull
   private TheRXFunctionDescriptor calculateRoot(@NotNull final Project project, @NotNull final PsiFile psiFile)
-    throws TheRXDebuggerException {
+    throws TheRDebugException {
     final TheRXFunctionDefinitionProcessor processor = new TheRXFunctionDefinitionProcessor(findDocument(project, psiFile));
 
     PsiTreeUtil.processElements(psiFile, processor);
@@ -93,10 +93,10 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   @NotNull
-  private Document findDocument(@NotNull final Project project, @NotNull final PsiFile psiFile) throws TheRXDebuggerException {
+  private Document findDocument(@NotNull final Project project, @NotNull final PsiFile psiFile) throws TheRDebugException {
     final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
 
-    if (document == null) throw new TheRXDebuggerException(psiFile.getName() + " couldn't be loaded");
+    if (document == null) throw new TheRDebugException(psiFile.getName() + " couldn't be loaded");
 
     return document;
   }

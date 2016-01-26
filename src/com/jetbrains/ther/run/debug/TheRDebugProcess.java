@@ -33,10 +33,10 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 // TODO [xdbg][test]
-class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Listener {
+class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.Listener {
 
   @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
+  private static final Logger LOGGER = Logger.getInstance(TheRDebugProcess.class);
 
   @NotNull
   private final TheRXProcessHandler myProcessHandler;
@@ -66,18 +66,18 @@ class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Lis
   private final ConsoleView myConsole;
 
   @NotNull
-  private final TheRXDebuggerEditorsProvider myEditorsProvider;
+  private final TheREditorsProvider myEditorsProvider;
 
   @NotNull
   private final XBreakpointHandler[] myBreakpointHandlers;
 
-  public TheRXDebugProcess(@NotNull final XDebugSession session,
-                           @NotNull final TheRXProcessHandler processHandler,
-                           @NotNull final List<String> initCommands,
-                           @NotNull final TheRDebugger debugger,
-                           @NotNull final TheRXOutputReceiver outputReceiver,
-                           @NotNull final TheRXResolvingSession resolvingSession,
-                           @NotNull final ExecutorService executor) {
+  public TheRDebugProcess(@NotNull final XDebugSession session,
+                          @NotNull final TheRXProcessHandler processHandler,
+                          @NotNull final List<String> initCommands,
+                          @NotNull final TheRDebugger debugger,
+                          @NotNull final TheRXOutputReceiver outputReceiver,
+                          @NotNull final TheRXResolvingSession resolvingSession,
+                          @NotNull final ExecutorService executor) {
     super(session);
 
     myProcessHandler = processHandler;
@@ -93,10 +93,11 @@ class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Lis
 
     myConsole = (ConsoleView)super.createConsole();
 
-    myEditorsProvider = new TheRXDebuggerEditorsProvider();
+    myEditorsProvider = new TheREditorsProvider();
     myBreakpointHandlers = new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
 
     myProcessHandler.addListener(this);
+    myConsole.attachToProcess(myProcessHandler);
   }
 
   @NotNull
@@ -233,7 +234,7 @@ class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Lis
     final VirtualFile file = position.getFile();
     final int line = position.getLine();
 
-    if (!TheRXBreakpointUtils.canPutAt(project, file, line)) {
+    if (!TheRLineBreakpointUtils.canPutAt(project, file, line)) {
       Messages.showErrorDialog(
         project,
         "There is no executable code at " + file.getName() + ":" + (line + 1),
@@ -374,7 +375,7 @@ class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Lis
   private class TheRXLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
 
     public TheRXLineBreakpointHandler() {
-      super(TheRXLineBreakpointType.class);
+      super(TheRLineBreakpointType.class);
     }
 
     @Override
