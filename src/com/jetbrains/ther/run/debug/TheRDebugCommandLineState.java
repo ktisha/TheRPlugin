@@ -7,9 +7,9 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImpl;
 import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.run.TheRCommandLineState;
+import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
-import com.jetbrains.ther.ui.graphics.TheRGraphicsUtils;
-import com.jetbrains.ther.xdebugger.TheRXProcessHandler;
+import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

@@ -15,7 +15,7 @@ import com.jetbrains.ther.TheRFileType;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
-import com.jetbrains.ther.ui.graphics.TheRGraphicsUtils;
+import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
