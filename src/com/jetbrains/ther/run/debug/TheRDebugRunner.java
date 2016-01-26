@@ -145,7 +145,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
     try {
       return new TheRResolvingSessionImpl(project, scriptPath);
     }
-    catch (final TheRDebugException e) {
+    catch (final IOException e) {
       throw new ExecutionException(e);
     }
   }

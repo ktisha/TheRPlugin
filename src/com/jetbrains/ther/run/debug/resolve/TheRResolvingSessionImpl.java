@@ -11,16 +11,26 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.jetbrains.ther.debugger.data.TheRLocation;
-import com.jetbrains.ther.run.debug.TheRDebugException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 // TODO [xdbg][test]
 public class TheRResolvingSessionImpl implements TheRResolvingSession {
+
+  @NotNull
+  private static final String FILE_IS_NOT_FOUND = "File is not found [path: %s]";
+
+  @NotNull
+  private static final String PSI_FILE_COULD_NOT_BE_LOADED = "PSI file couldn't be loaded [path: %s]";
+
+  @NotNull
+  private static final String DOCUMENT_COULD_NOT_BE_LOADED = "Document couldn't be loaded [path: %s]";
 
   @NotNull
   private final TheRFunctionDescriptor myRoot;
@@ -31,9 +41,9 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   @NotNull
   private final List<TheRXResolvingSessionEntry> myEntries;
 
-  public TheRResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws TheRDebugException {
-    myVirtualFile = findVirtualFile(scriptPath);
-    myRoot = calculateRoot(project, findPsiFile(project, myVirtualFile));
+  public TheRResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws IOException {
+    myVirtualFile = getVirtualFile(scriptPath);
+    myRoot = calculateRoot(project, getPsiFile(project, myVirtualFile));
     myEntries = new ArrayList<TheRXResolvingSessionEntry>();
   }
 
@@ -65,27 +75,34 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   }
 
   @NotNull
-  private VirtualFile findVirtualFile(@NotNull final String scriptPath) throws TheRDebugException {
-    final VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(scriptPath);
+  private VirtualFile getVirtualFile(@NotNull final String scriptPath) throws FileNotFoundException {
+    final VirtualFile result = LocalFileSystem.getInstance().findFileByPath(scriptPath);
 
-    if (virtualFile == null) throw new TheRDebugException(scriptPath + " is not found");
+    if (result == null) {
+      throw new FileNotFoundException(
+        String.format(FILE_IS_NOT_FOUND, scriptPath)
+      );
+    }
 
-    return virtualFile;
+    return result;
   }
 
   @NotNull
-  private PsiFile findPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws TheRDebugException {
+  private PsiFile getPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws IOException {
     final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
 
-    if (psiFile == null) throw new TheRDebugException(virtualFile.getName() + " couldn't be loaded");
+    if (psiFile == null) {
+      throw new IOException(
+        String.format(PSI_FILE_COULD_NOT_BE_LOADED, virtualFile.getPath())
+      );
+    }
 
     return psiFile;
   }
 
   @NotNull
-  private TheRFunctionDescriptor calculateRoot(@NotNull final Project project, @NotNull final PsiFile psiFile)
-    throws TheRDebugException {
-    final TheRFunctionDefinitionProcessor processor = new TheRFunctionDefinitionProcessor(findDocument(project, psiFile));
+  private TheRFunctionDescriptor calculateRoot(@NotNull final Project project, @NotNull final PsiFile psiFile) throws IOException {
+    final TheRFunctionDefinitionProcessor processor = new TheRFunctionDefinitionProcessor(getDocument(project, psiFile));
 
     PsiTreeUtil.processElements(psiFile, processor);
 
@@ -93,10 +110,14 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   }
 
   @NotNull
-  private Document findDocument(@NotNull final Project project, @NotNull final PsiFile psiFile) throws TheRDebugException {
+  private Document getDocument(@NotNull final Project project, @NotNull final PsiFile psiFile) throws IOException {
     final Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
 
-    if (document == null) throw new TheRDebugException(psiFile.getName() + " couldn't be loaded");
+    if (document == null) {
+      throw new IOException(
+        String.format(DOCUMENT_COULD_NOT_BE_LOADED, psiFile.getVirtualFile().getPath())
+      );
+    }
 
     return document;
   }
@@ -104,8 +125,8 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   private void addEntry(@NotNull final TheRLocation nextLocation) {
     final String nextFunctionName = nextLocation.getFunctionName();
     final TheRFunctionDescriptor descriptor = myEntries.isEmpty()
-                                               ? myRoot
-                                               : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
+                                              ? myRoot
+                                              : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
 
 
     myEntries.add(
