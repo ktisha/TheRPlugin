@@ -2,43 +2,23 @@ package com.jetbrains.ther.run.debug;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
-import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
-import com.intellij.xdebugger.breakpoints.XLineBreakpointType;
-import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.breakpoints.XLineBreakpointTypeBase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class TheRLineBreakpointType extends XLineBreakpointType<XBreakpointProperties> {
+public class TheRLineBreakpointType extends XLineBreakpointTypeBase {
 
   @NotNull
   private static final String ID = "the-r-line";
 
   @NotNull
-  private static final String TITLE = "The R breakpoints";
-
-  @NotNull
-  private final TheRDebuggerEditorsProvider myProvider = new TheRDebuggerEditorsProvider();
+  private static final String TITLE = "The R Breakpoints";
 
   public TheRLineBreakpointType() {
-    super(ID, TITLE);
-  }
-
-  @Nullable
-  @Override
-  public XBreakpointProperties createBreakpointProperties(@NotNull final VirtualFile file, final int line) {
-    return null;
+    super(ID, TITLE, new TheREditorsProvider());
   }
 
   @Override
   public boolean canPutAt(@NotNull final VirtualFile file, final int line, @NotNull final Project project) {
-    return TheRBreakpointUtils.canPutAt(project, file, line);
-  }
-
-  @Nullable
-  @Override
-  public XDebuggerEditorsProvider getEditorsProvider(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint,
-                                                     @NotNull final Project project) {
-    return myProvider;
+    return TheRLineBreakpointUtils.canPutAt(project, file, line);
   }
 }
