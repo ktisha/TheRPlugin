@@ -23,6 +23,7 @@ import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
+import com.jetbrains.ther.run.TheRCommandLineState;
 import com.jetbrains.ther.run.TheRXOutputReceiver;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
@@ -88,7 +89,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
   @NotNull
   private TheRXProcessHandler startProcessHandler(@NotNull final RunProfileState state, @NotNull final ExecutionEnvironment environment)
     throws ExecutionException {
-    final TheRDebugCommandLineState commandLineState = (TheRDebugCommandLineState)state;
+    final TheRCommandLineState commandLineState = (TheRCommandLineState)state;
     final ExecutionResult executionResult = commandLineState.execute(environment.getExecutor(), this);
 
     return (TheRXProcessHandler)executionResult.getProcessHandler();

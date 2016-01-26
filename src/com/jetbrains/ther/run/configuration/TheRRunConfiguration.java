@@ -4,7 +4,6 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.execution.configurations.*;
-import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -13,8 +12,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.run.debug.TheRDebugCommandLineState;
-import com.jetbrains.ther.run.run.TheRRunCommandLineState;
+import com.jetbrains.ther.run.TheRCommandLineState;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,13 +61,9 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   }
 
   @Override
-  public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment env) throws ExecutionException {
-    if (executor.getId().equals(DefaultDebugExecutor.EXECUTOR_ID)) {
-      return new TheRDebugCommandLineState(env, this);
-    }
-    else {
-      return new TheRRunCommandLineState(env, this);
-    }
+  public RunProfileState getState(@NotNull final Executor executor, @NotNull final ExecutionEnvironment environment)
+    throws ExecutionException {
+    return new TheRCommandLineState(environment, this);
   }
 
   @NotNull

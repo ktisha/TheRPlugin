@@ -8,7 +8,7 @@ import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import org.jetbrains.annotations.NotNull;
 
 // TODO [run][test]
-class TheRRunExecutionResultCalculator implements TheRExecutionResultCalculator {
+public class TheRRunExecutionResultCalculator implements TheRExecutionResultCalculator {
 
   @NotNull
   private static final String PROMPT = "> ";
