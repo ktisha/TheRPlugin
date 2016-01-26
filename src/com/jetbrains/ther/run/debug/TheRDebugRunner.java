@@ -26,8 +26,8 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.run.TheRXOutputReceiver;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
-import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSession;
-import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSessionImpl;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSessionImpl;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,7 +99,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
                                                          @NotNull final List<String> initCommands,
                                                          @NotNull final TheRDebugger debugger,
                                                          @NotNull final TheRXOutputReceiver outputReceiver,
-                                                         @NotNull final TheRXResolvingSession resolvingSession) {
+                                                         @NotNull final TheRResolvingSession resolvingSession) {
     return new XDebugProcessStarter() {
       @NotNull
       @Override
@@ -140,10 +140,10 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRXResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final String scriptPath)
+  private TheRResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final String scriptPath)
     throws ExecutionException {
     try {
-      return new TheRXResolvingSessionImpl(project, scriptPath);
+      return new TheRResolvingSessionImpl(project, scriptPath);
     }
     catch (final TheRDebugException e) {
       throw new ExecutionException(e);

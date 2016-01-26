@@ -7,27 +7,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class TheRXFunctionDescriptor {
+class TheRFunctionDescriptor {
 
   @NotNull
   private final String myName;
 
   @Nullable
-  private final TheRXFunctionDescriptor myParent;
+  private final TheRFunctionDescriptor myParent;
 
   @NotNull
-  private final Map<String, List<TheRXFunctionDescriptor>> myChildren;
+  private final Map<String, List<TheRFunctionDescriptor>> myChildren;
 
   private final int myStartLine;
   private final int myEndLine;
 
-  public TheRXFunctionDescriptor(@NotNull final String name,
-                                 @Nullable final TheRXFunctionDescriptor parent,
-                                 final int startLine,
-                                 final int endLine) {
+  public TheRFunctionDescriptor(@NotNull final String name,
+                                @Nullable final TheRFunctionDescriptor parent,
+                                final int startLine,
+                                final int endLine) {
     myName = name;
     myParent = parent;
-    myChildren = new HashMap<String, List<TheRXFunctionDescriptor>>();
+    myChildren = new HashMap<String, List<TheRFunctionDescriptor>>();
     myStartLine = startLine;
     myEndLine = endLine;
   }
@@ -38,12 +38,12 @@ class TheRXFunctionDescriptor {
   }
 
   @Nullable
-  public TheRXFunctionDescriptor getParent() {
+  public TheRFunctionDescriptor getParent() {
     return myParent;
   }
 
   @NotNull
-  public Map<String, List<TheRXFunctionDescriptor>> getChildren() {
+  public Map<String, List<TheRFunctionDescriptor>> getChildren() {
     return myChildren;
   }
 

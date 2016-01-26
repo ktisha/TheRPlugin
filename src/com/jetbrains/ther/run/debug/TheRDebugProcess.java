@@ -23,7 +23,7 @@ import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
 import com.jetbrains.ther.run.TheRXOutputReceiver;
 import com.jetbrains.ther.run.TheRXProcessHandler;
-import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSession;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import com.jetbrains.ther.run.debug.stack.TheRXStack;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +76,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
                           @NotNull final List<String> initCommands,
                           @NotNull final TheRDebugger debugger,
                           @NotNull final TheRXOutputReceiver outputReceiver,
-                          @NotNull final TheRXResolvingSession resolvingSession,
+                          @NotNull final TheRResolvingSession resolvingSession,
                           @NotNull final ExecutorService executor) {
     super(session);
 

@@ -2,7 +2,7 @@ package com.jetbrains.ther.run.debug.stack;
 
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
-import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSession;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public class TheRXStack {
   private final List<TheRStackFrame> myOriginalStack;
 
   @NotNull
-  private final TheRXResolvingSession mySession;
+  private final TheRResolvingSession mySession;
 
   @NotNull
   private final ExecutorService myExecutor;
@@ -30,7 +30,7 @@ public class TheRXStack {
   private XSuspendContext mySuspendContext;
 
   public TheRXStack(@NotNull final List<TheRStackFrame> stack,
-                    @NotNull final TheRXResolvingSession session,
+                    @NotNull final TheRResolvingSession session,
                     @NotNull final ExecutorService executor) {
     myOriginalStack = stack;
     mySession = session;

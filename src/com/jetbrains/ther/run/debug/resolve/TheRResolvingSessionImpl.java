@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 // TODO [xdbg][test]
-public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
+public class TheRResolvingSessionImpl implements TheRResolvingSession {
 
   @NotNull
-  private final TheRXFunctionDescriptor myRoot;
+  private final TheRFunctionDescriptor myRoot;
 
   @NotNull
   private final VirtualFile myVirtualFile;
@@ -31,7 +31,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   @NotNull
   private final List<TheRXResolvingSessionEntry> myEntries;
 
-  public TheRXResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws TheRDebugException {
+  public TheRResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws TheRDebugException {
     myVirtualFile = findVirtualFile(scriptPath);
     myRoot = calculateRoot(project, findPsiFile(project, myVirtualFile));
     myEntries = new ArrayList<TheRXResolvingSessionEntry>();
@@ -83,9 +83,9 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   @NotNull
-  private TheRXFunctionDescriptor calculateRoot(@NotNull final Project project, @NotNull final PsiFile psiFile)
+  private TheRFunctionDescriptor calculateRoot(@NotNull final Project project, @NotNull final PsiFile psiFile)
     throws TheRDebugException {
-    final TheRXFunctionDefinitionProcessor processor = new TheRXFunctionDefinitionProcessor(findDocument(project, psiFile));
+    final TheRFunctionDefinitionProcessor processor = new TheRFunctionDefinitionProcessor(findDocument(project, psiFile));
 
     PsiTreeUtil.processElements(psiFile, processor);
 
@@ -103,7 +103,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
 
   private void addEntry(@NotNull final TheRLocation nextLocation) {
     final String nextFunctionName = nextLocation.getFunctionName();
-    final TheRXFunctionDescriptor descriptor = myEntries.isEmpty()
+    final TheRFunctionDescriptor descriptor = myEntries.isEmpty()
                                                ? myRoot
                                                : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
 
@@ -127,7 +127,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
 
   private void updateCurrentEntry(final int line) {
     final int lastIndex = myEntries.size() - 1;
-    final TheRXFunctionDescriptor descriptor = myEntries.get(lastIndex).myDescriptor;
+    final TheRFunctionDescriptor descriptor = myEntries.get(lastIndex).myDescriptor;
 
     myEntries.set(
       lastIndex,
@@ -139,13 +139,13 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   @Nullable
-  private TheRXFunctionDescriptor resolveDescriptor(@NotNull final ListIterator<TheRXResolvingSessionEntry> entries,
-                                                    @NotNull final String nextFunctionName) {
+  private TheRFunctionDescriptor resolveDescriptor(@NotNull final ListIterator<TheRXResolvingSessionEntry> entries,
+                                                   @NotNull final String nextFunctionName) {
     if (!entries.hasPrevious()) {
       return null;
     }
 
-    final TheRXFunctionDescriptor candidate = resolveDescriptor(entries.previous(), nextFunctionName);
+    final TheRFunctionDescriptor candidate = resolveDescriptor(entries.previous(), nextFunctionName);
 
     if (candidate != null) {
       return candidate;
@@ -154,7 +154,7 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
     return resolveDescriptor(entries, nextFunctionName);
   }
 
-  private int resolveLine(@Nullable final TheRXFunctionDescriptor descriptor, final int line) {
+  private int resolveLine(@Nullable final TheRFunctionDescriptor descriptor, final int line) {
     final boolean isUnbraceFunction = descriptor != null && line == 0;
 
     return isUnbraceFunction
@@ -163,20 +163,20 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   }
 
   @Nullable
-  private TheRXFunctionDescriptor resolveDescriptor(@NotNull final TheRXResolvingSessionEntry entry,
-                                                    @NotNull final String nextFunctionName) {
-    final TheRXFunctionDescriptor currentDescriptor = entry.myDescriptor;
+  private TheRFunctionDescriptor resolveDescriptor(@NotNull final TheRXResolvingSessionEntry entry,
+                                                   @NotNull final String nextFunctionName) {
+    final TheRFunctionDescriptor currentDescriptor = entry.myDescriptor;
 
     if (currentDescriptor == null) {
       return null;
     }
 
-    TheRXFunctionDescriptor result = null;
+    TheRFunctionDescriptor result = null;
 
     if (currentDescriptor.getChildren().containsKey(nextFunctionName)) {
       int distance = Integer.MAX_VALUE;
 
-      for (final TheRXFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
+      for (final TheRFunctionDescriptor candidate : currentDescriptor.getChildren().get(nextFunctionName)) {
         final int currentDistance = currentDescriptor.getStartLine() + entry.myLine - candidate.getStartLine();
 
         if (currentDistance > 0 && currentDistance < distance) { // candidate is declared before the current line
@@ -192,11 +192,11 @@ public class TheRXResolvingSessionImpl implements TheRXResolvingSession {
   private static class TheRXResolvingSessionEntry {
 
     @Nullable
-    private final TheRXFunctionDescriptor myDescriptor;
+    private final TheRFunctionDescriptor myDescriptor;
 
     private final int myLine;
 
-    public TheRXResolvingSessionEntry(@Nullable final TheRXFunctionDescriptor descriptor, final int line) {
+    public TheRXResolvingSessionEntry(@Nullable final TheRFunctionDescriptor descriptor, final int line) {
       myDescriptor = descriptor;
       myLine = line;
     }

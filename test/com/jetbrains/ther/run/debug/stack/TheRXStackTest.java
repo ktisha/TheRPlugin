@@ -10,7 +10,7 @@ import com.jetbrains.ther.debugger.mock.IllegalTheRVarsLoader;
 import com.jetbrains.ther.run.debug.mock.ExecutorServices;
 import com.jetbrains.ther.run.debug.mock.MockXSourcePosition;
 import com.jetbrains.ther.run.debug.mock.MockXStackFrameContainer;
-import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSession;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class TheRXStackTest {
   @Test
   public void sameDepth() {
     final List<TheRStackFrame> originalStack = new ArrayList<TheRStackFrame>();
-    final MockTheRXResolvingSession resolvingSession = new MockTheRXResolvingSession();
+    final MockTheRResolvingSession resolvingSession = new MockTheRResolvingSession();
 
     final TheRXStack stack = new TheRXStack(originalStack, resolvingSession, ExecutorServices.ILLEGAL_EXECUTOR);
 
@@ -72,7 +72,7 @@ public class TheRXStackTest {
   @Test
   public void plusOneDepth() {
     final List<TheRStackFrame> originalStack = new ArrayList<TheRStackFrame>();
-    final MockTheRXResolvingSession resolvingSession = new MockTheRXResolvingSession();
+    final MockTheRResolvingSession resolvingSession = new MockTheRResolvingSession();
 
     final TheRXStack stack = new TheRXStack(originalStack, resolvingSession, ExecutorServices.ILLEGAL_EXECUTOR);
 
@@ -118,7 +118,7 @@ public class TheRXStackTest {
   @Test
   public void moreDepth() {
     final List<TheRStackFrame> originalStack = new ArrayList<TheRStackFrame>();
-    final MockTheRXResolvingSession resolvingSession = new MockTheRXResolvingSession();
+    final MockTheRResolvingSession resolvingSession = new MockTheRResolvingSession();
 
     final TheRXStack stack = new TheRXStack(originalStack, resolvingSession, ExecutorServices.ILLEGAL_EXECUTOR);
 
@@ -172,7 +172,7 @@ public class TheRXStackTest {
   @Test
   public void minusOneDepth() {
     final List<TheRStackFrame> originalStack = new ArrayList<TheRStackFrame>();
-    final MockTheRXResolvingSession resolvingSession = new MockTheRXResolvingSession();
+    final MockTheRResolvingSession resolvingSession = new MockTheRResolvingSession();
 
     final TheRXStack stack = new TheRXStack(originalStack, resolvingSession, ExecutorServices.ILLEGAL_EXECUTOR);
 
@@ -212,7 +212,7 @@ public class TheRXStackTest {
   @Test
   public void lessDepth() {
     final List<TheRStackFrame> originalStack = new ArrayList<TheRStackFrame>();
-    final MockTheRXResolvingSession resolvingSession = new MockTheRXResolvingSession();
+    final MockTheRResolvingSession resolvingSession = new MockTheRResolvingSession();
 
     final TheRXStack stack = new TheRXStack(originalStack, resolvingSession, ExecutorServices.ILLEGAL_EXECUTOR);
 
@@ -277,7 +277,7 @@ public class TheRXStackTest {
     }
   }
 
-  private static class MockTheRXResolvingSession implements TheRXResolvingSession {
+  private static class MockTheRResolvingSession implements TheRResolvingSession {
 
     private int myNext = 0;
     private int myCurrent = 0;

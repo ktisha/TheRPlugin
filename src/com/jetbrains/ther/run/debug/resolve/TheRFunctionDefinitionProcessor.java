@@ -14,18 +14,18 @@ import java.util.Map;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 
 // TODO [xdbg][test]
-class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
+class TheRFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
 
   @NotNull
   private final Document myDocument;
 
   @NotNull
-  private final TheRXFunctionDescriptor myRoot;
+  private final TheRFunctionDescriptor myRoot;
 
-  public TheRXFunctionDefinitionProcessor(@NotNull final Document document) {
+  public TheRFunctionDefinitionProcessor(@NotNull final Document document) {
     myDocument = document;
 
-    myRoot = new TheRXFunctionDescriptor(
+    myRoot = new TheRFunctionDescriptor(
       MAIN_FUNCTION_NAME,
       null,
       0,
@@ -54,11 +54,11 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
   }
 
   @NotNull
-  public TheRXFunctionDescriptor getRoot() {
+  public TheRFunctionDescriptor getRoot() {
     return myRoot;
   }
 
-  private void add(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+  private void add(@NotNull final TheRFunctionDescriptor currentDescriptor,
                    @NotNull final String name,
                    final int startLine,
                    final int endLine) {
@@ -67,12 +67,12 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
     }
   }
 
-  private boolean trySiftDown(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+  private boolean trySiftDown(@NotNull final TheRFunctionDescriptor currentDescriptor,
                               @NotNull final String name,
                               final int startLine,
                               final int endLine) {
-    for (final List<TheRXFunctionDescriptor> sameNameChildren : currentDescriptor.getChildren().values()) {
-      for (final TheRXFunctionDescriptor child : sameNameChildren) {
+    for (final List<TheRFunctionDescriptor> sameNameChildren : currentDescriptor.getChildren().values()) {
+      for (final TheRFunctionDescriptor child : sameNameChildren) {
         if (child.getStartLine() <= startLine && endLine <= child.getEndLine()) {
           add(
             child,
@@ -89,21 +89,21 @@ class TheRXFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement
     return false;
   }
 
-  private void addAsChild(@NotNull final TheRXFunctionDescriptor currentDescriptor,
+  private void addAsChild(@NotNull final TheRFunctionDescriptor currentDescriptor,
                           @NotNull final String name,
                           final int startLine,
                           final int endLine) {
-    final Map<String, List<TheRXFunctionDescriptor>> children = currentDescriptor.getChildren();
+    final Map<String, List<TheRFunctionDescriptor>> children = currentDescriptor.getChildren();
 
     if (!children.containsKey(name)) {
       children.put(
         name,
-        new ArrayList<TheRXFunctionDescriptor>()
+        new ArrayList<TheRFunctionDescriptor>()
       );
     }
 
     children.get(name).add(
-      new TheRXFunctionDescriptor(
+      new TheRFunctionDescriptor(
         name,
         currentDescriptor,
         startLine,

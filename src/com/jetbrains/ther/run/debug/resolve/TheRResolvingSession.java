@@ -5,7 +5,7 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface TheRXResolvingSession {
+public interface TheRResolvingSession {
 
   @Nullable
   XSourcePosition resolveNext(@NotNull final TheRLocation nextLocation);
