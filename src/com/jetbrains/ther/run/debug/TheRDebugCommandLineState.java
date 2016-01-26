@@ -5,15 +5,10 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImpl;
-import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.run.TheRCommandLineState;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
-import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -33,19 +28,8 @@ public class TheRDebugCommandLineState extends TheRCommandLineState {
                                         @NotNull final GeneralCommandLine generalCommandLine) throws ExecutionException {
     return new TheRXProcessHandler(
       generalCommandLine,
-      calculateInitCommands(runConfiguration),
       new TheRExecutionResultCalculatorImpl(),
       parseBoolean(runConfiguration.getEnvs().get(IO_ENV_KEY))
     );
-  }
-
-  @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    final List<String> result = new ArrayList<String>();
-
-    result.addAll(TheRProcessUtils.getInitCommands());
-    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
-
-    return result;
   }
 }

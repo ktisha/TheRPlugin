@@ -33,13 +33,16 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 // TODO [xdbg][test]
-class TheRXDebugProcess extends XDebugProcess {
+class TheRXDebugProcess extends XDebugProcess implements TheRXProcessHandler.Listener {
 
   @NotNull
   private static final Logger LOGGER = Logger.getInstance(TheRXDebugProcess.class);
 
   @NotNull
   private final TheRXProcessHandler myProcessHandler;
+
+  @NotNull
+  private final List<String> myInitCommands;
 
   @NotNull
   private final TheRDebugger myDebugger;
@@ -70,6 +73,7 @@ class TheRXDebugProcess extends XDebugProcess {
 
   public TheRXDebugProcess(@NotNull final XDebugSession session,
                            @NotNull final TheRXProcessHandler processHandler,
+                           @NotNull final List<String> initCommands,
                            @NotNull final TheRDebugger debugger,
                            @NotNull final TheRXOutputReceiver outputReceiver,
                            @NotNull final TheRXResolvingSession resolvingSession,
@@ -77,6 +81,7 @@ class TheRXDebugProcess extends XDebugProcess {
     super(session);
 
     myProcessHandler = processHandler;
+    myInitCommands = initCommands;
 
     myDebugger = debugger;
     myOutputReceiver = outputReceiver;
@@ -90,6 +95,8 @@ class TheRXDebugProcess extends XDebugProcess {
 
     myEditorsProvider = new TheRXDebuggerEditorsProvider();
     myBreakpointHandlers = new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
+
+    myProcessHandler.addListener(this);
   }
 
   @NotNull
@@ -113,8 +120,6 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void sessionInitialized() {
     TheRGraphicsUtils.getGraphicsState(getSession().getProject()).reset();
-
-    resume();
   }
 
   @Nullable
@@ -248,6 +253,29 @@ class TheRXDebugProcess extends XDebugProcess {
   @Override
   public void stop() {
     myExecutor.shutdownNow();
+  }
+
+  @Override
+  public void onInitialized() {
+    myProcessHandler.removeListener(this);
+
+    myExecutor.execute(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            for (final String initCommand : myInitCommands) {
+              myProcessHandler.execute(initCommand);
+            }
+          }
+          catch (final TheRDebuggerException e) {
+            handleException(e);
+          }
+        }
+      }
+    );
+
+    resume();
   }
 
   private boolean advance() throws TheRDebuggerException {

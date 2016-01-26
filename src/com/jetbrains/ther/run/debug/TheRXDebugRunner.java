@@ -19,7 +19,7 @@ import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
-import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
@@ -29,12 +29,15 @@ import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSession;
 import com.jetbrains.ther.run.debug.resolve.TheRXResolvingSessionImpl;
+import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TheRXDebugRunner extends GenericProgramRunner {
 
@@ -59,14 +62,18 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     FileDocumentManager.getInstance().saveAllDocuments();
 
     final Project project = environment.getProject();
+
     final TheRXProcessHandler processHandler = getProcessHandler(state, environment);
     final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
-    final String scriptPath = getScriptPath(environment.getRunProfile());
+
+    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
+    final String scriptPath = runConfiguration.getScriptPath();
 
     final XDebugSession session = XDebuggerManager.getInstance(project).startSession(
       environment,
       createDebugProcessStarter(
         processHandler,
+        calculateInitCommands(runConfiguration),
         createDebugger(processHandler, outputReceiver, scriptPath),
         outputReceiver,
         createResolvingSession(project, scriptPath)
@@ -86,14 +93,8 @@ public class TheRXDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private String getScriptPath(@NotNull final RunProfile runProfile) {
-    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)runProfile;
-
-    return runConfiguration.getScriptPath();
-  }
-
-  @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRXProcessHandler processHandler,
+                                                         @NotNull final List<String> initCommands,
                                                          @NotNull final TheRDebugger debugger,
                                                          @NotNull final TheRXOutputReceiver outputReceiver,
                                                          @NotNull final TheRXResolvingSession resolvingSession) {
@@ -104,6 +105,7 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         final TheRXDebugProcess debugProcess = new TheRXDebugProcess(
           session,
           processHandler,
+          initCommands,
           debugger,
           outputReceiver,
           resolvingSession,
@@ -111,8 +113,6 @@ public class TheRXDebugRunner extends GenericProgramRunner {
         );
 
         ((ConsoleView)debugProcess.createConsole()).attachToProcess(processHandler);
-
-        startProcessHandler(processHandler);
 
         return debugProcess;
       }
@@ -152,12 +152,13 @@ public class TheRXDebugRunner extends GenericProgramRunner {
     }
   }
 
-  private void startProcessHandler(@NotNull final TheRXProcessHandler processHandler) throws ExecutionException {
-    try {
-      processHandler.start();
-    }
-    catch (final TheRDebuggerException e) {
-      throw new ExecutionException(e);
-    }
+  @NotNull
+  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
+    final List<String> result = new ArrayList<String>();
+
+    result.addAll(TheRProcessUtils.getInitCommands());
+    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
+
+    return result;
   }
 }
