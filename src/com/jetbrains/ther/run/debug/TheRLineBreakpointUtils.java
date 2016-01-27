@@ -11,21 +11,20 @@ import com.jetbrains.ther.TheRFileType;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import org.jetbrains.annotations.NotNull;
 
-// TODO [xdbg][test]
 final class TheRLineBreakpointUtils {
 
   public static boolean canPutAt(@NotNull final Project project, @NotNull final VirtualFile file, final int line) {
-    return isTheRFile(file) && isStoppable(file, line, project);
+    return isRFile(file) && isStoppable(project, file, line);
   }
 
-  private static boolean isTheRFile(@NotNull final VirtualFile file) {
+  private static boolean isRFile(@NotNull final VirtualFile file) {
     final String defaultExtension = TheRFileType.INSTANCE.getDefaultExtension();
     final String extension = file.getExtension();
 
     return defaultExtension.equalsIgnoreCase(extension);
   }
 
-  private static boolean isStoppable(@NotNull final VirtualFile file, final int line, @NotNull final Project project) {
+  private static boolean isStoppable(@NotNull final Project project, @NotNull final VirtualFile file, final int line) {
     final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
 
     if (psiFile == null) return false;
