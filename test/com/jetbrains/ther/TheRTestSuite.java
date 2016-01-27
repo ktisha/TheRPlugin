@@ -47,8 +47,7 @@ public class TheRTestSuite extends TestCase {
     suite.addTestSuite(TheRRenameTest.class);
 
     addDebuggerTests(suite);
-    addXDebuggerTests(suite);
-    addUiTests(suite);
+    addRunTests(suite);
 
     return suite;
   }
@@ -79,15 +78,13 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRForcedFunctionDebuggerHandlerTest.class);
   }
 
-  private static void addXDebuggerTests(@NotNull final TestSuite suite) {
-    // stack package
+  private static void addRunTests(@NotNull final TestSuite suite) {
+    // debug.stack package
     addJUnit4Test(suite, TheRXPresentationUtilsTest.class);
     addJUnit4Test(suite, TheRXStackFrameTest.class);
     addJUnit4Test(suite, TheRXStackTest.class);
     addJUnit4Test(suite, TheRXSuspendContextTest.class);
-  }
 
-  private static void addUiTests(@NotNull final TestSuite suite) {
     // graphics
     addJUnit4Test(suite, TheREmptyGraphicsStateTest.class);
     addJUnit4Test(suite, TheRGraphicsPanelTest.class);
