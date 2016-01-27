@@ -29,6 +29,7 @@ import com.jetbrains.ther.run.debug.stack.TheRXSuspendContextTest;
 import com.jetbrains.ther.run.graphics.TheREmptyGraphicsStateTest;
 import com.jetbrains.ther.run.graphics.TheRGraphicsPanelTest;
 import com.jetbrains.ther.run.graphics.TheRGraphicsStateImplTest;
+import com.jetbrains.ther.run.run.TheRRunExecutionResultCalculatorTest;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -87,10 +88,13 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRXStackTest.class);
     addJUnit4Test(suite, TheRXSuspendContextTest.class);
 
-    // graphics
+    // graphics package
     addJUnit4Test(suite, TheREmptyGraphicsStateTest.class);
     addJUnit4Test(suite, TheRGraphicsPanelTest.class);
     suite.addTestSuite(TheRGraphicsStateImplTest.class);
+
+    // run package
+    addJUnit4Test(suite, TheRRunExecutionResultCalculatorTest.class);
 
     // `main` package
     addJUnit4Test(suite, TheRCommandLineCalculatorTest.class);

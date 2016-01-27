@@ -84,13 +84,16 @@ public final class TheRDebugConstants {
   // responses
 
   @NotNull
+  public static final String PROMPT = "> ";
+
+  @NotNull
   public static final String PLUS_AND_SPACE = "+ ";
 
   @NotNull
   public static final String BROWSE_PREFIX = "Browse[";
 
   @NotNull
-  public static final String BROWSE_SUFFIX = "]> ";
+  public static final String BROWSE_SUFFIX = "]" + PROMPT;
 
   @NotNull
   public static final String DEBUGGING_IN = "debugging in";
