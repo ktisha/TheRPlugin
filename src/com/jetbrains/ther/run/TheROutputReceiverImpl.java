@@ -1,5 +1,6 @@
 package com.jetbrains.ther.run;
 
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
@@ -8,13 +9,12 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
 
-// TODO [xdbg][test]
-public class TheRXOutputReceiver implements TheROutputReceiver {
+public class TheROutputReceiverImpl implements TheROutputReceiver {
 
   @NotNull
-  private final TheRXProcessHandler myProcessHandler;
+  private final ProcessHandler myProcessHandler;
 
-  public TheRXOutputReceiver(@NotNull final TheRXProcessHandler processHandler) {
+  public TheROutputReceiverImpl(@NotNull final ProcessHandler processHandler) {
     myProcessHandler = processHandler;
   }
 

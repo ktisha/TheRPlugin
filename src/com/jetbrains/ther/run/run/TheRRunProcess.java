@@ -9,9 +9,10 @@ import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutorUtils;
-import com.jetbrains.ther.run.TheRXOutputReceiver;
+import com.jetbrains.ther.run.TheROutputReceiverImpl;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +91,7 @@ class TheRRunProcess {
         new Runnable() {
           @Override
           public void run() {
-            final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(myProcessHandler);
+            final TheROutputReceiver outputReceiver = new TheROutputReceiverImpl(myProcessHandler);
 
             try {
               for (final String initCommand : myInitCommands) {

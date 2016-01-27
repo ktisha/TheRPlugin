@@ -17,10 +17,10 @@ import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
-import com.jetbrains.ther.run.TheRXOutputReceiver;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import com.jetbrains.ther.run.debug.stack.TheRXStack;
@@ -50,7 +50,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
   private final TheRDebugger myDebugger;
 
   @NotNull
-  private final TheRXOutputReceiver myOutputReceiver;
+  private final TheROutputReceiver myOutputReceiver;
 
   @NotNull
   private final TheRXStack myStack;
@@ -75,7 +75,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
                           @NotNull final ExecutionConsole executionConsole,
                           @NotNull final List<String> initCommands,
                           @NotNull final TheRDebugger debugger,
-                          @NotNull final TheRXOutputReceiver outputReceiver,
+                          @NotNull final TheROutputReceiver outputReceiver,
                           @NotNull final TheRResolvingSession resolvingSession,
                           @NotNull final ExecutorService executor) {
     super(session);

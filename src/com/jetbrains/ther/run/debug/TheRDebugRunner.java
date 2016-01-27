@@ -17,6 +17,7 @@ import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
+import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
@@ -25,7 +26,7 @@ import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactoryImpl;
 import com.jetbrains.ther.run.TheRCommandLineState;
-import com.jetbrains.ther.run.TheRXOutputReceiver;
+import com.jetbrains.ther.run.TheROutputReceiverImpl;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
@@ -69,7 +70,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
     final ExecutionResult executionResult = getExecutionResult(state, environment);
 
     final TheRXProcessHandler processHandler = (TheRXProcessHandler)executionResult.getProcessHandler();
-    final TheRXOutputReceiver outputReceiver = new TheRXOutputReceiver(processHandler);
+    final TheROutputReceiver outputReceiver = new TheROutputReceiverImpl(processHandler);
 
     final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
     final String scriptPath = runConfiguration.getScriptPath();
@@ -102,7 +103,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
                                                          @NotNull final ExecutionConsole executionConsole,
                                                          @NotNull final List<String> initCommands,
                                                          @NotNull final TheRDebugger debugger,
-                                                         @NotNull final TheRXOutputReceiver outputReceiver,
+                                                         @NotNull final TheROutputReceiver outputReceiver,
                                                          @NotNull final TheRResolvingSession resolvingSession) {
     return new XDebugProcessStarter() {
       @NotNull
@@ -124,7 +125,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
 
   @NotNull
   private TheRDebugger createDebugger(@NotNull final TheRXProcessHandler processHandler,
-                                      @NotNull final TheRXOutputReceiver outputReceiver,
+                                      @NotNull final TheROutputReceiver outputReceiver,
                                       @NotNull final String scriptPath) throws ExecutionException {
     try {
       return new TheRDebugger(
