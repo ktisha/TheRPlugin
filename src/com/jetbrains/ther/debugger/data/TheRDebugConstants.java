@@ -25,6 +25,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String QUIET_PARAMETER = "--quiet";
 
+  @NotNull
+  public static final String ARGS_PARAMETER = "--args";
+
   // commands
 
   @NotNull

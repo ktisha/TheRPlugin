@@ -20,6 +20,7 @@ import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
 import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
+import com.jetbrains.ther.run.TheRCommandLineCalculatorTest;
 import com.jetbrains.ther.run.TheROutputReceiverImplTest;
 import com.jetbrains.ther.run.debug.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.run.debug.stack.TheRXStackFrameTest;
@@ -92,6 +93,7 @@ public class TheRTestSuite extends TestCase {
     suite.addTestSuite(TheRGraphicsStateImplTest.class);
 
     // `main` package
+    addJUnit4Test(suite, TheRCommandLineCalculatorTest.class);
     addJUnit4Test(suite, TheROutputReceiverImplTest.class);
   }
 

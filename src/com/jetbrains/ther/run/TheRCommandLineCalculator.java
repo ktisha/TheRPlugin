@@ -5,6 +5,7 @@ import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmen
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.execution.ParametersListUtil;
+import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO [run][test]
 final class TheRCommandLineCalculator {
 
   @NotNull
@@ -35,7 +35,7 @@ final class TheRCommandLineCalculator {
     final String scriptArgs = runConfiguration.getScriptArgs();
 
     if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
-      command.add("--args");
+      command.add(TheRDebugConstants.ARGS_PARAMETER);
       command.addAll(ParametersListUtil.parse(scriptArgs));
     }
 
