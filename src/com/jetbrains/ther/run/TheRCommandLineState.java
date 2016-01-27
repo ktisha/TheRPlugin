@@ -8,6 +8,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.execution.ParametersListUtil;
@@ -16,6 +17,7 @@ import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImpl;
 import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationUtils;
 import com.jetbrains.ther.run.run.TheRRunExecutionResultCalculator;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,16 +58,11 @@ public class TheRCommandLineState extends CommandLineState {
   }
 
   private void checkRunConfiguration() throws ExecutionException {
-    if (StringUtil.isEmptyOrSpaces(myInterpreterPath)) {
-      throw new ExecutionException("The R interpreter is not specified");
+    try {
+      TheRRunConfigurationUtils.checkConfiguration(myRunConfiguration);
     }
-
-    if (StringUtil.isEmptyOrSpaces(myRunConfiguration.getScriptPath())) {
-      throw new ExecutionException("The R script is not specified");
-    }
-
-    if (StringUtil.isEmptyOrSpaces(myRunConfiguration.getWorkingDirectoryPath())) {
-      throw new ExecutionException("The working directory is not specified");
+    catch (final ConfigurationException e) {
+      throw new ExecutionException(e);
     }
   }
 

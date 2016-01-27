@@ -117,7 +117,7 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
         protected void onFileChosen(@NotNull final VirtualFile chosenFile) {
           super.onFileChosen(chosenFile);
 
-          TheRRunConfigurationSuggests.setSuggestedWorkingDirectoryPathIfNotSpecified(TheRRunConfigurationForm.this);
+          TheRRunConfigurationUtils.setSuggestedWorkingDirectoryPathIfNotSpecified(TheRRunConfigurationForm.this);
         }
       };
 

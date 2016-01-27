@@ -31,8 +31,8 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
 
     configuration.setScriptPath(scriptVirtualFile.getPath());
 
-    TheRRunConfigurationSuggests.setSuggestedWorkingDirectoryPathIfNotSpecified(configuration);
-    configuration.setName(TheRRunConfigurationSuggests.suggestedName(configuration));
+    TheRRunConfigurationUtils.setSuggestedWorkingDirectoryPathIfNotSpecified(configuration);
+    configuration.setName(TheRRunConfigurationUtils.suggestedName(configuration));
 
     return true;
   }
@@ -50,7 +50,7 @@ public class TheRRunConfigurationProducer extends RunConfigurationProducer<TheRR
     final String configurationWorkingDirectoryPath = configuration.getWorkingDirectoryPath();
 
     final String contextScriptPath = scriptVirtualFile.getPath();
-    final String contextWorkingDirectoryPath = TheRRunConfigurationSuggests.suggestedWorkingDirectoryPath(configuration);
+    final String contextWorkingDirectoryPath = TheRRunConfigurationUtils.suggestedWorkingDirectoryPath(configuration);
 
     return configurationScriptPath.equals(contextScriptPath) && configurationWorkingDirectoryPath.equals(contextWorkingDirectoryPath);
   }

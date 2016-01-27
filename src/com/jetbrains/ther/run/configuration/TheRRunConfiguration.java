@@ -6,12 +6,12 @@ import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.PathMacroManager;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.run.TheRCommandLineState;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -74,17 +74,18 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
 
   @Override
   public void checkConfiguration() throws RuntimeConfigurationException {
-    if (StringUtil.isEmptyOrSpaces(myScriptPath)) {
-      throw new RuntimeConfigurationException("No script specified");
+    try {
+      TheRRunConfigurationUtils.checkConfiguration(this);
     }
-
-    // TODO [run][upd]
+    catch (final ConfigurationException e) {
+      throw new RuntimeConfigurationException(e.getMessage());
+    }
   }
 
   @Override
   @Nullable
   public String suggestedName() {
-    return TheRRunConfigurationSuggests.suggestedName(this);
+    return TheRRunConfigurationUtils.suggestedName(this);
   }
 
   @NotNull
