@@ -1,7 +1,6 @@
 package com.jetbrains.ther.run.debug;
 
 import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -42,6 +41,9 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
   private final TheRXProcessHandler myProcessHandler;
 
   @NotNull
+  private final ExecutionConsole myExecutionConsole;
+
+  @NotNull
   private final List<String> myInitCommands;
 
   @NotNull
@@ -63,9 +65,6 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
   private final Set<XSourcePositionWrapper> myTempBreakpoints;
 
   @NotNull
-  private final ConsoleView myConsole;
-
-  @NotNull
   private final TheREditorsProvider myEditorsProvider;
 
   @NotNull
@@ -73,6 +72,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
 
   public TheRDebugProcess(@NotNull final XDebugSession session,
                           @NotNull final TheRXProcessHandler processHandler,
+                          @NotNull final ExecutionConsole executionConsole,
                           @NotNull final List<String> initCommands,
                           @NotNull final TheRDebugger debugger,
                           @NotNull final TheRXOutputReceiver outputReceiver,
@@ -81,6 +81,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
     super(session);
 
     myProcessHandler = processHandler;
+    myExecutionConsole = executionConsole;
     myInitCommands = initCommands;
 
     myDebugger = debugger;
@@ -91,19 +92,16 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
     myBreakpoints = new HashMap<XSourcePositionWrapper, XLineBreakpoint<XBreakpointProperties>>();
     myTempBreakpoints = new HashSet<XSourcePositionWrapper>();
 
-    myConsole = (ConsoleView)super.createConsole();
-
     myEditorsProvider = new TheREditorsProvider();
     myBreakpointHandlers = new XBreakpointHandler[]{new TheRXLineBreakpointHandler()};
 
     myProcessHandler.addListener(this);
-    myConsole.attachToProcess(myProcessHandler);
   }
 
   @NotNull
   @Override
   public ExecutionConsole createConsole() {
-    return myConsole;
+    return myExecutionConsole;
   }
 
   @NotNull
