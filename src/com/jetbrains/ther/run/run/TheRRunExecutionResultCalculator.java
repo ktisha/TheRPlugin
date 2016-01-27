@@ -7,6 +7,8 @@ import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import org.jetbrains.annotations.NotNull;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
+
 // TODO [run][test]
 public class TheRRunExecutionResultCalculator implements TheRExecutionResultCalculator {
 
@@ -21,13 +23,26 @@ public class TheRRunExecutionResultCalculator implements TheRExecutionResultCalc
   @NotNull
   @Override
   public TheRExecutionResult calculate(@NotNull final CharSequence output, @NotNull final String error) {
-    final String outputString = output.toString();
+    final String result = calculateResult(output);
 
     return new TheRExecutionResult(
-      outputString,
+      result,
       TheRExecutionResultType.RESPONSE,
-      TextRange.allOf(outputString),
+      TextRange.allOf(result),
       error
     );
+  }
+
+  @NotNull
+  private String calculateResult(@NotNull final CharSequence output) {
+    final int leftBound = findNextLineBegin(output, 0);
+    final int rightBound = findLastButOneLineEnd(output, findLastLineBegin(output));
+
+    if (leftBound >= rightBound) {
+      return "";
+    }
+    else {
+      return output.subSequence(leftBound, rightBound).toString();
+    }
   }
 }

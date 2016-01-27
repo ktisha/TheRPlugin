@@ -68,20 +68,22 @@ public final class TheRDebuggerStringUtils {
     return current;
   }
 
-  private static int findLastLineBegin(@NotNull final String text) {
-    int current = text.length() - 1;
+  // TODO [dbg][test]
+  public static int findLastLineBegin(@NotNull final CharSequence sequence) {
+    int current = sequence.length() - 1;
 
-    while (current > -1 && !StringUtil.isLineBreak(text.charAt(current))) {
+    while (current > -1 && !StringUtil.isLineBreak(sequence.charAt(current))) {
       current--;
     }
 
     return current + 1;
   }
 
-  private static int findLastButOneLineEnd(@NotNull final String text, final int lastLineBegin) {
+  // TODO [dbg][test]
+  public static int findLastButOneLineEnd(@NotNull final CharSequence sequence, final int lastLineBegin) {
     int current = lastLineBegin - 1;
 
-    while (current > -1 && StringUtil.isLineBreak(text.charAt(current))) {
+    while (current > -1 && StringUtil.isLineBreak(sequence.charAt(current))) {
       current--;
     }
 
