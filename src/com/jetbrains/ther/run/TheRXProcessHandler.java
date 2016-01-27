@@ -1,0 +1,255 @@
+package com.jetbrains.ther.run;
+
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.ColoredProcessHandler;
+import com.intellij.execution.process.ProcessOutputTypes;
+import com.intellij.execution.process.RunnerWinProcess;
+import com.intellij.execution.process.UnixProcessManager;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.io.BaseDataReader;
+import com.intellij.util.io.BaseOutputReader;
+import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
+import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jvnet.winp.WinProcess;
+
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.util.LinkedList;
+import java.util.concurrent.Future;
+
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
+
+public class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
+
+  @NotNull
+  private static final Logger LOGGER = Logger.getInstance(TheRXProcessHandler.class);
+
+  @NotNull
+  private static final Key SERVICE_KEY = ProcessOutputTypes.STDERR;
+
+  @NotNull
+  private final TheRExecutionResultCalculator myResultCalculator;
+
+  private final boolean myPrintIO;
+
+  @NotNull
+  private final StringBuilder myOutputBuffer;
+
+  @NotNull
+  private final StringBuilder myErrorBuffer;
+
+  @NotNull
+  private final OutputStreamWriter myWriter;
+
+  @NotNull
+  private final LinkedList<Listener> myListeners;
+
+  @Nullable
+  private Reader myOutputReader;
+
+  @Nullable
+  private Reader myErrorReader;
+
+  private int myExecuteCounter;
+
+  public TheRXProcessHandler(@NotNull final GeneralCommandLine commandLine,
+                             @NotNull final TheRExecutionResultCalculator resultCalculator,
+                             final boolean printIO)
+    throws ExecutionException {
+    super(commandLine);
+
+    myResultCalculator = resultCalculator;
+    myPrintIO = printIO;
+
+    myOutputBuffer = new StringBuilder();
+    myErrorBuffer = new StringBuilder();
+
+    myWriter = new OutputStreamWriter(getProcess().getOutputStream());
+
+    myListeners = new LinkedList<Listener>();
+
+    myOutputReader = null;
+    myErrorReader = null;
+    myExecuteCounter = 0;
+  }
+
+  @NotNull
+  @Override
+  public TheRExecutionResult execute(@NotNull final String command) throws TheRDebuggerException {
+    try {
+      myWriter.write(command);
+      myWriter.write(LINE_SEPARATOR);
+      myWriter.flush();
+
+      synchronized (myOutputBuffer) {
+        waitForOutput();
+
+        synchronized (myErrorBuffer) {
+          waitForError();
+
+          final TheRExecutionResult result = myResultCalculator.calculate(myOutputBuffer, myErrorBuffer.toString());
+
+          myExecuteCounter++;
+
+          printIO(command, result);
+
+          myOutputBuffer.setLength(0);
+          myErrorBuffer.setLength(0);
+
+          return result;
+        }
+      }
+    }
+    catch (final IOException e) {
+      throw new TheRDebuggerException(e);
+    }
+    catch (final InterruptedException e) {
+      throw new TheRDebuggerException(e);
+    }
+  }
+
+  @Override
+  public void startNotify() {
+    super.startNotify();
+
+    for (final Listener listener : myListeners) {
+      listener.onInitialized();
+    }
+  }
+
+  public void addListener(@NotNull final Listener listener) {
+    myListeners.add(listener);
+  }
+
+  public void removeListener(@NotNull final Listener listener) {
+    myListeners.remove(listener);
+  }
+
+  @NotNull
+  @Override
+  protected BaseDataReader createOutputDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
+    myOutputReader = super.createProcessOutReader();
+
+    return new TheRXBaseOutputReader(myOutputReader, sleepingPolicy, myOutputBuffer);
+  }
+
+  @NotNull
+  @Override
+  protected BaseDataReader createErrorDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
+    myErrorReader = super.createProcessErrReader();
+
+    return new TheRXBaseOutputReader(myErrorReader, sleepingPolicy, myErrorBuffer);
+  }
+
+  @Override
+  protected void doDestroyProcess() {
+    // reworked version of com.intellij.execution.process.impl.OSProcessManagerImpl#killProcessTree
+
+    if (SystemInfo.isUnix) {
+      UnixProcessManager.sendSignalToProcessTree(getProcess(), UnixProcessManager.SIGTERM);
+    }
+    else if (SystemInfo.isWindows) {
+      convertToWinProcess(getProcess()).killRecursively(); // TODO [xdbg][check]
+    }
+    else {
+      LOGGER.warn("Unexpected OS. Process will be destroyed using Java API");
+
+      getProcess().destroy();
+    }
+  }
+
+  private void waitForOutput() throws IOException, InterruptedException {
+    assert myOutputReader != null;
+
+    synchronized (myOutputBuffer) {
+      while (myOutputReader.ready() || !myResultCalculator.isComplete(myOutputBuffer)) {
+        myOutputBuffer.wait();
+      }
+    }
+  }
+
+  private void waitForError() throws IOException, InterruptedException {
+    assert myErrorReader != null;
+
+    synchronized (myErrorBuffer) {
+      while (myErrorReader.ready()) {
+        myErrorBuffer.wait();
+      }
+    }
+  }
+
+  private void printIO(@NotNull final String command, @NotNull final TheRExecutionResult result) {
+    if (myPrintIO) {
+      printIO("COMMAND", command);
+
+      printIO("TYPE", result.getType().toString());
+      printIO("OUTPUT", result.getOutput());
+      printIO("RESULT", result.getResultRange().substring(result.getOutput()));
+
+      printIO("ERROR", result.getError());
+    }
+  }
+
+  @NotNull
+  private WinProcess convertToWinProcess(@NotNull final Process process) {
+    // copied from com.intellij.execution.process.impl.OSProcessManagerImpl#createWinProcess
+
+    if (process instanceof RunnerWinProcess) {
+      return new WinProcess(((RunnerWinProcess)process).getOriginalProcess());
+    }
+    else {
+      return new WinProcess(process);
+    }
+  }
+
+  private void printIO(@NotNull final String title, @NotNull final String message) {
+    notifyTextAvailable(title, SERVICE_KEY);
+    notifyTextAvailable(" #", SERVICE_KEY);
+    notifyTextAvailable(Integer.toString(myExecuteCounter), SERVICE_KEY);
+    notifyTextAvailable(":\n", SERVICE_KEY);
+    notifyTextAvailable(message, SERVICE_KEY);
+    notifyTextAvailable("\n\n", SERVICE_KEY);
+  }
+
+  public interface Listener {
+
+    void onInitialized();
+  }
+
+  private class TheRXBaseOutputReader extends BaseOutputReader {
+
+    @NotNull
+    private final StringBuilder myBuffer;
+
+    public TheRXBaseOutputReader(@NotNull final Reader reader,
+                                 @NotNull final SleepingPolicy sleepingPolicy,
+                                 @NotNull final StringBuilder buffer) {
+      super(reader, sleepingPolicy);
+
+      myBuffer = buffer;
+
+      start();
+    }
+
+    @Override
+    protected void onTextAvailable(@NotNull final String text) {
+      synchronized (myBuffer) {
+        myBuffer.append(text);
+        myBuffer.notify();
+      }
+    }
+
+    @Override
+    protected Future<?> executeOnPooledThread(@NotNull final Runnable runnable) {
+      return TheRXProcessHandler.this.executeOnPooledThread(runnable);
+    }
+  }
+}

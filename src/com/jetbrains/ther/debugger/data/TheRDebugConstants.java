@@ -25,6 +25,9 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String QUIET_PARAMETER = "--quiet";
 
+  @NotNull
+  public static final String ARGS_PARAMETER = "--args";
+
   // commands
 
   @NotNull
@@ -72,7 +75,16 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String BODY_COMMAND = "body";
 
+  @NotNull
+  public static final String SOURCE_COMMAND = "source";
+
+  @NotNull
+  public static final String QUIT_COMMAND = "q()";
+
   // responses
+
+  @NotNull
+  public static final String PROMPT = "> ";
 
   @NotNull
   public static final String PLUS_AND_SPACE = "+ ";
@@ -81,7 +93,7 @@ public final class TheRDebugConstants {
   public static final String BROWSE_PREFIX = "Browse[";
 
   @NotNull
-  public static final String BROWSE_SUFFIX = "]> ";
+  public static final String BROWSE_SUFFIX = "]" + PROMPT;
 
   @NotNull
   public static final String DEBUGGING_IN = "debugging in";

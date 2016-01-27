@@ -63,12 +63,12 @@ It includes syntax-highlighting editor that supports direct code execution, inte
     <treeStructureProvider implementation="com.jetbrains.ther.projectView.TheRTreeStructureProvider"/>
     <quoteHandler className="com.jetbrains.ther.completion.TheRQuoteHandler" fileType="The R"/>
 
-    <configurationType implementation="com.jetbrains.ther.run.TheRConfigurationType"/>
-    <runConfigurationProducer implementation="com.jetbrains.ther.run.TheRRunConfigurationProducer"/>
-    <programRunner implementation="com.jetbrains.ther.run.TheRRunner" order="first"/>
-    <programRunner implementation="com.jetbrains.ther.xdebugger.TheRXDebugRunner"/>
-    <xdebugger.breakpointType implementation="com.jetbrains.ther.xdebugger.TheRXLineBreakpointType"/>
-    <toolWindow id="The R Graphics" anchor="right" factoryClass="com.jetbrains.ther.ui.graphics.TheRGraphicsToolWindowFactory"/>
+    <configurationType implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationType"/>
+    <runConfigurationProducer implementation="com.jetbrains.ther.run.configuration.TheRRunConfigurationProducer"/>
+    <programRunner implementation="com.jetbrains.ther.run.run.TheRRunRunner"/>
+    <programRunner implementation="com.jetbrains.ther.run.debug.TheRDebugRunner"/>
+    <xdebugger.breakpointType implementation="com.jetbrains.ther.run.debug.TheRLineBreakpointType"/>
+    <toolWindow id="The R Graphics" anchor="right" factoryClass="com.jetbrains.ther.run.graphics.TheRGraphicsToolWindowFactory"/>
     <localInspection language="TheR" shortName="RTypeCheckerInspection" displayName="R Type Checker" enabledByDefault="true" level="WARNING"
                      implementationClass="com.jetbrains.ther.inspections.TheRTypeCheckerInspection" groupKey=""/>
     <!--localInspection language="TheR" shortName="RUnusedInspection" displayName="R Unused Inspection" enabledByDefault="true" level="WARNING"

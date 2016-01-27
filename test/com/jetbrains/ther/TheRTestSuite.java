@@ -20,13 +20,17 @@ import com.jetbrains.ther.inspections.TheRUnusedInspectionTest;
 import com.jetbrains.ther.lexer.TheRHighlightingLexerTest;
 import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
-import com.jetbrains.ther.ui.graphics.TheREmptyGraphicsStateTest;
-import com.jetbrains.ther.ui.graphics.TheRGraphicsPanelTest;
-import com.jetbrains.ther.ui.graphics.TheRGraphicsStateImplTest;
-import com.jetbrains.ther.xdebugger.stack.TheRXPresentationUtilsTest;
-import com.jetbrains.ther.xdebugger.stack.TheRXStackFrameTest;
-import com.jetbrains.ther.xdebugger.stack.TheRXStackTest;
-import com.jetbrains.ther.xdebugger.stack.TheRXSuspendContextTest;
+import com.jetbrains.ther.run.TheRCommandLineCalculatorTest;
+import com.jetbrains.ther.run.TheROutputReceiverImplTest;
+import com.jetbrains.ther.run.debug.TheRLineBreakpointUtilsTest;
+import com.jetbrains.ther.run.debug.stack.TheRXPresentationUtilsTest;
+import com.jetbrains.ther.run.debug.stack.TheRXStackFrameTest;
+import com.jetbrains.ther.run.debug.stack.TheRXStackTest;
+import com.jetbrains.ther.run.debug.stack.TheRXSuspendContextTest;
+import com.jetbrains.ther.run.graphics.TheREmptyGraphicsStateTest;
+import com.jetbrains.ther.run.graphics.TheRGraphicsPanelTest;
+import com.jetbrains.ther.run.graphics.TheRGraphicsStateImplTest;
+import com.jetbrains.ther.run.run.TheRRunExecutionResultCalculatorTest;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -47,8 +51,7 @@ public class TheRTestSuite extends TestCase {
     suite.addTestSuite(TheRRenameTest.class);
 
     addDebuggerTests(suite);
-    addXDebuggerTests(suite);
-    addUiTests(suite);
+    addRunTests(suite);
 
     return suite;
   }
@@ -79,19 +82,27 @@ public class TheRTestSuite extends TestCase {
     addJUnit4Test(suite, TheRForcedFunctionDebuggerHandlerTest.class);
   }
 
-  private static void addXDebuggerTests(@NotNull final TestSuite suite) {
-    // stack package
+  private static void addRunTests(@NotNull final TestSuite suite) {
+    // debug package
+    suite.addTestSuite(TheRLineBreakpointUtilsTest.class);
+
+    // debug.stack package
     addJUnit4Test(suite, TheRXPresentationUtilsTest.class);
     addJUnit4Test(suite, TheRXStackFrameTest.class);
     addJUnit4Test(suite, TheRXStackTest.class);
     addJUnit4Test(suite, TheRXSuspendContextTest.class);
-  }
 
-  private static void addUiTests(@NotNull final TestSuite suite) {
-    // graphics
+    // graphics package
     addJUnit4Test(suite, TheREmptyGraphicsStateTest.class);
     addJUnit4Test(suite, TheRGraphicsPanelTest.class);
     suite.addTestSuite(TheRGraphicsStateImplTest.class);
+
+    // run package
+    addJUnit4Test(suite, TheRRunExecutionResultCalculatorTest.class);
+
+    // `main` package
+    addJUnit4Test(suite, TheRCommandLineCalculatorTest.class);
+    addJUnit4Test(suite, TheROutputReceiverImplTest.class);
   }
 
   private static void addJUnit4Test(@NotNull final TestSuite suite, @NotNull final Class<?> cls) {
