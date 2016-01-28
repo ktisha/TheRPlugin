@@ -24,6 +24,7 @@ import com.jetbrains.ther.run.TheRCommandLineCalculatorTest;
 import com.jetbrains.ther.run.TheROutputReceiverImplTest;
 import com.jetbrains.ther.run.debug.TheRLineBreakpointUtilsTest;
 import com.jetbrains.ther.run.debug.resolve.TheRFunctionDefinitionProcessorTest;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSessionImplTest;
 import com.jetbrains.ther.run.debug.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.run.debug.stack.TheRXStackFrameTest;
 import com.jetbrains.ther.run.debug.stack.TheRXStackTest;
@@ -89,6 +90,7 @@ public class TheRTestSuite extends TestCase {
 
     // debug.resolve package
     addJUnit4Test(suite, TheRFunctionDefinitionProcessorTest.class);
+    addJUnit4Test(suite, TheRResolvingSessionImplTest.class);
 
     // debug.stack package
     addJUnit4Test(suite, TheRXPresentationUtilsTest.class);
