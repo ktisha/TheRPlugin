@@ -2,7 +2,6 @@ package com.jetbrains.ther.run.debug.resolve;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -14,17 +13,12 @@ import com.jetbrains.ther.debugger.data.TheRLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-// TODO [xdbg][test]
 public class TheRResolvingSessionImpl implements TheRResolvingSession {
-
-  @NotNull
-  private static final String FILE_IS_NOT_FOUND = "File is not found [path: %s]";
 
   @NotNull
   private static final String PSI_FILE_COULD_NOT_BE_LOADED = "PSI file couldn't be loaded [path: %s]";
@@ -41,9 +35,9 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   @NotNull
   private final List<TheRXResolvingSessionEntry> myEntries;
 
-  public TheRResolvingSessionImpl(@NotNull final Project project, @NotNull final String scriptPath) throws IOException {
-    myVirtualFile = getVirtualFile(scriptPath);
-    myRoot = calculateRoot(project, getPsiFile(project, myVirtualFile));
+  public TheRResolvingSessionImpl(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws IOException {
+    myVirtualFile = virtualFile;
+    myRoot = calculateRoot(project, getPsiFile(project));
     myEntries = new ArrayList<TheRXResolvingSessionEntry>();
   }
 
@@ -52,7 +46,7 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   public XSourcePosition resolveNext(@NotNull final TheRLocation nextLocation) {
     addEntry(nextLocation);
 
-    return resolvePosition(myEntries.get(myEntries.size() - 1));
+    return resolveCurrentPosition();
   }
 
   @Override
@@ -60,7 +54,7 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   public XSourcePosition resolveCurrent(final int line) {
     updateCurrentEntry(line);
 
-    return resolvePosition(myEntries.get(myEntries.size() - 1));
+    return resolveCurrentPosition();
   }
 
   @Override
@@ -75,25 +69,12 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   }
 
   @NotNull
-  private VirtualFile getVirtualFile(@NotNull final String scriptPath) throws FileNotFoundException {
-    final VirtualFile result = LocalFileSystem.getInstance().findFileByPath(scriptPath);
-
-    if (result == null) {
-      throw new FileNotFoundException(
-        String.format(FILE_IS_NOT_FOUND, scriptPath)
-      );
-    }
-
-    return result;
-  }
-
-  @NotNull
-  private PsiFile getPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) throws IOException {
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+  private PsiFile getPsiFile(@NotNull final Project project) throws IOException {
+    final PsiFile psiFile = PsiManager.getInstance(project).findFile(myVirtualFile);
 
     if (psiFile == null) {
       throw new IOException(
-        String.format(PSI_FILE_COULD_NOT_BE_LOADED, virtualFile.getPath())
+        String.format(PSI_FILE_COULD_NOT_BE_LOADED, myVirtualFile.getPath())
       );
     }
 
@@ -128,7 +109,6 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
                                               ? myRoot
                                               : resolveDescriptor(myEntries.listIterator(myEntries.size()), nextFunctionName);
 
-
     myEntries.add(
       new TheRXResolvingSessionEntry(
         descriptor,
@@ -138,7 +118,9 @@ public class TheRResolvingSessionImpl implements TheRResolvingSession {
   }
 
   @Nullable
-  private XSourcePosition resolvePosition(@NotNull final TheRXResolvingSessionEntry entry) {
+  private XSourcePosition resolveCurrentPosition() {
+    final TheRXResolvingSessionEntry entry = myEntries.get(myEntries.size() - 1);
+
     if (entry.myDescriptor == null) {
       return null;
     }

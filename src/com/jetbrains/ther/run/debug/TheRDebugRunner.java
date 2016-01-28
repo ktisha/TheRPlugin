@@ -11,6 +11,8 @@ import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ConcurrencyUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
@@ -42,6 +44,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TheRDebugRunner extends GenericProgramRunner {
+
+  @NotNull
+  private static final String FILE_IS_NOT_FOUND = "File is not found [path: %s]";
 
   @NotNull
   private static final String RUNNER_ID = "TheRDebugRunner";
@@ -83,7 +88,10 @@ public class TheRDebugRunner extends GenericProgramRunner {
         calculateInitCommands(runConfiguration),
         createDebugger(processHandler, outputReceiver, scriptPath),
         outputReceiver,
-        createResolvingSession(project, scriptPath)
+        createResolvingSession(
+          project,
+          getVirtualFile(scriptPath)
+        )
       )
     );
 
@@ -146,10 +154,20 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private TheRResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final String scriptPath)
+  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
+    final List<String> result = new ArrayList<String>();
+
+    result.addAll(TheRProcessUtils.getInitCommands());
+    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
+
+    return result;
+  }
+
+  @NotNull
+  private TheRResolvingSession createResolvingSession(@NotNull final Project project, @NotNull final VirtualFile virtualFile)
     throws ExecutionException {
     try {
-      return new TheRResolvingSessionImpl(project, scriptPath);
+      return new TheRResolvingSessionImpl(project, virtualFile);
     }
     catch (final IOException e) {
       throw new ExecutionException(e);
@@ -157,11 +175,14 @@ public class TheRDebugRunner extends GenericProgramRunner {
   }
 
   @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    final List<String> result = new ArrayList<String>();
+  private VirtualFile getVirtualFile(@NotNull final String scriptPath) throws ExecutionException {
+    final VirtualFile result = LocalFileSystem.getInstance().findFileByPath(scriptPath);
 
-    result.addAll(TheRProcessUtils.getInitCommands());
-    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
+    if (result == null) {
+      throw new ExecutionException(
+        String.format(FILE_IS_NOT_FOUND, scriptPath)
+      );
+    }
 
     return result;
   }
