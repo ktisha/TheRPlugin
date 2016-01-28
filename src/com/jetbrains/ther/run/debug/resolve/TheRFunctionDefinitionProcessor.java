@@ -13,7 +13,6 @@ import java.util.Map;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 
-// TODO [xdbg][test]
 class TheRFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
 
   @NotNull
