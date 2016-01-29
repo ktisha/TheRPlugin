@@ -22,6 +22,7 @@ import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
 import com.jetbrains.ther.run.TheRCommandLineCalculatorTest;
 import com.jetbrains.ther.run.TheROutputReceiverImplTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationEditorTest;
 import com.jetbrains.ther.run.configuration.TheRRunConfigurationTest;
 import com.jetbrains.ther.run.debug.TheRLineBreakpointUtilsTest;
 import com.jetbrains.ther.run.debug.resolve.TheRFunctionDefinitionProcessorTest;
@@ -88,6 +89,7 @@ public class TheRTestSuite extends TestCase {
   private static void addRunTests(@NotNull final TestSuite suite) {
     // configuration package
     suite.addTestSuite(TheRRunConfigurationTest.class);
+    addJUnit4Test(suite, TheRRunConfigurationEditorTest.class);
 
     // debug package
     suite.addTestSuite(TheRLineBreakpointUtilsTest.class);
