@@ -16,7 +16,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
     final String text = "f <- function(x) {\n" +
                         "    x\n" +
                         "}\n" +
-                        "f()\n";
+                        "f()";
 
     final VirtualFile virtualFile = createVirtualFile(text);
     final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
@@ -45,7 +45,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
                         "g <- function() {\n" +
                         "    c(1:5)\n" +
                         "}\n" +
-                        "f()\n";
+                        "f()";
 
     final VirtualFile virtualFile = createVirtualFile(text);
     final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
@@ -82,7 +82,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
                         "f <- function() {\n" +
                         "    g()\n" +
                         "}\n" +
-                        "f()\n";
+                        "f()";
 
     final VirtualFile virtualFile = createVirtualFile(text);
     final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
@@ -145,7 +145,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
     final String text = "f <- function(x) {\n" +
                         "    x\n" +
                         "}\n" +
-                        "g()\n";
+                        "g()";
 
     final VirtualFile virtualFile = createVirtualFile(text);
     final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
@@ -168,6 +168,122 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
       resolvingSession.resolveNext(
         new TheRLocation("h", 2)
       )
+    );
+  }
+
+  public void testNext_FirstIsNotMain() throws IOException {
+    final VirtualFile virtualFile = createVirtualFile("");
+    final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
+
+    assertNull(
+      resolvingSession.resolveNext(
+        new TheRLocation("f", 1)
+      )
+    );
+  }
+
+  public void testNext_Unbrace() throws IOException {
+    final String text = "print(\"ok\")\n" +
+                        "f <- function() c(1:6)\n" +
+                        "f()";
+
+    final VirtualFile virtualFile = createVirtualFile(text);
+    final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 3)
+      ),
+      virtualFile,
+      2
+    );
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation("f", 0)
+      ),
+      virtualFile,
+      1
+    );
+  }
+
+  public void testDropLast() throws IOException {
+    final String text = "f <- function(x) {\n" +
+                        "    x\n" +
+                        "}\n" +
+                        "f()\n" +
+                        "f()";
+
+    final VirtualFile virtualFile = createVirtualFile(text);
+    final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 4)
+      ),
+      virtualFile,
+      3
+    );
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation("f", 2)
+      ),
+      virtualFile,
+      1
+    );
+
+    resolvingSession.dropLast(1);
+
+    checkPosition(
+      resolvingSession.resolveCurrent(5),
+      virtualFile,
+      4
+    );
+  }
+
+  public void testCurrent() throws IOException {
+    final String text = "print(\"1\")\n" +
+                        "print(\"2\")";
+
+    final VirtualFile virtualFile = createVirtualFile(text);
+    final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 1)
+      ),
+      virtualFile,
+      0
+    );
+
+    checkPosition(
+      resolvingSession.resolveCurrent(2),
+      virtualFile,
+      1
+    );
+  }
+
+  public void testCurrent_Unknown() throws IOException {
+    final VirtualFile virtualFile = createVirtualFile("f()");
+    final TheRResolvingSessionImpl resolvingSession = new TheRResolvingSessionImpl(getProject(), virtualFile);
+
+    checkPosition(
+      resolvingSession.resolveNext(
+        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 1)
+      ),
+      virtualFile,
+      0
+    );
+
+    assertNull(
+      resolvingSession.resolveNext(
+        new TheRLocation("f", 1)
+      )
+    );
+
+    assertNull(
+      resolvingSession.resolveCurrent(2)
     );
   }
 
