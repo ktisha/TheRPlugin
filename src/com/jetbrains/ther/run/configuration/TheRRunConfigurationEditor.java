@@ -2,17 +2,17 @@ package com.jetbrains.ther.run.configuration;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-// TODO [run][test]
 class TheRRunConfigurationEditor extends SettingsEditor<TheRRunConfiguration> {
 
   private TheRRunConfigurationForm myForm;
 
-  public TheRRunConfigurationEditor(@NotNull final TheRRunConfiguration configuration) {
-    myForm = new TheRRunConfigurationForm(configuration);
+  public TheRRunConfigurationEditor(@NotNull final Project project) {
+    myForm = new TheRRunConfigurationForm(project);
   }
 
   @Override

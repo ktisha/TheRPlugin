@@ -68,7 +68,7 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   @NotNull
   @Override
   public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-    return new TheRRunConfigurationEditor(this);
+    return new TheRRunConfigurationEditor(getProject());
   }
 
   @Override
