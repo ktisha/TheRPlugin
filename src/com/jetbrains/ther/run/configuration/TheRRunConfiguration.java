@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// TODO [run][test]
 public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
 
   @NotNull
