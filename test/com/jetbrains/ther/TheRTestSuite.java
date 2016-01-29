@@ -25,6 +25,7 @@ import com.jetbrains.ther.run.TheROutputReceiverImplTest;
 import com.jetbrains.ther.run.configuration.TheRRunConfigurationEditorTest;
 import com.jetbrains.ther.run.configuration.TheRRunConfigurationTest;
 import com.jetbrains.ther.run.configuration.TheRRunConfigurationTypeTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationUtilsTest;
 import com.jetbrains.ther.run.debug.TheRLineBreakpointUtilsTest;
 import com.jetbrains.ther.run.debug.resolve.TheRFunctionDefinitionProcessorTest;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSessionImplTest;
@@ -92,6 +93,7 @@ public class TheRTestSuite extends TestCase {
     suite.addTestSuite(TheRRunConfigurationTest.class);
     addJUnit4Test(suite, TheRRunConfigurationEditorTest.class);
     addJUnit4Test(suite, TheRRunConfigurationTypeTest.class);
+    addJUnit4Test(suite, TheRRunConfigurationUtilsTest.class);
 
     // debug package
     suite.addTestSuite(TheRLineBreakpointUtilsTest.class);
