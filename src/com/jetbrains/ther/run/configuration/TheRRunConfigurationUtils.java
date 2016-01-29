@@ -3,7 +3,6 @@ package com.jetbrains.ther.run.configuration;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.TheRFileType;
-import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,15 +10,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO [run][test]
 public final class TheRRunConfigurationUtils {
 
   public static void checkConfiguration(@NotNull final TheRRunConfiguration runConfiguration) throws ConfigurationException {
     final List<String> unspecifiedParameters = new ArrayList<String>();
-
-    if (StringUtil.isEmptyOrSpaces(TheRInterpreterService.getInstance().getInterpreterPath())) {
-      unspecifiedParameters.add("interpreter");
-    }
 
     if (StringUtil.isEmptyOrSpaces(runConfiguration.getScriptPath())) {
       unspecifiedParameters.add("script");
@@ -30,8 +24,12 @@ public final class TheRRunConfigurationUtils {
     }
 
     if (!unspecifiedParameters.isEmpty()) {
+      final String prefix = unspecifiedParameters.size() == 1
+                            ? "There is unspecified parameter in R run configuration: "
+                            : "There are unspecified parameters in R run configuration: ";
+
       throw new ConfigurationException(
-        "There are unspecified parameters in R run configuration: " + StringUtil.join(unspecifiedParameters, ", ")
+        prefix + StringUtil.join(unspecifiedParameters, ", ")
       );
     }
   }
