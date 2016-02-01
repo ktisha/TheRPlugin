@@ -28,9 +28,9 @@ public class TheRSliceExpressionImpl extends TheRExpressionImpl implements TheRS
   }
 
   @Override
-  @NotNull
-  public PsiElement getColon() {
-    return findNotNullChildByType(THE_R_COLON);
+  @Nullable
+  public TheROperator getOperator() {
+    return findChildByClass(TheROperator.class);
   }
 
 }

@@ -29,7 +29,6 @@ It includes syntax-highlighting editor that supports direct code execution, inte
   <project-components>
     <!-- Add your project components here -->
   </project-components>
-
   <actions>
     <action id="com.jetbrains.ther.console.TheRConsoleAction" class="com.jetbrains.ther.console.TheRConsoleAction"
             text="Run R Console..." description="Starts R interactive console">

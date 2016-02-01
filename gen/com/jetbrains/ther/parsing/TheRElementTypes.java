@@ -12,7 +12,7 @@ public interface TheRElementTypes {
 
   IElementType THE_R_ARGUMENT_LIST = new TheRElementType("THE_R_ARGUMENT_LIST");
   IElementType THE_R_ASSIGNMENT_STATEMENT = TheRElementTypeFactory.getElementTypeByName("THE_R_ASSIGNMENT_STATEMENT");
-  IElementType THE_R_BINARY_EXPRESSION = new TheRElementType("THE_R_BINARY_EXPRESSION");
+  IElementType THE_R_AT_EXPRESSION = new TheRElementType("THE_R_AT_EXPRESSION");
   IElementType THE_R_BLOCK_EXPRESSION = new TheRElementType("THE_R_BLOCK_EXPRESSION");
   IElementType THE_R_BREAK_STATEMENT = new TheRElementType("THE_R_BREAK_STATEMENT");
   IElementType THE_R_CALL_EXPRESSION = new TheRElementType("THE_R_CALL_EXPRESSION");
@@ -23,17 +23,23 @@ public interface TheRElementTypes {
   IElementType THE_R_HELP_EXPRESSION = new TheRElementType("THE_R_HELP_EXPRESSION");
   IElementType THE_R_IF_STATEMENT = new TheRElementType("THE_R_IF_STATEMENT");
   IElementType THE_R_LOGICAL_LITERAL_EXPRESSION = new TheRElementType("THE_R_LOGICAL_LITERAL_EXPRESSION");
+  IElementType THE_R_MEMBER_EXPRESSION = new TheRElementType("THE_R_MEMBER_EXPRESSION");
+  IElementType THE_R_NA_LITERAL_EXPRESSION = new TheRElementType("THE_R_NA_LITERAL_EXPRESSION");
   IElementType THE_R_NEXT_STATEMENT = new TheRElementType("THE_R_NEXT_STATEMENT");
+  IElementType THE_R_NULL_LITERAL_EXPRESSION = new TheRElementType("THE_R_NULL_LITERAL_EXPRESSION");
   IElementType THE_R_NUMERIC_LITERAL_EXPRESSION = new TheRElementType("THE_R_NUMERIC_LITERAL_EXPRESSION");
+  IElementType THE_R_OPERATOR = new TheRElementType("THE_R_OPERATOR");
+  IElementType THE_R_OPERATOR_EXPRESSION = new TheRElementType("THE_R_OPERATOR_EXPRESSION");
   IElementType THE_R_PARAMETER = new TheRElementType("THE_R_PARAMETER");
   IElementType THE_R_PARAMETER_LIST = new TheRElementType("THE_R_PARAMETER_LIST");
   IElementType THE_R_PARENTHESIZED_EXPRESSION = new TheRElementType("THE_R_PARENTHESIZED_EXPRESSION");
-  IElementType THE_R_PREFIX_EXPRESSION = new TheRElementType("THE_R_PREFIX_EXPRESSION");
   IElementType THE_R_REFERENCE_EXPRESSION = new TheRElementType("THE_R_REFERENCE_EXPRESSION");
   IElementType THE_R_REPEAT_STATEMENT = new TheRElementType("THE_R_REPEAT_STATEMENT");
   IElementType THE_R_SLICE_EXPRESSION = new TheRElementType("THE_R_SLICE_EXPRESSION");
   IElementType THE_R_STRING_LITERAL_EXPRESSION = new TheRElementType("THE_R_STRING_LITERAL_EXPRESSION");
   IElementType THE_R_SUBSCRIPTION_EXPRESSION = new TheRElementType("THE_R_SUBSCRIPTION_EXPRESSION");
+  IElementType THE_R_TILDE_EXPRESSION = new TheRElementType("THE_R_TILDE_EXPRESSION");
+  IElementType THE_R_UNARY_TILDE_EXPRESSION = new TheRElementType("THE_R_UNARY_TILDE_EXPRESSION");
   IElementType THE_R_WHILE_STATEMENT = new TheRElementType("THE_R_WHILE_STATEMENT");
 
   IElementType THE_R_AND = new TheRElementType("&");
@@ -62,8 +68,6 @@ public interface TheRElementTypes {
   IElementType THE_R_INF = new TheRElementType("INF");
   IElementType THE_R_INFIX_OP = new TheRElementType("INFIX_OP");
   IElementType THE_R_INTEGER = new TheRElementType("integer");
-  IElementType THE_R_INT_DIV = new TheRElementType("INT_DIV");
-  IElementType THE_R_KRONECKER_PROD = new TheRElementType("KRONECKER_PROD");
   IElementType THE_R_LBRACE = new TheRElementType("{");
   IElementType THE_R_LBRACKET = new TheRElementType("[");
   IElementType THE_R_LDBRACKET = new TheRElementType("[[");
@@ -73,10 +77,7 @@ public interface TheRElementTypes {
   IElementType THE_R_LIST_SUBSET = new TheRElementType("$");
   IElementType THE_R_LPAR = new TheRElementType("(");
   IElementType THE_R_LT = new TheRElementType("<");
-  IElementType THE_R_MATCHING = new TheRElementType("MATCHING");
-  IElementType THE_R_MATRIX_PROD = new TheRElementType("MATRIX_PROD");
   IElementType THE_R_MINUS = new TheRElementType("-");
-  IElementType THE_R_MODULUS = new TheRElementType("MODULUS");
   IElementType THE_R_MULT = new TheRElementType("*");
   IElementType THE_R_NA = new TheRElementType("NA");
   IElementType THE_R_NAN = new TheRElementType("NAN");
@@ -92,7 +93,6 @@ public interface TheRElementTypes {
   IElementType THE_R_NUMERIC = new TheRElementType("numeric");
   IElementType THE_R_OR = new TheRElementType("|");
   IElementType THE_R_OROR = new TheRElementType("||");
-  IElementType THE_R_OUTER_PROD = new TheRElementType("OUTER_PROD");
   IElementType THE_R_PLUS = new TheRElementType("+");
   IElementType THE_R_RBRACE = new TheRElementType("}");
   IElementType THE_R_RBRACKET = new TheRElementType("]");
@@ -119,8 +119,8 @@ public interface TheRElementTypes {
       else if (type == THE_R_ASSIGNMENT_STATEMENT) {
         return new TheRAssignmentStatementImpl(node);
       }
-      else if (type == THE_R_BINARY_EXPRESSION) {
-        return new TheRBinaryExpressionImpl(node);
+      else if (type == THE_R_AT_EXPRESSION) {
+        return new TheRAtExpressionImpl(node);
       }
       else if (type == THE_R_BLOCK_EXPRESSION) {
         return new TheRBlockExpressionImpl(node);
@@ -152,11 +152,26 @@ public interface TheRElementTypes {
       else if (type == THE_R_LOGICAL_LITERAL_EXPRESSION) {
         return new TheRLogicalLiteralExpressionImpl(node);
       }
+      else if (type == THE_R_MEMBER_EXPRESSION) {
+        return new TheRMemberExpressionImpl(node);
+      }
+      else if (type == THE_R_NA_LITERAL_EXPRESSION) {
+        return new TheRNaLiteralExpressionImpl(node);
+      }
       else if (type == THE_R_NEXT_STATEMENT) {
         return new TheRNextStatementImpl(node);
       }
+      else if (type == THE_R_NULL_LITERAL_EXPRESSION) {
+        return new TheRNullLiteralExpressionImpl(node);
+      }
       else if (type == THE_R_NUMERIC_LITERAL_EXPRESSION) {
         return new TheRNumericLiteralExpressionImpl(node);
+      }
+      else if (type == THE_R_OPERATOR) {
+        return new TheROperatorImpl(node);
+      }
+      else if (type == THE_R_OPERATOR_EXPRESSION) {
+        return new TheROperatorExpressionImpl(node);
       }
       else if (type == THE_R_PARAMETER) {
         return new TheRParameterImpl(node);
@@ -166,9 +181,6 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_PARENTHESIZED_EXPRESSION) {
         return new TheRParenthesizedExpressionImpl(node);
-      }
-      else if (type == THE_R_PREFIX_EXPRESSION) {
-        return new TheRPrefixExpressionImpl(node);
       }
       else if (type == THE_R_REFERENCE_EXPRESSION) {
         return new TheRReferenceExpressionImpl(node);
@@ -184,6 +196,12 @@ public interface TheRElementTypes {
       }
       else if (type == THE_R_SUBSCRIPTION_EXPRESSION) {
         return new TheRSubscriptionExpressionImpl(node);
+      }
+      else if (type == THE_R_TILDE_EXPRESSION) {
+        return new TheRTildeExpressionImpl(node);
+      }
+      else if (type == THE_R_UNARY_TILDE_EXPRESSION) {
+        return new TheRUnaryTildeExpressionImpl(node);
       }
       else if (type == THE_R_WHILE_STATEMENT) {
         return new TheRWhileStatementImpl(node);

@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.jetbrains.ther.TheRPsiUtils;
+import com.jetbrains.ther.TheRStaticAnalyzerHelper;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +16,8 @@ import java.util.*;
 
 public class TheRTypeProvider {
 
+
+  public static final String LIST = "list";
 
   public static TheRType getType(TheRPsiElement element) {
     return TheRTypeContext.getTypeFromCache(element);
@@ -25,7 +28,7 @@ public class TheRTypeProvider {
    */
   public static TheRType buildType(PsiElement element) {
     if (element == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     if (element instanceof TheRStringLiteralExpression) {
       return TheRCharacterType.INSTANCE;
@@ -35,6 +38,12 @@ public class TheRTypeProvider {
     }
     if (element instanceof TheRLogicalLiteralExpression) {
       return TheRLogicalType.INSTANCE;
+    }
+    if (element instanceof TheRNullLiteralExpression) {
+      return TheRNullType.INSTANCE;
+    }
+    if (element instanceof TheRNaLiteralExpression) {
+      return ((TheRNaLiteralExpression)element).getType();
     }
 
     if (element instanceof TheRReferenceExpression) {
@@ -56,12 +65,13 @@ public class TheRTypeProvider {
       return new TheRFunctionType((TheRFunctionExpression)element);
     }
     if (element instanceof TheRSubscriptionExpression) {
-      TheRReferenceExpression reference = PsiTreeUtil.getChildOfType(element, TheRReferenceExpression.class);
-      if (reference != null) {
-        TheRType type = getType(reference);
-        if (type != TheRType.UNKNOWN) {
-          return type.getSubscriptionType();
-        }
+      TheRSubscriptionExpression subscriptionExpression = (TheRSubscriptionExpression)element;
+      boolean isSingleBracket = subscriptionExpression.getLbracket() != null;
+      List<TheRExpression> expressionList = subscriptionExpression.getExpressionList();
+      TheRExpression base = expressionList.get(0);
+      if (base != null) {
+        TheRType type = getType(base);
+        return type.getSubscriptionType(expressionList.subList(1, expressionList.size()), isSingleBracket);
       }
     }
     if (element instanceof TheRBlockExpression) {
@@ -80,14 +90,33 @@ public class TheRTypeProvider {
         Set<TheRType> types = new HashSet<TheRType>();
         for (int i = 1; i < expressions.size(); i++) {
           TheRType type = getType(expressions.get(i));
-          if (type != TheRType.UNKNOWN) {
+          if (!TheRUnknownType.class.isInstance(type)) {
             types.add(type);
           }
         }
         return TheRUnionType.create(types);
       }
     }
-    return TheRType.UNKNOWN;
+
+    if (element instanceof TheRMemberExpression) {
+      TheRMemberExpression memberExpression = (TheRMemberExpression)element;
+      TheRType elementType = getType(memberExpression.getExpression());
+      return elementType.getMemberType(memberExpression.getTag());
+    }
+    if (element instanceof TheRSliceExpression) {
+      return TheRNumericType.INSTANCE; // TODO: think!
+    }
+    if (element instanceof TheROperatorExpression) {
+      return getBinaryExpressionType((TheROperatorExpression)element);
+    }
+    if (element instanceof TheRAtExpression) {
+      TheRAtExpression atExpression = (TheRAtExpression)element;
+      TheRExpression base = atExpression.getExpression();
+      String tag = atExpression.getTag();
+      TheRType baseType = getType(base);
+      return baseType.getSlotType(tag);
+    }
+    return TheRUnknownType.INSTANCE;
   }
 
   private static TheRType getNumericType(TheRNumericLiteralExpression expression) {
@@ -97,29 +126,113 @@ public class TheRTypeProvider {
     if (expression.getComplex() != null) {
       return TheRComplexType.INSTANCE;
     }
-    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRType.UNKNOWN;
+    return expression.getNumeric() != null ? TheRNumericType.INSTANCE : TheRUnknownType.INSTANCE;
+  }
+
+  private static TheRType getBinaryExpressionType(TheROperatorExpression expression) {
+    TheRFunctionExpression function = TheRPsiUtils.getFunction(expression);
+    if (function == null) {
+      return TheRUnknownType.INSTANCE;
+    }
+    TheRType functionType = getType(function);
+    if (!TheRFunctionType.class.isInstance(functionType)) {
+      return TheRUnknownType.INSTANCE; // TODO: Error?
+    }
+    List<TheRExpression> arguments = PsiTreeUtil.getChildrenOfTypeAsList(expression, TheRExpression.class);
+    return getFunctionCallReturnType((TheRFunctionType)functionType, arguments);
   }
 
   private static TheRType getCallExpressionType(TheRCallExpression element) {
-    TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
-    if (function == null) {
-      return TheRType.UNKNOWN;
+    String functionName = element.getExpression().getName();
+    if (LIST.equals(functionName)) {
+      return getNewListType(element.getArgumentList().getExpressionList());
     }
-    TheRFunctionType functionType = new TheRFunctionType(function);
+    if ("setClass".equals(functionName)) {
+      return getClassConstructor(element);
+    }
+    if ("new".equals(functionName)) {
+      return getTypeFromNew(element);
+    }
+
+    TheRFunctionExpression function = TheRPsiUtils.getFunction(element);
+    final TheRFunctionType functionType;
+    if (function != null) {
+      functionType = new TheRFunctionType(function);
+    } else {
+      TheRType type = TheRTypeProvider.getType(element.getExpression());
+      if (!TheRFunctionType.class.isInstance(type)) {
+        return TheRUnknownType.INSTANCE;
+      }
+      functionType = (TheRFunctionType)type;
+    }
+
+    return getFunctionCallReturnType(functionType, element.getArgumentList().getExpressionList());
+  }
+
+  private static TheRType getClassConstructor(TheRCallExpression element) {
+    TheRS4ClassType s4Class = TheRS4ClassType.createFromSetClass(element);
+    if (s4Class != null) {
+      // TODO : check S4 params
+      return new TheRFunctionType(s4Class);
+    }
+    return TheRUnknownType.INSTANCE;
+  }
+
+  private static TheRType getTypeFromNew(TheRCallExpression callExpression) {
+    String name = null;
+    TheRExpression classExpression = TheRPsiUtils.findParameterValue("Class", callExpression);
+    if (classExpression instanceof TheRStringLiteralExpression) {
+        name = classExpression.getText().substring(1, classExpression.getText().length() - 1);
+    }
+    if (name == null) {
+      return TheRUnknownType.INSTANCE;
+    }
+    TheRType atomicType = findTypeByName(name);
+    if (atomicType != null) {
+      return atomicType;
+    }
+    if ("list".equals(name)) {
+      List<TheRExpression> arguments = callExpression.getArgumentList().getExpressionList();
+      arguments.remove(classExpression);
+      return getNewListType(arguments);
+    }
+
+    TheRS4ClassType s4Class = TheRS4ClassType.byName(callExpression.getProject(), name);
+    if (s4Class == null) {
+      return TheRUnknownType.INSTANCE;
+    }
+    for (TheRExpression argument : callExpression.getArgumentList().getExpressionList()) {
+      if (argument instanceof TheRAssignmentStatement) {
+        PsiElement assignee = ((TheRAssignmentStatement)argument).getAssignee();
+        TheRPsiElement value = ((TheRAssignmentStatement)argument).getAssignedValue();
+        if (assignee instanceof TheRReferenceExpression) {
+          String slotName = assignee.getText();
+          if (!s4Class.hasSlot(slotName)) {
+            return new TheRErrorType("Invalid slot " + slotName);
+          }
+          if (!TheRTypeChecker.matchTypes(s4Class.getSlotType(slotName), getType(value))) {
+            return new TheRErrorType("Wrong type of slot " + slotName);
+          }
+        }
+      }
+    }
+    return s4Class;
+  }
+
+  private static TheRType getFunctionCallReturnType(TheRFunctionType functionType, List<TheRExpression> arguments) {
     // step 1: check @return
     if (functionType.getReturnType() != null) {
       return functionType.getReturnType();
     }
 
-    List<TheRExpression> arguments = element.getArgumentList().getExpressionList();
     Map<TheRExpression, TheRParameter> matchedParams = new HashMap<TheRExpression, TheRParameter>();
     List<TheRExpression> matchedByTripleDot = new ArrayList<TheRExpression>();
 
     try {
-      TheRTypeChecker.matchArgs(arguments, function, matchedParams, matchedByTripleDot, functionType);
+      TheRTypeChecker.matchArgs(arguments, matchedParams, matchedByTripleDot, functionType);
     }
     catch (MatchingException e) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
 
     Map<String, TheRParameterConfiguration> paramToSuppliedConfiguration =
@@ -127,11 +240,24 @@ public class TheRTypeProvider {
 
     // step 2: check @type annotation
     if (!isMatchedTypes(functionType, matchedParams, matchedByTripleDot, paramToSuppliedConfiguration)) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
 
     //step 3: check @rule
-   return tryApplyRule(functionType, paramToSuppliedConfiguration);
+    return tryApplyRule(functionType, paramToSuppliedConfiguration);
+  }
+
+  private static TheRType getNewListType(List<TheRExpression> arguments) {
+    TheRListType list = new TheRListType();
+    for (TheRExpression arg : arguments) {
+      if (arg instanceof TheRAssignmentStatement) {
+        TheRAssignmentStatement assignment = (TheRAssignmentStatement)arg;
+        list.addField(assignment.getAssignee().getText(), getType(assignment.getAssignedValue()));
+      } else {
+        list.addField(getType(arg));
+      }
+    }
+    return list;
   }
 
   private static boolean isMatchedTypes(TheRFunctionType functionType,
@@ -173,12 +299,7 @@ public class TheRTypeProvider {
     if (type != null) {
       return type;
     }
-    //TODO: uncomment this
-    //type = guessTypeFromFunctionBody(parameter);
-    if (type != null) {
-      return type;
-    }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
   }
 
   private static TheRType tryApplyRule(TheRFunctionType functionType,
@@ -212,14 +333,27 @@ public class TheRTypeProvider {
           TheRExpression exprValue = exprConf.getValue();
 
           // TODO : evaluate expressions?
-          if (exprValue == null || !exprValue.getText().equals(ruleValue.getText())) {
+          if (exprValue == null || !matchExpressions(exprValue, ruleValue)) {
             continue rulefor;
           }
         }
       }
       return rule.getReturnType().resolveType(env);
     }
-    return TheRType.UNKNOWN;
+    return TheRUnknownType.INSTANCE;
+  }
+
+  private static boolean matchExpressions(TheRExpression substitution, TheRExpression base) {
+    if (base instanceof TheRReferenceExpression) {
+      String name = base.getName();
+      if ("string".equals(name) && substitution instanceof TheRStringLiteralExpression) {
+        return true;
+      }
+      if ("number".equals(name) && substitution instanceof TheRNumericLiteralExpression) {
+        return true;
+      }
+    }
+    return substitution.getText().equals(base.getText());
   }
 
 
@@ -243,7 +377,7 @@ public class TheRTypeProvider {
         PsiElement parent = element.getParent();
         //TODO: check operations more strict
         //TODO: check control flow analysis
-        if (parent instanceof TheRBinaryExpression) {
+        if (parent instanceof TheROperatorExpression) {
           if (PsiTreeUtil.isAncestor(blockExpression, element, false)) {
             type[0] = TheRNumericType.INSTANCE;
             return false;
@@ -269,6 +403,15 @@ public class TheRTypeProvider {
     if (typeName.equals("complex")) {
       return TheRComplexType.INSTANCE;
     }
+    if (typeName.equals("integer")) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (typeName.equals("null")) {
+      return TheRNullType.INSTANCE;
+    }
+    if (typeName.equals("raw")) {
+      return TheRRawType.INSTANCE;
+    }
     //we need to return null in this case to create type variable
     return null;
   }
@@ -276,27 +419,19 @@ public class TheRTypeProvider {
   private static TheRType getReferenceExpressionType(TheRReferenceExpression expression) {
     PsiReference reference = expression.getReference();
     if (reference == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
-    PsiElement resolve = reference.resolve();
-    if (resolve != null && resolve instanceof TheRAssignmentStatement) {
-      TheRAssignmentStatement assignmentStatement = (TheRAssignmentStatement)resolve;
-      TheRPsiElement assignedValue = assignmentStatement.getAssignedValue();
-      if (assignedValue != null) {
-        return getType(assignedValue);
-      }
-    }
-    return TheRType.UNKNOWN;
+    return TheRStaticAnalyzerHelper.getReferenceType(expression);
   }
 
   public static TheRType guessReturnValueTypeFromBody(TheRFunctionExpression functionExpression) {
     TheRExpression expression = functionExpression.getExpression();
     if (expression == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     Set<TheRType> types = new HashSet<TheRType>();
     TheRType type = getType(expression);
-    if (type != TheRType.UNKNOWN) {
+    if (!TheRUnknownType.class.isInstance(type)) {
       types.add(type);
     }
     collectReturnTypes(functionExpression, types);
@@ -310,7 +445,7 @@ public class TheRTypeProvider {
         List<TheRExpression> args = callExpression.getArgumentList().getExpressionList();
         if (args.size() == 1) {
           TheRType rType = TheRTypeProvider.getType(args.iterator().next());
-          if (rType != null && rType != TheRType.UNKNOWN) {
+          if (rType != null && !TheRUnknownType.class.isInstance(rType)) {
             types.add(rType);
           }
         }

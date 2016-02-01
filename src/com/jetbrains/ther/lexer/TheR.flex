@@ -121,13 +121,7 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
 {IDENTIFIER}                { return TheRElementTypes.THE_R_IDENTIFIER; }
 
 //special operators
-"%/%"                       { return TheRElementTypes.THE_R_INT_DIV; }
-"%*%"                       { return TheRElementTypes.THE_R_MATRIX_PROD; }
-"%o%"                       { return TheRElementTypes.THE_R_OUTER_PROD; }
-"%in%"                      { return TheRElementTypes.THE_R_MATCHING; }
-"%x%"                       { return TheRElementTypes.THE_R_KRONECKER_PROD; }
-// user-defined
-"%"{LETTER_OR_OP}+"%"       { return TheRElementTypes.THE_R_INFIX_OP; }
+"%"{LETTER_OR_OP}*"%"       { return TheRElementTypes.THE_R_INFIX_OP; }
 
 // Infix and prefix operators
 ":::"                       { return TheRElementTypes.THE_R_TRIPLECOLON; }
@@ -143,7 +137,6 @@ private Stack<IElementType> myExpectedBracketsStack = new Stack<IElementType>();
 "*"                         { return TheRElementTypes.THE_R_MULT; }
 "/"                         { return TheRElementTypes.THE_R_DIV; }
 "^"                         { return TheRElementTypes.THE_R_EXP; }
-"%%"                        { return TheRElementTypes.THE_R_MODULUS; }
 
 // relational
 "<"                         { return TheRElementTypes.THE_R_LT; }

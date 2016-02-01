@@ -1,12 +1,13 @@
 TheRFile:ReprInSublist.r
-  THE_R_PREFIX_EXPRESSION
-    PsiElement(!)('!')
-    THE_R_REFERENCE_EXPRESSION
-      THE_R_CALL_EXPRESSION
-        THE_R_REFERENCE_EXPRESSION
-          PsiElement(identifier)('l10n_info')
-        THE_R_ARGUMENT_LIST
-          PsiElement(()('(')
-          PsiElement())(')')
-      PsiElement($)('$')
-      PsiElement(identifier)('`UTF-8`')
+  TheR:THE_R_OPERATOR_EXPRESSION
+    TheR:THE_R_OPERATOR
+      PsiElement(TheR:!)('!')
+    TheR:THE_R_MEMBER_EXPRESSION
+      TheR:THE_R_CALL_EXPRESSION
+        TheR:THE_R_REFERENCE_EXPRESSION
+          PsiElement(TheR:identifier)('l10n_info')
+        TheR:THE_R_ARGUMENT_LIST
+          PsiElement(TheR:()('(')
+          PsiElement(TheR:))(')')
+      PsiElement(TheR:$)('$')
+      PsiElement(TheR:identifier)('`UTF-8`')

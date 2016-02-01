@@ -3,9 +3,7 @@ package com.jetbrains.ther.typing.types;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.TheRStaticAnalyzerHelper;
-import com.jetbrains.ther.psi.api.TheRAssignmentStatement;
-import com.jetbrains.ther.psi.api.TheRFunctionExpression;
-import com.jetbrains.ther.psi.api.TheRParameter;
+import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.*;
 
 import java.util.*;
@@ -26,8 +24,19 @@ public class TheRFunctionType extends TheRType {
     createFunctionType();
   }
 
+  public TheRFunctionType(TheRS4ClassType returnType) {
+    myReturnType = returnType;
+    myFunctionExpression = null;
+
+    for (String slot : returnType.getSlots()) {
+      TheRTypedParameter typedParameter = new TheRTypedParameter(slot, returnType.getSlotType(slot), null);
+      typedParameter.setOptional(true);
+      myParameters.put(slot, typedParameter);
+    }
+  }
+
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "function";
   }
 
@@ -51,10 +60,27 @@ public class TheRFunctionType extends TheRType {
         typedParameter.setOptional(true);
       }
     }
-    if (myReturnType == null || myReturnType == TheRType.UNKNOWN) {
+    for (TheRTypedParameter parameter : myParameters.values()) {
+      Set<TheRType> parameterTypes = new HashSet<TheRType>();
+      TheRType fromAnnotation = parameter.getType();
+      if (fromAnnotation != null) {
+        parameterTypes.add(fromAnnotation);
+        TheRExpression defaultValue = parameter.getParameter().getExpression();
+        if (defaultValue != null) {
+          TheRType defaultType = TheRTypeProvider.getType(defaultValue);
+          if (!TheRUnknownType.class.isInstance(defaultType)) {
+            parameterTypes.add(defaultType);
+          }
+        }
+      }
+      if (!parameterTypes.isEmpty()) {
+        parameter.setType(TheRUnionType.create(parameterTypes));
+      }
+    }
+    if (myReturnType == null || myReturnType instanceof TheRUnknownType) {
       if (PsiManager.getInstance(myFunctionExpression.getProject()).isInProject(myFunctionExpression)) {
         TheRType type = TheRTypeProvider.guessReturnValueTypeFromBody(myFunctionExpression);
-        if (type != TheRType.UNKNOWN) {
+        if (!TheRUnknownType.class.isInstance(type)) {
           myReturnType = type;
         }
       }
@@ -90,7 +116,7 @@ public class TheRFunctionType extends TheRType {
   }
 
   public void addRule(TheRFunctionRule rule) {
-    myRules.add(rule);
+    myRules.add(0, rule); // we are parsing from bottom to top
   }
 
   public List<TheRParameter> getOptionalParams() {
@@ -101,5 +127,19 @@ public class TheRFunctionType extends TheRType {
       }
     }
     return optionalParams;
+  }
+
+  @SuppressWarnings("SimplifiableIfStatement")
+  public boolean isOptional(String param) {
+    if (param != null && myParameters.containsKey(param)) {
+      return myParameters.get(param).isOptional();
+    }
+    return true;
+  }
+
+  public List<TheRParameter> getFormalArguments() {
+    return myFunctionExpression != null
+           ? myFunctionExpression.getParameterList().getParameterList()
+           : Collections.<TheRParameter>emptyList();
   }
 }

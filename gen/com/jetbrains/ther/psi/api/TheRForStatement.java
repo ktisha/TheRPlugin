@@ -22,4 +22,10 @@ public interface TheRForStatement extends TheRExpression {
   @NotNull
   TheRExpression getTarget();
 
+  @Nullable
+  TheRExpression getRange();
+
+  @Nullable
+  TheRExpression getBody();
+
 }
