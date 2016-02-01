@@ -20,9 +20,9 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
-import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRVarsLoaderFactoryImpl;
@@ -157,7 +157,7 @@ public class TheRDebugRunner extends GenericProgramRunner {
   private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
     final List<String> result = new ArrayList<String>();
 
-    result.addAll(TheRProcessUtils.getInitCommands());
+    result.addAll(TheRInterpreterConstants.INIT_DEBUG_COMMANDS);
     result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
 
     return result;

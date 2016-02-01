@@ -5,7 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public final class TheRInterpreterParameters {
+import static com.jetbrains.ther.debugger.data.TheRCommands.BROWSER_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.optionsCommand;
+
+public final class TheRInterpreterConstants {
 
   @NotNull
   public static final String NO_SAVE_PARAMETER = "--no-save";
@@ -18,4 +21,7 @@ public final class TheRInterpreterParameters {
 
   @NotNull
   public static final List<String> DEFAULT_PARAMETERS = Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER);
+
+  @NotNull
+  public static final List<String> INIT_DEBUG_COMMANDS = Arrays.asList(BROWSER_COMMAND, optionsCommand("keep.source", "TRUE"));
 }
