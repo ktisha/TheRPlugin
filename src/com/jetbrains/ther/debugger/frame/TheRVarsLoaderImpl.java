@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.handleValue;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
@@ -167,17 +167,6 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   private boolean isService(@NotNull final String var) {
     return var.startsWith(SERVICE_FUNCTION_PREFIX) && var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX);
-  }
-
-  @NotNull
-  private String handleValue(@NotNull final String type,
-                             @NotNull final String value) {
-    if (type.equals(FUNCTION_TYPE)) {
-      return TheRDebuggerStringUtils.handleFunctionValue(value);
-    }
-    else {
-      return value;
-    }
   }
 
   @NotNull

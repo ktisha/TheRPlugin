@@ -5,8 +5,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
-
 public final class TheRDebuggerStringUtils {
 
   public static void appendError(@NotNull final TheRExecutionResult result, @NotNull final TheROutputReceiver receiver) {
@@ -26,21 +24,6 @@ public final class TheRDebuggerStringUtils {
           result.getOutput()
         )
       );
-    }
-  }
-
-  @NotNull
-  public static String handleFunctionValue(@NotNull final String functionValue) {
-    final int lastLineBegin = findLastLineBegin(functionValue);
-
-    if (functionValue.startsWith(ENVIRONMENT, lastLineBegin + "<".length())) {
-      return functionValue.substring(
-        0,
-        findLastButOneLineEnd(functionValue, lastLineBegin)
-      );
-    }
-    else {
-      return functionValue;
     }
   }
 

@@ -10,7 +10,6 @@ import org.junit.Test;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
 import static org.junit.Assert.assertEquals;
 
 public class TheRDebuggerStringUtilsTest {
@@ -55,35 +54,6 @@ public class TheRDebuggerStringUtilsTest {
 
     assertEquals(Collections.singletonList("out"), receiver.getOutputs());
     assertEquals(Collections.emptyList(), receiver.getErrors());
-  }
-
-  @Test
-  public void outerFunctionValueHandling() {
-    assertEquals(
-      "function(x) {\n" +
-      "    x ^ 2\n" +
-      "}",
-      handleFunctionValue(
-        "function(x) {\n" +
-        "    x ^ 2\n" +
-        "}"
-      )
-    );
-  }
-
-  @Test
-  public void innerFunctionValueHandling() {
-    assertEquals(
-      "function(x) {\n" +
-      "    x ^ 2\n" +
-      "}",
-      handleFunctionValue(
-        "function(x) {\n" +
-        "    x ^ 2\n" +
-        "}\n" +
-        "<" + ENVIRONMENT + ": 0xfffffff>"
-      )
-    );
   }
 
   @Test
