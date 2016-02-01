@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.executor;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
@@ -334,7 +334,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
 
   @Nullable
   private static TypeAndResultLineBounds tryUnbraceDebugAt(@NotNull final String[] lines) {
-    if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG_AT_PREFIX)) {
+    if (lines.length > 2 && lines[lines.length - 2].startsWith(DEBUG_AT_PREFIX)) {
       return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 2);
     }
     else {

@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -15,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
@@ -638,7 +638,7 @@ public class TheRUnbraceFunctionDebuggerTest {
         return new TheRExecutionResult(
           EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUGGING_IN_PREFIX + "abc()\n" +
+          DEBUGGING_IN_PREFIX + "abc()\n" +
           DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +

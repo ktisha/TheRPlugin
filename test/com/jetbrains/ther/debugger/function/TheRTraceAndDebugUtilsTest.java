@@ -2,6 +2,7 @@ package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
@@ -24,7 +25,12 @@ public class TheRTraceAndDebugUtilsTest {
   @NotNull
   public static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
                                                     "function(x) x == \"" + CLOSURE + "\", " +
-                                                    EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
+                                                    EAPPLY_COMMAND +
+                                                    "(" +
+                                                    TheRResponseConstants.ENVIRONMENT +
+                                                    "(), " +
+                                                    TYPEOF_COMMAND +
+                                                    ")" +
                                                     ")";
 
   @NotNull
@@ -92,11 +98,11 @@ public class TheRTraceAndDebugUtilsTest {
       LS_FUNCTIONS_COMMAND,
 
       xEnterFunctionName + " <- function() { print(\"" + xFunctionName + "\") }",
-      TRACE_COMMAND + "(" + xFunctionName + ", " + xEnterFunctionName + ", where = " + ENVIRONMENT + "())",
+      TRACE_COMMAND + "(" + xFunctionName + ", " + xEnterFunctionName + ", where = " + TheRResponseConstants.ENVIRONMENT + "())",
       DEBUG_COMMAND + "(" + xFunctionName + ")",
 
       mainEnterFunctionName + " <- function() { print(\"" + mainFunctionName + "\") }",
-      TRACE_COMMAND + "(" + mainFunctionName + ", " + mainEnterFunctionName + ", where = " + ENVIRONMENT + "())",
+      TRACE_COMMAND + "(" + mainFunctionName + ", " + mainEnterFunctionName + ", where = " + TheRResponseConstants.ENVIRONMENT + "())",
       DEBUG_COMMAND + "(" + mainFunctionName + ")"
     );
   }

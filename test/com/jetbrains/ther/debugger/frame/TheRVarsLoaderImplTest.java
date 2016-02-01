@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResultTheRExecutor;
@@ -175,7 +175,7 @@ public class TheRVarsLoaderImplTest {
         final String output = "function(x) {\n" +
                               "    x ^ 2\n" +
                               "}\n" +
-                              "<" + ENVIRONMENT + ": 0xfffffff>";
+                              "<" + TheRResponseConstants.ENVIRONMENT + ": 0xfffffff>";
 
         return new TheRExecutionResult(
           output,
@@ -217,7 +217,7 @@ public class TheRVarsLoaderImplTest {
       }
 
       if (getCounter() == 3) {
-        final String output = TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
+        final String output = TheRResponseConstants.DEBUG_AT_LINE_PREFIX + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
 
         return new TheRExecutionResult(
           output,

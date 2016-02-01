@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,12 @@ public final class TheRTraceAndDebugUtils {
   @NotNull
   private static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
                                                      "function(x) x == \"" + CLOSURE + "\", " +
-                                                     EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
+                                                     EAPPLY_COMMAND +
+                                                     "(" +
+                                                     TheRResponseConstants.ENVIRONMENT +
+                                                     "(), " +
+                                                     TYPEOF_COMMAND +
+                                                     ")" +
                                                      ")";
 
   public static void traceAndDebugFunctions(@NotNull final TheRExecutor executor, @NotNull final TheROutputReceiver receiver)
@@ -71,7 +77,7 @@ public final class TheRTraceAndDebugUtils {
            functionName +
            ", " +
            enterFunctionName(functionName) +
-           ", where = " + ENVIRONMENT + "()" +
+           ", where = " + TheRResponseConstants.ENVIRONMENT + "()" +
            ")";
   }
 

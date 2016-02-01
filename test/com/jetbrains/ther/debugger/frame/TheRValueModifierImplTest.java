@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
@@ -11,7 +10,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -191,7 +192,7 @@ public class TheRValueModifierImplTest {
     final String error = "error";
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      TheRDebugConstants.DEBUGGING_IN_PREFIX + "def(c(1:5))\n" +
+      DEBUGGING_IN_PREFIX + "def(c(1:5))\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
       "    {\n" +
@@ -310,7 +311,7 @@ public class TheRValueModifierImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: x <- c(1:10)",
+          DEBUG_AT_LINE_PREFIX + "2: x <- c(1:10)",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

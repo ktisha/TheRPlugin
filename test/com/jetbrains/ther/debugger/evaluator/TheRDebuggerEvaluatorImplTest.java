@@ -12,7 +12,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 
@@ -219,7 +221,7 @@ public class TheRDebuggerEvaluatorImplTest {
     final String result = "[1] 1 2 3";
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      TheRDebugConstants.DEBUGGING_IN_PREFIX + expression + "\n" +
+      DEBUGGING_IN_PREFIX + expression + "\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
       "    {\n" +
@@ -291,7 +293,7 @@ public class TheRDebuggerEvaluatorImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: " + TheRDebugConstants.SYS_FRAME_COMMAND + "(0)$abc",
+          DEBUG_AT_LINE_PREFIX + "2: " + TheRDebugConstants.SYS_FRAME_COMMAND + "(0)$abc",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

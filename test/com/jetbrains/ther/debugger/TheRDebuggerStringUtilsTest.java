@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
 import static org.junit.Assert.assertEquals;
 
 public class TheRDebuggerStringUtilsTest {

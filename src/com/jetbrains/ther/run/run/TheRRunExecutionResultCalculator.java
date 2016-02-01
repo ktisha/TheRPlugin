@@ -2,21 +2,21 @@ package com.jetbrains.ther.run.run;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.PROMPT;
 
 public class TheRRunExecutionResultCalculator implements TheRExecutionResultCalculator {
 
   @Override
   public boolean isComplete(@NotNull final CharSequence output) {
-    final int promptIndex = output.length() - TheRDebugConstants.PROMPT.length();
+    final int promptIndex = output.length() - PROMPT.length();
 
-    return StringUtil.endsWith(output, TheRDebugConstants.PROMPT) &&
+    return StringUtil.endsWith(output, PROMPT) &&
            promptIndex > 0 &&
            StringUtil.isLineBreak(output.charAt(promptIndex - 1));
   }

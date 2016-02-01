@@ -5,7 +5,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.ENVIRONMENT;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
 
 public final class TheRDebuggerStringUtils {
 

@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger;
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
@@ -1142,7 +1143,7 @@ public class TheRDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() < myScriptLength + 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.PLUS_AND_SPACE,
+          TheRResponseConstants.PLUS_AND_SPACE,
           TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error" + getCounter()

@@ -6,7 +6,7 @@ import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.PROMPT;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.PROMPT;
 import static org.junit.Assert.*;
 
 public class TheRRunExecutionResultCalculatorTest {

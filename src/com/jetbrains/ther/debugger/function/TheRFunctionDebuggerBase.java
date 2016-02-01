@@ -3,7 +3,6 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -15,8 +14,9 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.DEBUG_AT_LINE_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.EXITING_FROM_PREFIX;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
@@ -226,7 +226,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT_LINE_PREFIX.length();
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT_LINE_PREFIX.length();
     final int lineNumberEnd = output.indexOf(':', lineNumberBegin + 1);
 
     return Integer.parseInt(output.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
@@ -245,7 +245,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private boolean isBraceLoopEntrance(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT_LINE_PREFIX.length();
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT_LINE_PREFIX.length();
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
     final int lines = StringUtil.countNewLines(output.substring(loopEntranceBegin));
 
@@ -287,7 +287,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final String output = result.getOutput();
     final int debugAtIndex = findDebugAtIndexInEndTraceReturn(result, lastExitingFrom);
 
-    if (output.startsWith(TheRDebugConstants.DEBUG_AT_LINE_PREFIX, debugAtIndex)) {
+    if (output.startsWith(DEBUG_AT_LINE_PREFIX, debugAtIndex)) {
       if (isBraceLoopEntrance(output, debugAtIndex)) {
         handleDebugAt(
           execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT),
