@@ -663,7 +663,7 @@ public class TheRUnbraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          TRACING + " abc() on entry \n" +
+          TRACING_PREFIX + "abc() on entry \n" +
           "[1] \"abc\"\n" +
           DEBUG + ": c(4:6)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,

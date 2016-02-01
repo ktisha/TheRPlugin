@@ -146,7 +146,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateStartTraceBraceTopLevel() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " x() on entry \n" +
+      TRACING_PREFIX + "x() on entry \n" +
       "[1] \"x\"\n" +
       DEBUG + ": {\n" +
       "    print(\"x\")\n" +
@@ -161,7 +161,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateStartTraceBraceInside() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " f() on entry \n" +
+      TRACING_PREFIX + "f() on entry \n" +
       "[1] \"f\"\n" +
       DEBUG + ": for (i in 1:2) {\n" +
       "    print(i)\n" +
@@ -176,7 +176,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateStartTraceUnbrace() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TRACING + " x() on entry \n" +
+      TRACING_PREFIX + "x() on entry \n" +
       "[1] \"x\"\n" +
       DEBUG + ": print(\"x\")",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,

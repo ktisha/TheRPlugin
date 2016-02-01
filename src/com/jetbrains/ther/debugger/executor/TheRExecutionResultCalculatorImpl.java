@@ -18,7 +18,7 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
 
   @NotNull
-  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");
+  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING_PREFIX + ".* on entry( )*$");
 
   @NotNull
   private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)");

@@ -985,7 +985,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRExecutionResult(
-          TRACING + " abc() on entry \n" +
+          TRACING_PREFIX + "abc() on entry \n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    c(4:6)\n" +

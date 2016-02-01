@@ -82,7 +82,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
+          TheRDebugConstants.TRACING_PREFIX + "abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    x + 1\n" +
@@ -122,7 +122,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
+          TheRDebugConstants.TRACING_PREFIX + "abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: x + 1",
           START_TRACE_UNBRACE,

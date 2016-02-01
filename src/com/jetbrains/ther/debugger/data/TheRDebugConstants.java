@@ -94,7 +94,7 @@ public final class TheRDebugConstants {
   public static final String DEBUG = "debug";
 
   @NotNull
-  public static final String TRACING = "Tracing";
+  public static final String TRACING_PREFIX = "Tracing ";
 
   @NotNull
   public static final String EXITING_FROM_PREFIX = "exiting from: ";
