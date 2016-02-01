@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LOAD_LIB_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.LOAD_LIB_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
 import static java.lang.Boolean.parseBoolean;
 

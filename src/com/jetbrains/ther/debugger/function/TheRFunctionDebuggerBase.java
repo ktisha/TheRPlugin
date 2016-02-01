@@ -13,7 +13,9 @@ import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.FOR_LOOP_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.WHILE_LOOP_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.DEBUG_AT_LINE_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.EXITING_FROM_PREFIX;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;

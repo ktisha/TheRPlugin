@@ -3,7 +3,8 @@ package com.jetbrains.ther.debugger.evaluator;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.CLOSURE;
 
 public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
 

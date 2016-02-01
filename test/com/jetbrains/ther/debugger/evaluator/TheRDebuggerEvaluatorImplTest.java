@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.mock.*;
@@ -293,7 +293,7 @@ public class TheRDebuggerEvaluatorImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT_LINE_PREFIX + "2: " + TheRDebugConstants.SYS_FRAME_COMMAND + "(0)$abc",
+          DEBUG_AT_LINE_PREFIX + "2: " + TheRCommands.SYS_FRAME_COMMAND + "(0)$abc",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

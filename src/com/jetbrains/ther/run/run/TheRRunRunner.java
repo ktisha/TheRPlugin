@@ -11,7 +11,7 @@ import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ConcurrencyUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.run.TheRCommandLineState;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
@@ -70,9 +70,9 @@ public class TheRRunRunner extends GenericProgramRunner {
 
     result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
 
-    result.add(TheRDebugConstants.SOURCE_COMMAND + "(\"" + runConfiguration.getScriptPath() + "\")");
+    result.add(TheRCommands.SOURCE_COMMAND + "(\"" + runConfiguration.getScriptPath() + "\")");
 
-    result.add(TheRDebugConstants.QUIT_COMMAND);
+    result.add(TheRCommands.QUIT_COMMAND);
 
     return result;
   }

@@ -5,8 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.BROWSER_COMMAND;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.KEEP_SOURCE_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.BROWSER_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.KEEP_SOURCE_COMMAND;
 
 public final class TheRProcessUtils {
 

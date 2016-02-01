@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_UNBRACE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;

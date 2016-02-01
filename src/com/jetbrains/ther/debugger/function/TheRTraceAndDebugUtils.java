@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
+import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
