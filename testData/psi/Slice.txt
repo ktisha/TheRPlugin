@@ -1,8 +1,8 @@
 TheRFile:Slice.r
-  TheR:THE_R_SLICE_EXPRESSION
-    TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
-      PsiElement(TheR:numeric)('1')
-    TheR:THE_R_OPERATOR
-      PsiElement(TheR::)(':')
-    TheR:THE_R_NUMERIC_LITERAL_EXPRESSION
-      PsiElement(TheR:numeric)('10')
+  THE_R_SLICE_EXPRESSION
+    THE_R_NUMERIC_LITERAL_EXPRESSION
+      PsiElement(numeric)('1')
+    THE_R_OPERATOR
+      PsiElement(:)(':')
+    THE_R_NUMERIC_LITERAL_EXPRESSION
+      PsiElement(numeric)('10')
