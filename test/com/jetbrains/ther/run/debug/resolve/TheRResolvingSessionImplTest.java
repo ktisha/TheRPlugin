@@ -3,12 +3,13 @@ package com.jetbrains.ther.run.debug.resolve;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.xdebugger.XSourcePosition;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.MAIN_FUNCTION_NAME;
 
 public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
@@ -23,7 +24,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 4)
+        new TheRLocation(MAIN_FUNCTION_NAME, 4)
       ),
       virtualFile,
       3
@@ -52,7 +53,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 7)
+        new TheRLocation(MAIN_FUNCTION_NAME, 7)
       ),
       virtualFile,
       6
@@ -89,7 +90,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 7)
+        new TheRLocation(MAIN_FUNCTION_NAME, 7)
       ),
       virtualFile,
       6
@@ -126,7 +127,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 7)
+        new TheRLocation(MAIN_FUNCTION_NAME, 7)
       ),
       virtualFile,
       6
@@ -152,7 +153,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 4)
+        new TheRLocation(MAIN_FUNCTION_NAME, 4)
       ),
       virtualFile,
       3
@@ -192,7 +193,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 3)
+        new TheRLocation(MAIN_FUNCTION_NAME, 3)
       ),
       virtualFile,
       2
@@ -219,7 +220,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 4)
+        new TheRLocation(MAIN_FUNCTION_NAME, 4)
       ),
       virtualFile,
       3
@@ -251,7 +252,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 1)
+        new TheRLocation(MAIN_FUNCTION_NAME, 1)
       ),
       virtualFile,
       0
@@ -270,7 +271,7 @@ public class TheRResolvingSessionImplTest extends PlatformTestCase {
 
     checkPosition(
       resolvingSession.resolveNext(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 1)
+        new TheRLocation(MAIN_FUNCTION_NAME, 1)
       ),
       virtualFile,
       0

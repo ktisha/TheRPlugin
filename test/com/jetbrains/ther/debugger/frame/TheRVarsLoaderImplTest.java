@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;

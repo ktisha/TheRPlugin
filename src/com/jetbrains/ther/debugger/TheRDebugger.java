@@ -25,7 +25,7 @@ import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.SYS_NFRAME_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRCommands.bodyCommand;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.MAIN_FUNCTION_NAME;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;

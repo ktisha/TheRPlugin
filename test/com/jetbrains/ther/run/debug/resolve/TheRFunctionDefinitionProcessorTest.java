@@ -7,7 +7,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.PlatformTestCase;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRFunctionConstants;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -143,7 +143,7 @@ public class TheRFunctionDefinitionProcessorTest extends PlatformTestCase {
 
     final TheRFunctionDescriptor root = processor.getRoot();
 
-    assertEquals(TheRDebugConstants.MAIN_FUNCTION_NAME, root.getName());
+    assertEquals(TheRFunctionConstants.MAIN_FUNCTION_NAME, root.getName());
     assertEquals(null, root.getParent());
     assertEquals(0, root.getStartLine());
     assertEquals(Integer.MAX_VALUE, root.getEndLine());

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class TheRDebugConstants {
+public final class TheRFunctionConstants {
 
   @NotNull
   public static final String SERVICE_FUNCTION_PREFIX = "jetbrains_ther_";

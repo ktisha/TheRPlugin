@@ -3,7 +3,7 @@ package com.jetbrains.ther.debugger.data;
 import com.intellij.util.LineSeparator;
 import org.jetbrains.annotations.NotNull;
 
-public class TheRLanguageConstants {
+public final class TheRLanguageConstants {
 
   @NotNull
   public static final String LINE_SEPARATOR = LineSeparator.getSystemLineSeparator().getSeparatorString();

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.NotNull;
 
-public class TheRCommands {
+public final class TheRCommands {
 
   @NotNull
   public static final String TYPEOF_FUNCTION = "typeof";

@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.data;
 
 import org.jetbrains.annotations.NotNull;
 
-public class TheRResponseConstants {
+public final class TheRResponseConstants {
 
   @NotNull
   public static final String PLUS_AND_SPACE = "+ ";

@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
