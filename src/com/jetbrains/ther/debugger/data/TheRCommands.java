@@ -20,7 +20,7 @@ public final class TheRCommands {
   public static final String QUIT_COMMAND = "q()";
 
   @NotNull
-  public static String optionsCommands(@NotNull final String key, @NotNull final String value) {
+  public static String optionsCommand(@NotNull final String key, @NotNull final String value) {
     return String.format("options(%s=%s)", key, value);
   }
 
@@ -55,11 +55,6 @@ public final class TheRCommands {
   }
 
   @NotNull
-  public static String sysFrameCommand(final int frameNumber) {
-    return String.format("sys.frame(%d)", frameNumber);
-  }
-
-  @NotNull
   public static String expressionOnFrameCommand(final int frameNumber, @NotNull final String expression) {
     return String.format("%s$%s", sysFrameCommand(frameNumber), expression);
   }
@@ -87,5 +82,10 @@ public final class TheRCommands {
   @NotNull
   public static String sourceCommand(@NotNull final String path) {
     return String.format("source(\"%s\")", path);
+  }
+
+  @NotNull
+  private static String sysFrameCommand(final int frameNumber) {
+    return String.format("sys.frame(%d)", frameNumber);
   }
 }
