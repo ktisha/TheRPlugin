@@ -98,7 +98,7 @@ public class TheRTypeCheckerInspection extends TheRLocalInspection {
 
   @Override
   public boolean isEnabledByDefault() {
-    return true;
+    return false;
   }
 
   @Override
