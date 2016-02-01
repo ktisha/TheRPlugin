@@ -1298,8 +1298,8 @@ public class TheRDebuggerTest {
     private int myCounter = 0;
 
     @Override
-    public void setMaxFrameNumber(final int maxFrameNumber) {
-      myCounter += maxFrameNumber;
+    public void setLastFrameNumber(final int lastFrameNumber) {
+      myCounter += lastFrameNumber;
     }
   }
 

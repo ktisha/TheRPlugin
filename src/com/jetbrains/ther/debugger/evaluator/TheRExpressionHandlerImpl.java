@@ -8,7 +8,7 @@ import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 
 public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
 
-  private int myMaxFrameNumber = 0;
+  private int myLastFrameNumber = 0;
 
   @NotNull
   @Override
@@ -17,7 +17,7 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
       return handleIdentifier(frameNumber, expression);
     }
 
-    if (frameNumber == myMaxFrameNumber) {
+    if (frameNumber == myLastFrameNumber) {
       return expression;
     }
     else {
@@ -26,8 +26,8 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
   }
 
   @Override
-  public void setMaxFrameNumber(final int maxFrameNumber) {
-    myMaxFrameNumber = maxFrameNumber;
+  public void setLastFrameNumber(final int lastFrameNumber) {
+    myLastFrameNumber = lastFrameNumber;
   }
 
   @NotNull

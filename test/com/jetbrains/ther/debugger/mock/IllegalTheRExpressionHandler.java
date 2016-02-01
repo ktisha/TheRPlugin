@@ -12,7 +12,7 @@ public class IllegalTheRExpressionHandler implements TheRExpressionHandler {
   }
 
   @Override
-  public void setMaxFrameNumber(final int maxFrameNumber) {
+  public void setLastFrameNumber(final int lastFrameNumber) {
     throw new IllegalStateException("SetMaxFrameNumber shouldn't be called");
   }
 }

@@ -11,7 +11,7 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void identifierOnTheLast() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(1);
+    handler.setLastFrameNumber(1);
 
     final String globalIdentifier = expressionOnFrameCommand(1, "abc");
     final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
@@ -26,7 +26,7 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void identifierOnThePrevious() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(2);
+    handler.setLastFrameNumber(2);
 
     final String globalIdentifier = expressionOnFrameCommand(1, "abc");
     final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
@@ -41,7 +41,7 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void callOnTheLast() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(1);
+    handler.setLastFrameNumber(1);
 
     assertEquals(
       "abc()",
@@ -52,7 +52,7 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void callOnThePrevious() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(2);
+    handler.setLastFrameNumber(2);
 
     assertEquals(
       expressionOnFrameCommand(1, "abc()"),
