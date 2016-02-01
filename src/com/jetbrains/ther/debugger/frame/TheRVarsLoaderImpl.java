@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateRepresentation;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateValueCommand;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
@@ -88,17 +87,14 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @Nullable
   private TheRVar loadVar(@NotNull final String var) throws TheRDebuggerException {
-    final String type = handleType(
-      var,
-      execute(
-        myExecutor,
-        typeOfCommand(expressionOnFrameCommand(myFrameNumber, var)),
-        RESPONSE,
-        myReceiver
-      )
+    final String type = execute(
+      myExecutor,
+      typeOfCommand(expressionOnFrameCommand(myFrameNumber, var)),
+      RESPONSE,
+      myReceiver
     );
 
-    if (type == null) {
+    if (type.equals(FUNCTION_TYPE) && TheRDebuggerUtils.isServiceName(var)) {
       return null;
     }
 
@@ -122,20 +118,10 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     }
   }
 
-  @Nullable
-  private String handleType(@NotNull final String var,
-                            @NotNull final String type) {
-    if (type.equals(FUNCTION_TYPE) && isService(var)) {
-      return null;
-    }
-
-    return type;
-  }
-
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    final TheRExecutionResult result = execute(myExecutor, TheRDebuggerUtils.calculateValueCommand(myFrameNumber, var), myReceiver);
+    final TheRExecutionResult result = execute(myExecutor, calculateValueCommand(myFrameNumber, var), myReceiver);
 
     switch (result.getType()) {
       case RESPONSE:
@@ -163,9 +149,5 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
           "]"
         );
     }
-  }
-
-  private boolean isService(@NotNull final String var) {
-    return var.startsWith(SERVICE_FUNCTION_PREFIX) && var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX);
   }
 }

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findLastButOneLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findLastLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT_PREFIX;
@@ -60,5 +61,9 @@ public final class TheRDebuggerUtils {
     final String isDebugged = isDebuggedCommand(globalVar);
 
     return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalVar, "original") + " else " + globalVar;
+  }
+
+  public static boolean isServiceName(@NotNull final String name) {
+    return name.startsWith(SERVICE_FUNCTION_PREFIX);
   }
 }

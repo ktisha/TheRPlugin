@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
@@ -52,7 +53,7 @@ public final class TheRTraceAndDebugUtils {
   private static void traceAndDebugFunction(@NotNull final TheRExecutor executor,
                                             @NotNull final TheROutputReceiver receiver,
                                             @NotNull final String functionName) throws TheRDebuggerException {
-    if (functionName.startsWith(SERVICE_FUNCTION_PREFIX) && !functionName.equals(MAIN_FUNCTION_NAME)) {
+    if (TheRDebuggerUtils.isServiceName(functionName) && !functionName.equals(MAIN_FUNCTION_NAME)) {
       return;
     }
 
