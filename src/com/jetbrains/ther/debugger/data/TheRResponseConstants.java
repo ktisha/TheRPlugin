@@ -32,5 +32,5 @@ public final class TheRResponseConstants {
   public static final String EXITING_FROM_PREFIX = "exiting from: ";
 
   @NotNull
-  public static final String ENVIRONMENT = "environment";
+  public static final String ENVIRONMENT_PREFIX = "<environment: ";
 }

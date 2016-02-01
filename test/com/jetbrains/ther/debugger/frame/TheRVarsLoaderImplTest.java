@@ -178,7 +178,7 @@ public class TheRVarsLoaderImplTest {
         final String output = "function(x) {\n" +
                               "    x ^ 2\n" +
                               "}\n" +
-                              "<" + TheRResponseConstants.ENVIRONMENT + ": 0xfffffff>";
+                              TheRResponseConstants.ENVIRONMENT_PREFIX + "0xfffffff>";
 
         return new TheRExecutionResult(
           output,

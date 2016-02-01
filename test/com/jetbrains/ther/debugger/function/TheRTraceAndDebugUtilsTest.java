@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
@@ -28,9 +27,7 @@ public class TheRTraceAndDebugUtilsTest {
   @NotNull
   public static final String LS_FUNCTIONS_COMMAND = filterCommand(
     "function(x) x == \"" + CLOSURE,
-    eapplyCommand(
-      TheRResponseConstants.ENVIRONMENT + "()",
-      TYPEOF_FUNCTION)
+    eapplyCommand(ENVIRONMENT_COMMAND, TYPEOF_FUNCTION)
   );
 
   @NotNull

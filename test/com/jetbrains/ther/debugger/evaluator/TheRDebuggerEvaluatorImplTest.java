@@ -178,7 +178,7 @@ public class TheRDebuggerEvaluatorImplTest {
     final String output = "function(x) {\n" +
                           "    x ^ 2\n" +
                           "}\n" +
-                          "<" + ENVIRONMENT + ": 0xfffffff>";
+                          ENVIRONMENT_PREFIX + "0xfffffff>";
 
     final String result = "function(x) {\n" +
                           "    x ^ 2\n" +

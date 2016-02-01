@@ -14,6 +14,9 @@ public final class TheRCommands {
   public static final String EXECUTE_AND_STEP_COMMAND = "n";
 
   @NotNull
+  public static final String ENVIRONMENT_COMMAND = "environment()";
+
+  @NotNull
   public static final String SYS_NFRAME_COMMAND = "sys.nframe()";
 
   @NotNull

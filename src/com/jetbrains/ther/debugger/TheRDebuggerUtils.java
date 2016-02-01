@@ -10,7 +10,7 @@ import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findLastLineBe
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
-import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT_PREFIX;
 
 public final class TheRDebuggerUtils {
 
@@ -31,7 +31,7 @@ public final class TheRDebuggerUtils {
   public static String handleValue(@NotNull final String value) {
     final int lastLineBegin = findLastLineBegin(value);
 
-    if (value.startsWith(ENVIRONMENT, lastLineBegin + "<".length())) {
+    if (value.startsWith(ENVIRONMENT_PREFIX, lastLineBegin)) {
       return value.substring(
         0,
         findLastButOneLineEnd(value, lastLineBegin)

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger;
 
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT_PREFIX;
 import static org.junit.Assert.assertEquals;
 
 public class TheRDebuggerUtilsTest {
@@ -31,7 +31,7 @@ public class TheRDebuggerUtilsTest {
         "function(x) {\n" +
         "    x ^ 2\n" +
         "}\n" +
-        "<" + ENVIRONMENT + ": 0xfffffff>"
+        ENVIRONMENT_PREFIX + "0xfffffff>"
       )
     );
   }
