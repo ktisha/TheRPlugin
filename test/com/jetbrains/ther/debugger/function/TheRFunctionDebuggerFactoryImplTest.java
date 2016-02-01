@@ -95,7 +95,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 3) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "2: x + 1",
+          TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: x + 1",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"

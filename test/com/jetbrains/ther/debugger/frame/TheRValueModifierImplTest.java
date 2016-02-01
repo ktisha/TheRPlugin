@@ -13,7 +13,6 @@ import java.util.Collections;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -312,7 +311,7 @@ public class TheRValueModifierImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "2: x <- c(1:10)",
+          TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: x <- c(1:10)",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

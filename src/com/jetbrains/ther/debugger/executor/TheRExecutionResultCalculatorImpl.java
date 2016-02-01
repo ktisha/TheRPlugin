@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
@@ -367,7 +366,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
   private static int findDebugAt(@NotNull final String[] lines, final int index) {
     int result = index;
 
-    while (result < lines.length - 1 && !lines[result].startsWith(DEBUG_AT)) {
+    while (result < lines.length - 1 && !lines[result].startsWith(DEBUG_AT_LINE_PREFIX)) {
       result++;
     }
 

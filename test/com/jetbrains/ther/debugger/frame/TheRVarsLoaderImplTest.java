@@ -217,7 +217,7 @@ public class TheRVarsLoaderImplTest {
       }
 
       if (getCounter() == 3) {
-        final String output = TheRDebugConstants.DEBUG_AT + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
+        final String output = TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
 
         return new TheRExecutionResult(
           output,

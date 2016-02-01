@@ -88,7 +88,7 @@ public final class TheRDebugConstants {
   public static final String DEBUGGING_IN = "debugging in";
 
   @NotNull
-  public static final String DEBUG_AT = "debug at #";
+  public static final String DEBUG_AT_LINE_PREFIX = "debug at #";
 
   @NotNull
   public static final String DEBUG = "debug";

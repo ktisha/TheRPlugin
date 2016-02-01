@@ -7,7 +7,6 @@ import org.junit.Test;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static org.junit.Assert.*;
 
 public class TheRExecutionResultCalculatorImplTest {
@@ -87,7 +86,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       DEBUG_AT,
       ""
@@ -122,7 +121,7 @@ public class TheRExecutionResultCalculatorImplTest {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       DEBUG_AT,
       "[1] 1 2 3"
@@ -133,7 +132,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateDebugAtFunction() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      TheRDebugConstants.DEBUG_AT + "2: x <- function() {\n" +
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "2: x <- function() {\n" +
       "print(\"x\")\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -282,7 +281,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
@@ -295,7 +294,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3\n" +
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       TheRExecutionResultType.EXITING_FROM,
       "[1] 1 2 3"
@@ -351,7 +350,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
@@ -366,7 +365,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
       "[1] 1 2 3\n" +
-      TheRDebugConstants.DEBUG_AT + "1: x <- c(1)",
+      TheRDebugConstants.DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"

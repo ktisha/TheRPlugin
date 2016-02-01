@@ -536,7 +536,7 @@ public class TheRUnbraceFunctionDebuggerTest {
         return new TheRExecutionResult(
           EXITING_FROM_PREFIX + "abc(c(1:10))\n" +
           "[1] 1 2 3\n" +
-          DEBUG_AT + "6: x <- c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "6: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(27, 36),
@@ -573,7 +573,7 @@ public class TheRUnbraceFunctionDebuggerTest {
           EXITING_FROM_PREFIX + "def()\n" +
           EXITING_FROM_PREFIX + "abc(1:10)\n" +
           "[1] 1 2 3\n" +
-          DEBUG_AT + "6: x <- c(1)" +
+          DEBUG_AT_LINE_PREFIX + "6: x <- c(1)" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
           new TextRange(86, 95),
@@ -772,7 +772,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
-          DEBUG_AT + "2: print(i + 1)\n" +
+          DEBUG_AT_LINE_PREFIX + "2: print(i + 1)\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
