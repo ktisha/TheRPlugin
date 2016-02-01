@@ -690,7 +690,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -736,7 +736,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -780,9 +780,9 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " ghi()\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "ghi()\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
@@ -826,7 +826,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
@@ -871,9 +871,9 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " ghi()\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "ghi()\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
@@ -929,7 +929,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
           "[1] 1 2 3\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 9),
@@ -958,7 +958,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
           "debug: {\n" +
@@ -999,7 +999,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 8) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 4 5 6\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -1059,7 +1059,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1121,7 +1121,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
         return new TheRExecutionResult(
-          EXITING_FROM + " f()\n" +
+          EXITING_FROM_PREFIX + "f()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1172,7 +1172,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1211,7 +1211,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          EXITING_FROM + " f()\n" +
+          EXITING_FROM_PREFIX + "f()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1269,7 +1269,7 @@ public class TheRBraceFunctionDebuggerTest {
 
         return new TheRExecutionResult(
           "[1] 1\n" +
-          EXITING_FROM + " d()\n" +
+          EXITING_FROM_PREFIX + "d()\n" +
           debugAt + "\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,

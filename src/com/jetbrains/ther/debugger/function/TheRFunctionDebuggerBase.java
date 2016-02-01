@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
@@ -185,7 +184,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     handleEndTraceResult(result);
     appendError(result, myOutputReceiver);
 
-    final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM);
+    final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM_PREFIX);
 
     handleEndTraceReturn(result, lastExitingFromEntry);
 
@@ -275,11 +274,11 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     int currentIndex = 0;
     int count = 0;
 
-    while ((currentIndex = output.indexOf(EXITING_FROM, currentIndex)) != -1) {
+    while ((currentIndex = output.indexOf(EXITING_FROM_PREFIX, currentIndex)) != -1) {
       lastEntry = currentIndex;
 
       count++;
-      currentIndex += EXITING_FROM.length();
+      currentIndex += EXITING_FROM_PREFIX.length();
     }
 
     return new RecursiveEndTraceData(lastEntry, count);
@@ -306,7 +305,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     if (result.getResultRange().getStartOffset() == 0) {
       return findNextLineBegin(
         result.getOutput(),
-        lastExitingFrom + EXITING_FROM.length()
+        lastExitingFrom + EXITING_FROM_PREFIX.length()
       );
     }
     else {

@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
@@ -242,7 +241,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     final int endOffset = -2; // "debugging in..." line and "debug: {..." line
 
     for (int i = 1; i < lines.length + endOffset - 1; i++) {
-      if (lines[i].startsWith(EXITING_FROM)) {
+      if (lines[i].startsWith(EXITING_FROM_PREFIX)) {
         for (int j = i + 1; j < lines.length; j++) {
           if (lines[j].startsWith(DEBUGGING_IN)) {
             if (i == 1) {
@@ -268,7 +267,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     final List<Integer> exitingFromIndices = new ArrayList<Integer>();
 
     for (int i = 1; i < lines.length - 1; i++) {
-      if (lines[i].startsWith(EXITING_FROM)) {
+      if (lines[i].startsWith(EXITING_FROM_PREFIX)) {
         exitingFromIndices.add(i);
       }
     }
