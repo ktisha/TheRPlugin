@@ -91,7 +91,7 @@ public final class TheRDebugConstants {
   public static final String DEBUG_AT_LINE_PREFIX = "debug at #";
 
   @NotNull
-  public static final String DEBUG = "debug";
+  public static final String DEBUG_AT_PREFIX = "debug: ";
 
   @NotNull
   public static final String TRACING_PREFIX = "Tracing ";

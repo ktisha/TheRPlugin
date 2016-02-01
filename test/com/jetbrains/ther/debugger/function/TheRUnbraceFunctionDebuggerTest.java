@@ -460,7 +460,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": abc(c(1:10))\n" +
-          DEBUG + ": {\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        x + 1\n" +
@@ -639,7 +639,7 @@ public class TheRUnbraceFunctionDebuggerTest {
           EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
-          DEBUG + ": {\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        c(1:3)\n" +
@@ -665,7 +665,7 @@ public class TheRUnbraceFunctionDebuggerTest {
         return new TheRExecutionResult(
           TRACING_PREFIX + "abc() on entry \n" +
           "[1] \"abc\"\n" +
-          DEBUG + ": c(4:6)\n" +
+          DEBUG_AT_PREFIX + "c(4:6)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
@@ -736,7 +736,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": {\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    print(i)\n" +
           "}\n" +

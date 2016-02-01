@@ -70,7 +70,7 @@ public class TheRExecutionResultCalculatorImplTest {
     check(
       "x()",
       TheRDebugConstants.DEBUGGING_IN + ": x()\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +
@@ -97,7 +97,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateUnbraceDebugAt() {
     check(
       EXECUTE_AND_STEP_COMMAND,
-      DEBUG + ": x <- c(1)",
+      DEBUG_AT_PREFIX + "x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       DEBUG_AT,
       ""
@@ -109,7 +109,7 @@ public class TheRExecutionResultCalculatorImplTest {
     check(
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
-      DEBUG + ": x <- c(1)",
+      DEBUG_AT_PREFIX + "x <- c(1)",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       DEBUG_AT,
       "[1] 1 2 3"
@@ -147,7 +147,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING_PREFIX + "x() on entry \n" +
       "[1] \"x\"\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    print(\"x\")\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -162,7 +162,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING_PREFIX + "f() on entry \n" +
       "[1] \"f\"\n" +
-      DEBUG + ": for (i in 1:2) {\n" +
+      DEBUG_AT_PREFIX + "for (i in 1:2) {\n" +
       "    print(i)\n" +
       "}",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
@@ -177,7 +177,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       TRACING_PREFIX + "x() on entry \n" +
       "[1] \"x\"\n" +
-      DEBUG + ": print(\"x\")",
+      DEBUG_AT_PREFIX + "print(\"x\")",
       BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
       START_TRACE_UNBRACE,
       ""
@@ -190,7 +190,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +
@@ -209,7 +209,7 @@ public class TheRExecutionResultCalculatorImplTest {
       "[1] 1 2 3\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +
@@ -228,7 +228,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       "[1] 1 2 3\n" +
       TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +

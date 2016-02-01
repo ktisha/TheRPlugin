@@ -193,7 +193,7 @@ public class TheRValueModifierImplTest {
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
       TheRDebugConstants.DEBUGGING_IN + ": def(c(1:5))\n" +
-      DEBUG + ": {\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +

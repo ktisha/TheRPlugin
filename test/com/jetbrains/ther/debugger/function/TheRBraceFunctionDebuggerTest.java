@@ -1111,7 +1111,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 6 || getCounter() == 9)) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": print(i)\n" +
+          DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
@@ -1201,7 +1201,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
           DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": print(i)\n" +
+          DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "4" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
