@@ -44,9 +44,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @Override
-  public void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver) {
+  public void evaluate(@NotNull final String expression, @NotNull final Receiver receiver) {
     try {
-      evaluate(
+      doEvaluate(
         myHandler.handle(myFrameNumber, expression),
         receiver
       );
@@ -56,8 +56,8 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
   }
 
-  private void evaluate(@NotNull final String expression,
-                        @NotNull final Receiver receiver) throws TheRDebuggerException {
+  private void doEvaluate(@NotNull final String expression,
+                          @NotNull final Receiver receiver) throws TheRDebuggerException {
     final TheRExecutionResult result = myExecutor.execute(expression);
 
     switch (result.getType()) {

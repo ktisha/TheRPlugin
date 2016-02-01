@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class IllegalTheRDebuggerEvaluator implements TheRDebuggerEvaluator {
 
   @Override
-  public void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver) {
+  public void evaluate(@NotNull final String expression, @NotNull final Receiver receiver) {
     throw new IllegalStateException("EvalExpression shouldn't be called");
   }
 }

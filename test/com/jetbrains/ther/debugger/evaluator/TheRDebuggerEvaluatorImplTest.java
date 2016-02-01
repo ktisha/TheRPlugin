@@ -42,7 +42,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -72,7 +72,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -97,7 +97,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -131,7 +131,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -160,7 +160,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(2, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -204,7 +204,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -248,7 +248,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(2, debugger.getCounter());
