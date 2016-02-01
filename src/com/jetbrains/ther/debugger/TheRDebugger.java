@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.BODY_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRCommands.SYS_NFRAME_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.bodyCommand;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
@@ -280,7 +280,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
   }
 
   private boolean isMainFunctionEmpty() throws TheRDebuggerException {
-    final String collapsedMainFunction = execute(myExecutor, BODY_COMMAND + "(" + MAIN_FUNCTION_NAME + ")", RESPONSE, myOutputReceiver);
+    final String collapsedMainFunction = execute(myExecutor, bodyCommand(MAIN_FUNCTION_NAME), RESPONSE, myOutputReceiver);
 
     return StringUtil.countNewLines(collapsedMainFunction) < 5;
   }

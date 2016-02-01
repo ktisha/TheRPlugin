@@ -24,15 +24,12 @@ import static org.mockito.Mockito.*;
 public class TheRTraceAndDebugUtilsTest {
 
   @NotNull
-  public static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
-                                                    "function(x) x == \"" + CLOSURE + "\", " +
-                                                    EAPPLY_COMMAND +
-                                                    "(" +
-                                                    TheRResponseConstants.ENVIRONMENT +
-                                                    "(), " +
-                                                    TYPEOF_COMMAND +
-                                                    ")" +
-                                                    ")";
+  public static final String LS_FUNCTIONS_COMMAND = filterCommand(
+    "function(x) x == \"" + CLOSURE,
+    eapplyCommand(
+      TheRResponseConstants.ENVIRONMENT + "()",
+      TYPEOF_FUNCTION)
+  );
 
   @NotNull
   public static final TheRExecutionResult NO_FUNCTIONS_RESULT = new TheRExecutionResult(
@@ -99,12 +96,12 @@ public class TheRTraceAndDebugUtilsTest {
       LS_FUNCTIONS_COMMAND,
 
       xEnterFunctionName + " <- function() { print(\"" + xFunctionName + "\") }",
-      TRACE_COMMAND + "(" + xFunctionName + ", " + xEnterFunctionName + ", where = " + TheRResponseConstants.ENVIRONMENT + "())",
-      DEBUG_COMMAND + "(" + xFunctionName + ")",
+      traceCommand(xFunctionName, xEnterFunctionName),
+      debugCommand(xFunctionName),
 
       mainEnterFunctionName + " <- function() { print(\"" + mainFunctionName + "\") }",
-      TRACE_COMMAND + "(" + mainFunctionName + ", " + mainEnterFunctionName + ", where = " + TheRResponseConstants.ENVIRONMENT + "())",
-      DEBUG_COMMAND + "(" + mainFunctionName + ")"
+      traceCommand(mainFunctionName, mainEnterFunctionName),
+      debugCommand(mainFunctionName)
     );
   }
 

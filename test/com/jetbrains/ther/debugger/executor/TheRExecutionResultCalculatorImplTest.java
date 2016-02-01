@@ -1,10 +1,10 @@
 package com.jetbrains.ther.debugger.executor;
 
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.DEBUG_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
@@ -49,7 +49,7 @@ public class TheRExecutionResultCalculatorImplTest {
   @Test
   public void calculateJustBrowse() {
     check(
-      DEBUG_COMMAND + "(x)",
+      TheRCommands.debugCommand("x"),
       "",
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       EMPTY,

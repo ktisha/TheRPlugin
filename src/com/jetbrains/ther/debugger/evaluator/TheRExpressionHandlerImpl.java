@@ -21,7 +21,7 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
       return expression;
     }
     else {
-      return SYS_FRAME_COMMAND + "(" + frameNumber + ")$" + expression;
+      return expressionOnFrameCommand(frameNumber, expression);
     }
   }
 
@@ -32,14 +32,11 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
 
   @NotNull
   private String handleIdentifier(final int frameNumber, @NotNull final String identifier) {
-    final String globalIdentifier = SYS_FRAME_COMMAND + "(" + frameNumber + ")$" + identifier;
+    final String globalIdentifier = expressionOnFrameCommand(frameNumber, identifier);
 
-    final String isFunction = TYPEOF_COMMAND + "(" + globalIdentifier + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalIdentifier + ")";
+    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
+    final String isDebugged = isDebuggedCommand(globalIdentifier);
 
-    return "if (" + isFunction + " && " + isDebugged + ") " +
-           ATTR_COMMAND + "(" + globalIdentifier + ", \"original\")" +
-           " else " +
-           globalIdentifier;
+    return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier;
   }
 }

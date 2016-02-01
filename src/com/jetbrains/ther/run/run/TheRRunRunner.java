@@ -70,7 +70,7 @@ public class TheRRunRunner extends GenericProgramRunner {
 
     result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
 
-    result.add(TheRCommands.SOURCE_COMMAND + "(\"" + runConfiguration.getScriptPath() + "\")");
+    result.add(TheRCommands.sourceCommand(runConfiguration.getScriptPath()));
 
     result.add(TheRCommands.QUIT_COMMAND);
 

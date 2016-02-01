@@ -293,7 +293,7 @@ public class TheRDebuggerEvaluatorImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT_LINE_PREFIX + "2: " + TheRCommands.SYS_FRAME_COMMAND + "(0)$abc",
+          DEBUG_AT_LINE_PREFIX + "2: " + TheRCommands.expressionOnFrameCommand(0, "abc"),
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

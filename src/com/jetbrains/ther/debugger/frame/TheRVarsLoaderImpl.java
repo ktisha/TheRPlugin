@@ -31,8 +31,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private final TheRValueModifier myModifier;
 
-  @NotNull
-  private final String myFrame;
+  private final int myFrameNumber;
 
   public TheRVarsLoaderImpl(@NotNull final TheRExecutor executor,
                             @NotNull final TheROutputReceiver receiver,
@@ -41,7 +40,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     myExecutor = executor;
     myReceiver = receiver;
     myModifier = modifier;
-    myFrame = SYS_FRAME_COMMAND + "(" + frameNumber + ")";
+    myFrameNumber = frameNumber;
   }
 
   @NotNull
@@ -49,7 +48,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   public List<TheRVar> load() throws TheRDebuggerException {
     final String text = execute(
       myExecutor,
-      LS_COMMAND + "(" + myFrame + ")",
+      lsCommand(myFrameNumber),
       RESPONSE,
       myReceiver
     );
@@ -90,7 +89,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
       var,
       execute(
         myExecutor,
-        TYPEOF_COMMAND + "(" + myFrame + "$" + var + ")",
+        typeOfCommand(expressionOnFrameCommand(myFrameNumber, var)),
         RESPONSE,
         myReceiver
       )
@@ -180,14 +179,11 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @NotNull
   private String valueCommand(@NotNull final String var) {
-    final String globalVar = myFrame + "$" + var;
+    final String globalVar = expressionOnFrameCommand(myFrameNumber, var);
 
-    final String isFunction = TYPEOF_COMMAND + "(" + globalVar + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalVar + ")";
+    final String isFunction = typeOfCommand(globalVar) + " == \"" + CLOSURE + "\"";
+    final String isDebugged = isDebuggedCommand(globalVar);
 
-    return "if (" + isFunction + " && " + isDebugged + ") " +
-           ATTR_COMMAND + "(" + globalVar + ", \"original\")" +
-           " else " +
-           globalVar;
+    return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalVar, "original") + " else " + globalVar;
   }
 }

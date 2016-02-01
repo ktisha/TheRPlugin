@@ -17,15 +17,12 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 public final class TheRTraceAndDebugUtils {
 
   @NotNull
-  private static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
-                                                     "function(x) x == \"" + CLOSURE + "\", " +
-                                                     EAPPLY_COMMAND +
-                                                     "(" +
-                                                     TheRResponseConstants.ENVIRONMENT +
-                                                     "(), " +
-                                                     TYPEOF_COMMAND +
-                                                     ")" +
-                                                     ")";
+  private static final String LS_FUNCTIONS_COMMAND = filterCommand(
+    "function(x) x == \"" + CLOSURE,
+    eapplyCommand(
+      TheRResponseConstants.ENVIRONMENT + "()",
+      TYPEOF_FUNCTION)
+  );
 
   public static void traceAndDebugFunctions(@NotNull final TheRExecutor executor, @NotNull final TheROutputReceiver receiver)
     throws TheRDebuggerException {
@@ -62,29 +59,13 @@ public final class TheRTraceAndDebugUtils {
     }
 
     execute(executor, enterFunction(functionName), EMPTY, receiver);
-    execute(executor, traceCommand(functionName), RESPONSE);
+    execute(executor, traceCommand(functionName, enterFunctionName(functionName)), RESPONSE);
     execute(executor, debugCommand(functionName), EMPTY, receiver);
   }
 
   @NotNull
   private static String enterFunction(@NotNull final String functionName) {
     return enterFunctionName(functionName) + " <- function() { print(\"" + functionName + "\") }";
-  }
-
-  @NotNull
-  private static String traceCommand(@NotNull final String functionName) {
-    return TRACE_COMMAND +
-           "(" +
-           functionName +
-           ", " +
-           enterFunctionName(functionName) +
-           ", where = " + TheRResponseConstants.ENVIRONMENT + "()" +
-           ")";
-  }
-
-  @NotNull
-  private static String debugCommand(@NotNull final String functionName) {
-    return DEBUG_COMMAND + "(" + functionName + ")";
   }
 
   @NotNull

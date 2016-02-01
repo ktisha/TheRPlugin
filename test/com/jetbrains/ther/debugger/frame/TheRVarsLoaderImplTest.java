@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.SYS_FRAME_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
@@ -218,7 +218,7 @@ public class TheRVarsLoaderImplTest {
       }
 
       if (getCounter() == 3) {
-        final String output = TheRResponseConstants.DEBUG_AT_LINE_PREFIX + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
+        final String output = TheRResponseConstants.DEBUG_AT_LINE_PREFIX + "2: print(" + expressionOnFrameCommand(0, "a") + ")";
 
         return new TheRExecutionResult(
           output,

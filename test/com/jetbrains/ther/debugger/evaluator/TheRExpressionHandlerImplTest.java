@@ -13,12 +13,12 @@ public class TheRExpressionHandlerImplTest {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
     handler.setMaxFrameNumber(1);
 
-    final String globalIdentified = SYS_FRAME_COMMAND + "(1)$abc";
-    final String isFunction = TYPEOF_COMMAND + "(" + globalIdentified + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalIdentified + ")";
+    final String globalIdentifier = expressionOnFrameCommand(1, "abc");
+    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
+    final String isDebugged = isDebuggedCommand(globalIdentifier);
 
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + ATTR_COMMAND + "(" + globalIdentified + ", \"original\") else " + globalIdentified,
+      "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier,
       handler.handle(1, "abc")
     );
   }
@@ -28,12 +28,12 @@ public class TheRExpressionHandlerImplTest {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
     handler.setMaxFrameNumber(2);
 
-    final String globalIdentified = SYS_FRAME_COMMAND + "(1)$abc";
-    final String isFunction = TYPEOF_COMMAND + "(" + globalIdentified + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalIdentified + ")";
+    final String globalIdentifier = expressionOnFrameCommand(1, "abc");
+    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
+    final String isDebugged = isDebuggedCommand(globalIdentifier);
 
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + ATTR_COMMAND + "(" + globalIdentified + ", \"original\") else " + globalIdentified,
+      "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier,
       handler.handle(1, "abc")
     );
   }
@@ -55,7 +55,7 @@ public class TheRExpressionHandlerImplTest {
     handler.setMaxFrameNumber(2);
 
     assertEquals(
-      SYS_FRAME_COMMAND + "(1)$abc()",
+      expressionOnFrameCommand(1, "abc()"),
       handler.handle(1, "abc()")
     );
   }

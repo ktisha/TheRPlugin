@@ -8,6 +8,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.LOAD_LIB_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
 import static java.lang.Boolean.parseBoolean;
 
@@ -80,7 +80,7 @@ public final class TheRGraphicsUtils {
 
         if (snapshotDir != null) {
           return Arrays.asList(
-            LOAD_LIB_COMMAND + "(\"" + libPath + "\")",
+            TheRCommands.loadLibCommand(libPath),
             DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDir.getPath() + "\") }",
             SETUP_DEVICE_COMMAND
           );
