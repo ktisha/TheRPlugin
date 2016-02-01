@@ -28,7 +28,7 @@ public final class TheRDebuggerUtils {
   }
 
   @NotNull
-  public static String handleValue(@NotNull final String value) {
+  public static String calculateRepresentation(@NotNull final String value) {
     final int lastLineBegin = findLastLineBegin(value);
 
     if (value.startsWith(ENVIRONMENT_PREFIX, lastLineBegin)) {
@@ -43,9 +43,9 @@ public final class TheRDebuggerUtils {
   }
 
   @NotNull
-  public static String handleValue(@NotNull final String type, @NotNull final String value) {
+  public static String calculateRepresentation(@NotNull final String type, @NotNull final String value) {
     if (type.equals(FUNCTION_TYPE)) {
-      return handleValue(value);
+      return calculateRepresentation(value);
     }
     else {
       return value;

@@ -13,7 +13,7 @@ public class TheRDebuggerUtilsTest {
       "function(x) {\n" +
       "    x ^ 2\n" +
       "}",
-      TheRDebuggerUtils.handleValue(
+      TheRDebuggerUtils.calculateRepresentation(
         "function(x) {\n" +
         "    x ^ 2\n" +
         "}"
@@ -27,7 +27,7 @@ public class TheRDebuggerUtilsTest {
       "function(x) {\n" +
       "    x ^ 2\n" +
       "}",
-      TheRDebuggerUtils.handleValue(
+      TheRDebuggerUtils.calculateRepresentation(
         "function(x) {\n" +
         "    x ^ 2\n" +
         "}\n" +

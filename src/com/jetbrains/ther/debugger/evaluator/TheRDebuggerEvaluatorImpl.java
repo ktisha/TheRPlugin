@@ -10,7 +10,7 @@ import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
-import static com.jetbrains.ther.debugger.TheRDebuggerUtils.handleValue;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateRepresentation;
 import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
@@ -65,7 +65,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleValue(
+          calculateRepresentation(
             TheRDebuggerUtils.forciblyEvaluateFunction(
               myExecutor, myFactory, myReceiver
             )
@@ -85,7 +85,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleValue(
+          calculateRepresentation(
             result.getOutput()
           )
         );
@@ -95,7 +95,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleValue(
+          calculateRepresentation(
             execute(myExecutor, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver)
           )
         );

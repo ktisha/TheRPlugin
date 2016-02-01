@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static com.jetbrains.ther.debugger.TheRDebuggerUtils.handleValue;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateRepresentation;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
@@ -139,12 +139,12 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
     switch (result.getType()) {
       case RESPONSE:
-        return handleValue(
+        return calculateRepresentation(
           type,
           result.getOutput()
         );
       case DEBUG_AT:
-        return handleValue(
+        return calculateRepresentation(
           type,
           execute(
             myExecutor,
