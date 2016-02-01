@@ -720,7 +720,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUGGING_IN + ": def()\n" +
+          TheRDebugConstants.DEBUGGING_IN_PREFIX + "def()\n" +
           "debug: {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
@@ -960,7 +960,7 @@ public class TheRBraceFunctionDebuggerTest {
         return new TheRExecutionResult(
           EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
+          TheRDebugConstants.DEBUGGING_IN_PREFIX + "abc()\n" +
           "debug: {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
@@ -1110,7 +1110,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 6 || getCounter() == 9)) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": d(i)\n" +
+          DEBUGGING_IN_PREFIX + "d(i)\n" +
           DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,
@@ -1200,7 +1200,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": d(i)\n" +
+          DEBUGGING_IN_PREFIX + "d(i)\n" +
           DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "4" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,

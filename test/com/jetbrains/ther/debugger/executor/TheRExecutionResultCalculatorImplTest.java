@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
 import static org.junit.Assert.*;
 
 public class TheRExecutionResultCalculatorImplTest {
@@ -69,7 +68,7 @@ public class TheRExecutionResultCalculatorImplTest {
   public void calculateDebuggingIn() {
     check(
       "x()",
-      TheRDebugConstants.DEBUGGING_IN + ": x()\n" +
+      TheRDebugConstants.DEBUGGING_IN_PREFIX + "x()\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
@@ -189,7 +188,7 @@ public class TheRExecutionResultCalculatorImplTest {
     check(
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
-      TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
+      TheRDebugConstants.DEBUGGING_IN_PREFIX + "FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
@@ -208,7 +207,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       "[1] 1 2 3\n" +
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
-      TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
+      TheRDebugConstants.DEBUGGING_IN_PREFIX + "FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +
@@ -227,7 +226,7 @@ public class TheRExecutionResultCalculatorImplTest {
       EXECUTE_AND_STEP_COMMAND,
       EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[1L]], ...)\n" +
       "[1] 1 2 3\n" +
-      TheRDebugConstants.DEBUGGING_IN + ": FUN(c(-1, 0, 1)[[2L]], ...)\n" +
+      TheRDebugConstants.DEBUGGING_IN_PREFIX + "FUN(c(-1, 0, 1)[[2L]], ...)\n" +
       DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + INTELLIJ_THER_X_ENTER + "(), \"on entry\")\n" +
       "    {\n" +

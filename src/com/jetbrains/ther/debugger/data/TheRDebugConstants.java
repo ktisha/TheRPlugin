@@ -85,7 +85,7 @@ public final class TheRDebugConstants {
   public static final String BROWSE_SUFFIX = "]" + PROMPT;
 
   @NotNull
-  public static final String DEBUGGING_IN = "debugging in";
+  public static final String DEBUGGING_IN_PREFIX = "debugging in: ";
 
   @NotNull
   public static final String DEBUG_AT_LINE_PREFIX = "debug at #";

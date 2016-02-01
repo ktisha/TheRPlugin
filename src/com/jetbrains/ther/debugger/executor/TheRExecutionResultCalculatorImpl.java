@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
@@ -227,7 +226,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
 
   @Nullable
   private static TypeAndResultLineBounds tryDebugging(@NotNull final String[] lines) {
-    if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN)) {
+    if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN_PREFIX)) {
       return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUGGING_IN, 1, 1);
     }
     else {
@@ -242,7 +241,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     for (int i = 1; i < lines.length + endOffset - 1; i++) {
       if (lines[i].startsWith(EXITING_FROM_PREFIX)) {
         for (int j = i + 1; j < lines.length; j++) {
-          if (lines[j].startsWith(DEBUGGING_IN)) {
+          if (lines[j].startsWith(DEBUGGING_IN_PREFIX)) {
             if (i == 1) {
               // result could be located inside trace information between "exiting from ..." and "debugging in..." lines
               return new TypeAndResultLineBounds(CONTINUE_TRACE, i + 1, j);
