@@ -8,12 +8,15 @@ import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.TheRPsiUtils;
 import com.jetbrains.ther.interpreter.TheRInterpreterConfigurable;
+import com.jetbrains.ther.interpreter.TheRInterpreterService;
+import com.jetbrains.ther.interpreter.TheRSkeletonGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.psi.stubs.TheRAssignmentNameIndex;
@@ -156,6 +159,7 @@ public class TheRReferenceImpl implements PsiPolyVariantReference {
     final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myElement.getProject());
     if (model != null) {
       final Library library = model.getLibraryByName(TheRInterpreterConfigurable.THE_R_SKELETONS);
+      final String skeletonsDir = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
       if (library != null) {
         final Collection<String> assignmentStatements = TheRAssignmentNameIndex.allKeys(myElement.getProject());
         for (String statement : assignmentStatements) {
@@ -164,7 +168,8 @@ public class TheRReferenceImpl implements PsiPolyVariantReference {
           for (TheRAssignmentStatement assignmentStatement : statements) {
             final PsiDirectory directory = assignmentStatement.getContainingFile().getParent();
             assert directory != null;
-            if (directory.getName().equals("base")) {
+
+            if (directory.getName().equals("base") || FileUtil.pathsEqual(directory.getVirtualFile().getCanonicalPath(), skeletonsDir)) {
               result.add(LookupElementBuilder.create(assignmentStatement));
             }
             else {
