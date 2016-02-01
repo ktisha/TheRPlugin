@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLanguageConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
@@ -1286,7 +1286,7 @@ public class TheRDebuggerTest {
       final StringBuilder sb = new StringBuilder();
 
       for (int i = 0; i < length; i++) {
-        sb.append(TheRDebugConstants.LINE_SEPARATOR);
+        sb.append(TheRLanguageConstants.LINE_SEPARATOR);
       }
 
       return sb.toString();

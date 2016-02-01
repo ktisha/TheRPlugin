@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.LINE_SEPARATOR;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 

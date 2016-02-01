@@ -25,7 +25,7 @@ import java.io.Reader;
 import java.util.LinkedList;
 import java.util.concurrent.Future;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.LINE_SEPARATOR;
 
 public class TheRXProcessHandler extends ColoredProcessHandler implements TheRExecutor {
 

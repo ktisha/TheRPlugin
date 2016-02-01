@@ -10,6 +10,7 @@ import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLin
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.EMPTY;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;

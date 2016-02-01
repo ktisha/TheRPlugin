@@ -3,7 +3,7 @@ package com.jetbrains.ther.debugger.evaluator;
 import org.junit.Test;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.CLOSURE;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static org.junit.Assert.assertEquals;
 
 public class TheRExpressionHandlerImplTest {

@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.executor;
 
 import com.jetbrains.ther.debugger.data.TheRCommands;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLanguageConstants;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -408,11 +408,11 @@ public class TheRExecutionResultCalculatorImplTest {
     final StringBuilder sb = new StringBuilder();
 
     sb.append(command);
-    sb.append(TheRDebugConstants.LINE_SEPARATOR);
+    sb.append(TheRLanguageConstants.LINE_SEPARATOR);
 
     if (!expectedOutput.isEmpty()) {
       sb.append(expectedOutput);
-      sb.append(TheRDebugConstants.LINE_SEPARATOR);
+      sb.append(TheRLanguageConstants.LINE_SEPARATOR);
     }
 
     sb.append(tail);

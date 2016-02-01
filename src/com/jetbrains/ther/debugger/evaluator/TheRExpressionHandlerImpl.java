@@ -4,7 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.CLOSURE;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 
 public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
 
