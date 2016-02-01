@@ -1,10 +1,12 @@
 package com.jetbrains.ther.run.graphics;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
@@ -219,19 +221,28 @@ public final class TheRGraphicsUtils {
 
   @Nullable
   private static VirtualFile createSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
-    try {
-      final VirtualFile snapshotDir = dotIdeaDir.createChildDirectory(new TheRGraphicsUtils(), SNAPSHOT_DIR_NAME);
+    final Ref<VirtualFile> resultRef = new Ref<VirtualFile>(null);
 
-      LOGGER.info(
-        String.format(SNAPSHOT_DIR_HAS_BEEN_CREATED, snapshotDir.getPath())
-      );
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            resultRef.set(
+              dotIdeaDir.createChildDirectory(new TheRGraphicsUtils(), SNAPSHOT_DIR_NAME)
+            );
 
-      return snapshotDir;
-    }
-    catch (final IOException e) {
-      LOGGER.error(e);
+            LOGGER.info(
+              String.format(SNAPSHOT_DIR_HAS_BEEN_CREATED, resultRef.get().getPath())
+            );
+          }
+          catch (final IOException e) {
+            LOGGER.error(e);
+          }
+        }
+      }
+    );
 
-      return null;
-    }
+    return resultRef.get();
   }
 }
