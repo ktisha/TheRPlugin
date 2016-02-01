@@ -139,7 +139,7 @@ public class TheRTypeChecker {
         break;
       }
       TheRExpression arg = suppliedArguments.get(i);
-      if (arg instanceof TheRAssignmentStatement) {
+      if (arg instanceof TheRAssignmentStatement && ((TheRAssignmentStatement)arg).isEqual()) {
         String argName = ((TheRAssignmentStatement)arg).getAssignee().getText();
         if (!argName.equals(param.getName())) {
           wasTripleDot = true;

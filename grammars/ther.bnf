@@ -90,7 +90,7 @@ expression ::=
 
 //operators
 assignment_statement ::= {
-  methods=[isLeft isRight getAssignedValue getAssignee getName setName getNameNode]
+  methods=[isLeft isRight isEqual getAssignedValue getAssignee getName setName getNameNode]
   extends="com.jetbrains.ther.psi.stubs.TheRAssignmentBase"
   stubClass="com.jetbrains.ther.psi.stubs.TheRAssignmentStub"
 }

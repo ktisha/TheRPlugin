@@ -51,6 +51,11 @@ public class TheRPsiImplUtil {
     return operator != null;
   }
 
+  public static boolean isEqual(TheRAssignmentStatement assignment) {
+    final ASTNode operator = assignment.getNode().findChildByType(TheRElementTypes.THE_R_EQ);
+    return operator != null;
+  }
+
   public static boolean isRight(TheRAssignmentStatement assignment) {
     final ASTNode operator = assignment.getNode().findChildByType(RIGHT_ASSIGNMENTS);
     return operator != null;
