@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger.evaluator;
 
-import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
@@ -65,7 +65,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleResult(evaluateFunction())
+          handleResult(
+            TheRDebuggerUtils.forciblyEvaluateFunction(
+              myExecutor, myFactory, myReceiver
+            )
+          )
         );
 
         break;
@@ -107,21 +111,6 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           "]"
         );
     }
-  }
-
-  @NotNull
-  private String evaluateFunction() throws TheRDebuggerException {
-    final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myExecutor,
-      myFactory,
-      myReceiver
-    );
-
-    //noinspection StatementWithEmptyBody
-    while (handler.advance()) {
-    }
-
-    return handler.getResult();
   }
 
   @NotNull

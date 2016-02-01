@@ -1,6 +1,6 @@
 package com.jetbrains.ther.debugger.frame;
 
-import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
@@ -75,7 +75,7 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
         return;
       case DEBUGGING_IN:
-        runFunction();
+        TheRDebuggerUtils.forciblyEvaluateFunction(myExecutor, myFactory, myReceiver);
 
         listener.onSuccess();
 
@@ -95,18 +95,6 @@ class TheRValueModifierImpl implements TheRValueModifier {
           "[" + DEBUGGING_IN + ", " + EMPTY + ", " + DEBUG_AT + "]" +
           "]"
         );
-    }
-  }
-
-  private void runFunction() throws TheRDebuggerException {
-    final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myExecutor,
-      myFactory,
-      myReceiver
-    );
-
-    //noinspection StatementWithEmptyBody
-    while (handler.advance()) {
     }
   }
 }
