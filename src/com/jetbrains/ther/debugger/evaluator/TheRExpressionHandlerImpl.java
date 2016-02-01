@@ -1,10 +1,10 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
+import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
 
 public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
 
@@ -14,7 +14,7 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
   @Override
   public String handle(final int frameNumber, @NotNull final String expression) {
     if (StringUtil.isJavaIdentifier(expression)) {
-      return handleIdentifier(frameNumber, expression);
+      return TheRDebuggerUtils.calculateValueCommand(frameNumber, expression);
     }
 
     if (frameNumber == myLastFrameNumber) {
@@ -28,15 +28,5 @@ public class TheRExpressionHandlerImpl implements TheRExpressionHandler {
   @Override
   public void setLastFrameNumber(final int lastFrameNumber) {
     myLastFrameNumber = lastFrameNumber;
-  }
-
-  @NotNull
-  private String handleIdentifier(final int frameNumber, @NotNull final String identifier) {
-    final String globalIdentifier = expressionOnFrameCommand(frameNumber, identifier);
-
-    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
-    final String isDebugged = isDebuggedCommand(globalIdentifier);
-
-    return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier;
   }
 }

@@ -1,9 +1,9 @@
 package com.jetbrains.ther.debugger.evaluator;
 
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.data.TheRCommands.*;
-import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
+import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
 import static org.junit.Assert.assertEquals;
 
 public class TheRExpressionHandlerImplTest {
@@ -13,12 +13,8 @@ public class TheRExpressionHandlerImplTest {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
     handler.setLastFrameNumber(1);
 
-    final String globalIdentifier = expressionOnFrameCommand(1, "abc");
-    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
-    final String isDebugged = isDebuggedCommand(globalIdentifier);
-
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier,
+      TheRDebuggerUtils.calculateValueCommand(1, "abc"),
       handler.handle(1, "abc")
     );
   }
@@ -28,12 +24,8 @@ public class TheRExpressionHandlerImplTest {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
     handler.setLastFrameNumber(2);
 
-    final String globalIdentifier = expressionOnFrameCommand(1, "abc");
-    final String isFunction = typeOfCommand(globalIdentifier) + " == \"" + CLOSURE + "\"";
-    final String isDebugged = isDebuggedCommand(globalIdentifier);
-
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalIdentifier, "original") + " else " + globalIdentifier,
+      TheRDebuggerUtils.calculateValueCommand(1, "abc"),
       handler.handle(1, "abc")
     );
   }

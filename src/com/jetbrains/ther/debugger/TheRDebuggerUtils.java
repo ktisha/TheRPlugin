@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findLastButOneLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findLastLineBegin;
+import static com.jetbrains.ther.debugger.data.TheRCommands.*;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT;
 
@@ -48,5 +50,15 @@ public final class TheRDebuggerUtils {
     else {
       return value;
     }
+  }
+
+  @NotNull
+  public static String calculateValueCommand(final int frameNumber, @NotNull final String var) {
+    final String globalVar = expressionOnFrameCommand(frameNumber, var);
+
+    final String isFunction = typeOfCommand(globalVar) + " == \"" + CLOSURE + "\"";
+    final String isDebugged = isDebuggedCommand(globalVar);
+
+    return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalVar, "original") + " else " + globalVar;
   }
 }

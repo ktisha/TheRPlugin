@@ -1,6 +1,7 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
@@ -17,7 +18,6 @@ import static com.jetbrains.ther.debugger.TheRDebuggerUtils.handleValue;
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
-import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
@@ -135,7 +135,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    final TheRExecutionResult result = execute(myExecutor, valueCommand(var), myReceiver);
+    final TheRExecutionResult result = execute(myExecutor, TheRDebuggerUtils.calculateValueCommand(myFrameNumber, var), myReceiver);
 
     switch (result.getType()) {
       case RESPONSE:
@@ -167,15 +167,5 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   private boolean isService(@NotNull final String var) {
     return var.startsWith(SERVICE_FUNCTION_PREFIX) && var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX);
-  }
-
-  @NotNull
-  private String valueCommand(@NotNull final String var) {
-    final String globalVar = expressionOnFrameCommand(myFrameNumber, var);
-
-    final String isFunction = typeOfCommand(globalVar) + " == \"" + CLOSURE + "\"";
-    final String isDebugged = isDebuggedCommand(globalVar);
-
-    return "if (" + isFunction + " && " + isDebugged + ") " + attrCommand(globalVar, "original") + " else " + globalVar;
   }
 }
