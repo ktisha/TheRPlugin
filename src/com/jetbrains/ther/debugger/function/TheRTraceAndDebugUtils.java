@@ -19,7 +19,7 @@ public final class TheRTraceAndDebugUtils {
 
   @NotNull
   private static final String LS_FUNCTIONS_COMMAND = filterCommand(
-    "function(x) x == \"" + CLOSURE,
+    "function(x) x == \"" + CLOSURE + "\"",
     eapplyCommand(ENVIRONMENT_COMMAND, TYPEOF_FUNCTION)
   );
 
