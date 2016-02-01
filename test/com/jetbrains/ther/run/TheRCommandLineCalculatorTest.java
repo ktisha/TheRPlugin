@@ -2,6 +2,7 @@ package com.jetbrains.ther.run;
 
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType;
+import com.jetbrains.ther.debugger.data.TheRInterpreterParameters;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +41,13 @@ public class TheRCommandLineCalculatorTest {
     final GeneralCommandLine commandLine = TheRCommandLineCalculator.calculateCommandLine(INTERPRETER_PATH, runConfiguration);
 
     assertEquals(
-      Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER, ARGS_PARAMETER, arg1, arg2),
+      Arrays.asList(
+        TheRInterpreterParameters.NO_SAVE_PARAMETER,
+        TheRInterpreterParameters.QUIET_PARAMETER,
+        TheRInterpreterParameters.ARGS_PARAMETER,
+        arg1,
+        arg2
+      ),
       commandLine.getParametersList().getList()
     );
     assertEquals(WORKING_DIRECTORY_PATH, commandLine.getWorkDirectory().getAbsolutePath());
@@ -60,10 +66,7 @@ public class TheRCommandLineCalculatorTest {
 
     final GeneralCommandLine commandLine = TheRCommandLineCalculator.calculateCommandLine(INTERPRETER_PATH, runConfiguration);
 
-    assertEquals(
-      Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER),
-      commandLine.getParametersList().getList()
-    );
+    assertEquals(TheRInterpreterParameters.DEFAULT_PARAMETERS, commandLine.getParametersList().getList());
     assertEquals(WORKING_DIRECTORY_PATH, commandLine.getWorkDirectory().getAbsolutePath());
     assertEquals(ENVS, commandLine.getEnvironment());
     assertEquals(ParentEnvironmentType.CONSOLE, commandLine.getParentEnvironmentType());
@@ -80,10 +83,7 @@ public class TheRCommandLineCalculatorTest {
 
     final GeneralCommandLine commandLine = TheRCommandLineCalculator.calculateCommandLine(INTERPRETER_PATH, runConfiguration);
 
-    assertEquals(
-      Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER),
-      commandLine.getParametersList().getList()
-    );
+    assertEquals(TheRInterpreterParameters.DEFAULT_PARAMETERS, commandLine.getParametersList().getList());
     assertEquals(WORKING_DIRECTORY_PATH, commandLine.getWorkDirectory().getAbsolutePath());
     assertEquals(ENVS, commandLine.getEnvironment());
     assertEquals(ParentEnvironmentType.NONE, commandLine.getParentEnvironmentType());

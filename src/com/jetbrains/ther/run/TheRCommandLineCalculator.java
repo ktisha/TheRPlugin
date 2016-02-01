@@ -5,8 +5,7 @@ import com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmen
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.execution.ParametersListUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
-import com.jetbrains.ther.debugger.executor.TheRProcessUtils;
+import com.jetbrains.ther.debugger.data.TheRInterpreterParameters;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,12 +29,12 @@ final class TheRCommandLineCalculator {
     final List<String> command = new ArrayList<String>();
 
     command.add(FileUtil.toSystemDependentName(interpreterPath));
-    command.addAll(TheRProcessUtils.getStartOptions());
+    command.addAll(TheRInterpreterParameters.DEFAULT_PARAMETERS);
 
     final String scriptArgs = runConfiguration.getScriptArgs();
 
     if (!StringUtil.isEmptyOrSpaces(scriptArgs)) {
-      command.add(TheRDebugConstants.ARGS_PARAMETER);
+      command.add(TheRInterpreterParameters.ARGS_PARAMETER);
       command.addAll(ParametersListUtil.parse(scriptArgs));
     }
 

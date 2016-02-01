@@ -5,14 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.BROWSER_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRDebugConstants.KEEP_SOURCE_COMMAND;
 
 public final class TheRProcessUtils {
-
-  @NotNull
-  public static List<String> getStartOptions() {
-    return Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER);
-  }
 
   @NotNull
   public static List<String> getInitCommands() {

@@ -17,17 +17,6 @@ public final class TheRDebugConstants {
   @NotNull
   public static final String MAIN_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "main";
 
-  // interpreter parameters
-
-  @NotNull
-  public static final String NO_SAVE_PARAMETER = "--no-save";
-
-  @NotNull
-  public static final String QUIET_PARAMETER = "--quiet";
-
-  @NotNull
-  public static final String ARGS_PARAMETER = "--args";
-
   // commands
 
   @NotNull
