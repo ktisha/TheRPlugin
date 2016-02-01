@@ -10,7 +10,7 @@ public class IllegalTheRValueModifierHandler implements TheRValueModifierHandler
   }
 
   @Override
-  public void setMaxFrameNumber(final int maxFrameNumber) {
-    throw new IllegalStateException("SetMaxFrameNumber shouldn't be called");
+  public void setLastFrameNumber(final int lastFrameNumber) {
+    throw new IllegalStateException("SetLastFrameNumber shouldn't be called");
   }
 }

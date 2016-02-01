@@ -11,7 +11,7 @@ public class TheRValueModifierHandlerImplTest {
   public void ordinary() {
     final TheRValueModifierHandlerImpl handler = new TheRValueModifierHandlerImpl();
 
-    handler.setMaxFrameNumber(2);
+    handler.setLastFrameNumber(2);
 
     assertTrue(handler.isModificationAvailable(2));
     assertFalse(handler.isModificationAvailable(1));

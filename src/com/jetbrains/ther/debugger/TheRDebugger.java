@@ -148,7 +148,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     );
 
     myExpressionHandler.setLastFrameNumber(myStack.size() - 1);
-    myModifierHandler.setMaxFrameNumber(myStack.size() - 1);
+    myModifierHandler.setLastFrameNumber(myStack.size() - 1);
   }
 
   @Override
@@ -258,7 +258,7 @@ public class TheRDebugger implements TheRFunctionDebuggerHandler {
     myStack.remove(myStack.size() - 1);
 
     myExpressionHandler.setLastFrameNumber(myStack.size() - 1);
-    myModifierHandler.setMaxFrameNumber(myStack.size() - 1);
+    myModifierHandler.setLastFrameNumber(myStack.size() - 1);
   }
 
   @NotNull
