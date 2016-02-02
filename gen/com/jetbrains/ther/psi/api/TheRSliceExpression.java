@@ -10,7 +10,7 @@ public interface TheRSliceExpression extends TheRExpression {
   @NotNull
   List<TheRExpression> getExpressionList();
 
-  @NotNull
-  PsiElement getColon();
+  @Nullable
+  TheROperator getOperator();
 
 }

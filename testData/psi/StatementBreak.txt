@@ -1,15 +1,17 @@
 TheRFile:StatementBreak.r
-  THE_R_BINARY_EXPRESSION
+  THE_R_OPERATOR_EXPRESSION
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('13')
     PsiWhiteSpace(' ')
-    PsiElement(+)('+')
+    THE_R_OPERATOR
+      PsiElement(+)('+')
     PsiWhiteSpace(' ')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('4')
   PsiElement(nl)('\n')
-  THE_R_PREFIX_EXPRESSION
-    PsiElement(-)('-')
+  THE_R_OPERATOR_EXPRESSION
+    THE_R_OPERATOR
+      PsiElement(-)('-')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('7')
   PsiElement(nl)('\n')

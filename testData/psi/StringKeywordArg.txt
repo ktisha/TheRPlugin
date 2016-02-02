@@ -3,7 +3,8 @@ TheRFile:StringKeywordArg.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('person')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_CALL_EXPRESSION
       THE_R_REFERENCE_EXPRESSION
@@ -13,7 +14,8 @@ TheRFile:StringKeywordArg.r
         THE_R_ASSIGNMENT_STATEMENT
           THE_R_STRING_LITERAL_EXPRESSION
             PsiElement(string)('"3"')
-          PsiElement(=)('=')
+          THE_R_OPERATOR
+            PsiElement(=)('=')
           THE_R_STRING_LITERAL_EXPRESSION
             PsiElement(string)('"payal"')
         PsiElement(,)(',')
@@ -21,7 +23,8 @@ TheRFile:StringKeywordArg.r
         THE_R_ASSIGNMENT_STATEMENT
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('x')
-          PsiElement(=)('=')
+          THE_R_OPERATOR
+            PsiElement(=)('=')
           THE_R_NUMERIC_LITERAL_EXPRESSION
             PsiElement(numeric)('2')
         PsiElement(,)(',')
@@ -29,7 +32,8 @@ TheRFile:StringKeywordArg.r
         THE_R_ASSIGNMENT_STATEMENT
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('y')
-          PsiElement(=)('=')
+          THE_R_OPERATOR
+            PsiElement(=)('=')
           THE_R_NUMERIC_LITERAL_EXPRESSION
             PsiElement(numeric)('9')
         PsiElement(,)(',')
@@ -37,7 +41,8 @@ TheRFile:StringKeywordArg.r
         THE_R_ASSIGNMENT_STATEMENT
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('year')
-          PsiElement(=)('=')
+          THE_R_OPERATOR
+            PsiElement(=)('=')
           THE_R_NUMERIC_LITERAL_EXPRESSION
             PsiElement(numeric)('1990')
         PsiElement())(')')

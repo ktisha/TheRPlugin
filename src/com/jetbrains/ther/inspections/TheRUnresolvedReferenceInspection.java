@@ -1,6 +1,7 @@
 package com.jetbrains.ther.inspections;
 
 import com.intellij.codeInspection.LocalInspectionToolSession;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -62,7 +63,7 @@ public class TheRUnresolvedReferenceInspection extends TheRLocalInspection {
       if (reference != null) {
         PsiElement resolve = reference.resolve();
         if (resolve == null) {
-          registerProblem(myProblemHolder, element, "Unresolved reference");
+          registerProblem(myProblemHolder, element, "Unresolved reference", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
         }
       }
     }

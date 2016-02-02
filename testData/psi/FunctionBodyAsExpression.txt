@@ -3,7 +3,8 @@ TheRFile:FunctionBodyAsExpression.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('d')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_FUNCTION_EXPRESSION
       PsiElement(function)('function')
@@ -15,32 +16,34 @@ TheRFile:FunctionBodyAsExpression.r
       PsiWhiteSpace(' ')
       THE_R_PARENTHESIZED_EXPRESSION
         PsiElement(()('(')
-        THE_R_BINARY_EXPRESSION
+        THE_R_OPERATOR_EXPRESSION
           THE_R_CALL_EXPRESSION
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('sum')
             THE_R_ARGUMENT_LIST
               PsiElement(()('(')
-              THE_R_BINARY_EXPRESSION
-                THE_R_REFERENCE_EXPRESSION
+              THE_R_OPERATOR_EXPRESSION
+                THE_R_MEMBER_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('piece')
                   PsiElement($)('$')
                   PsiElement(identifier)('mktcap')
-                PsiElement(*)('*')
-                THE_R_REFERENCE_EXPRESSION
+                THE_R_OPERATOR
+                  PsiElement(*)('*')
+                THE_R_MEMBER_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('piece')
                   PsiElement($)('$')
                   PsiElement(identifier)('spread')
               PsiElement())(')')
-          PsiElement(/)('/')
+          THE_R_OPERATOR
+            PsiElement(/)('/')
           THE_R_CALL_EXPRESSION
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('sum')
             THE_R_ARGUMENT_LIST
               PsiElement(()('(')
-              THE_R_REFERENCE_EXPRESSION
+              THE_R_MEMBER_EXPRESSION
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('piece')
                 PsiElement($)('$')

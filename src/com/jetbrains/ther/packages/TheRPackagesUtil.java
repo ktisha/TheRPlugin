@@ -318,7 +318,7 @@ public final class TheRPackagesUtil {
     Collections.addAll(command, args);
     try {
       final Process process = new GeneralCommandLine(command).createProcess();
-      final CapturingProcessHandler processHandler = new CapturingProcessHandler(process);
+      final CapturingProcessHandler processHandler = new CapturingProcessHandler(process, null, StringUtil.join(command, " "));
       final ProcessOutput output = processHandler.runProcess(5 * TheRPsiUtils.MINUTE);
       if (output.getExitCode() != 0) {
         LOG.error("Failed to run script. Exit code: " + output.getExitCode());

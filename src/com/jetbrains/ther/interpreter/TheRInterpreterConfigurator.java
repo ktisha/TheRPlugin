@@ -1,6 +1,10 @@
 package com.jetbrains.ther.interpreter;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.SystemInfo;
@@ -8,8 +12,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.platform.DirectoryProjectConfigurator;
-import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -30,6 +34,14 @@ public class TheRInterpreterConfigurator implements DirectoryProjectConfigurator
       final List<String> homePaths = suggestHomePaths();
       if (!homePaths.isEmpty())
       interpreterService.setInterpreterPath(homePaths.get(0));
+      ProgressManager.getInstance().run(new Task.Backgroundable(project, "Updating Skeletons", false,
+                                                                PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+        @Override
+        public void run(@NotNull ProgressIndicator indicator) {
+          TheRSkeletonGenerator.generateSkeletons(project);
+          VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
+        }
+      });
     }
   }
 

@@ -8,7 +8,8 @@ TheRFile:IfInKeywordArgument.r
         THE_R_STRING_LITERAL_EXPRESSION
           PsiElement(string)('"\\cite"')
         PsiWhiteSpace(' ')
-        PsiElement(=)('=')
+        THE_R_OPERATOR
+          PsiElement(=)('=')
         PsiElement(nl)('\n')
         PsiWhiteSpace('                   ')
         THE_R_IF_STATEMENT

@@ -3,7 +3,8 @@ TheRFile:ReprInFunctionDef.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('transform.data.frame')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_FUNCTION_EXPRESSION
       PsiElement(function)('function')

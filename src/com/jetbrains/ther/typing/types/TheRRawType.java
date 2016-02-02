@@ -4,7 +4,7 @@ public class TheRRawType extends TheRAtomicType {
   public static TheRRawType INSTANCE = new TheRRawType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "raw";
   }
 }

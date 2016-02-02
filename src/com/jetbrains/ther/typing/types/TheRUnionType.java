@@ -1,5 +1,6 @@
 package com.jetbrains.ther.typing.types;
 
+import com.jetbrains.ther.psi.api.TheRExpression;
 import com.jetbrains.ther.typing.TheRTypeProvider;
 
 import java.util.*;
@@ -7,9 +8,12 @@ import java.util.*;
 public class TheRUnionType extends TheRType {
   private Set<TheRType> myTypes;
 
+  public Set<TheRType> getTypes() {
+    return myTypes;
+  }
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "union";
   }
 
@@ -19,9 +23,9 @@ public class TheRUnionType extends TheRType {
 
   public static TheRType create(Set<TheRType> types) {
     if (types.isEmpty()) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
-    unpackUnions(types);
+    unpackUnions(types  );
     types = mergeSimilar(types);
     if (types.size() == 1) {
       return types.iterator().next();
@@ -103,5 +107,39 @@ public class TheRUnionType extends TheRType {
     }
     builder.deleteCharAt(builder.length() - 1);
     return builder.toString();
+  }
+
+  @Override
+  public TheRType getSubscriptionType(List<TheRExpression> expressions, boolean isSingleBracket) {
+    HashSet<TheRType> subscriptTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      subscriptTypes.add(type.getSubscriptionType(expressions, isSingleBracket));
+    }
+    return TheRUnionType.create(subscriptTypes);
+  }
+
+  @Override
+  public TheRType afterSubscriptionType(List<TheRExpression> arguments, TheRType valueType, boolean isSingle) {
+    HashSet<TheRType> afterTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      afterTypes.add(type.afterSubscriptionType(arguments, valueType, isSingle));
+    }
+    return TheRUnionType.create(afterTypes);
+  }
+
+  @Override
+  public TheRType getElementTypes() {
+    HashSet<TheRType> elementTypes = new HashSet<TheRType>();
+    for (TheRType type : myTypes) {
+      elementTypes.add(type.getElementTypes());
+    }
+    return TheRUnionType.create(elementTypes);
+  }
+
+  @Override
+  public TheRUnionType clone() {
+    TheRUnionType result = (TheRUnionType)super.clone();
+    result.myTypes = new HashSet<TheRType>(myTypes);
+    return result;
   }
 }

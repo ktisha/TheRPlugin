@@ -18,18 +18,21 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('gaussian')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('1')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_PARENTHESIZED_EXPRESSION
                 PsiElement(()('(')
-                THE_R_BINARY_EXPRESSION
+                THE_R_OPERATOR_EXPRESSION
                   THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(numeric)('2')
-                  PsiElement(*)('*')
+                  THE_R_OPERATOR
+                    PsiElement(*)('*')
                   THE_R_CALL_EXPRESSION
                     THE_R_REFERENCE_EXPRESSION
                       PsiElement(identifier)('sqrt')
@@ -46,9 +49,10 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('rectangular')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
               THE_R_CALL_EXPRESSION
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('sqrt')
@@ -57,7 +61,8 @@ TheRFile:NewLineAfterKeywordArgument.r
                   THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(numeric)('3')
                   PsiElement())(')')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('6')
           PsiElement(,)(',')
@@ -67,9 +72,10 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('triangular')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
               THE_R_CALL_EXPRESSION
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('sqrt')
@@ -78,7 +84,8 @@ TheRFile:NewLineAfterKeywordArgument.r
                   THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(numeric)('6')
                   PsiElement())(')')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('9')
           PsiElement(,)(',')
@@ -88,18 +95,21 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('epanechnikov')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('3')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_PARENTHESIZED_EXPRESSION
                 PsiElement(()('(')
-                THE_R_BINARY_EXPRESSION
+                THE_R_OPERATOR_EXPRESSION
                   THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(numeric)('5')
-                  PsiElement(*)('*')
+                  THE_R_OPERATOR
+                    PsiElement(*)('*')
                   THE_R_CALL_EXPRESSION
                     THE_R_REFERENCE_EXPRESSION
                       PsiElement(identifier)('sqrt')
@@ -116,13 +126,15 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('biweight')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
-              THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
+              THE_R_OPERATOR_EXPRESSION
                 THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(numeric)('5')
-                PsiElement(*)('*')
+                THE_R_OPERATOR
+                  PsiElement(*)('*')
                 THE_R_CALL_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('sqrt')
@@ -131,7 +143,8 @@ TheRFile:NewLineAfterKeywordArgument.r
                     THE_R_NUMERIC_LITERAL_EXPRESSION
                       PsiElement(numeric)('7')
                     PsiElement())(')')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('49')
           PsiElement(,)(',')
@@ -141,39 +154,46 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('cosine')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
-              THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
+              THE_R_OPERATOR_EXPRESSION
                 THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(numeric)('3')
-                PsiElement(/)('/')
+                THE_R_OPERATOR
+                  PsiElement(/)('/')
                 THE_R_NUMERIC_LITERAL_EXPRESSION
                   PsiElement(numeric)('4')
-              PsiElement(*)('*')
+              THE_R_OPERATOR
+                PsiElement(*)('*')
               THE_R_CALL_EXPRESSION
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('sqrt')
                 THE_R_ARGUMENT_LIST
                   PsiElement(()('(')
-                  THE_R_BINARY_EXPRESSION
-                    THE_R_BINARY_EXPRESSION
+                  THE_R_OPERATOR_EXPRESSION
+                    THE_R_OPERATOR_EXPRESSION
                       THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(numeric)('1')
-                      PsiElement(/)('/')
+                      THE_R_OPERATOR
+                        PsiElement(/)('/')
                       THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(numeric)('3')
                     PsiWhiteSpace(' ')
-                    PsiElement(-)('-')
+                    THE_R_OPERATOR
+                      PsiElement(-)('-')
                     PsiWhiteSpace(' ')
-                    THE_R_BINARY_EXPRESSION
+                    THE_R_OPERATOR_EXPRESSION
                       THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(numeric)('2')
-                      PsiElement(/)('/')
-                      THE_R_BINARY_EXPRESSION
+                      THE_R_OPERATOR
+                        PsiElement(/)('/')
+                      THE_R_OPERATOR_EXPRESSION
                         THE_R_REFERENCE_EXPRESSION
                           PsiElement(identifier)('pi')
-                        PsiElement(^)('^')
+                        THE_R_OPERATOR
+                          PsiElement(^)('^')
                         THE_R_NUMERIC_LITERAL_EXPRESSION
                           PsiElement(numeric)('2')
                   PsiElement())(')')
@@ -184,38 +204,45 @@ TheRFile:NewLineAfterKeywordArgument.r
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('optcosine')
             PsiWhiteSpace(' ')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             PsiWhiteSpace(' ')
-            THE_R_BINARY_EXPRESSION
-              THE_R_BINARY_EXPRESSION
+            THE_R_OPERATOR_EXPRESSION
+              THE_R_OPERATOR_EXPRESSION
                 THE_R_CALL_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('sqrt')
                   THE_R_ARGUMENT_LIST
                     PsiElement(()('(')
-                    THE_R_BINARY_EXPRESSION
+                    THE_R_OPERATOR_EXPRESSION
                       THE_R_NUMERIC_LITERAL_EXPRESSION
                         PsiElement(numeric)('1')
-                      PsiElement(-)('-')
-                      THE_R_BINARY_EXPRESSION
+                      THE_R_OPERATOR
+                        PsiElement(-)('-')
+                      THE_R_OPERATOR_EXPRESSION
                         THE_R_NUMERIC_LITERAL_EXPRESSION
                           PsiElement(numeric)('8')
-                        PsiElement(/)('/')
-                        THE_R_BINARY_EXPRESSION
+                        THE_R_OPERATOR
+                          PsiElement(/)('/')
+                        THE_R_OPERATOR_EXPRESSION
                           THE_R_REFERENCE_EXPRESSION
                             PsiElement(identifier)('pi')
-                          PsiElement(^)('^')
+                          THE_R_OPERATOR
+                            PsiElement(^)('^')
                           THE_R_NUMERIC_LITERAL_EXPRESSION
                             PsiElement(numeric)('2')
                     PsiElement())(')')
-                PsiElement(*)('*')
-                THE_R_BINARY_EXPRESSION
+                THE_R_OPERATOR
+                  PsiElement(*)('*')
+                THE_R_OPERATOR_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('pi')
-                  PsiElement(^)('^')
+                  THE_R_OPERATOR
+                    PsiElement(^)('^')
                   THE_R_NUMERIC_LITERAL_EXPRESSION
                     PsiElement(numeric)('2')
-              PsiElement(/)('/')
+              THE_R_OPERATOR
+                PsiElement(/)('/')
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('16')
           PsiElement(nl)('\n')

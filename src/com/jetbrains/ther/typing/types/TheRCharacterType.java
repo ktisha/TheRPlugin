@@ -4,7 +4,7 @@ public class TheRCharacterType extends TheRAtomicType {
   public static TheRCharacterType INSTANCE = new TheRCharacterType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "character";
   }
 }

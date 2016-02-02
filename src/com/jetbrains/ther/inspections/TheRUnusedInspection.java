@@ -1,6 +1,7 @@
 package com.jetbrains.ther.inspections;
 
 import com.intellij.codeInspection.LocalInspectionToolSession;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
@@ -39,7 +40,7 @@ public class TheRUnusedInspection extends TheRLocalInspection {
       Query<PsiReference> search = ReferencesSearch.search(o);
       PsiReference first = search.findFirst();
       if (first == null) {
-        registerProblem(myProblemHolder, o, "Unused parameter " + o.getText());
+        registerProblem(myProblemHolder, o, "Unused parameter " + o.getText(), ProblemHighlightType.WEAK_WARNING);
       }
     }
   }

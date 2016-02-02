@@ -12,7 +12,8 @@ TheRFile:BlockAsArgument.r
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('B')
           PsiWhiteSpace(' ')
-          PsiElement(=)('=')
+          THE_R_OPERATOR
+            PsiElement(=)('=')
           PsiWhiteSpace(' ')
           THE_R_CALL_EXPRESSION
             THE_R_REFERENCE_EXPRESSION
@@ -22,7 +23,8 @@ TheRFile:BlockAsArgument.r
               THE_R_ASSIGNMENT_STATEMENT
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('x1')
-                PsiElement(=)('=')
+                THE_R_OPERATOR
+                  PsiElement(=)('=')
                 THE_R_CALL_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('runif')
@@ -36,7 +38,8 @@ TheRFile:BlockAsArgument.r
               THE_R_ASSIGNMENT_STATEMENT
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('x2')
-                PsiElement(=)('=')
+                THE_R_OPERATOR
+                  PsiElement(=)('=')
                 THE_R_CALL_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('runif')
@@ -50,7 +53,8 @@ TheRFile:BlockAsArgument.r
               THE_R_ASSIGNMENT_STATEMENT
                 THE_R_REFERENCE_EXPRESSION
                   PsiElement(identifier)('x3')
-                PsiElement(=)('=')
+                THE_R_OPERATOR
+                  PsiElement(=)('=')
                 THE_R_CALL_EXPRESSION
                   THE_R_REFERENCE_EXPRESSION
                     PsiElement(identifier)('runif')

@@ -4,16 +4,18 @@ TheRFile:Formulae.r
       PsiElement(identifier)('levelplot')
     THE_R_ARGUMENT_LIST
       PsiElement(()('(')
-      THE_R_BINARY_EXPRESSION
+      THE_R_TILDE_EXPRESSION
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('z')
         PsiWhiteSpace(' ')
-        PsiElement(~)('~')
+        THE_R_OPERATOR
+          PsiElement(~)('~')
         PsiWhiteSpace(' ')
-        THE_R_BINARY_EXPRESSION
+        THE_R_OPERATOR_EXPRESSION
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('x')
-          PsiElement(+)('+')
+          THE_R_OPERATOR
+            PsiElement(+)('+')
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('y')
       PsiElement(,)(',')
@@ -21,7 +23,8 @@ TheRFile:Formulae.r
       THE_R_ASSIGNMENT_STATEMENT
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('pretty')
-        PsiElement(=)('=')
+        THE_R_OPERATOR
+          PsiElement(=)('=')
         THE_R_LOGICAL_LITERAL_EXPRESSION
           PsiElement(TRUE)('TRUE')
       PsiElement(,)(',')
@@ -29,7 +32,8 @@ TheRFile:Formulae.r
       THE_R_ASSIGNMENT_STATEMENT
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('contour')
-        PsiElement(=)('=')
+        THE_R_OPERATOR
+          PsiElement(=)('=')
         THE_R_LOGICAL_LITERAL_EXPRESSION
           PsiElement(TRUE)('TRUE')
       PsiElement(,)(',')
@@ -37,7 +41,8 @@ TheRFile:Formulae.r
       THE_R_ASSIGNMENT_STATEMENT
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('data')
-        PsiElement(=)('=')
+        THE_R_OPERATOR
+          PsiElement(=)('=')
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('d3')
       PsiElement())(')')

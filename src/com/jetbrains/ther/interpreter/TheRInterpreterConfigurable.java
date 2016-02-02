@@ -1,7 +1,6 @@
 package com.jetbrains.ther.interpreter;
 
 import com.google.common.collect.Lists;
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -11,41 +10,32 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.OrderEntry;
-import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.impl.OrderEntryUtil;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.jetbrains.ther.TheRHelpersLocator;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TheRInterpreterConfigurable implements SearchableConfigurable, Configurable.NoScroll {
-  private static final Logger LOG = Logger.getInstance(TheRInterpreterConfigurable.class);
   private JPanel myMainPanel;
   private final Project myProject;
   private final TextFieldWithBrowseButton myInterpreterField;
   private final TextFieldWithBrowseButton mySourcesField;
+
   public static final String THE_R_LIBRARY = "R Library";
   public static final String THE_R_SKELETONS = "R Skeletons";
   public static final String The_R_USER_SKELETONS = "R User Skeletons";
@@ -152,78 +142,12 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
       }
     }
 
-    generateSkeletons();
+    TheRSkeletonGenerator.generateSkeletons(myProject);
     interpreterService.setSourcesPath(sourcesPath);
     interpreterService.setInterpreterPath(interpreterPath);
   }
 
-  private void generateSkeletons() {
-    final ModifiableModelsProvider modelsProvider = ModifiableModelsProvider.SERVICE.getInstance();
-    final Application application = ApplicationManager.getApplication();
 
-    application.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-
-        application.runWriteAction(new Runnable() {
-          @Override
-          public void run() {
-            // add all paths to library
-            final String skeletonLibraryPath = TheRSkeletonGenerator.getSkeletonsPath(TheRInterpreterService.getInstance().getInterpreterPath());
-            File skeletonLibDir = new File(skeletonLibraryPath);
-            if (!skeletonLibDir.exists()) {
-              if (!skeletonLibDir.mkdir()) {
-                LOG.error("Failed to create skeleton dir");
-                return;
-              }
-            }
-            String skeletons = TheRHelpersLocator.getHelperPath("r-skeletons");
-            File pregeneratedSkeletonsDir = new File(skeletons);
-            if (!pregeneratedSkeletonsDir.exists()) {
-              LOG.info("Pre-generated skeletons not found");
-            } else {
-              try {
-                FileUtil.copyDirContent(pregeneratedSkeletonsDir, skeletonLibDir);
-              }
-              catch (IOException e) {
-                LOG.error(e);
-              }
-            }
-            generateLibrary(THE_R_SKELETONS, skeletonLibraryPath, modelsProvider);
-            final String userSkeletonsPath = TheRHelpersLocator.getHelperPath("r-user-skeletons");
-            generateLibrary(The_R_USER_SKELETONS, userSkeletonsPath, modelsProvider);
-          }
-        });
-
-        ProgressManager.getInstance().run(new Task.Backgroundable(myProject, "Updating skeletons", false) {
-          @Override
-          public void run(@NotNull ProgressIndicator indicator) {
-            VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
-            //TODO: run my brand new action
-            TheRSkeletonGenerator.runSkeletonGeneration();
-          }
-        });
-      }
-    });
-  }
-
-  private void generateLibrary(final String name, final String path, ModifiableModelsProvider modelsProvider) {
-    final LibraryTable.ModifiableModel model = modelsProvider.getLibraryTableModifiableModel(myProject);
-    Library library = model.getLibraryByName(name);
-    if (library == null) {
-      library = model.createLibrary(name);
-    }
-    fillLibrary(library, Lists.newArrayList(path));
-    model.commit();
-    final Library.ModifiableModel libModel = library.getModifiableModel();
-    libModel.commit();
-    final Module[] modules = ModuleManager.getInstance(myProject).getModules();
-    for (Module module : modules) {
-      final ModifiableRootModel modifiableModel = modelsProvider.getModuleModifiableModel(module);
-      modifiableModel.addLibraryEntry(library);
-      modelsProvider.commitModuleModifiableModel(modifiableModel);
-    }
-  }
 
   private ArrayList<String> getSourcePaths(@NotNull final String sourcesPath) {
     final ArrayList<String> paths = Lists.newArrayList();
@@ -296,7 +220,7 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
         if (library == null) {
           library = model.createLibrary(THE_R_LIBRARY);
         }
-        fillLibrary(library, paths);
+        TheRSkeletonGenerator.fillLibrary(library, paths);
         model.commit();
         final Library.ModifiableModel libModel = library.getModifiableModel();
         libModel.commit();
@@ -310,20 +234,4 @@ public class TheRInterpreterConfigurable implements SearchableConfigurable, Conf
     });
   }
 
-  private static void fillLibrary(@NotNull final Library lib, @NotNull final List<String> paths) {
-    Library.ModifiableModel modifiableModel = lib.getModifiableModel();
-    for (String root : lib.getUrls(OrderRootType.CLASSES)) {
-      modifiableModel.removeRoot(root, OrderRootType.CLASSES);
-    }
-    for (String dir : paths) {
-      final VirtualFile pathEntry = LocalFileSystem.getInstance().findFileByPath(dir);
-      if (pathEntry != null) {
-        modifiableModel.addRoot(pathEntry, OrderRootType.CLASSES);
-      }
-      else {
-        modifiableModel.addRoot("file://" + dir, OrderRootType.CLASSES);
-      }
-    }
-    modifiableModel.commit();
-  }
 }

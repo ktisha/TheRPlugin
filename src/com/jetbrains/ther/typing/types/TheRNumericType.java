@@ -4,7 +4,7 @@ public class TheRNumericType extends TheRComplexType {
   public static TheRNumericType INSTANCE = new TheRNumericType();
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "numeric";
   }
 }

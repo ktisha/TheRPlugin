@@ -3,19 +3,22 @@ TheRFile:Parenthesized.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('i')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('2')
   PsiElement(nl)('\n')
-  THE_R_BINARY_EXPRESSION
+  THE_R_OPERATOR_EXPRESSION
     THE_R_SLICE_EXPRESSION
       THE_R_NUMERIC_LITERAL_EXPRESSION
         PsiElement(numeric)('1')
-      PsiElement(:)(':')
+      THE_R_OPERATOR
+        PsiElement(:)(':')
       THE_R_REFERENCE_EXPRESSION
         PsiElement(identifier)('i')
-    PsiElement(-)('-')
+    THE_R_OPERATOR
+      PsiElement(-)('-')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('1')
   PsiWhiteSpace(' ')
@@ -27,13 +30,15 @@ TheRFile:Parenthesized.r
   THE_R_SLICE_EXPRESSION
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('1')
-    PsiElement(:)(':')
+    THE_R_OPERATOR
+      PsiElement(:)(':')
     THE_R_PARENTHESIZED_EXPRESSION
       PsiElement(()('(')
-      THE_R_BINARY_EXPRESSION
+      THE_R_OPERATOR_EXPRESSION
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('i')
-        PsiElement(-)('-')
+        THE_R_OPERATOR
+          PsiElement(-)('-')
         THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(numeric)('1')
       PsiElement())(')')

@@ -1,7 +1,8 @@
 TheRFile:ReprInSublist.r
-  THE_R_PREFIX_EXPRESSION
-    PsiElement(!)('!')
-    THE_R_REFERENCE_EXPRESSION
+  THE_R_OPERATOR_EXPRESSION
+    THE_R_OPERATOR
+      PsiElement(!)('!')
+    THE_R_MEMBER_EXPRESSION
       THE_R_CALL_EXPRESSION
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('l10n_info')

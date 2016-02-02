@@ -30,44 +30,8 @@ public class TheRReferenceExpressionImpl extends TheRExpressionImpl implements T
 
   @Override
   @Nullable
-  public PsiElement getNa() {
-    return findChildByType(THE_R_NA);
-  }
-
-  @Override
-  @Nullable
   public PsiElement getNan() {
     return findChildByType(THE_R_NAN);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNaCharacter() {
-    return findChildByType(THE_R_NA_CHARACTER);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNaComplex() {
-    return findChildByType(THE_R_NA_COMPLEX);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNaInteger() {
-    return findChildByType(THE_R_NA_INTEGER);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNaReal() {
-    return findChildByType(THE_R_NA_REAL);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getNull() {
-    return findChildByType(THE_R_NULL);
   }
 
   @Override

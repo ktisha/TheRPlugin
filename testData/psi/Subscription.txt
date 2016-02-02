@@ -7,10 +7,12 @@ TheRFile:Subscription.r
       THE_R_SLICE_EXPRESSION
         THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(numeric)('2')
-        PsiElement(:)(':')
+        THE_R_OPERATOR
+          PsiElement(:)(':')
         THE_R_NUMERIC_LITERAL_EXPRESSION
           PsiElement(numeric)('3')
-      PsiElement(:)(':')
+      THE_R_OPERATOR
+        PsiElement(:)(':')
       THE_R_NUMERIC_LITERAL_EXPRESSION
         PsiElement(numeric)('5')
     PsiElement(,)(',')
@@ -52,7 +54,7 @@ TheRFile:Subscription.r
     PsiElement(]])(']]')
   PsiElement(nl)('\n')
   THE_R_SUBSCRIPTION_EXPRESSION
-    THE_R_REFERENCE_EXPRESSION
+    THE_R_MEMBER_EXPRESSION
       THE_R_REFERENCE_EXPRESSION
         PsiElement(identifier)('D')
       PsiElement($)('$')
@@ -63,7 +65,7 @@ TheRFile:Subscription.r
         PsiElement(identifier)('length')
       THE_R_ARGUMENT_LIST
         PsiElement(()('(')
-        THE_R_REFERENCE_EXPRESSION
+        THE_R_MEMBER_EXPRESSION
           THE_R_REFERENCE_EXPRESSION
             PsiElement(identifier)('D')
           PsiElement($)('$')

@@ -14,7 +14,7 @@ public class TheRTypeSequence extends TheRType {
   }
 
   @Override
-  public String getName() {
+  public String getCanonicalName() {
     return "type sequence: " + StringUtil.join(myTypes, new Function<TheRType, String>() {
       @Override
       public String fun(TheRType type) {

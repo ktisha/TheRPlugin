@@ -13,7 +13,8 @@ TheRFile:AssignmentInSubscription.r
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('i2')
         PsiWhiteSpace(' ')
-        PsiElement(<-)('<-')
+        THE_R_OPERATOR
+          PsiElement(<-)('<-')
         PsiWhiteSpace(' ')
         THE_R_CALL_EXPRESSION
           THE_R_REFERENCE_EXPRESSION
@@ -34,7 +35,8 @@ TheRFile:AssignmentInSubscription.r
             PsiElement())(')')
       PsiElement(])(']')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_STRING_LITERAL_EXPRESSION
       PsiElement(string)('"gray"')
@@ -48,7 +50,8 @@ TheRFile:AssignmentInSubscription.r
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('i1')
         PsiWhiteSpace(' ')
-        PsiElement(<-)('<-')
+        THE_R_OPERATOR
+          PsiElement(<-)('<-')
         PsiWhiteSpace(' ')
         THE_R_CALL_EXPRESSION
           THE_R_REFERENCE_EXPRESSION
@@ -74,7 +77,8 @@ TheRFile:AssignmentInSubscription.r
         <empty list>
       PsiElement(])(']')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_STRING_LITERAL_EXPRESSION
       PsiElement(string)('"gray"')

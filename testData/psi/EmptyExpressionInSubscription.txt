@@ -3,7 +3,8 @@ TheRFile:EmptyExpressionInSubscription.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('DF2')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_CALL_EXPRESSION
       THE_R_REFERENCE_EXPRESSION
@@ -21,7 +22,8 @@ TheRFile:EmptyExpressionInSubscription.r
           THE_R_SLICE_EXPRESSION
             THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(numeric)('7')
-            PsiElement(:)(':')
+            THE_R_OPERATOR
+              PsiElement(:)(':')
             THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(numeric)('8')
           PsiElement(,)(',')
@@ -32,7 +34,8 @@ TheRFile:EmptyExpressionInSubscription.r
           THE_R_ASSIGNMENT_STATEMENT
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('drop')
-            PsiElement(=)('=')
+            THE_R_OPERATOR
+              PsiElement(=)('=')
             THE_R_LOGICAL_LITERAL_EXPRESSION
               PsiElement(FALSE)('FALSE')
           PsiElement(])(']')

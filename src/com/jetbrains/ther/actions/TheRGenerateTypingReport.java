@@ -18,8 +18,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.ther.psi.api.TheRPsiElement;
-import com.jetbrains.ther.psi.api.TheRVisitor;
+import com.jetbrains.ther.psi.api.*;
 import com.jetbrains.ther.typing.TheRTypeProvider;
 import com.jetbrains.ther.typing.types.TheRType;
 import org.jetbrains.annotations.NotNull;
@@ -117,6 +116,27 @@ public class TheRGenerateTypingReport extends AnAction {
 
     @Override
     public void visitPsiElement(@NotNull TheRPsiElement element) {
+      if (!(element instanceof TheRExpression)) {
+        element.acceptChildren(this);
+        return;
+      }
+      if (element instanceof  TheRReferenceExpression &&
+          ((element.getParent() instanceof TheRAssignmentStatement)||(element.getParent() instanceof TheRCallExpression))) {
+        element.acceptChildren(this);
+        return;
+      }
+      if (element instanceof TheRAssignmentStatement) {
+        element.acceptChildren(this);
+        return;
+      }
+      if (element instanceof TheRParenthesizedExpression) {
+        element.acceptChildren(this);
+        return;
+      }
+      if (element instanceof TheRBlockExpression && (element.getParent() instanceof TheRFunctionExpression)) {
+        element.acceptChildren(this);
+        return;
+      }
       insertReportString(element);
       element.acceptChildren(this);
     }

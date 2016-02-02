@@ -33,11 +33,6 @@
   GT=">"
   LT="<"
   NOTEQ="!="
-  INT_DIV="%/%"
-  MATRIX_PROD="%*%"
-  OUTER_PROD="%o%"
-  MATCHING="%in%"
-  KRONECKER_PROD="%x%"
   COMMA=","
   TICK="`"
   UNDERSCORE="_"
@@ -51,7 +46,6 @@
   MULT="*"
   DIV="/"
   EXP="^"
-  MODULUS="%%"
   LIST_SUBSET="$"
   COLON=":"
   LPAR="("
@@ -73,11 +67,15 @@
 root ::= expression_list
 private expression_list ::= expression? (semicolon+ expression?)*
 
-private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression
+private constant ::= numeric_literal_expression | string_literal_expression | logical_literal_expression | null_literal_expression | na_literal_expression
 numeric_literal_expression ::= integer | numeric | complex
 string_literal_expression ::= string
 logical_literal_expression ::= TRUE | FALSE | T | F
-private special_constant ::= NULL | NA | INF | NAN | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER
+null_literal_expression ::= NULL
+na_literal_expression ::= NA | NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER {
+  methods = [getType]
+}
+private special_constant ::= INF | NAN
 private keyword ::= NA_INTEGER | NA_REAL | NA_COMPLEX | NA_CHARACTER |
   TRIPLE_DOTS | if | else | repeat | while |
   function | for | in | next | break
@@ -92,38 +90,59 @@ expression ::=
 
 //operators
 assignment_statement ::= {
-  methods=[isLeft isRight getAssignedValue getAssignee getName setName getNameNode]
+  methods=[isLeft isRight isEqual getAssignedValue getAssignee getName setName getNameNode]
   extends="com.jetbrains.ther.psi.stubs.TheRAssignmentBase"
   stubClass="com.jetbrains.ther.psi.stubs.TheRAssignmentStub"
 }
-binary_expression ::= expression //todo: fake not to generate psi, how to remove it?
-prefix_expression ::= expression //todo: fake not to generate psi, how to remove it?
-left_assign_expression ::= expression ('<-' | '<<-') nl* expression { rightAssociative=true; elementType=assignment_statement }
-eq_assign_expression ::= expression '=' nl* (expression | external_empty_expression) { rightAssociative=true; elementType=assignment_statement }
-right_assign_expression ::= expression ('->' | '->>') nl* expression { elementType=assignment_statement }
+
+operator ::= {
+  methods=[getName getReference]
+}
+left_assign_operator ::= '<-' | '<<-'  { elementType=operator }
+right_assign_operator ::= '->' | '->>' { elementType=operator }
+eq_assign_operator ::= '=' { elementType=operator }
+or_operator ::= '|' | '||' { elementType=operator }
+tilde_operator ::= '~' { elementType=operator }
+and_operator ::= '&' | '&&' { elementType=operator }
+compare_operator ::= '>' | '>=' | '<' | '<=' | '==' | '!=' { elementType=operator }
+plusminus_operator ::= '+' | '-' { elementType=operator }
+muldiv_operator ::= '*' | '/' { elementType=operator }
+slice_operator ::= ':' { elementType=operator }
+exp_operator ::= '^' { elementType=operator }
+infix_operator ::= INFIX_OP { elementType=operator }
+not_operator ::= '!' { elementType=operator }
+
+operator_expression ::= expression
+left_assign_expression ::= expression left_assign_operator nl* expression { rightAssociative=true; elementType=assignment_statement }
+eq_assign_expression ::= expression eq_assign_operator nl* (expression | external_empty_expression) { rightAssociative=true; elementType=assignment_statement }
+right_assign_expression ::= expression right_assign_operator nl* expression { elementType=assignment_statement }
 private tilde_group ::= unary_tilde_expression | tilde_expression
-unary_tilde_expression ::= '~' nl* expression { elementType=prefix_expression }
-tilde_expression ::= expression '~' nl* expression { elementType=binary_expression }
-or_expression ::= expression nl* ('|' | '||') nl* expression { elementType=binary_expression }
-and_expression ::= expression nl* ('&' | '&&') nl* expression { elementType=binary_expression }
-unary_not_expression ::= '!' nl* expression  { elementType=prefix_expression }
-compare_expression ::= expression ('>' | '>=' | '<' | '<=' | '==' | '!=') nl* expression { elementType=binary_expression }
-plusminus_expression ::= expression ('+' | '-') nl* expression { elementType=binary_expression }
-muldiv_expression ::= expression ('*' | '/') nl* expression { elementType=binary_expression }
-user_defined_expression ::= expression (INFIX_OP | MODULUS | INT_DIV | MATRIX_PROD | OUTER_PROD | MATCHING | KRONECKER_PROD) nl* expression { elementType=binary_expression }
-slice_expression ::= expression ':' nl* expression
-unary_plusminus_expression ::= ('+' | '-') nl* expression { elementType=prefix_expression }
-exp_expression ::= expression '^' nl* expression { elementType=binary_expression }
+unary_tilde_expression ::= tilde_operator nl* expression
+tilde_expression ::= expression tilde_operator nl* expression
+or_expression ::= expression nl* or_operator nl* expression { elementType=operator_expression }
+and_expression ::= expression nl* and_operator nl* expression { elementType=operator_expression }
+unary_not_expression ::= not_operator nl* expression  { elementType=operator_expression }
+compare_expression ::= expression compare_operator nl* expression { elementType=operator_expression }
+plusminus_expression ::= expression plusminus_operator nl* expression { elementType=operator_expression }
+muldiv_expression ::= expression muldiv_operator nl* expression { elementType=operator_expression }
+user_defined_expression ::= expression infix_operator nl* expression { elementType=operator_expression }
+slice_expression ::= expression slice_operator nl* expression
+unary_plusminus_expression ::= plusminus_operator nl* expression { elementType=operator_expression }
+exp_expression ::= expression exp_operator nl* expression { elementType=operator_expression }
 private member_tag ::= identifier | string | '...'
-member_expression ::= expression '$' nl* member_tag { elementType=reference_expression }
-at_expression ::= expression '@' nl* expression { elementType=reference_expression }
+member_expression ::= expression '$' nl* member_tag {
+  methods = [ getTag ]
+}
+at_expression ::= expression '@' nl* member_tag {
+  methods = [ getTag ]
+}
 namespace_access_expression ::= expression ('::' | ':::') identifier { elementType=reference_expression }
 
 //statements
 if_statement ::= if nl* '(' nl* expression nl* ')' nl* expression (nl* else nl* expression)?
 while_statement ::= while nl* '(' nl* expression nl* ')' nl* expression
 for_statement ::= for nl* '(' nl* expression 'in' nl* expression ')' nl* expression {
-  methods=[ target = "expression[0]" ]
+  methods=[ target = "expression[0]" range = "expression[1]" body = "expression[2]"]
 }
 repeat_statement ::= repeat nl* expression
 break_statement ::= break break_next_expression?

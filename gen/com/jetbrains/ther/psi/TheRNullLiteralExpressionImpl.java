@@ -10,15 +10,21 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.jetbrains.ther.parsing.TheRElementTypes.*;
 import com.jetbrains.ther.psi.api.*;
 
-public class TheRPrefixExpressionImpl extends TheRExpressionImpl implements TheRPrefixExpression {
+public class TheRNullLiteralExpressionImpl extends TheRExpressionImpl implements TheRNullLiteralExpression {
 
-  public TheRPrefixExpressionImpl(ASTNode node) {
+  public TheRNullLiteralExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof TheRVisitor) ((TheRVisitor)visitor).visitPrefixExpression(this);
+    if (visitor instanceof TheRVisitor) ((TheRVisitor)visitor).visitNullLiteralExpression(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getNull() {
+    return findNotNullChildByType(THE_R_NULL);
   }
 
 }

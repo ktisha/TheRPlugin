@@ -43,7 +43,7 @@ public class TheRSkeletonGeneratorHelper {
       TheRParameter parameter = entry.getKey();
       String text = entry.getValue();
       TheRType type = findType(text);
-      if (type != TheRType.UNKNOWN) {
+      if (!TheRUnknownType.class.isInstance(type)) {
         parsedTypes.put(parameter, type);
       }
     }
@@ -86,7 +86,7 @@ public class TheRSkeletonGeneratorHelper {
 
   public static TheRType guessReturnValueTypeFromHelp(TheRHelp help) {
     if (help.myValue == null) {
-      return TheRType.UNKNOWN;
+      return TheRUnknownType.INSTANCE;
     }
     return findType(help.myValue);
   }

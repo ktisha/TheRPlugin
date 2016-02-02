@@ -1,6 +1,7 @@
 package com.jetbrains.ther.inspections;
 
 import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nls;
@@ -15,9 +16,9 @@ public abstract class TheRLocalInspection extends LocalInspectionTool {
     return "R inspections";
   }
 
-  protected void registerProblem(ProblemsHolder holder, PsiElement element, String message) {
+  protected void registerProblem(ProblemsHolder holder, PsiElement element, String message, ProblemHighlightType highlightType) {
     if (holder != null) {
-      holder.registerProblem(element, message);
+      holder.registerProblem(element, message, highlightType);
     }
   }
 }

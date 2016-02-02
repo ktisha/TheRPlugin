@@ -5,6 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface TheRBinaryExpression extends TheRExpression {
+public interface TheRTildeExpression extends TheRExpression {
+
+  @NotNull
+  List<TheRExpression> getExpressionList();
+
+  @Nullable
+  TheROperator getOperator();
 
 }

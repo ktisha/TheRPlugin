@@ -8,7 +8,8 @@ TheRFile:KeywordArg.r
         THE_R_REFERENCE_EXPRESSION
           PsiElement(identifier)('z')
         PsiWhiteSpace(' ')
-        PsiElement(<-)('<-')
+        THE_R_OPERATOR
+          PsiElement(<-)('<-')
         PsiWhiteSpace(' ')
         THE_R_CALL_EXPRESSION
           THE_R_REFERENCE_EXPRESSION
@@ -18,8 +19,9 @@ TheRFile:KeywordArg.r
             THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(numeric)('14.084')
             PsiElement(,)(',')
-            THE_R_PREFIX_EXPRESSION
-              PsiElement(-)('-')
+            THE_R_OPERATOR_EXPRESSION
+              THE_R_OPERATOR
+                PsiElement(-)('-')
               THE_R_NUMERIC_LITERAL_EXPRESSION
                 PsiElement(numeric)('3.4107')
             PsiElement(,)(',')

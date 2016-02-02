@@ -3,7 +3,8 @@ TheRFile:Operator.r
     THE_R_REFERENCE_EXPRESSION
       PsiElement(identifier)('`%myop%`')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_FUNCTION_EXPRESSION
       PsiElement(function)('function')
@@ -19,20 +20,23 @@ TheRFile:Operator.r
       PsiWhiteSpace(' ')
       THE_R_BLOCK_EXPRESSION
         PsiElement({)('{')
-        THE_R_BINARY_EXPRESSION
-          THE_R_BINARY_EXPRESSION
+        THE_R_OPERATOR_EXPRESSION
+          THE_R_OPERATOR_EXPRESSION
             THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(numeric)('2')
-            PsiElement(*)('*')
+            THE_R_OPERATOR
+              PsiElement(*)('*')
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('a')
           PsiWhiteSpace(' ')
-          PsiElement(+)('+')
+          THE_R_OPERATOR
+            PsiElement(+)('+')
           PsiWhiteSpace(' ')
-          THE_R_BINARY_EXPRESSION
+          THE_R_OPERATOR_EXPRESSION
             THE_R_NUMERIC_LITERAL_EXPRESSION
               PsiElement(numeric)('2')
-            PsiElement(*)('*')
+            THE_R_OPERATOR
+              PsiElement(*)('*')
             THE_R_REFERENCE_EXPRESSION
               PsiElement(identifier)('b')
         PsiElement(})('}')
@@ -40,22 +44,24 @@ TheRFile:Operator.r
   PsiElement(nl)('\n')
   PsiComment(END_OF_LINE_COMMENT)('# use own operator')
   PsiElement(nl)('\n')
-  THE_R_BINARY_EXPRESSION
+  THE_R_OPERATOR_EXPRESSION
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('1')
     PsiWhiteSpace(' ')
-    PsiElement(INFIX_OP)('%myop%')
+    THE_R_OPERATOR
+      PsiElement(INFIX_OP)('%myop%')
     PsiWhiteSpace(' ')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('1')
   PsiElement(nl)('\n')
   PsiComment(END_OF_LINE_COMMENT)('#[1] 4')
   PsiElement(nl)('\n')
-  THE_R_BINARY_EXPRESSION
+  THE_R_OPERATOR_EXPRESSION
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('1')
     PsiWhiteSpace(' ')
-    PsiElement(INFIX_OP)('%myop%')
+    THE_R_OPERATOR
+      PsiElement(INFIX_OP)('%myop%')
     PsiWhiteSpace(' ')
     THE_R_NUMERIC_LITERAL_EXPRESSION
       PsiElement(numeric)('2')

@@ -8,7 +8,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.ther.TheRElementGenerator;
 import com.jetbrains.ther.parsing.TheRElementTypes;
 import com.jetbrains.ther.psi.api.*;
+import com.jetbrains.ther.psi.references.TheROperatorReference;
 import com.jetbrains.ther.psi.references.TheRReferenceImpl;
+import com.jetbrains.ther.typing.types.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,15 +32,27 @@ public class TheRPsiImplUtil {
     TheRElementTypes.THE_R_IN, TheRElementTypes.THE_R_NEXT, TheRElementTypes.THE_R_BREAK);
   public static final TokenSet OPERATORS = TokenSet.create(
     TheRElementTypes.THE_R_MINUS, TheRElementTypes.THE_R_PLUS, TheRElementTypes.THE_R_NOT, TheRElementTypes.THE_R_TILDE, TheRElementTypes.THE_R_HELP,
-    TheRElementTypes.THE_R_COLON, TheRElementTypes.THE_R_MULT, TheRElementTypes.THE_R_DIV, TheRElementTypes.THE_R_EXP, TheRElementTypes.THE_R_MODULUS,
-    TheRElementTypes.THE_R_INT_DIV, TheRElementTypes.THE_R_MATRIX_PROD, TheRElementTypes.THE_R_OUTER_PROD, TheRElementTypes.THE_R_MATCHING, TheRElementTypes.THE_R_KRONECKER_PROD,
+    TheRElementTypes.THE_R_COLON, TheRElementTypes.THE_R_MULT, TheRElementTypes.THE_R_DIV, TheRElementTypes.THE_R_EXP,
     TheRElementTypes.THE_R_INFIX_OP, TheRElementTypes.THE_R_LT, TheRElementTypes.THE_R_GT, TheRElementTypes.THE_R_EQEQ, TheRElementTypes.THE_R_GE,
     TheRElementTypes.THE_R_LE, TheRElementTypes.THE_R_AND, TheRElementTypes.THE_R_ANDAND, TheRElementTypes.THE_R_OR, TheRElementTypes.THE_R_OROR,
     TheRElementTypes.THE_R_LEFT_ASSIGN, TheRElementTypes.THE_R_RIGHT_ASSIGN, TheRElementTypes.THE_R_LIST_SUBSET, TheRElementTypes.THE_R_AT);
 
 
+  public static String getName(TheROperator binaryOperator) {
+    return binaryOperator.getText();
+  }
+
+  public static TheROperatorReference getReference(TheROperator binaryOperator) {
+    return new TheROperatorReference(binaryOperator);
+  }
+
   public static boolean isLeft(TheRAssignmentStatement assignment) {
     final ASTNode operator = assignment.getNode().findChildByType(LEFT_ASSIGNMENTS);
+    return operator != null;
+  }
+
+  public static boolean isEqual(TheRAssignmentStatement assignment) {
+    final ASTNode operator = assignment.getNode().findChildByType(TheRElementTypes.THE_R_EQ);
     return operator != null;
   }
 
@@ -67,16 +81,21 @@ public class TheRPsiImplUtil {
 
   public static PsiElement getAssignee(TheRAssignmentStatement assignment) {
     final ASTNode node = assignment.getNode();
+    PsiElement child;
     if (!assignment.isRight()) {
-      ASTNode childNode = node.findChildByType(TheRElementTypes.THE_R_REFERENCE_EXPRESSION);
-      return childNode == null ? null : childNode.getPsi();
-    }
-    for (ASTNode element = node.getLastChildNode(); element != null; element = element.getTreePrev()) {
-      if (element.getElementType() == TheRElementTypes.THE_R_REFERENCE_EXPRESSION) {
-        return element.getPsi();
+      child = assignment.getFirstChild();
+      while (child != null && !(child instanceof TheRExpression)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getPrevSibling();
+      }
+    } else {
+      child = assignment.getLastChild();
+      while (child != null && !(child instanceof TheRExpression)) {
+        if (child instanceof PsiErrorElement) return null; // incomplete assignment operator can't be analyzed properly, bail out.
+        child = child.getNextSibling();
       }
     }
-    return null;
+    return child;
   }
 
   public static PsiElement setName(TheRAssignmentStatement assignment, String name) {
@@ -135,6 +154,30 @@ public class TheRPsiImplUtil {
     return new TheRReferenceImpl(referenceExpression);
   }
 
+  public static String getTag(TheRMemberExpression memberExpression) {
+    PsiElement identifier = memberExpression.getIdentifier();
+    if (identifier != null) {
+      return identifier.getText();
+    }
+    PsiElement name = memberExpression.getString();
+    if (name != null) {
+      return name.getText().substring(1, name.getText().length() - 1);
+    }
+    return "...";
+  }
+
+  public static String getTag(TheRAtExpression atExpression) {
+    PsiElement identifier = atExpression.getIdentifier();
+    if (identifier != null) {
+      return identifier.getText();
+    }
+    PsiElement name = atExpression.getString();
+    if (name != null) {
+      return name.getText().substring(1, name.getText().length() - 1);
+    }
+    return "...";
+  }
+
   @Nullable
   public static String getDocStringValue(@NotNull final TheRFunctionExpression functionExpression) {  //TODO: make stub-aware
     final TheRBlockExpression blockExpression = PsiTreeUtil.findChildOfType(functionExpression, TheRBlockExpression.class);
@@ -177,5 +220,24 @@ public class TheRPsiImplUtil {
       return text.substring(namespaceIndex + 2);
     }
     return text;
+  }
+
+  public static TheRType getType(TheRNaLiteralExpression na) {
+    if (na.getNa() != null) {
+      return TheRLogicalType.INSTANCE;
+    }
+    if (na.getNaCharacter() != null) {
+      return TheRCharacterType.INSTANCE;
+    }
+    if (na.getNaComplex() != null) {
+      return TheRComplexType.INSTANCE;
+    }
+    if (na.getNaInteger() != null) {
+      return TheRIntegerType.INSTANCE;
+    }
+    if (na.getNaReal() != null) {
+      return TheRNumericType.INSTANCE;
+    }
+    return TheRUnknownType.INSTANCE;
   }
 }

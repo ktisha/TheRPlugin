@@ -1,13 +1,13 @@
 TheRFile:ReferenceWithAt.r
   THE_R_ASSIGNMENT_STATEMENT
-    THE_R_REFERENCE_EXPRESSION
+    THE_R_AT_EXPRESSION
       THE_R_REFERENCE_EXPRESSION
         PsiElement(identifier)('c')
       PsiElement(@)('@')
-      THE_R_REFERENCE_EXPRESSION
-        PsiElement(identifier)('names')
+      PsiElement(identifier)('names')
     PsiWhiteSpace(' ')
-    PsiElement(<-)('<-')
+    THE_R_OPERATOR
+      PsiElement(<-)('<-')
     PsiWhiteSpace(' ')
     THE_R_STRING_LITERAL_EXPRESSION
       PsiElement(string)('"B"')
