@@ -17,7 +17,7 @@ public final class TheRProcessUtils {
     throws TheRDebuggerException {
     final boolean is64Bit = is64Bit(loadArchitecture(executor));
 
-    for (final String command : TheRGraphicsUtils.calculateInitCommands(project, !is64Bit)) {
+    for (final String command : TheRGraphicsUtils.calculateInitCommands(project, is64Bit)) {
       executor.execute(command);
     }
   }

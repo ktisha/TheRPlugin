@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
 import com.jetbrains.ther.debugger.data.TheRCommands;
@@ -29,13 +28,13 @@ public final class TheRGraphicsUtils {
   private static final Map<String, TheRGraphicsState> GRAPHICS_STATES = new HashMap<String, TheRGraphicsState>();
 
   @NotNull
-  private static final String DEVICE_LIB_NAME = String.format("libtherplugin_device%s.so", SystemInfo.is32Bit ? "32" : "64");
+  private static final String DEVICE_LIB_FORMAT = "libtherplugin_device%s.so";
 
   @NotNull
   private static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
 
   @NotNull
-  private static final String SETUP_DEVICE_COMMAND = "options(device=\"" + DEVICE_FUNCTION_NAME + "\")";
+  private static final String SETUP_DEVICE_COMMAND = TheRCommands.optionsCommand("device", DEVICE_FUNCTION_NAME);
 
   @NotNull
   private static final String LIB_DIR_NAME = "libs";
@@ -65,8 +64,10 @@ public final class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
-  public static List<String> calculateInitCommands(@NotNull final Project project, final boolean is32Bit) {
-    final String libPath = getLibPath(DEVICE_LIB_NAME);
+  public static List<String> calculateInitCommands(@NotNull final Project project, final boolean is64Bit) {
+    final String libPath = getLibPath(
+      String.format(DEVICE_LIB_FORMAT, is64Bit ? "64" : "32")
+    );
 
     if (libPath != null) {
       final VirtualFile snapshotDir = getSnapshotDir(project);
