@@ -11,7 +11,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.PathUtil;
 import com.jetbrains.ther.debugger.data.TheRCommands;
-import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
-import static java.lang.Boolean.parseBoolean;
 
 public final class TheRGraphicsUtils {
 
@@ -29,12 +27,6 @@ public final class TheRGraphicsUtils {
 
   @NotNull
   private static final Map<String, TheRGraphicsState> GRAPHICS_STATES = new HashMap<String, TheRGraphicsState>();
-
-  @NotNull
-  private static final String DEVICE_ENV_KEY = "ther.debugger.device";
-
-  @NotNull
-  private static final String DEVICE_IS_DISABLED = "Device is disabled [script: %s]";
 
   @NotNull
   private static final String DEVICE_LIB_NAME = String.format("libtherplugin_device%s.so", SystemInfo.is32Bit ? "32" : "64");
@@ -73,26 +65,19 @@ public final class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
-  public static List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    if (isDeviceEnabled(runConfiguration)) {
-      final String libPath = getLibPath(DEVICE_LIB_NAME);
+  public static List<String> calculateInitCommands(@NotNull final Project project) {
+    final String libPath = getLibPath(DEVICE_LIB_NAME);
 
-      if (libPath != null) {
-        final VirtualFile snapshotDir = getSnapshotDir(runConfiguration.getProject());
+    if (libPath != null) {
+      final VirtualFile snapshotDir = getSnapshotDir(project);
 
-        if (snapshotDir != null) {
-          return Arrays.asList(
-            TheRCommands.loadLibCommand(libPath),
-            DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDir.getPath() + "\") }",
-            SETUP_DEVICE_COMMAND
-          );
-        }
+      if (snapshotDir != null) {
+        return Arrays.asList(
+          TheRCommands.loadLibCommand(libPath),
+          DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDir.getPath() + "\") }",
+          SETUP_DEVICE_COMMAND
+        );
       }
-    }
-    else {
-      LOGGER.warn(
-        String.format(DEVICE_IS_DISABLED, runConfiguration.getScriptPath())
-      );
     }
 
     return Collections.emptyList();
@@ -126,12 +111,6 @@ public final class TheRGraphicsUtils {
     }
 
     return GRAPHICS_STATES.get(snapshotDirPath);
-  }
-
-  private static boolean isDeviceEnabled(@NotNull final TheRRunConfiguration runConfiguration) {
-    final Map<String, String> envs = runConfiguration.getEnvs();
-
-    return !envs.containsKey(DEVICE_ENV_KEY) || parseBoolean(envs.get(DEVICE_ENV_KEY));
   }
 
   @Nullable
