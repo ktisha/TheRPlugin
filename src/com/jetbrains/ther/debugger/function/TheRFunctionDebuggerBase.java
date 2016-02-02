@@ -6,7 +6,7 @@ import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
@@ -22,6 +22,7 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
+// TODO [dbg][upd_test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   @NotNull
@@ -100,7 +101,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         handleRecursiveEndTrace(result);
         break;
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +

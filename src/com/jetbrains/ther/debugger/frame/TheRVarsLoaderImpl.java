@@ -4,7 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +22,7 @@ import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
+// TODO [dbg][upd_test]
 class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @NotNull
@@ -140,7 +141,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
           )
         );
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
