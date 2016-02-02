@@ -70,18 +70,15 @@ public class TheRValueModifierImplTest {
       0
     );
 
-    try {
-      modifier.setValue("name", "value", new IllegalListener());
+    final ExceptionListener listener = new ExceptionListener();
 
-      fail();
-    }
-    catch (final IllegalStateException ignored) {
-    }
+    modifier.setValue("name", "value", listener);
 
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);
+    assertEquals(1, listener.myCounter);
   }
 
   @Test
