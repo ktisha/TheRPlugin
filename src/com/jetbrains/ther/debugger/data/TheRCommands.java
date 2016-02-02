@@ -88,6 +88,11 @@ public final class TheRCommands {
   }
 
   @NotNull
+  public static String rVersionCommand(@NotNull final String key) {
+    return String.format("R.Version()[\"%s\"]", key);
+  }
+
+  @NotNull
   private static String sysFrameCommand(final int frameNumber) {
     return String.format("sys.frame(%d)", frameNumber);
   }

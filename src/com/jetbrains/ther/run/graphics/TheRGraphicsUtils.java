@@ -65,7 +65,7 @@ public final class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
-  public static List<String> calculateInitCommands(@NotNull final Project project) {
+  public static List<String> calculateInitCommands(@NotNull final Project project, final boolean is32Bit) {
     final String libPath = getLibPath(DEVICE_LIB_NAME);
 
     if (libPath != null) {

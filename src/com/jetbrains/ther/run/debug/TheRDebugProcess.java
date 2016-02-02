@@ -22,6 +22,7 @@ import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
+import com.jetbrains.ther.run.TheRProcessUtils;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import com.jetbrains.ther.run.debug.stack.TheRXStack;
@@ -263,11 +264,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
               myProcessHandler.execute(command);
             }
 
-            // TODO [run][load_arch]
-
-            for (final String command : TheRGraphicsUtils.calculateInitCommands(getSession().getProject())) {
-              myProcessHandler.execute(command);
-            }
+            TheRProcessUtils.executeInitGraphicsCommands(getSession().getProject(), myProcessHandler);
           }
           catch (final TheRDebuggerException e) {
             handleException(e);

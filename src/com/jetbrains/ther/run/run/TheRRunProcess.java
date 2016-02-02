@@ -14,6 +14,7 @@ import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutorUtils;
 import com.jetbrains.ther.run.TheROutputReceiverImpl;
+import com.jetbrains.ther.run.TheRProcessUtils;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
@@ -96,11 +97,7 @@ class TheRRunProcess {
             final TheROutputReceiver outputReceiver = new TheROutputReceiverImpl(myProcessHandler);
 
             try {
-              // TODO [run][load_arch]
-
-              for (final String command : TheRGraphicsUtils.calculateInitCommands(myProject)) {
-                myProcessHandler.execute(command);
-              }
+              TheRProcessUtils.executeInitGraphicsCommands(myProject, myProcessHandler);
 
               TheRDebuggerStringUtils.appendResult(
                 TheRExecutorUtils.execute(
