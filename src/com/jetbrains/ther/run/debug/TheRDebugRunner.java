@@ -20,7 +20,6 @@ import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactoryImpl;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImpl;
 import com.jetbrains.ther.debugger.frame.TheRValueModifierFactoryImpl;
@@ -33,15 +32,12 @@ import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSessionImpl;
-import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TheRDebugRunner extends GenericProgramRunner {
 
@@ -85,7 +81,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
       createDebugProcessStarter(
         processHandler,
         executionResult.getExecutionConsole(),
-        calculateInitCommands(runConfiguration),
         createDebugger(processHandler, outputReceiver, scriptPath),
         outputReceiver,
         createResolvingSession(
@@ -109,7 +104,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
   @NotNull
   private XDebugProcessStarter createDebugProcessStarter(@NotNull final TheRXProcessHandler processHandler,
                                                          @NotNull final ExecutionConsole executionConsole,
-                                                         @NotNull final List<String> initCommands,
                                                          @NotNull final TheRDebugger debugger,
                                                          @NotNull final TheROutputReceiver outputReceiver,
                                                          @NotNull final TheRResolvingSession resolvingSession) {
@@ -121,7 +115,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
           session,
           processHandler,
           executionConsole,
-          initCommands,
           debugger,
           outputReceiver,
           resolvingSession,
@@ -151,16 +144,6 @@ public class TheRDebugRunner extends GenericProgramRunner {
     catch (final IOException e) {
       throw new ExecutionException(e);
     }
-  }
-
-  @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    final List<String> result = new ArrayList<String>();
-
-    result.addAll(TheRInterpreterConstants.INIT_DEBUG_COMMANDS);
-    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
-
-    return result;
   }
 
   @NotNull

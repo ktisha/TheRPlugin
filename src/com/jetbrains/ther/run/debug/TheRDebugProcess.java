@@ -18,6 +18,7 @@ import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
@@ -42,9 +43,6 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
 
   @NotNull
   private final ExecutionConsole myExecutionConsole;
-
-  @NotNull
-  private final List<String> myInitCommands;
 
   @NotNull
   private final TheRDebugger myDebugger;
@@ -73,7 +71,6 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
   public TheRDebugProcess(@NotNull final XDebugSession session,
                           @NotNull final TheRXProcessHandler processHandler,
                           @NotNull final ExecutionConsole executionConsole,
-                          @NotNull final List<String> initCommands,
                           @NotNull final TheRDebugger debugger,
                           @NotNull final TheROutputReceiver outputReceiver,
                           @NotNull final TheRResolvingSession resolvingSession,
@@ -82,7 +79,6 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
 
     myProcessHandler = processHandler;
     myExecutionConsole = executionConsole;
-    myInitCommands = initCommands;
 
     myDebugger = debugger;
     myOutputReceiver = outputReceiver;
@@ -263,8 +259,14 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
         @Override
         public void run() {
           try {
-            for (final String initCommand : myInitCommands) {
-              myProcessHandler.execute(initCommand);
+            for (final String command : TheRInterpreterConstants.INIT_DEBUG_COMMANDS) {
+              myProcessHandler.execute(command);
+            }
+
+            // TODO [run][load_arch]
+
+            for (final String command : TheRGraphicsUtils.calculateInitCommands(getSession().getProject())) {
+              myProcessHandler.execute(command);
             }
           }
           catch (final TheRDebuggerException e) {
