@@ -7,8 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.PathUtil;
+import com.jetbrains.ther.TheRHelpersLocator;
 import com.jetbrains.ther.debugger.data.TheRCommands;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,9 +36,6 @@ public final class TheRGraphicsUtils {
 
   @NotNull
   private static final String SETUP_DEVICE_COMMAND = TheRCommands.optionsCommand("device", DEVICE_FUNCTION_NAME);
-
-  @NotNull
-  private static final String LIB_DIR_NAME = "libs";
 
   @NotNull
   private static final String LIB_IS_NOT_FOUND = "Lib is not found [path: %s]";
@@ -116,10 +114,8 @@ public final class TheRGraphicsUtils {
 
   @Nullable
   private static String getLibPath(@NotNull final String libName) {
-    final File pluginDir = new File(PathUtil.getJarPathForClass(TheRGraphicsUtils.class));
-    final File libDir = new File(pluginDir, LIB_DIR_NAME);
-    final File libFile = new File(libDir, libName);
-    final String absolutePath = libFile.getAbsolutePath();
+    final File libFile = TheRHelpersLocator.getHelperFile(libName);
+    final String absolutePath = FileUtil.toSystemIndependentName(libFile.getAbsolutePath());
 
     if (!libFile.exists()) {
       LOGGER.warn(
