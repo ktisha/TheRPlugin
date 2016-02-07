@@ -16,6 +16,5 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="org.mockito:mockito-core:2.0.36-beta" level="project" />
-    <orderEntry type="library" name="FAKE" level="project" />
   </component>
 </module>
