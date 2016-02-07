@@ -82,7 +82,6 @@
     <zip destfile="${out.zip}">
       <zipfileset file="${out.jar}" prefix="${ant.project.name}/lib"/>
       <zipfileset dir="${in.r-helpers.dir}" prefix="${ant.project.name}"/>
-      <zipfileset dir="${in.resources.dir}/libs" prefix="${ant.project.name}"/>
     </zip>
   </target>
 

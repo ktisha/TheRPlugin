@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.ther.TheRHelpersLocator;
@@ -29,7 +30,7 @@ public final class TheRGraphicsUtils {
   private static final Map<String, TheRGraphicsState> GRAPHICS_STATES = new HashMap<String, TheRGraphicsState>();
 
   @NotNull
-  private static final String DEVICE_LIB_FORMAT = "libtherplugin_device%s.so";
+  private static final String DEVICE_LIB_FORMAT = "libtherplugin_device%s.%s";
 
   @NotNull
   private static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
@@ -63,9 +64,7 @@ public final class TheRGraphicsUtils {
 
   @NotNull
   public static List<String> calculateInitCommands(@NotNull final Project project, final boolean is64Bit) {
-    final String libPath = getLibPath(
-      String.format(DEVICE_LIB_FORMAT, is64Bit ? "64" : "32")
-    );
+    final String libPath = getLibPath(calculateLibName(is64Bit));
 
     if (libPath != null) {
       final VirtualFile snapshotDir = getSnapshotDir(project);
@@ -134,6 +133,15 @@ public final class TheRGraphicsUtils {
     }
 
     return absolutePath;
+  }
+
+  @NotNull
+  private static String calculateLibName(final boolean is64Bit) {
+    return String.format(
+      DEVICE_LIB_FORMAT,
+      is64Bit ? "64" : "32",
+      SystemInfo.isWindows ? "dll" : "so"
+    );
   }
 
   @Nullable
