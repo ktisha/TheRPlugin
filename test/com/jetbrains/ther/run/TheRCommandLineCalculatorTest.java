@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRInterpreterConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,10 +60,7 @@ public class TheRCommandLineCalculatorTest {
 
     final GeneralCommandLine commandLine = TheRCommandLineCalculator.calculateCommandLine(INTERPRETER_PATH, runConfiguration);
 
-    assertEquals(
-      Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER),
-      commandLine.getParametersList().getList()
-    );
+    assertEquals(DEFAULT_PARAMETERS, commandLine.getParametersList().getList());
     assertEquals(WORKING_DIRECTORY_PATH, commandLine.getWorkDirectory().getAbsolutePath());
     assertEquals(ENVS, commandLine.getEnvironment());
     assertEquals(ParentEnvironmentType.CONSOLE, commandLine.getParentEnvironmentType());
@@ -80,10 +77,7 @@ public class TheRCommandLineCalculatorTest {
 
     final GeneralCommandLine commandLine = TheRCommandLineCalculator.calculateCommandLine(INTERPRETER_PATH, runConfiguration);
 
-    assertEquals(
-      Arrays.asList(NO_SAVE_PARAMETER, QUIET_PARAMETER),
-      commandLine.getParametersList().getList()
-    );
+    assertEquals(DEFAULT_PARAMETERS, commandLine.getParametersList().getList());
     assertEquals(WORKING_DIRECTORY_PATH, commandLine.getWorkDirectory().getAbsolutePath());
     assertEquals(ENVS, commandLine.getEnvironment());
     assertEquals(ParentEnvironmentType.NONE, commandLine.getParentEnvironmentType());

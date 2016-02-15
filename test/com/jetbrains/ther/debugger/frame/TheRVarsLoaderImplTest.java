@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.mock.AlwaysSameResultTheRExecutor;
@@ -15,7 +14,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.DEBUG_AT_LINE_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.ENVIRONMENT_PREFIX;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
@@ -113,9 +116,8 @@ public class TheRVarsLoaderImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         final String output = "[1] \"a\" \"b\" \"c\"\n" +
-                              "[4] " +
-                              "\"" + SERVICE_FUNCTION_PREFIX + "d" + SERVICE_ENTER_FUNCTION_SUFFIX + "\"";
-        // list, function, inner function and service functions
+                              "[4] \"" + SERVICE_FUNCTION_PREFIX + "d" + "\"";
+        // list, function, inner function and service function
 
         return new TheRExecutionResult(
           output,
@@ -175,7 +177,7 @@ public class TheRVarsLoaderImplTest {
         final String output = "function(x) {\n" +
                               "    x ^ 2\n" +
                               "}\n" +
-                              "<" + ENVIRONMENT + ": 0xfffffff>";
+                              ENVIRONMENT_PREFIX + "0xfffffff>";
 
         return new TheRExecutionResult(
           output,
@@ -217,7 +219,7 @@ public class TheRVarsLoaderImplTest {
       }
 
       if (getCounter() == 3) {
-        final String output = TheRDebugConstants.DEBUG_AT + "2: print(" + SYS_FRAME_COMMAND + "(0)$a";
+        final String output = DEBUG_AT_LINE_PREFIX + "2: print(" + expressionOnFrameCommand(0, "a") + ")";
 
         return new TheRExecutionResult(
           output,

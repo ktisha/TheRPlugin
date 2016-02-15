@@ -1,10 +1,10 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.TheRDebuggerStringUtils;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateRepresentation;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateValueCommand;
+import static com.jetbrains.ther.debugger.data.TheRCommands.*;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.RESPONSE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
+// TODO [dbg][upd_test]
 class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @NotNull
@@ -30,8 +34,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   @NotNull
   private final TheRValueModifier myModifier;
 
-  @NotNull
-  private final String myFrame;
+  private final int myFrameNumber;
 
   public TheRVarsLoaderImpl(@NotNull final TheRExecutor executor,
                             @NotNull final TheROutputReceiver receiver,
@@ -40,7 +43,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     myExecutor = executor;
     myReceiver = receiver;
     myModifier = modifier;
-    myFrame = SYS_FRAME_COMMAND + "(" + frameNumber + ")";
+    myFrameNumber = frameNumber;
   }
 
   @NotNull
@@ -48,7 +51,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
   public List<TheRVar> load() throws TheRDebuggerException {
     final String text = execute(
       myExecutor,
-      LS_COMMAND + "(" + myFrame + ")",
+      lsCommand(myFrameNumber),
       RESPONSE,
       myReceiver
     );
@@ -85,17 +88,14 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
 
   @Nullable
   private TheRVar loadVar(@NotNull final String var) throws TheRDebuggerException {
-    final String type = handleType(
-      var,
-      execute(
-        myExecutor,
-        TYPEOF_COMMAND + "(" + myFrame + "$" + var + ")",
-        RESPONSE,
-        myReceiver
-      )
+    final String type = execute(
+      myExecutor,
+      typeOfCommand(expressionOnFrameCommand(myFrameNumber, var)),
+      RESPONSE,
+      myReceiver
     );
 
-    if (type == null) {
+    if (type.equals(FUNCTION_TYPE) && TheRDebuggerUtils.isServiceName(var)) {
       return null;
     }
 
@@ -119,29 +119,19 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
     }
   }
 
-  @Nullable
-  private String handleType(@NotNull final String var,
-                            @NotNull final String type) {
-    if (type.equals(FUNCTION_TYPE) && isService(var)) {
-      return null;
-    }
-
-    return type;
-  }
-
   @NotNull
   private String loadValue(@NotNull final String var,
                            @NotNull final String type) throws TheRDebuggerException {
-    final TheRExecutionResult result = execute(myExecutor, valueCommand(var), myReceiver);
+    final TheRExecutionResult result = execute(myExecutor, calculateValueCommand(myFrameNumber, var), myReceiver);
 
     switch (result.getType()) {
       case RESPONSE:
-        return handleValue(
+        return calculateRepresentation(
           type,
           result.getOutput()
         );
       case DEBUG_AT:
-        return handleValue(
+        return calculateRepresentation(
           type,
           execute(
             myExecutor,
@@ -151,7 +141,7 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
           )
         );
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
@@ -160,33 +150,5 @@ class TheRVarsLoaderImpl implements TheRVarsLoader {
           "]"
         );
     }
-  }
-
-  private boolean isService(@NotNull final String var) {
-    return var.startsWith(SERVICE_FUNCTION_PREFIX) && var.endsWith(SERVICE_ENTER_FUNCTION_SUFFIX);
-  }
-
-  @NotNull
-  private String handleValue(@NotNull final String type,
-                             @NotNull final String value) {
-    if (type.equals(FUNCTION_TYPE)) {
-      return TheRDebuggerStringUtils.handleFunctionValue(value);
-    }
-    else {
-      return value;
-    }
-  }
-
-  @NotNull
-  private String valueCommand(@NotNull final String var) {
-    final String globalVar = myFrame + "$" + var;
-
-    final String isFunction = TYPEOF_COMMAND + "(" + globalVar + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalVar + ")";
-
-    return "if (" + isFunction + " && " + isDebugged + ") " +
-           ATTR_COMMAND + "(" + globalVar + ", \"original\")" +
-           " else " +
-           globalVar;
   }
 }

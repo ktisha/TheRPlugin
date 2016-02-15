@@ -34,7 +34,7 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   public boolean evaluateCondition(@NotNull final String expression) {
     final ConditionReceiver receiver = new ConditionReceiver();
 
-    myEvaluator.evalExpression(expression, receiver);
+    myEvaluator.evaluate(expression, receiver);
 
     return receiver.myResult;
   }
@@ -47,7 +47,7 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
       new Runnable() {
         @Override
         public void run() {
-          myEvaluator.evalExpression(
+          myEvaluator.evaluate(
             expression,
             new ExpressionReceiver(callback)
           );

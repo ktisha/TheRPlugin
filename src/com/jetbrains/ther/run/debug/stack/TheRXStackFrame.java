@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.MAIN_FUNCTION_NAME;
 
 class TheRXStackFrame extends XStackFrame {
 

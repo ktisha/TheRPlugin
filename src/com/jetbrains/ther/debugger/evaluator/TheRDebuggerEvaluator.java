@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface TheRDebuggerEvaluator {
 
-  void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver);
+  void evaluate(@NotNull final String expression, @NotNull final Receiver receiver);
 
   interface Receiver {
 

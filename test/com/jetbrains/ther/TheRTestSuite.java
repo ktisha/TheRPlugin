@@ -2,6 +2,7 @@ package com.jetbrains.ther;
 
 import com.jetbrains.ther.debugger.TheRDebuggerStringUtilsTest;
 import com.jetbrains.ther.debugger.TheRDebuggerTest;
+import com.jetbrains.ther.debugger.TheRDebuggerUtilsTest;
 import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandlerTest;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorImplTest;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandlerImplTest;
@@ -22,7 +23,13 @@ import com.jetbrains.ther.parser.TheRParsingTest;
 import com.jetbrains.ther.rename.TheRRenameTest;
 import com.jetbrains.ther.run.TheRCommandLineCalculatorTest;
 import com.jetbrains.ther.run.TheROutputReceiverImplTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationEditorTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationTypeTest;
+import com.jetbrains.ther.run.configuration.TheRRunConfigurationUtilsTest;
 import com.jetbrains.ther.run.debug.TheRLineBreakpointUtilsTest;
+import com.jetbrains.ther.run.debug.resolve.TheRFunctionDefinitionProcessorTest;
+import com.jetbrains.ther.run.debug.resolve.TheRResolvingSessionImplTest;
 import com.jetbrains.ther.run.debug.stack.TheRXPresentationUtilsTest;
 import com.jetbrains.ther.run.debug.stack.TheRXStackFrameTest;
 import com.jetbrains.ther.run.debug.stack.TheRXStackTest;
@@ -79,12 +86,23 @@ public class TheRTestSuite extends TestCase {
     // `main` package
     addJUnit4Test(suite, TheRDebuggerTest.class);
     addJUnit4Test(suite, TheRDebuggerStringUtilsTest.class);
+    addJUnit4Test(suite, TheRDebuggerUtilsTest.class);
     addJUnit4Test(suite, TheRForcedFunctionDebuggerHandlerTest.class);
   }
 
   private static void addRunTests(@NotNull final TestSuite suite) {
+    // configuration package
+    suite.addTestSuite(TheRRunConfigurationTest.class);
+    addJUnit4Test(suite, TheRRunConfigurationEditorTest.class);
+    addJUnit4Test(suite, TheRRunConfigurationTypeTest.class);
+    addJUnit4Test(suite, TheRRunConfigurationUtilsTest.class);
+
     // debug package
     suite.addTestSuite(TheRLineBreakpointUtilsTest.class);
+
+    // debug.resolve package
+    addJUnit4Test(suite, TheRFunctionDefinitionProcessorTest.class);
+    addJUnit4Test(suite, TheRResolvingSessionImplTest.class);
 
     // debug.stack package
     addJUnit4Test(suite, TheRXPresentationUtilsTest.class);

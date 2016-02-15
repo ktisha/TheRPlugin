@@ -2,7 +2,6 @@ package com.jetbrains.ther.debugger.executor;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,16 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.DEBUG_AT;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.LINE_SEPARATOR;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 
 public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCalculator {
 
   @NotNull
-  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING + " .* on entry( )*$");
+  private static final Pattern START_TRACE_PATTERN = Pattern.compile("^" + TRACING_PREFIX + ".* on entry( )*$");
 
   @NotNull
   private static final Pattern LINE_BREAK_PATTERN = Pattern.compile("(\r|\n|\r\n)");
@@ -229,7 +226,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
 
   @Nullable
   private static TypeAndResultLineBounds tryDebugging(@NotNull final String[] lines) {
-    if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN)) {
+    if (lines.length > 1 && lines[1].startsWith(DEBUGGING_IN_PREFIX)) {
       return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUGGING_IN, 1, 1);
     }
     else {
@@ -242,9 +239,9 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     final int endOffset = -2; // "debugging in..." line and "debug: {..." line
 
     for (int i = 1; i < lines.length + endOffset - 1; i++) {
-      if (lines[i].startsWith(EXITING_FROM)) {
+      if (lines[i].startsWith(EXITING_FROM_PREFIX)) {
         for (int j = i + 1; j < lines.length; j++) {
-          if (lines[j].startsWith(DEBUGGING_IN)) {
+          if (lines[j].startsWith(DEBUGGING_IN_PREFIX)) {
             if (i == 1) {
               // result could be located inside trace information between "exiting from ..." and "debugging in..." lines
               return new TypeAndResultLineBounds(CONTINUE_TRACE, i + 1, j);
@@ -268,7 +265,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     final List<Integer> exitingFromIndices = new ArrayList<Integer>();
 
     for (int i = 1; i < lines.length - 1; i++) {
-      if (lines[i].startsWith(EXITING_FROM)) {
+      if (lines[i].startsWith(EXITING_FROM_PREFIX)) {
         exitingFromIndices.add(i);
       }
     }
@@ -337,7 +334,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
 
   @Nullable
   private static TypeAndResultLineBounds tryUnbraceDebugAt(@NotNull final String[] lines) {
-    if (lines.length > 2 && lines[lines.length - 2].startsWith(TheRDebugConstants.DEBUG + ": ")) {
+    if (lines.length > 2 && lines[lines.length - 2].startsWith(DEBUG_AT_PREFIX)) {
       return new TypeAndResultLineBounds(TheRExecutionResultType.DEBUG_AT, 1, lines.length - 2);
     }
     else {
@@ -368,7 +365,7 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
   private static int findDebugAt(@NotNull final String[] lines, final int index) {
     int result = index;
 
-    while (result < lines.length - 1 && !lines[result].startsWith(DEBUG_AT)) {
+    while (result < lines.length - 1 && !lines[result].startsWith(DEBUG_AT_LINE_PREFIX)) {
       result++;
     }
 

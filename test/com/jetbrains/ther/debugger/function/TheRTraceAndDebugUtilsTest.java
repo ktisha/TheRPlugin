@@ -14,7 +14,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.*;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.mockito.Mockito.*;
@@ -22,10 +25,10 @@ import static org.mockito.Mockito.*;
 public class TheRTraceAndDebugUtilsTest {
 
   @NotNull
-  public static final String LS_FUNCTIONS_COMMAND = FILTER_COMMAND + "(" +
-                                                    "function(x) x == \"" + CLOSURE + "\", " +
-                                                    EAPPLY_COMMAND + "(" + ENVIRONMENT + "(), " + TYPEOF_COMMAND + ")" +
-                                                    ")";
+  public static final String LS_FUNCTIONS_COMMAND = filterCommand(
+    "function(x) x == \"" + CLOSURE + "\"",
+    eapplyCommand(ENVIRONMENT_COMMAND, TYPEOF_FUNCTION)
+  );
 
   @NotNull
   public static final TheRExecutionResult NO_FUNCTIONS_RESULT = new TheRExecutionResult(
@@ -92,12 +95,12 @@ public class TheRTraceAndDebugUtilsTest {
       LS_FUNCTIONS_COMMAND,
 
       xEnterFunctionName + " <- function() { print(\"" + xFunctionName + "\") }",
-      TRACE_COMMAND + "(" + xFunctionName + ", " + xEnterFunctionName + ", where = " + ENVIRONMENT + "())",
-      DEBUG_COMMAND + "(" + xFunctionName + ")",
+      traceCommand(xFunctionName, xEnterFunctionName),
+      debugCommand(xFunctionName),
 
       mainEnterFunctionName + " <- function() { print(\"" + mainFunctionName + "\") }",
-      TRACE_COMMAND + "(" + mainFunctionName + ", " + mainEnterFunctionName + ", where = " + ENVIRONMENT + "())",
-      DEBUG_COMMAND + "(" + mainFunctionName + ")"
+      traceCommand(mainFunctionName, mainEnterFunctionName),
+      debugCommand(mainFunctionName)
     );
   }
 

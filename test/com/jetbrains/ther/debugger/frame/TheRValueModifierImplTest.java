@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.frame;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
@@ -11,9 +10,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -71,18 +70,15 @@ public class TheRValueModifierImplTest {
       0
     );
 
-    try {
-      modifier.setValue("name", "value", new IllegalListener());
+    final ExceptionListener listener = new ExceptionListener();
 
-      fail();
-    }
-    catch (final IllegalStateException ignored) {
-    }
+    modifier.setValue("name", "value", listener);
 
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.singletonList("error"), receiver.getErrors());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(1, handler.myCounter);
+    assertEquals(1, listener.myCounter);
   }
 
   @Test
@@ -193,8 +189,8 @@ public class TheRValueModifierImplTest {
     final String error = "error";
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      TheRDebugConstants.DEBUGGING_IN + ": def(c(1:5))\n" +
-      DEBUG + ": {\n" +
+      DEBUGGING_IN_PREFIX + "def(c(1:5))\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +
@@ -312,7 +308,7 @@ public class TheRValueModifierImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "2: x <- c(1:10)",
+          DEBUG_AT_LINE_PREFIX + "2: x <- c(1:10)",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

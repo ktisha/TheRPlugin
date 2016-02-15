@@ -1,17 +1,17 @@
 package com.jetbrains.ther.debugger.evaluator;
 
-import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
-import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.handleFunctionValue;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.TheRDebuggerUtils.calculateRepresentation;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
@@ -44,9 +44,9 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
   }
 
   @Override
-  public void evalExpression(@NotNull final String expression, @NotNull final Receiver receiver) {
+  public void evaluate(@NotNull final String expression, @NotNull final Receiver receiver) {
     try {
-      evaluate(
+      doEvaluate(
         myHandler.handle(myFrameNumber, expression),
         receiver
       );
@@ -56,8 +56,8 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
     }
   }
 
-  private void evaluate(@NotNull final String expression,
-                        @NotNull final Receiver receiver) throws TheRDebuggerException {
+  private void doEvaluate(@NotNull final String expression,
+                          @NotNull final Receiver receiver) throws TheRDebuggerException {
     final TheRExecutionResult result = myExecutor.execute(expression);
 
     switch (result.getType()) {
@@ -65,7 +65,11 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleResult(evaluateFunction())
+          calculateRepresentation(
+            TheRDebuggerUtils.forciblyEvaluateFunction(
+              myExecutor, myFactory, myReceiver
+            )
+          )
         );
 
         break;
@@ -81,7 +85,7 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleResult(
+          calculateRepresentation(
             result.getOutput()
           )
         );
@@ -91,14 +95,14 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
         appendError(result, myReceiver);
 
         receiver.receiveResult(
-          handleResult(
+          calculateRepresentation(
             execute(myExecutor, EXECUTE_AND_STEP_COMMAND, RESPONSE, myReceiver)
           )
         );
 
         break;
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
@@ -107,25 +111,5 @@ class TheRDebuggerEvaluatorImpl implements TheRDebuggerEvaluator {
           "]"
         );
     }
-  }
-
-  @NotNull
-  private String evaluateFunction() throws TheRDebuggerException {
-    final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myExecutor,
-      myFactory,
-      myReceiver
-    );
-
-    //noinspection StatementWithEmptyBody
-    while (handler.advance()) {
-    }
-
-    return handler.getResult();
-  }
-
-  @NotNull
-  private String handleResult(@NotNull final String result) {
-    return handleFunctionValue(result);
   }
 }

@@ -8,6 +8,7 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculator;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultCalculatorImpl;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
@@ -37,10 +38,16 @@ public class TheRCommandLineState extends CommandLineState {
   protected ProcessHandler startProcess() throws ExecutionException {
     checkRunConfiguration();
 
+    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
+
+    if (StringUtil.isEmptyOrSpaces(interpreterPath)) {
+      throw new ExecutionException("The R interpreter is not specified");
+    }
+
     final ProcessHandler processHandler = startProcess(
       myRunConfiguration,
       TheRCommandLineCalculator.calculateCommandLine(
-        TheRInterpreterService.getInstance().getInterpreterPath(),
+        interpreterPath,
         myRunConfiguration
       )
     );

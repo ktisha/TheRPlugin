@@ -2,7 +2,7 @@ package com.jetbrains.ther.run;
 
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessOutputTypes;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLanguageConstants;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -20,7 +20,7 @@ public class TheROutputReceiverImplTest {
 
     final InOrder inOrder = inOrder(processHandler);
     inOrder.verify(processHandler).notifyTextAvailable(output, ProcessOutputTypes.STDOUT);
-    inOrder.verify(processHandler).notifyTextAvailable(TheRDebugConstants.LINE_SEPARATOR, ProcessOutputTypes.STDOUT);
+    inOrder.verify(processHandler).notifyTextAvailable(TheRLanguageConstants.LINE_SEPARATOR, ProcessOutputTypes.STDOUT);
 
     verifyNoMoreInteractions(processHandler);
   }
@@ -29,7 +29,7 @@ public class TheROutputReceiverImplTest {
   public void outputWithLineBreak() {
     final ProcessHandler processHandler = mock(ProcessHandler.class);
     final TheROutputReceiverImpl outputReceiver = new TheROutputReceiverImpl(processHandler);
-    final String output = "output" + TheRDebugConstants.LINE_SEPARATOR;
+    final String output = "output" + TheRLanguageConstants.LINE_SEPARATOR;
 
     outputReceiver.receiveOutput(output);
 
@@ -47,7 +47,7 @@ public class TheROutputReceiverImplTest {
 
     final InOrder inOrder = inOrder(processHandler);
     inOrder.verify(processHandler).notifyTextAvailable(error, ProcessOutputTypes.STDERR);
-    inOrder.verify(processHandler).notifyTextAvailable(TheRDebugConstants.LINE_SEPARATOR, ProcessOutputTypes.STDERR);
+    inOrder.verify(processHandler).notifyTextAvailable(TheRLanguageConstants.LINE_SEPARATOR, ProcessOutputTypes.STDERR);
 
     verifyNoMoreInteractions(processHandler);
   }
@@ -56,7 +56,7 @@ public class TheROutputReceiverImplTest {
   public void errorWithLineBreak() {
     final ProcessHandler processHandler = mock(ProcessHandler.class);
     final TheROutputReceiverImpl outputReceiver = new TheROutputReceiverImpl(processHandler);
-    final String error = "error" + TheRDebugConstants.LINE_SEPARATOR;
+    final String error = "error" + TheRLanguageConstants.LINE_SEPARATOR;
 
     outputReceiver.receiveError(error);
 

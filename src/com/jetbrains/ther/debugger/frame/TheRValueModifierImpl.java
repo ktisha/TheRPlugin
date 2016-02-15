@@ -1,15 +1,15 @@
 package com.jetbrains.ther.debugger.frame;
 
-import com.jetbrains.ther.debugger.TheRForcedFunctionDebuggerHandler;
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.function.TheRFunctionDebuggerFactory;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 
@@ -75,7 +75,7 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
         return;
       case DEBUGGING_IN:
-        runFunction();
+        TheRDebuggerUtils.forciblyEvaluateFunction(myExecutor, myFactory, myReceiver);
 
         listener.onSuccess();
 
@@ -87,7 +87,7 @@ class TheRValueModifierImpl implements TheRValueModifier {
 
         return;
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
@@ -95,18 +95,6 @@ class TheRValueModifierImpl implements TheRValueModifier {
           "[" + DEBUGGING_IN + ", " + EMPTY + ", " + DEBUG_AT + "]" +
           "]"
         );
-    }
-  }
-
-  private void runFunction() throws TheRDebuggerException {
-    final TheRForcedFunctionDebuggerHandler handler = new TheRForcedFunctionDebuggerHandler(
-      myExecutor,
-      myFactory,
-      myReceiver
-    );
-
-    //noinspection StatementWithEmptyBody
-    while (handler.advance()) {
     }
   }
 }

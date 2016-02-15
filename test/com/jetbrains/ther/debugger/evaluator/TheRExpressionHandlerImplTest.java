@@ -1,8 +1,9 @@
 package com.jetbrains.ther.debugger.evaluator;
 
+import com.jetbrains.ther.debugger.TheRDebuggerUtils;
 import org.junit.Test;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.expressionOnFrameCommand;
 import static org.junit.Assert.assertEquals;
 
 public class TheRExpressionHandlerImplTest {
@@ -10,14 +11,10 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void identifierOnTheLast() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(1);
-
-    final String globalIdentified = SYS_FRAME_COMMAND + "(1)$abc";
-    final String isFunction = TYPEOF_COMMAND + "(" + globalIdentified + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalIdentified + ")";
+    handler.setLastFrameNumber(1);
 
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + ATTR_COMMAND + "(" + globalIdentified + ", \"original\") else " + globalIdentified,
+      TheRDebuggerUtils.calculateValueCommand(1, "abc"),
       handler.handle(1, "abc")
     );
   }
@@ -25,14 +22,10 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void identifierOnThePrevious() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(2);
-
-    final String globalIdentified = SYS_FRAME_COMMAND + "(1)$abc";
-    final String isFunction = TYPEOF_COMMAND + "(" + globalIdentified + ") == \"" + CLOSURE + "\"";
-    final String isDebugged = IS_DEBUGGED_COMMAND + "(" + globalIdentified + ")";
+    handler.setLastFrameNumber(2);
 
     assertEquals(
-      "if (" + isFunction + " && " + isDebugged + ") " + ATTR_COMMAND + "(" + globalIdentified + ", \"original\") else " + globalIdentified,
+      TheRDebuggerUtils.calculateValueCommand(1, "abc"),
       handler.handle(1, "abc")
     );
   }
@@ -40,7 +33,7 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void callOnTheLast() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(1);
+    handler.setLastFrameNumber(1);
 
     assertEquals(
       "abc()",
@@ -51,10 +44,10 @@ public class TheRExpressionHandlerImplTest {
   @Test
   public void callOnThePrevious() {
     final TheRExpressionHandlerImpl handler = new TheRExpressionHandlerImpl();
-    handler.setMaxFrameNumber(2);
+    handler.setLastFrameNumber(2);
 
     assertEquals(
-      SYS_FRAME_COMMAND + "(1)$abc()",
+      expressionOnFrameCommand(1, "abc()"),
       handler.handle(1, "abc()")
     );
   }

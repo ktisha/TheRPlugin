@@ -1,7 +1,7 @@
 package com.jetbrains.ther.debugger.evaluator;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.mock.*;
@@ -12,9 +12,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
 import static org.junit.Assert.assertEquals;
 
@@ -42,7 +42,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -72,7 +72,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -97,7 +97,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorErrorReceiver receiver = new TheRDebuggerEvaluatorErrorReceiver();
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, handler.myCounter);
@@ -131,7 +131,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -160,7 +160,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(output);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(2, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -178,7 +178,7 @@ public class TheRDebuggerEvaluatorImplTest {
     final String output = "function(x) {\n" +
                           "    x ^ 2\n" +
                           "}\n" +
-                          "<" + ENVIRONMENT + ": 0xfffffff>";
+                          ENVIRONMENT_PREFIX + "0xfffffff>";
 
     final String result = "function(x) {\n" +
                           "    x ^ 2\n" +
@@ -204,7 +204,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(1, receiver.getCounter());
@@ -221,8 +221,8 @@ public class TheRDebuggerEvaluatorImplTest {
     final String result = "[1] 1 2 3";
 
     final AlwaysSameResultTheRExecutor executor = new AlwaysSameResultTheRExecutor(
-      TheRDebugConstants.DEBUGGING_IN + ": " + expression + "\n" +
-      DEBUG + ": {\n" +
+      DEBUGGING_IN_PREFIX + expression + "\n" +
+      DEBUG_AT_PREFIX + "{\n" +
       "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
       "    {\n" +
       "        print(\"x\")\n" +
@@ -248,7 +248,7 @@ public class TheRDebuggerEvaluatorImplTest {
 
     final TheRDebuggerEvaluatorReceiver receiver = new TheRDebuggerEvaluatorReceiver(result);
 
-    evaluator.evalExpression(expression, receiver);
+    evaluator.evaluate(expression, receiver);
 
     assertEquals(1, executor.getCounter());
     assertEquals(2, debugger.getCounter());
@@ -293,7 +293,7 @@ public class TheRDebuggerEvaluatorImplTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "2: " + TheRDebugConstants.SYS_FRAME_COMMAND + "(0)$abc",
+          DEBUG_AT_LINE_PREFIX + "2: " + TheRCommands.expressionOnFrameCommand(0, "abc"),
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "abc"

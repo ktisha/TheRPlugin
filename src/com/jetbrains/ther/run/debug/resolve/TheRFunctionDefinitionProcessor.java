@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.MAIN_FUNCTION_NAME;
 
-// TODO [xdbg][test]
 class TheRFunctionDefinitionProcessor implements PsiElementProcessor<PsiElement> {
 
   @NotNull

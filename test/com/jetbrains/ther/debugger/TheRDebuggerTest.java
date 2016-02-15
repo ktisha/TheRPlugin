@@ -1,8 +1,9 @@
 package com.jetbrains.ther.debugger;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRLanguageConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluatorFactory;
 import com.jetbrains.ther.debugger.evaluator.TheRExpressionHandler;
@@ -23,7 +24,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.MAIN_FUNCTION_NAME;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.MAIN_FUNCTION_NAME;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
@@ -1142,7 +1143,7 @@ public class TheRDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (getCounter() < myScriptLength + 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.PLUS_AND_SPACE,
+          TheRResponseConstants.PLUS_AND_SPACE,
           TheRExecutionResultType.PLUS,
           TextRange.EMPTY_RANGE,
           "error" + getCounter()
@@ -1285,7 +1286,7 @@ public class TheRDebuggerTest {
       final StringBuilder sb = new StringBuilder();
 
       for (int i = 0; i < length; i++) {
-        sb.append(TheRDebugConstants.LINE_SEPARATOR);
+        sb.append(TheRLanguageConstants.LINE_SEPARATOR);
       }
 
       return sb.toString();
@@ -1297,8 +1298,8 @@ public class TheRDebuggerTest {
     private int myCounter = 0;
 
     @Override
-    public void setMaxFrameNumber(final int maxFrameNumber) {
-      myCounter += maxFrameNumber;
+    public void setLastFrameNumber(final int lastFrameNumber) {
+      myCounter += lastFrameNumber;
     }
   }
 
@@ -1324,8 +1325,8 @@ public class TheRDebuggerTest {
     private int myCounter = 0;
 
     @Override
-    public void setMaxFrameNumber(final int maxFrameNumber) {
-      myCounter += maxFrameNumber;
+    public void setLastFrameNumber(final int lastFrameNumber) {
+      myCounter += lastFrameNumber;
     }
   }
 

@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -14,7 +13,10 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
@@ -439,7 +441,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc(c(1:10))\n" +
+          EXITING_FROM_PREFIX + "abc(c(1:10))\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -459,8 +461,8 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": abc(c(1:10))\n" +
-          DEBUG + ": {\n" +
+          DEBUGGING_IN_PREFIX + "abc(c(1:10))\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        x + 1\n" +
@@ -498,9 +500,9 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc(1:10)\n" +
+          EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc(1:10)\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
@@ -534,9 +536,9 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc(c(1:10))\n" +
+          EXITING_FROM_PREFIX + "abc(c(1:10))\n" +
           "[1] 1 2 3\n" +
-          DEBUG_AT + "6: x <- c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "6: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(27, 36),
@@ -569,11 +571,11 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          EXITING_FROM + " FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc(1:10)\n" +
+          EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc(1:10)\n" +
           "[1] 1 2 3\n" +
-          DEBUG_AT + "6: x <- c(1)" +
+          DEBUG_AT_LINE_PREFIX + "6: x <- c(1)" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
           new TextRange(86, 95),
@@ -617,7 +619,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
           "[1] 1 2 3\n" +
-          EXITING_FROM + " abc(c(1:10))\n" +
+          EXITING_FROM_PREFIX + "abc(c(1:10))\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 9),
@@ -636,10 +638,10 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
-          DEBUG + ": {\n" +
+          DEBUGGING_IN_PREFIX + "abc()\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
           "        c(1:3)\n" +
@@ -663,9 +665,9 @@ public class TheRUnbraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          TRACING + " abc() on entry \n" +
+          TRACING_PREFIX + "abc() on entry \n" +
           "[1] \"abc\"\n" +
-          DEBUG + ": c(4:6)\n" +
+          DEBUG_AT_PREFIX + "c(4:6)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.START_TRACE_UNBRACE,
           TextRange.EMPTY_RANGE,
@@ -675,7 +677,7 @@ public class TheRUnbraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 6) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 4 5 6\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -716,7 +718,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
           "[1] 1\n[1] 2\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 11),
@@ -735,8 +737,8 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": {\n" +
+          DEBUGGING_IN_PREFIX + "d(i)\n" +
+          DEBUG_AT_PREFIX + "{\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    print(i)\n" +
           "}\n" +
@@ -772,7 +774,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
-          DEBUG_AT + "2: print(i + 1)\n" +
+          DEBUG_AT_LINE_PREFIX + "2: print(i + 1)\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -783,7 +785,7 @@ public class TheRUnbraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
           "[1] 2\n" +
-          EXITING_FROM + " f(1)\n" +
+          EXITING_FROM_PREFIX + "f(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 5),

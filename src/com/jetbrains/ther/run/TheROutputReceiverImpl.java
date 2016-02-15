@@ -7,7 +7,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LINE_SEPARATOR;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.LINE_SEPARATOR;
 
 public class TheROutputReceiverImpl implements TheROutputReceiver {
 

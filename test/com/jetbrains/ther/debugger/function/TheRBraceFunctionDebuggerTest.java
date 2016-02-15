@@ -1,7 +1,6 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -14,7 +13,10 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
 
@@ -669,7 +671,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: print(c(1))\n" +
+          DEBUG_AT_LINE_PREFIX + "1: print(c(1))\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -680,7 +682,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUG_AT + "2: c(1) + 1\n" +
+          DEBUG_AT_LINE_PREFIX + "2: c(1) + 1\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           new TextRange(0, 9),
@@ -690,7 +692,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -710,7 +712,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: def()\n" +
+          DEBUG_AT_LINE_PREFIX + "1: def()\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -720,7 +722,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUGGING_IN + ": def()\n" +
+          DEBUGGING_IN_PREFIX + "def()\n" +
           "debug: {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "def" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
@@ -736,7 +738,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -770,7 +772,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -780,9 +782,9 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " ghi()\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "ghi()\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
@@ -816,7 +818,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -826,9 +828,9 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(20, 29),
@@ -861,7 +863,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -871,11 +873,11 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " ghi()\n" +
-          EXITING_FROM + " def()\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "ghi()\n" +
+          EXITING_FROM_PREFIX + "def()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUG_AT + "4: x <- c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "4: x <- c(1)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.RECURSIVE_EXITING_FROM,
           new TextRange(60, 69),
@@ -918,7 +920,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: c(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -929,7 +931,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
           "[1] 1 2 3\n" +
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           new TextRange(0, 9),
@@ -948,7 +950,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 1 || getCounter() == 6)) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "1: c(1:3)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: c(1:3)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -958,9 +960,9 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 1 2 3\n" +
-          TheRDebugConstants.DEBUGGING_IN + ": abc()\n" +
+          DEBUGGING_IN_PREFIX + "abc()\n" +
           "debug: {\n" +
           "    .doTrace(" + SERVICE_FUNCTION_PREFIX + "abc" + SERVICE_ENTER_FUNCTION_SUFFIX + "(), \"on entry\")\n" +
           "    {\n" +
@@ -985,7 +987,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRExecutionResult(
-          TRACING + " abc() on entry \n" +
+          TRACING_PREFIX + "abc() on entry \n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    c(4:6)\n" +
@@ -999,7 +1001,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 8) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           "[1] 4 5 6\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -1027,7 +1029,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           myOutputBefore +
-          DEBUG_AT + "1: for (i in 1:2) {\n" +
+          DEBUG_AT_LINE_PREFIX + "1: for (i in 1:2) {\n" +
           "ls()\n" +
           "}\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
@@ -1039,7 +1041,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 2 || getCounter() == 6)) {
         return new TheRExecutionResult(
-          DEBUG_AT + "1: i\n" +
+          DEBUG_AT_LINE_PREFIX + "1: i\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1049,7 +1051,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 4 || getCounter() == 8)) {
         return new TheRExecutionResult(
-          DEBUG_AT + "2: ls()\n" +
+          DEBUG_AT_LINE_PREFIX + "2: ls()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1059,7 +1061,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1078,7 +1080,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT + "1: for (i in 1:2) {\n" +
+          DEBUG_AT_LINE_PREFIX + "1: for (i in 1:2) {\n" +
           "    d(i)\n" +
           "}\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
@@ -1090,7 +1092,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
-          DEBUG_AT + "1: i\n" +
+          DEBUG_AT_LINE_PREFIX + "1: i\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1100,7 +1102,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 4 || getCounter() == 7)) {
         return new TheRExecutionResult(
-          DEBUG_AT + "2: d(i)\n" +
+          DEBUG_AT_LINE_PREFIX + "2: d(i)\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1110,8 +1112,8 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 6 || getCounter() == 9)) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": print(i)\n" +
+          DEBUGGING_IN_PREFIX + "d(i)\n" +
+          DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
@@ -1121,7 +1123,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 10) {
         return new TheRExecutionResult(
-          EXITING_FROM + " f()\n" +
+          EXITING_FROM_PREFIX + "f()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1162,7 +1164,7 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
           myOutputBefore +
-          DEBUG_AT + "1: for (i in 1:2) print(i)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: for (i in 1:2) print(i)\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           myOutputBefore.isEmpty() ? TextRange.EMPTY_RANGE : new TextRange(0, myOutputBefore.length()),
@@ -1172,7 +1174,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          EXITING_FROM + " abc()\n" +
+          EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1191,7 +1193,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT + "1: for (i in 1:2) d(i)",
+          DEBUG_AT_LINE_PREFIX + "1: for (i in 1:2) d(i)",
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_ent"
@@ -1200,8 +1202,8 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         return new TheRExecutionResult(
-          DEBUGGING_IN + ": d(i)\n" +
-          DEBUG + ": print(i)\n" +
+          DEBUGGING_IN_PREFIX + "d(i)\n" +
+          DEBUG_AT_PREFIX + "print(i)\n" +
           BROWSE_PREFIX + "4" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUGGING_IN,
           TextRange.EMPTY_RANGE,
@@ -1211,7 +1213,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          EXITING_FROM + " f()\n" +
+          EXITING_FROM_PREFIX + "f()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
           TextRange.EMPTY_RANGE,
@@ -1250,7 +1252,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT + "1: print(1)\n" +
+          DEBUG_AT_LINE_PREFIX + "1: print(1)\n" +
           BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1261,15 +1263,15 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
         final String debugAt = myIsBrace
                                ?
-                               DEBUG_AT + "3: for (i in 1:2) {\n" +
+                               DEBUG_AT_LINE_PREFIX + "3: for (i in 1:2) {\n" +
                                "    print(i)\n" +
                                "}"
                                :
-                               DEBUG_AT + "3: for (i in 1:2) print(i)";
+                               DEBUG_AT_LINE_PREFIX + "3: for (i in 1:2) print(i)";
 
         return new TheRExecutionResult(
           "[1] 1\n" +
-          EXITING_FROM + " d()\n" +
+          EXITING_FROM_PREFIX + "d()\n" +
           debugAt + "\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
@@ -1280,7 +1282,7 @@ public class TheRBraceFunctionDebuggerTest {
 
       if (myIsBrace && command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
         return new TheRExecutionResult(
-          DEBUG_AT + "3: i\n" +
+          DEBUG_AT_LINE_PREFIX + "3: i\n" +
           BROWSE_PREFIX + "2" + BROWSE_SUFFIX,
           TheRExecutionResultType.DEBUG_AT,
           TextRange.EMPTY_RANGE,
@@ -1313,7 +1315,7 @@ public class TheRBraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
         return new TheRExecutionResult(
-          DEBUG_AT + "2: if (10 > log(-1)) {\n" +
+          DEBUG_AT_LINE_PREFIX + "2: if (10 > log(-1)) {\n" +
           "    print(\"ok\")\n" +
           "}\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.executor;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.appendError;
@@ -16,7 +16,7 @@ public final class TheRExecutorUtils {
     final TheRExecutionResult result = executor.execute(command);
 
     if (result.getType() != expectedType) {
-      throw new TheRUnexpectedExecutionResultException(
+      throw new TheRUnexpectedExecutionResultTypeException(
         "Actual type is not the same as expected: [actual: " + result.getType() + ", expected: " + expectedType + "]"
       );
     }

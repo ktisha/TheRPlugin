@@ -11,14 +11,9 @@ import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ConcurrencyUtil;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.run.TheRCommandLineState;
 import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
-import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TheRRunRunner extends GenericProgramRunner {
 
@@ -45,13 +40,11 @@ public class TheRRunRunner extends GenericProgramRunner {
     FileDocumentManager.getInstance().saveAllDocuments();
 
     final Project project = environment.getProject();
-    final TheRRunConfiguration runConfiguration = (TheRRunConfiguration)environment.getRunProfile();
 
     return new TheRRunProcess(
       project,
       environment,
       getExecutionResult(state, environment),
-      calculateInitCommands(runConfiguration),
       ConcurrencyUtil.newSingleThreadExecutor(EXECUTOR_NAME)
     ).getRunContentDescriptor();
   }
@@ -62,18 +55,5 @@ public class TheRRunRunner extends GenericProgramRunner {
     final TheRCommandLineState commandLineState = (TheRCommandLineState)state;
 
     return commandLineState.execute(environment.getExecutor(), this);
-  }
-
-  @NotNull
-  private List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    final List<String> result = new ArrayList<String>();
-
-    result.addAll(TheRGraphicsUtils.calculateInitCommands(runConfiguration));
-
-    result.add(TheRDebugConstants.SOURCE_COMMAND + "(\"" + runConfiguration.getScriptPath() + "\")");
-
-    result.add(TheRDebugConstants.QUIT_COMMAND);
-
-    return result;
   }
 }

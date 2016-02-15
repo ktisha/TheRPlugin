@@ -4,7 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.frame.XValueChildrenList;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
+import com.jetbrains.ther.debugger.data.TheRFunctionConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.frame.TheRStackFrame;
@@ -105,7 +105,7 @@ public class TheRXStackFrameTest {
   public void mainPresentation() {
     final TheRXStackFrame frame = new TheRXStackFrame(
       new TheRStackFrame(
-        new TheRLocation(TheRDebugConstants.MAIN_FUNCTION_NAME, 2),
+        new TheRLocation(TheRFunctionConstants.MAIN_FUNCTION_NAME, 2),
         new IllegalTheRVarsLoader(),
         new IllegalTheRDebuggerEvaluator()
       ),

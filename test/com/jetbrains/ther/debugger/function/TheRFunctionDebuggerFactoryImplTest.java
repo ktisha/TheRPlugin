@@ -1,10 +1,10 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
+import com.jetbrains.ther.debugger.data.TheRResponseConstants;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.mock.IllegalTheRFunctionDebuggerHandler;
 import com.jetbrains.ther.debugger.mock.MockTheRExecutor;
@@ -55,7 +55,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
     assertEquals(Arrays.asList("error_entry", "error_st", LS_FUNCTIONS_ERROR), outputReceiver.getErrors());
   }
 
-  @Test(expected = TheRUnexpectedExecutionResultException.class)
+  @Test(expected = TheRUnexpectedExecutionResultTypeException.class)
   public void unexpectedResult() throws TheRDebuggerException {
     final MockTheROutputReceiver outputReceiver = new MockTheROutputReceiver();
 
@@ -82,7 +82,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
+          TheRResponseConstants.TRACING_PREFIX + "abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: {\n" +
           "    x + 1\n" +
@@ -95,7 +95,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 3) {
         return new TheRExecutionResult(
-          TheRDebugConstants.DEBUG_AT + "2: x + 1",
+          TheRResponseConstants.DEBUG_AT_LINE_PREFIX + "2: x + 1",
           DEBUG_AT,
           TextRange.EMPTY_RANGE,
           "error_dbg_at"
@@ -122,7 +122,7 @@ public class TheRFunctionDebuggerFactoryImplTest {
 
       if (getCounter() == 2) {
         return new TheRExecutionResult(
-          TheRDebugConstants.TRACING + " abc(1) on entry\n" +
+          TheRResponseConstants.TRACING_PREFIX + "abc(1) on entry\n" +
           "[1] \"abc\"\n" +
           "debug: x + 1",
           START_TRACE_UNBRACE,

@@ -2,7 +2,7 @@ package com.jetbrains.ther.debugger.function;
 
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findCurrentLineEnd;
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.findNextLineBegin;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_BRACE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.START_TRACE_UNBRACE;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
@@ -46,7 +46,7 @@ public class TheRFunctionDebuggerFactoryImpl implements TheRFunctionDebuggerFact
           extractFunctionName(startTraceResult.getOutput())
         );
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + startTraceResult.getType() + ", " +

@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// TODO [run][test]
 public class TheRRunConfiguration extends LocatableConfigurationBase implements TheRRunConfigurationParams {
 
   @NotNull
@@ -69,7 +68,7 @@ public class TheRRunConfiguration extends LocatableConfigurationBase implements 
   @NotNull
   @Override
   public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-    return new TheRRunConfigurationEditor(this);
+    return new TheRRunConfigurationEditor(getProject());
   }
 
   @Override

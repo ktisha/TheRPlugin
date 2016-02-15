@@ -1,14 +1,17 @@
 package com.jetbrains.ther.run.graphics;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCoreUtil;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.PathUtil;
-import com.jetbrains.ther.run.configuration.TheRRunConfiguration;
+import com.jetbrains.ther.TheRHelpersLocator;
+import com.jetbrains.ther.debugger.data.TheRCommands;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,9 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.LOAD_LIB_COMMAND;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.SERVICE_FUNCTION_PREFIX;
-import static java.lang.Boolean.parseBoolean;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
 
 public final class TheRGraphicsUtils {
 
@@ -29,22 +30,13 @@ public final class TheRGraphicsUtils {
   private static final Map<String, TheRGraphicsState> GRAPHICS_STATES = new HashMap<String, TheRGraphicsState>();
 
   @NotNull
-  private static final String DEVICE_ENV_KEY = "ther.debugger.device";
-
-  @NotNull
-  private static final String DEVICE_IS_DISABLED = "Device is disabled [script: %s]";
-
-  @NotNull
-  private static final String DEVICE_LIB_NAME = String.format("libtherplugin_device%s.so", SystemInfo.is32Bit ? "32" : "64");
+  private static final String DEVICE_LIB_FORMAT = "libtherplugin_device%s.%s";
 
   @NotNull
   private static final String DEVICE_FUNCTION_NAME = SERVICE_FUNCTION_PREFIX + "device_init";
 
   @NotNull
-  private static final String SETUP_DEVICE_COMMAND = "options(device=\"" + DEVICE_FUNCTION_NAME + "\")";
-
-  @NotNull
-  private static final String LIB_DIR_NAME = "libs";
+  private static final String SETUP_DEVICE_COMMAND = TheRCommands.optionsCommand("device", DEVICE_FUNCTION_NAME);
 
   @NotNull
   private static final String LIB_IS_NOT_FOUND = "Lib is not found [path: %s]";
@@ -71,26 +63,19 @@ public final class TheRGraphicsUtils {
   private static final String SNAPSHOT_DIR_HAS_BEEN_CREATED = "Snapshot dir has been created [path: %s]";
 
   @NotNull
-  public static List<String> calculateInitCommands(@NotNull final TheRRunConfiguration runConfiguration) {
-    if (isDeviceEnabled(runConfiguration)) {
-      final String libPath = getLibPath(DEVICE_LIB_NAME);
+  public static List<String> calculateInitCommands(@NotNull final Project project, final boolean is64Bit) {
+    final String libPath = getLibPath(calculateLibName(is64Bit));
 
-      if (libPath != null) {
-        final VirtualFile snapshotDir = getSnapshotDir(runConfiguration.getProject());
+    if (libPath != null) {
+      final VirtualFile snapshotDir = getSnapshotDir(project);
 
-        if (snapshotDir != null) {
-          return Arrays.asList(
-            LOAD_LIB_COMMAND + "(\"" + libPath + "\")",
-            DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDir.getPath() + "\") }",
-            SETUP_DEVICE_COMMAND
-          );
-        }
+      if (snapshotDir != null) {
+        return Arrays.asList(
+          TheRCommands.loadLibCommand(libPath),
+          DEVICE_FUNCTION_NAME + " <- function() { .Call(\"" + DEVICE_FUNCTION_NAME + "\", \"" + snapshotDir.getPath() + "\") }",
+          SETUP_DEVICE_COMMAND
+        );
       }
-    }
-    else {
-      LOGGER.warn(
-        String.format(DEVICE_IS_DISABLED, runConfiguration.getScriptPath())
-      );
     }
 
     return Collections.emptyList();
@@ -126,18 +111,10 @@ public final class TheRGraphicsUtils {
     return GRAPHICS_STATES.get(snapshotDirPath);
   }
 
-  private static boolean isDeviceEnabled(@NotNull final TheRRunConfiguration runConfiguration) {
-    final Map<String, String> envs = runConfiguration.getEnvs();
-
-    return !envs.containsKey(DEVICE_ENV_KEY) || parseBoolean(envs.get(DEVICE_ENV_KEY));
-  }
-
   @Nullable
   private static String getLibPath(@NotNull final String libName) {
-    final File pluginDir = new File(PathUtil.getJarPathForClass(TheRGraphicsUtils.class));
-    final File libDir = new File(pluginDir, LIB_DIR_NAME);
-    final File libFile = new File(libDir, libName);
-    final String absolutePath = libFile.getAbsolutePath();
+    final File libFile = TheRHelpersLocator.getHelperFile(libName);
+    final String absolutePath = FileUtil.toSystemIndependentName(libFile.getAbsolutePath());
 
     if (!libFile.exists()) {
       LOGGER.warn(
@@ -156,6 +133,15 @@ public final class TheRGraphicsUtils {
     }
 
     return absolutePath;
+  }
+
+  @NotNull
+  private static String calculateLibName(final boolean is64Bit) {
+    return String.format(
+      DEVICE_LIB_FORMAT,
+      is64Bit ? "64" : "32",
+      SystemInfo.isWindows ? "dll" : "so"
+    );
   }
 
   @Nullable
@@ -219,19 +205,28 @@ public final class TheRGraphicsUtils {
 
   @Nullable
   private static VirtualFile createSnapshotDir(@NotNull final VirtualFile dotIdeaDir) {
-    try {
-      final VirtualFile snapshotDir = dotIdeaDir.createChildDirectory(new TheRGraphicsUtils(), SNAPSHOT_DIR_NAME);
+    final Ref<VirtualFile> resultRef = new Ref<VirtualFile>(null);
 
-      LOGGER.info(
-        String.format(SNAPSHOT_DIR_HAS_BEEN_CREATED, snapshotDir.getPath())
-      );
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            resultRef.set(
+              dotIdeaDir.createChildDirectory(new TheRGraphicsUtils(), SNAPSHOT_DIR_NAME)
+            );
 
-      return snapshotDir;
-    }
-    catch (final IOException e) {
-      LOGGER.error(e);
+            LOGGER.info(
+              String.format(SNAPSHOT_DIR_HAS_BEEN_CREATED, resultRef.get().getPath())
+            );
+          }
+          catch (final IOException e) {
+            LOGGER.error(e);
+          }
+        }
+      }
+    );
 
-      return null;
-    }
+    return resultRef.get();
   }
 }

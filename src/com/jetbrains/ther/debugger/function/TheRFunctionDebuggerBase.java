@@ -3,25 +3,26 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
-import com.jetbrains.ther.debugger.data.TheRDebugConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
-import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultException;
+import com.jetbrains.ther.debugger.exception.TheRUnexpectedExecutionResultTypeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jetbrains.ther.debugger.TheRDebuggerStringUtils.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.*;
-import static com.jetbrains.ther.debugger.data.TheRDebugConstants.EXITING_FROM;
+import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FOR_LOOP_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.WHILE_LOOP_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.DEBUG_AT_LINE_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRResponseConstants.EXITING_FROM_PREFIX;
 import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.*;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUGGING_IN;
-import static com.jetbrains.ther.debugger.executor.TheRExecutionResultType.DEBUG_AT;
 import static com.jetbrains.ther.debugger.executor.TheRExecutorUtils.execute;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 
+// TODO [dbg][upd_test]
 abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
 
   @NotNull
@@ -100,7 +101,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
         handleRecursiveEndTrace(result);
         break;
       default:
-        throw new TheRUnexpectedExecutionResultException(
+        throw new TheRUnexpectedExecutionResultTypeException(
           "Actual type is not the same as expected: " +
           "[" +
           "actual: " + result.getType() + ", " +
@@ -185,7 +186,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     handleEndTraceResult(result);
     appendError(result, myOutputReceiver);
 
-    final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM);
+    final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM_PREFIX);
 
     handleEndTraceReturn(result, lastExitingFromEntry);
 
@@ -228,7 +229,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT.length();
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT_LINE_PREFIX.length();
     final int lineNumberEnd = output.indexOf(':', lineNumberBegin + 1);
 
     return Integer.parseInt(output.substring(lineNumberBegin, lineNumberEnd)) - 1; // -1 because of `MAIN_FUNCTION` declaration
@@ -247,7 +248,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private boolean isBraceLoopEntrance(@NotNull final String output, final int debugAtIndex) {
-    final int lineNumberBegin = debugAtIndex + TheRDebugConstants.DEBUG_AT.length();
+    final int lineNumberBegin = debugAtIndex + DEBUG_AT_LINE_PREFIX.length();
     final int loopEntranceBegin = output.indexOf(':', lineNumberBegin + 1) + 2;
     final int lines = StringUtil.countNewLines(output.substring(loopEntranceBegin));
 
@@ -275,11 +276,11 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     int currentIndex = 0;
     int count = 0;
 
-    while ((currentIndex = output.indexOf(EXITING_FROM, currentIndex)) != -1) {
+    while ((currentIndex = output.indexOf(EXITING_FROM_PREFIX, currentIndex)) != -1) {
       lastEntry = currentIndex;
 
       count++;
-      currentIndex += EXITING_FROM.length();
+      currentIndex += EXITING_FROM_PREFIX.length();
     }
 
     return new RecursiveEndTraceData(lastEntry, count);
@@ -289,7 +290,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     final String output = result.getOutput();
     final int debugAtIndex = findDebugAtIndexInEndTraceReturn(result, lastExitingFrom);
 
-    if (output.startsWith(TheRDebugConstants.DEBUG_AT, debugAtIndex)) {
+    if (output.startsWith(DEBUG_AT_LINE_PREFIX, debugAtIndex)) {
       if (isBraceLoopEntrance(output, debugAtIndex)) {
         handleDebugAt(
           execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT),
@@ -306,7 +307,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     if (result.getResultRange().getStartOffset() == 0) {
       return findNextLineBegin(
         result.getOutput(),
-        lastExitingFrom + EXITING_FROM.length()
+        lastExitingFrom + EXITING_FROM_PREFIX.length()
       );
     }
     else {

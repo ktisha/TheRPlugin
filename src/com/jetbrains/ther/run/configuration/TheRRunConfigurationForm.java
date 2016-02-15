@@ -32,9 +32,7 @@ public class TheRRunConfigurationForm implements TheRRunConfigurationParams {
 
   private EnvironmentVariablesComponent myEnvsComponent;
 
-  public TheRRunConfigurationForm(@NotNull final TheRRunConfiguration configuration) {
-    final Project project = configuration.getProject();
-
+  public TheRRunConfigurationForm(@NotNull final Project project) {
     setupScriptPathField(project);
     setupScriptArgsField();
     setupWorkingDirectoryPathField(project);
