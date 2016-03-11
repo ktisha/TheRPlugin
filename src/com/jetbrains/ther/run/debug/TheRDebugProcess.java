@@ -8,14 +8,17 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XExpression;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.intellij.xdebugger.frame.XValue;
 import com.jetbrains.ther.debugger.TheRDebugger;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
@@ -26,6 +29,7 @@ import com.jetbrains.ther.run.TheRProcessUtils;
 import com.jetbrains.ther.run.TheRXProcessHandler;
 import com.jetbrains.ther.run.debug.resolve.TheRResolvingSession;
 import com.jetbrains.ther.run.debug.stack.TheRXStack;
+import com.jetbrains.ther.run.debug.stack.TheRXValue;
 import com.jetbrains.ther.run.graphics.TheRGraphicsUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -300,8 +304,17 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
     final XSuspendContext suspendContext = myStack.getSuspendContext();
 
     if (breakpoint != null) {
-      if (!session
-        .breakpointReached(breakpoint, null, suspendContext)) { // second argument is printed to console when breakpoint is reached
+      final XDebuggerEvaluator evaluator = getActiveEvaluator();
+      final XExpression conditionExpression = breakpoint.getConditionExpression();
+
+      if (evaluator != null && conditionExpression != null) {
+        evaluator.evaluate(
+          conditionExpression,
+          new EvaluationCallback(breakpoint, suspendContext),
+          null
+        );
+      }
+      else if (!session.breakpointReached(breakpoint, null, suspendContext)) { // 2nd arg is printed to console when breakpoint is reached
         resume();
       }
     }
@@ -311,7 +324,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
       myTempBreakpoints.remove(wrapper);
     }
 
-    TheRGraphicsUtils.getGraphicsState(getSession().getProject()).refresh(true);
+    TheRGraphicsUtils.getGraphicsState(session.getProject()).refresh(true);
   }
 
   private void handleException(@NotNull final TheRDebuggerException e) {
@@ -341,6 +354,16 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
     assert frame != null;
 
     return frame.getSourcePosition();  // TODO [xdbg][null]
+  }
+
+  @Nullable
+  private XDebuggerEvaluator getActiveEvaluator() {
+    final XExecutionStack activeExecutionStack = myStack.getSuspendContext().getActiveExecutionStack();
+    assert activeExecutionStack != null; // see TheRXSuspendContext#getActiveExecutionStack()
+
+    final XStackFrame topFrame = activeExecutionStack.getTopFrame();
+
+    return topFrame == null ? null : topFrame.getEvaluator();
   }
 
   private static class XSourcePositionWrapper {
@@ -392,6 +415,44 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
       myBreakpoints.remove(
         new XSourcePositionWrapper(breakpoint.getSourcePosition())
       );
+    }
+  }
+
+  private class EvaluationCallback implements XDebuggerEvaluator.XEvaluationCallback {
+
+    private final int myPrefixLength = "[1] ".length();
+
+    @NotNull
+    private final XLineBreakpoint<XBreakpointProperties> myBreakpoint;
+
+    @NotNull
+    private final XSuspendContext mySuspendContext;
+
+    public EvaluationCallback(@NotNull final XLineBreakpoint<XBreakpointProperties> breakpoint,
+                              @NotNull final XSuspendContext suspendContext) {
+      myBreakpoint = breakpoint;
+      mySuspendContext = suspendContext;
+    }
+
+    @Override
+    public void evaluated(@NotNull final XValue result) {
+      if (result instanceof TheRXValue) {
+        final String value = ((TheRXValue)result).getValue();
+        final boolean evaluatedToTrue = value.length() > myPrefixLength && Boolean.parseBoolean(value.substring(myPrefixLength));
+
+        if (evaluatedToTrue &&
+            getSession()
+              .breakpointReached(myBreakpoint, null, mySuspendContext)) { // 2 arg is printed to console when breakpoint is reached
+          return;
+        }
+      }
+
+      resume();
+    }
+
+    @Override
+    public void errorOccurred(@NotNull final String errorMessage) {
+      LOGGER.info(errorMessage);
     }
   }
 }

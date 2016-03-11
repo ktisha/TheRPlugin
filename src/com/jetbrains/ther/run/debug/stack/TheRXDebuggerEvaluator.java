@@ -1,11 +1,7 @@
 package com.jetbrains.ther.run.debug.stack;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
-import com.intellij.xdebugger.frame.XValue;
-import com.intellij.xdebugger.frame.XValueNode;
-import com.intellij.xdebugger.frame.XValuePlace;
 import com.jetbrains.ther.debugger.evaluator.TheRDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,9 +12,6 @@ import java.util.concurrent.ExecutorService;
 class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
   @NotNull
-  private static final Logger LOGGER = Logger.getInstance(TheRXDebuggerEvaluator.class);
-
-  @NotNull
   private final TheRDebuggerEvaluator myEvaluator;
 
   @NotNull
@@ -27,16 +20,6 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
   public TheRXDebuggerEvaluator(@NotNull final TheRDebuggerEvaluator evaluator, @NotNull final ExecutorService executor) {
     myEvaluator = evaluator;
     myExecutor = executor;
-  }
-
-  // This method is overridden because XDebugSessionImpl.breakpointReached(XBreakpoint<?>, String, XSuspendContext) calls it anyway
-  @Override
-  public boolean evaluateCondition(@NotNull final String expression) {
-    final ConditionReceiver receiver = new ConditionReceiver();
-
-    myEvaluator.evaluate(expression, receiver);
-
-    return receiver.myResult;
   }
 
   @Override
@@ -56,28 +39,6 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
     );
   }
 
-  private static class ConditionReceiver implements TheRDebuggerEvaluator.Receiver {
-
-    private boolean myResult = false;
-
-    @Override
-    public void receiveResult(@NotNull final String result) {
-      final int prefixLength = "[1] ".length();
-
-      myResult = result.length() > prefixLength && Boolean.parseBoolean(result.substring(prefixLength));
-    }
-
-    @Override
-    public void receiveError(@NotNull final Exception e) {
-      LOGGER.info(e);
-    }
-
-    @Override
-    public void receiveError(@NotNull final String error) {
-      LOGGER.info(error);
-    }
-  }
-
   private static class ExpressionReceiver implements TheRDebuggerEvaluator.Receiver {
 
     @NotNull
@@ -89,14 +50,7 @@ class TheRXDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void receiveResult(@NotNull final String result) {
-      final XValue xvalue = new XValue() {
-        @Override
-        public void computePresentation(@NotNull final XValueNode node, @NotNull final XValuePlace place) {
-          TheRXPresentationUtils.computePresentation(result, node);
-        }
-      };
-
-      myCallback.evaluated(xvalue);
+      myCallback.evaluated(new TheRXValue(result));
     }
 
     @Override
