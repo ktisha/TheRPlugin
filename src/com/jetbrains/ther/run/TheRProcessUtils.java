@@ -22,7 +22,7 @@ public final class TheRProcessUtils {
     }
   }
 
-  private static boolean is64Bit(@NotNull final String architecture) throws TheRDebuggerException {
+  private static boolean is64Bit(@NotNull final String architecture) {
     final int begin = TheRDebuggerStringUtils.findNextLineBegin(architecture, 0) + 5;
     final int end = TheRDebuggerStringUtils.findCurrentLineEnd(architecture, begin) - 1;
 
