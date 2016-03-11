@@ -37,7 +37,7 @@ public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<Language
   @Override
   protected Process createProcess() throws ExecutionException {
     final GeneralCommandLine commandLine = new GeneralCommandLine();
-    commandLine.setPassParentEnvironment(true);
+    commandLine.withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE);
     commandLine.setExePath(getInterpreterPath());
     commandLine.addParameter("--slave");
 
