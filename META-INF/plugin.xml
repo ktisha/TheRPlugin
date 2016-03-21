@@ -8,6 +8,8 @@
       The R plugin for PyCharm and IntelliJ provides smart editing for R scripts.
 
 It includes syntax-highlighting editor that supports direct code execution, integrated console, builtin visual debugger, package manager and more.
+      <br/>
+      <a href="http://ktisha.github.io/TheRPlugin/">Plugin homepage</a>
       ]]></description>
 
   <change-notes><![CDATA[
