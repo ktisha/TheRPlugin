@@ -1,6 +1,5 @@
 package com.jetbrains.ther.run.debug.mock;
 
-import com.intellij.util.NotNullFunction;
 import com.intellij.xdebugger.frame.XFullValueEvaluator;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
@@ -29,25 +28,6 @@ public class IllegalXValueNode implements XValueNode {
                               @Nullable final String type,
                               @NotNull final String separator,
                               @Nullable final String value,
-                              final boolean hasChildren) {
-    throw new IllegalStateException("SetPresentation shouldn't be called");
-  }
-
-  @Override
-  public void setPresentation(@Nullable final Icon icon,
-                              @Nullable final String type,
-                              @NotNull final String value,
-                              @Nullable final NotNullFunction<String, String> valuePresenter,
-                              final boolean hasChildren) {
-    throw new IllegalStateException("SetPresentation shouldn't be called");
-  }
-
-  @Override
-  public void setPresentation(@Nullable final Icon icon,
-                              @Nullable final String type,
-                              @NotNull final String separator,
-                              @NotNull final String value,
-                              @Nullable final NotNullFunction<String, String> valuePresenter,
                               final boolean hasChildren) {
     throw new IllegalStateException("SetPresentation shouldn't be called");
   }
