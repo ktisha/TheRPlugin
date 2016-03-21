@@ -3,7 +3,7 @@
   <name>IntelliJ plugin for the R language</name>
   <version>0.1</version>
   <vendor email="kt@jetbrains.com">JetBrains</vendor>
-
+  <idea-version since-build="145.258.11"/>
   <description><![CDATA[
       The R plugin for PyCharm and IntelliJ provides smart editing for R scripts.
 
