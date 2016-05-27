@@ -1,17 +1,22 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.util.containers.ContainerUtil;
+import com.jetbrains.ther.debugger.MockitoUtils;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
+import com.jetbrains.ther.debugger.executor.TheRExecutor;
 import com.jetbrains.ther.debugger.mock.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
@@ -19,6 +24,7 @@ import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUN
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class TheRUnbraceFunctionDebuggerTest {
 
@@ -96,40 +102,63 @@ public class TheRUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void recursiveReturn() throws TheRDebuggerException {
+  public void recursiveReturnAndOutputBefore() throws TheRDebuggerException {
     /*
     `x + 1` with recursive return
     */
 
-    final RecursiveReturnTheRExecutor executor = new RecursiveReturnTheRExecutor();
-    final RecursiveReturnTheRFunctionDebuggerHandler handler = new RecursiveReturnTheRFunctionDebuggerHandler();
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
-      executor,
-      new MockTheRFunctionDebuggerFactory(null),
-      handler,
-      receiver,
-      "abc"
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(0, 9),
+      "error_exit"
     );
 
-    assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(1, executor.getCounter());
-    assertEquals(0, handler.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
+    recursiveReturn(secondResult, true, -1);
+  }
 
-    receiver.reset();
-    debugger.advance();
+  @Test
+  public void recursiveReturnAndOutputInside() throws TheRDebuggerException {
+    /*
+    `x + 1` with recursive return
+    */
 
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(2, executor.getCounter());
-    assertEquals(3, handler.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(42, 51),
+      "error_exit"
+    );
+
+    recursiveReturn(secondResult, true, -1);
+  }
+
+  @Test
+  public void recursiveReturnAndOutputAfter() throws TheRDebuggerException {
+    /*
+    `x + 1` with recursive return
+    */
+
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      "[1] 1 2 3\n" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(86, 95),
+      "error_exit"
+    );
+
+    recursiveReturn(secondResult, false, -1);
   }
 
   @Test
@@ -170,42 +199,67 @@ public class TheRUnbraceFunctionDebuggerTest {
   }
 
   @Test
-  public void recursiveReturnAndDebugAt() throws TheRDebuggerException {
+  public void recursiveReturnAndOutputBeforeAndDebugAt() throws TheRDebuggerException {
+
     /*
     `x + 1` with recursive return and `debug at` at the end
     */
 
-    final RecursiveReturnAndDebugAtTheRExecutor executor = new RecursiveReturnAndDebugAtTheRExecutor();
-    final RecursiveReturnAndDebugAtTheRFunctionDebuggerHandler handler = new RecursiveReturnAndDebugAtTheRFunctionDebuggerHandler();
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
-      executor,
-      new MockTheRFunctionDebuggerFactory(null),
-      handler,
-      receiver,
-      "abc"
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      DEBUG_AT_LINE_PREFIX + "6: x <- c(1)" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(0, 9),
+      "error_exit"
     );
 
-    assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(1, executor.getCounter());
-    assertEquals(0, handler.getDroppedFramesCounter());
-    assertEquals(0, handler.getReturnLineNumberCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
+    recursiveReturn(secondResult, true, 5);
+  }
 
-    receiver.reset();
-    debugger.advance();
+  @Test
+  public void recursiveReturnAndOutputInsideAndDebugAt() throws TheRDebuggerException {
+    /*
+    `x + 1` with recursive return and `debug at` at the end
+    */
 
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(2, executor.getCounter());
-    assertEquals(3, handler.getDroppedFramesCounter());
-    assertEquals(5, handler.getReturnLineNumberCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      DEBUG_AT_LINE_PREFIX + "6: x <- c(1)" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(42, 51),
+      "error_exit"
+    );
+
+    recursiveReturn(secondResult, true, 5);
+  }
+
+  @Test
+  public void recursiveReturnAndOutputAfterAndDebugAt() throws TheRDebuggerException {
+    /*
+    `x + 1` with recursive return and `debug at` at the end
+    */
+
+    final TheRExecutionResult secondResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
+      EXITING_FROM_PREFIX + "def()\n" +
+      EXITING_FROM_PREFIX + "abc(1:10)\n" +
+      "[1] 1 2 3\n" +
+      DEBUG_AT_LINE_PREFIX + "6: x <- c(1)" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.RECURSIVE_EXITING_FROM,
+      new TextRange(86, 95),
+      "error_exit"
+    );
+
+    recursiveReturn(secondResult, false, 5);
   }
 
   @Test
@@ -434,6 +488,51 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
+  private void recursiveReturn(@NotNull final TheRExecutionResult secondResult, final boolean output, final int returnLineNumber)
+    throws TheRDebuggerException {
+    final TheRExecutor executor = MockitoUtils.setupExecutor(
+      new ContainerUtil.ImmutableMapBuilder<String, List<TheRExecutionResult>>()
+        .put(TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND, Collections.singletonList(TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT))
+        .put(EXECUTE_AND_STEP_COMMAND, Collections.singletonList(secondResult))
+        .build()
+    );
+
+    final TheRFunctionDebuggerHandler handler = mock(TheRFunctionDebuggerHandler.class);
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRUnbraceFunctionDebugger debugger = new TheRUnbraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      handler,
+      receiver,
+      "abc"
+    );
+
+    final List<String> currentCommands = new ArrayList<String>(Collections.singletonList(TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND));
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    MockitoUtils.verifyExecutor(executor, currentCommands);
+    verifyZeroInteractions(handler);
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    currentCommands.add(EXECUTE_AND_STEP_COMMAND);
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals("[1] 1 2 3", debugger.getResult());
+    MockitoUtils.verifyExecutor(executor, currentCommands);
+    verify(handler, times(1)).setDropFrames(3);
+    if (returnLineNumber != -1) verify(handler, times(1)).setReturnLineNumber(returnLineNumber);
+    assertEquals(output ? Collections.singletonList("[1] 1 2 3") : Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+
+    verifyNoMoreInteractions(executor, handler);
+  }
+
   private static class OrdinaryTheRExecutor extends MockTheRExecutor {
 
     @NotNull
@@ -486,42 +585,6 @@ public class TheRUnbraceFunctionDebuggerTest {
     @Override
     public void appendDebugger(@NotNull final TheRFunctionDebugger debugger) {
       myCounter++;
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
-  }
-
-  private static class RecursiveReturnTheRExecutor extends MockTheRExecutor {
-
-    @NotNull
-    @Override
-    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
-        return new TheRExecutionResult(
-          EXITING_FROM_PREFIX + "FUN(c(-1, 0, 1)[[3L]], ...)\n" +
-          EXITING_FROM_PREFIX + "def()\n" +
-          EXITING_FROM_PREFIX + "abc(1:10)\n" +
-          "[1] 1 2 3\n" +
-          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRExecutionResultType.RECURSIVE_EXITING_FROM,
-          new TextRange(86, 95),
-          "error_exit"
-        );
-      }
-
-      throw new IllegalStateException("Unexpected command");
-    }
-  }
-
-  private static class RecursiveReturnTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
-
-    private int myCounter = 0;
-
-    @Override
-    public void setDropFrames(final int number) {
-      myCounter += number;
     }
 
     public int getCounter() {

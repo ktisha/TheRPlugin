@@ -172,7 +172,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleContinueTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    handleEndTraceResult(result);
+    handleEndTraceResult(result, 0);
     appendError(result, myOutputReceiver);
 
     execute(myExecutor, EXECUTE_AND_STEP_COMMAND, DEBUG_AT, myOutputReceiver);
@@ -183,11 +183,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleEndTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    handleEndTraceResult(result);
-    appendError(result, myOutputReceiver);
-
     final int lastExitingFromEntry = result.getOutput().lastIndexOf(EXITING_FROM_PREFIX);
 
+    handleEndTraceResult(result, lastExitingFromEntry);
+    appendError(result, myOutputReceiver);
     handleEndTraceReturn(result, lastExitingFromEntry);
 
     myCurrentLineNumber = -1;
@@ -206,11 +205,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   protected void handleRecursiveEndTrace(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    handleEndTraceResult(result);
-    appendError(result, myOutputReceiver);
-
     final RecursiveEndTraceData data = calculateRecursiveEndTraceData(result);
 
+    handleEndTraceResult(result, data.myLastExitingFrom);
+    appendError(result, myOutputReceiver);
     handleEndTraceReturn(result, data.myLastExitingFrom);
 
     myCurrentLineNumber = -1;
@@ -258,10 +256,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     );
   }
 
-  private void handleEndTraceResult(@NotNull final TheRExecutionResult result) {
+  private void handleEndTraceResult(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
     final TextRange resultRange = result.getResultRange();
 
-    if (resultRange.getStartOffset() == 0) {
+    if (resultRange.getStartOffset() == 0 || isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
       appendResult(result, myOutputReceiver);
     }
 
@@ -304,7 +302,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   }
 
   private int findDebugAtIndexInEndTraceReturn(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
-    if (result.getResultRange().getStartOffset() == 0) {
+    if (result.getResultRange().getStartOffset() == 0 || isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
       return findNextLineBegin(
         result.getOutput(),
         lastExitingFrom + EXITING_FROM_PREFIX.length()
@@ -313,6 +311,10 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     else {
       return findNextLineAfterResult(result);
     }
+  }
+
+  private boolean isRecursiveEndTraceWithOutputInside(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
+    return result.getType() == RECURSIVE_EXITING_FROM && result.getResultRange().getEndOffset() < lastExitingFrom;
   }
 
   private static class RecursiveEndTraceData {
