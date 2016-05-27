@@ -1,18 +1,21 @@
 package com.jetbrains.ther.debugger.function;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.util.containers.hash.HashMap;
+import com.jetbrains.ther.debugger.MockitoUtils;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResult;
 import com.jetbrains.ther.debugger.executor.TheRExecutionResultType;
 import com.jetbrains.ther.debugger.executor.TheRExecutor;
+import com.jetbrains.ther.debugger.mock.MockTheROutputReceiver;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.mockito.InOrder;
 
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.*;
 import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.*;
@@ -20,6 +23,7 @@ import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.CLOSURE;
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.FUNCTION_TYPE;
 import static com.jetbrains.ther.debugger.function.TheRTraceAndDebugUtils.traceAndDebugFunctions;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class TheRTraceAndDebugUtilsTest {
@@ -56,9 +60,6 @@ public class TheRTraceAndDebugUtilsTest {
 
   @Test
   public void ordinary() throws TheRDebuggerException {
-    final TheRExecutor executor = mock(TheRExecutor.class);
-    final TheROutputReceiver receiver = mock(TheROutputReceiver.class);
-
     final String xFunctionName = "x";
     final String mainFunctionName = MAIN_FUNCTION_NAME;
     final String deviceFunctionName = SERVICE_FUNCTION_PREFIX + "device_init";
@@ -67,6 +68,8 @@ public class TheRTraceAndDebugUtilsTest {
 
     final List<String> commands = getCommands(xFunctionName, mainFunctionName, xEnterFunctionName, mainEnterFunctionName);
     final List<TheRExecutionResult> results = getResults(xFunctionName, mainFunctionName, deviceFunctionName, xEnterFunctionName);
+    final Map<String, List<TheRExecutionResult>> commandsAndResults = getCommandsAndResults(commands, results);
+
     final List<String> errors = Arrays.asList(
       LS_FUNCTIONS_ERROR,
       "error_" + xFunctionName + "_e",
@@ -75,15 +78,28 @@ public class TheRTraceAndDebugUtilsTest {
       "error_" + mainFunctionName + "_d"
     );
 
-    setupExecutor(executor, commands, results);
+    final TheRExecutor executor = MockitoUtils.setupExecutor(commandsAndResults);
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
 
     traceAndDebugFunctions(executor, receiver);
 
-    verifyExecutor(executor, commands);
-    verifyReceiver(receiver, errors);
+    MockitoUtils.verifyExecutor(executor, commands);
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(errors, receiver.getErrors());
 
     verifyNoMoreInteractions(executor);
-    verifyNoMoreInteractions(receiver);
+  }
+
+  @NotNull
+  private Map<String, List<TheRExecutionResult>> getCommandsAndResults(@NotNull final List<String> commands,
+                                                                       @NotNull final List<TheRExecutionResult> results) {
+    final Map<String, List<TheRExecutionResult>> commandsAndResults = new HashMap<String, List<TheRExecutionResult>>();
+
+    for (int i = 0; i < commands.size(); i++) {
+      commandsAndResults.put(commands.get(i), Collections.singletonList(results.get(i)));
+    }
+
+    return commandsAndResults;
   }
 
   @NotNull
@@ -162,33 +178,5 @@ public class TheRTraceAndDebugUtilsTest {
         "error_" + mainFunctionName + "_d"
       )
     );
-  }
-
-
-  private void setupExecutor(@NotNull final TheRExecutor executor,
-                             @NotNull final List<String> commands,
-                             @NotNull final List<TheRExecutionResult> results) throws TheRDebuggerException {
-    final Iterator<String> commandsIterator = commands.iterator();
-    final Iterator<TheRExecutionResult> resultsIterator = results.iterator();
-
-    while (commandsIterator.hasNext()) {
-      when(executor.execute(commandsIterator.next())).thenReturn(resultsIterator.next());
-    }
-  }
-
-  private void verifyExecutor(@NotNull final TheRExecutor executor, @NotNull final List<String> commands) throws TheRDebuggerException {
-    final InOrder inOrder = inOrder(executor);
-
-    for (final String command : commands) {
-      inOrder.verify(executor).execute(command);
-    }
-  }
-
-  private void verifyReceiver(@NotNull final TheROutputReceiver receiver, @NotNull final List<String> errors) {
-    final InOrder inOrder = inOrder(receiver);
-
-    for (final String error : errors) {
-      inOrder.verify(receiver).receiveError(error);
-    }
   }
 }
