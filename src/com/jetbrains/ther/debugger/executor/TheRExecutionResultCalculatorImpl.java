@@ -1,5 +1,6 @@
 package com.jetbrains.ther.debugger.executor;
 
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Pattern;
 
 import static com.jetbrains.ther.debugger.data.TheRLanguageConstants.LINE_SEPARATOR;
@@ -280,8 +282,15 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     final Integer lastExitingFrom = exitingFromIndices.get(exitingFromIndices.size() - 1);
 
     if (firstExitingFrom == 1) {
-      // result could be located inside trace information between last "exiting from ..." and "debug at #..." lines
+      // result could be located between "exiting from ..." lines
+      // or between last "exiting from ..." and "debug at #..." lines
       // or just after last "exiting from ..." line if there is no "debug at #..." line
+
+      final Pair<Integer, Integer> resultBetweenExitingFrom = findResultBetweenExitingFrom(exitingFromIndices);
+
+      if (resultBetweenExitingFrom != null) {
+        return new TypeAndResultLineBounds(type, resultBetweenExitingFrom.first, resultBetweenExitingFrom.second);
+      }
 
       final int resultLineBegin = lastExitingFrom + 1;
       final int resultLineEnd = findDebugAt(lines, resultLineBegin);
@@ -360,6 +369,23 @@ public class TheRExecutionResultCalculatorImpl implements TheRExecutionResultCal
     return line.startsWith(BROWSE_PREFIX) &&
            line.endsWith(BROWSE_SUFFIX) &&
            isDigits(line, BROWSE_PREFIX.length(), line.length() - BROWSE_SUFFIX.length() - 1);
+  }
+
+  @Nullable
+  private static Pair<Integer, Integer> findResultBetweenExitingFrom(@NotNull final List<Integer> exitingFromIndices) {
+    final ListIterator<Integer> curIterator = exitingFromIndices.listIterator();
+    final ListIterator<Integer> nextIterator = exitingFromIndices.listIterator(1);
+
+    while (curIterator.hasNext() && nextIterator.hasNext()) {
+      final Integer current = curIterator.next();
+      final Integer next = nextIterator.next();
+
+      if (next - current > 1) {
+        return Pair.create(current + 1, next);
+      }
+    }
+
+    return null;
   }
 
   private static int findDebugAt(@NotNull final String[] lines, final int index) {

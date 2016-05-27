@@ -332,6 +332,19 @@ public class TheRExecutionResultCalculatorImplTest {
   }
 
   @Test
+  public void calculateRecursiveExitingFromWithOutputInside() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      EXITING_FROM_PREFIX + "foo()\n" +
+      "[1] 2 3 4 5 6\n" +
+      EXITING_FROM_PREFIX + "bar()",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_EXITING_FROM,
+      "[1] 2 3 4 5 6"
+    );
+  }
+
+  @Test
   public void calculateRecursiveExitingFromWithOutputAfter() {
     check(
       EXECUTE_AND_STEP_COMMAND,
@@ -357,6 +370,20 @@ public class TheRExecutionResultCalculatorImplTest {
       BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
       RECURSIVE_EXITING_FROM,
       "[1] 1 2 3"
+    );
+  }
+
+  @Test
+  public void calculateRecursiveExitingFromWithOutputInsideAndDebugAt() {
+    check(
+      EXECUTE_AND_STEP_COMMAND,
+      EXITING_FROM_PREFIX + "foo()\n" +
+      "[1] 2 3 4 5 6\n" +
+      EXITING_FROM_PREFIX + "bar()\n" +
+      DEBUG_AT_LINE_PREFIX + "1: x <- c(1)",
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      RECURSIVE_EXITING_FROM,
+      "[1] 2 3 4 5 6"
     );
   }
 
