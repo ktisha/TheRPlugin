@@ -68,7 +68,7 @@ public class TheRBraceFunctionDebuggerTest {
 
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
+    assertEquals("", debugger.getResult());
     assertEquals(5, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
@@ -124,7 +124,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(4, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -216,45 +216,6 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void debugAt() throws TheRDebuggerException {
-    /*
-    abc() {
-      `x + 1` with `debug at`
-    }
-    */
-
-    final DebugAtTheRExecutor executor = new DebugAtTheRExecutor();
-    final DebugAtTheRFunctionDebuggerHandler handler = new DebugAtTheRFunctionDebuggerHandler();
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
-      executor,
-      new MockTheRFunctionDebuggerFactory(null),
-      handler,
-      receiver,
-      "abc"
-    );
-
-    assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, executor.getCounter());
-    assertEquals(0, handler.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
-
-    receiver.reset();
-    debugger.advance();
-
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, executor.getCounter());
-    assertEquals(3, handler.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-  }
-
-  @Test
   public void recursiveReturnAndOutputBeforeAndDebugAt() throws TheRDebuggerException {
     /*
     abc() {
@@ -342,39 +303,58 @@ public class TheRBraceFunctionDebuggerTest {
   }
 
   @Test
-  public void print() throws TheRDebuggerException {
+  public void exitingFromWithOutputBefore() throws TheRDebuggerException {
     /*
     abc() {
       print(c(1:3))
     }
     */
 
-    final PrintTheRExecutor executor = new PrintTheRExecutor();
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
-      executor,
-      new MockTheRFunctionDebuggerFactory(null),
-      new IllegalTheRFunctionDebuggerHandler(),
-      receiver,
-      "abc"
+    final TheRExecutionResult firstResult = new TheRExecutionResult(
+      DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      TheRExecutionResultType.DEBUG_AT,
+      TextRange.EMPTY_RANGE,
+      "error_dbg_at"
+    );
+    final TheRExecutionResult thirdResult = new TheRExecutionResult(
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + "abc()\n" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.EXITING_FROM,
+      new TextRange(0, 9),
+      "error_exit"
     );
 
-    assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    assertEquals(2, executor.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
+    exitingFromWithOutput(firstResult, thirdResult, -1);
+  }
 
-    receiver.reset();
-    debugger.advance();
+  @Test
+  public void exitingFromWithOutputAfter() throws TheRDebuggerException {
+    /*
+    abc() {
+      `x + 1` with `debug at`
+    }
+    */
 
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
-    assertEquals(3, executor.getCounter());
-    assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+    final TheRExecutionResult firstResult = new TheRExecutionResult(
+      DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
+      BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
+      TheRExecutionResultType.DEBUG_AT,
+      TextRange.EMPTY_RANGE,
+      "error_dbg_at"
+    );
+    final TheRExecutionResult thirdResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + "abc()\n" +
+      "[1] 1 2 3\n" +
+      DEBUG_AT_LINE_PREFIX + "4: x <- c(1)\n" +
+      BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
+      TheRExecutionResultType.EXITING_FROM,
+      new TextRange(20, 29),
+      "error_exit"
+    );
+
+    exitingFromWithOutput(firstResult, thirdResult, 3);
   }
 
   @Test
@@ -421,7 +401,7 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 4 5 6", debugger.getResult());
     assertEquals(8, executor.getCounter());
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("[1] 4 5 6"), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
@@ -651,6 +631,52 @@ public class TheRBraceFunctionDebuggerTest {
     debugger.advance();
   }
 
+  private void exitingFromWithOutput(@NotNull final TheRExecutionResult firstResult,
+                                     @NotNull final TheRExecutionResult thirdResult,
+                                     final int returnLineNumber) throws TheRDebuggerException {
+    final TheRExecutor executor = MockitoUtils.setupExecutor(
+      new ContainerUtil.ImmutableMapBuilder<String, List<TheRExecutionResult>>()
+        .put(EXECUTE_AND_STEP_COMMAND, Arrays.asList(firstResult, thirdResult))
+        .put(TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND, Collections.singletonList(TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT))
+        .build()
+    );
+
+    final TheRFunctionDebuggerHandler handler = mock(TheRFunctionDebuggerHandler.class);
+    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
+
+    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
+      executor,
+      new MockTheRFunctionDebuggerFactory(null),
+      handler,
+      receiver,
+      "abc"
+    );
+
+    final List<String> currentCommands =
+      new ArrayList<String>(Arrays.asList(EXECUTE_AND_STEP_COMMAND, TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND));
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    MockitoUtils.verifyExecutor(executor, currentCommands);
+    verifyZeroInteractions(handler);
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    currentCommands.add(EXECUTE_AND_STEP_COMMAND);
+    debugger.advance();
+
+    assertFalse(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals("[1] 1 2 3", debugger.getResult());
+    MockitoUtils.verifyExecutor(executor, currentCommands);
+    if (returnLineNumber != -1) verify(handler, times(1)).setReturnLineNumber(returnLineNumber);
+    assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
+
+    verifyNoMoreInteractions(executor, handler);
+  }
+
   private void braceLoop(@NotNull final String outputBefore) throws TheRDebuggerException {
     final BraceLoopTheRExecutor executor = new BraceLoopTheRExecutor(outputBefore);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
@@ -843,10 +869,9 @@ public class TheRBraceFunctionDebuggerTest {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 5) {
         return new TheRExecutionResult(
           EXITING_FROM_PREFIX + "abc()\n" +
-          "[1] 1 2 3\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
           TheRExecutionResultType.EXITING_FROM,
-          new TextRange(20, 29),
+          TextRange.EMPTY_RANGE,
           "error_exit"
         );
       }
@@ -912,81 +937,6 @@ public class TheRBraceFunctionDebuggerTest {
 
     public int getCounter() {
       return myCounter;
-    }
-  }
-
-  private static class DebugAtTheRExecutor extends MockTheRExecutor {
-
-    @NotNull
-    @Override
-    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRExecutionResult(
-          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
-          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRExecutionResultType.DEBUG_AT,
-          TextRange.EMPTY_RANGE,
-          "error_dbg_at"
-        );
-      }
-
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRExecutionResult(
-          EXITING_FROM_PREFIX + "abc()\n" +
-          "[1] 1 2 3\n" +
-          DEBUG_AT_LINE_PREFIX + "4: x <- c(1)\n" +
-          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRExecutionResultType.EXITING_FROM,
-          new TextRange(20, 29),
-          "error_exit"
-        );
-      }
-
-      throw new IllegalStateException("Unexpected command");
-    }
-  }
-
-  private static class DebugAtTheRFunctionDebuggerHandler extends IllegalTheRFunctionDebuggerHandler {
-
-    private int myCounter = 0;
-
-    @Override
-    public void setReturnLineNumber(final int number) {
-      myCounter += number;
-    }
-
-    public int getCounter() {
-      return myCounter;
-    }
-  }
-
-  private static class PrintTheRExecutor extends MockTheRExecutor {
-
-    @NotNull
-    @Override
-    protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 1) {
-        return new TheRExecutionResult(
-          DEBUG_AT_LINE_PREFIX + "1: c(1)\n" +
-          BROWSE_PREFIX + "3" + BROWSE_SUFFIX,
-          TheRExecutionResultType.DEBUG_AT,
-          TextRange.EMPTY_RANGE,
-          "error_dbg_at"
-        );
-      }
-
-      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 3) {
-        return new TheRExecutionResult(
-          "[1] 1 2 3\n" +
-          EXITING_FROM_PREFIX + "abc()\n" +
-          BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
-          TheRExecutionResultType.EXITING_FROM,
-          new TextRange(0, 9),
-          "error_exit"
-        );
-      }
-
-      throw new IllegalStateException("Unexpected command");
     }
   }
 

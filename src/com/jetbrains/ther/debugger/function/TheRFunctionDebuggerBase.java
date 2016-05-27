@@ -259,7 +259,7 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
     final TextRange resultRange = result.getResultRange();
 
-    if (resultRange.getStartOffset() == 0 || isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
+    if (resultRange.getStartOffset() == 0 || result.getType() == EXITING_FROM || isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
       appendResult(result, myOutputReceiver);
     }
 
