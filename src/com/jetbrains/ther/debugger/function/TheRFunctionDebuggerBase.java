@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.debugger.TheROutputReceiver;
+import com.jetbrains.ther.debugger.data.TheRFunctionConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -259,7 +260,9 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
   private void handleEndTraceResult(@NotNull final TheRExecutionResult result, final int lastExitingFrom) {
     final TextRange resultRange = result.getResultRange();
 
-    if (resultRange.getStartOffset() == 0 || result.getType() == EXITING_FROM || isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
+    if (resultRange.getStartOffset() == 0 ||
+        result.getType() == EXITING_FROM && !myFunctionName.equals(TheRFunctionConstants.MAIN_FUNCTION_NAME) ||
+        isRecursiveEndTraceWithOutputInside(result, lastExitingFrom)) {
       appendResult(result, myOutputReceiver);
     }
 

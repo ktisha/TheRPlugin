@@ -3,6 +3,7 @@ package com.jetbrains.ther.debugger.function;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.ther.debugger.MockitoUtils;
+import com.jetbrains.ther.debugger.data.TheRFunctionConstants;
 import com.jetbrains.ther.debugger.data.TheRLocation;
 import com.jetbrains.ther.debugger.exception.TheRDebuggerException;
 import com.jetbrains.ther.debugger.exception.TheRRuntimeException;
@@ -19,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.jetbrains.ther.debugger.data.TheRCommands.EXECUTE_AND_STEP_COMMAND;
-import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_ENTER_FUNCTION_SUFFIX;
-import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.SERVICE_FUNCTION_PREFIX;
+import static com.jetbrains.ther.debugger.data.TheRFunctionConstants.*;
 import static com.jetbrains.ther.debugger.data.TheRResponseConstants.*;
 import static com.jetbrains.ther.debugger.mock.MockTheRExecutor.LS_FUNCTIONS_ERROR;
 import static org.junit.Assert.*;
@@ -154,7 +154,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, -1, true);
+    exiting(firstResult, thirdResult, "abc", true, true, -1);
   }
 
   @Test
@@ -183,7 +183,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, -1, true);
+    exiting(firstResult, thirdResult, "abc", true, true, -1);
   }
 
   @Test
@@ -212,7 +212,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, -1, false);
+    exiting(firstResult, thirdResult, "abc", false, true, -1);
   }
 
   @Test
@@ -241,7 +241,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, 3, true);
+    exiting(firstResult, thirdResult, "abc", true, true, 3);
   }
 
   @Test
@@ -270,7 +270,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, 3, true);
+    exiting(firstResult, thirdResult, "abc", true, true, 3);
   }
 
   @Test
@@ -299,7 +299,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    recursiveReturn(firstResult, thirdResult, 3, false);
+    exiting(firstResult, thirdResult, "abc", false, true, 3);
   }
 
   @Test
@@ -326,7 +326,7 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    exitingFromWithOutput(firstResult, thirdResult, -1);
+    exiting(firstResult, thirdResult, "abc", true, false, -1);
   }
 
   @Test
@@ -354,7 +354,57 @@ public class TheRBraceFunctionDebuggerTest {
       "error_exit"
     );
 
-    exitingFromWithOutput(firstResult, thirdResult, 3);
+    exiting(firstResult, thirdResult, "abc", true, false, 3);
+  }
+
+  @Test
+  public void exitingFromMainWithOutputBefore() throws TheRDebuggerException {
+    /*
+    main() {
+      print("ok")
+    }
+    */
+
+    final TheRExecutionResult firstResult = new TheRExecutionResult(
+      DEBUG_AT_LINE_PREFIX + "1: ls()",
+      TheRExecutionResultType.DEBUG_AT,
+      TextRange.EMPTY_RANGE,
+      "error_dbg_at"
+    );
+    final TheRExecutionResult thirdResult = new TheRExecutionResult(
+      "[1] 1 2 3\n" +
+      EXITING_FROM_PREFIX + TheRFunctionConstants.MAIN_FUNCTION_NAME + "()",
+      TheRExecutionResultType.EXITING_FROM,
+      new TextRange(0, 9),
+      "error_exit"
+    );
+
+    exiting(firstResult, thirdResult, MAIN_FUNCTION_NAME, true, false, -1);
+  }
+
+  @Test
+  public void exitingFromMainWithOutputAfter() throws TheRDebuggerException {
+    /*
+    main() {
+      ls()
+    }
+    */
+
+    final TheRExecutionResult firstResult = new TheRExecutionResult(
+      DEBUG_AT_LINE_PREFIX + "1: ls()",
+      TheRExecutionResultType.DEBUG_AT,
+      TextRange.EMPTY_RANGE,
+      "error_dbg_at"
+    );
+    final TheRExecutionResult thirdResult = new TheRExecutionResult(
+      EXITING_FROM_PREFIX + TheRFunctionConstants.MAIN_FUNCTION_NAME + "()\n" +
+      "[1] 1 2 3",
+      TheRExecutionResultType.EXITING_FROM,
+      new TextRange(36, 45),
+      "error_exit"
+    );
+
+    exiting(firstResult, thirdResult, MAIN_FUNCTION_NAME, false, false, -1);
   }
 
   @Test
@@ -631,52 +681,6 @@ public class TheRBraceFunctionDebuggerTest {
     debugger.advance();
   }
 
-  private void exitingFromWithOutput(@NotNull final TheRExecutionResult firstResult,
-                                     @NotNull final TheRExecutionResult thirdResult,
-                                     final int returnLineNumber) throws TheRDebuggerException {
-    final TheRExecutor executor = MockitoUtils.setupExecutor(
-      new ContainerUtil.ImmutableMapBuilder<String, List<TheRExecutionResult>>()
-        .put(EXECUTE_AND_STEP_COMMAND, Arrays.asList(firstResult, thirdResult))
-        .put(TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND, Collections.singletonList(TheRTraceAndDebugUtilsTest.NO_FUNCTIONS_RESULT))
-        .build()
-    );
-
-    final TheRFunctionDebuggerHandler handler = mock(TheRFunctionDebuggerHandler.class);
-    final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
-
-    final TheRBraceFunctionDebugger debugger = new TheRBraceFunctionDebugger(
-      executor,
-      new MockTheRFunctionDebuggerFactory(null),
-      handler,
-      receiver,
-      "abc"
-    );
-
-    final List<String> currentCommands =
-      new ArrayList<String>(Arrays.asList(EXECUTE_AND_STEP_COMMAND, TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND));
-
-    assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
-    MockitoUtils.verifyExecutor(executor, currentCommands);
-    verifyZeroInteractions(handler);
-    assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
-
-    receiver.reset();
-    currentCommands.add(EXECUTE_AND_STEP_COMMAND);
-    debugger.advance();
-
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals("[1] 1 2 3", debugger.getResult());
-    MockitoUtils.verifyExecutor(executor, currentCommands);
-    if (returnLineNumber != -1) verify(handler, times(1)).setReturnLineNumber(returnLineNumber);
-    assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
-
-    verifyNoMoreInteractions(executor, handler);
-  }
-
   private void braceLoop(@NotNull final String outputBefore) throws TheRDebuggerException {
     final BraceLoopTheRExecutor executor = new BraceLoopTheRExecutor(outputBefore);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
@@ -791,10 +795,12 @@ public class TheRBraceFunctionDebuggerTest {
     assertEquals(isBrace ? Arrays.asList("error_exit", "error_loop") : Collections.singletonList("error_exit"), receiver.getErrors());
   }
 
-  private void recursiveReturn(@NotNull final TheRExecutionResult firstResult,
-                               @NotNull final TheRExecutionResult thirdResult,
-                               final int returnLineNumber,
-                               final boolean output)
+  private void exiting(@NotNull final TheRExecutionResult firstResult,
+                       @NotNull final TheRExecutionResult thirdResult,
+                       @NotNull final String functionName,
+                       final boolean output,
+                       final boolean recursive,
+                       final int returnLineNumber)
     throws TheRDebuggerException {
     final TheRExecutor executor = MockitoUtils.setupExecutor(
       new ContainerUtil.ImmutableMapBuilder<String, List<TheRExecutionResult>>()
@@ -811,14 +817,14 @@ public class TheRBraceFunctionDebuggerTest {
       new MockTheRFunctionDebuggerFactory(null),
       handler,
       receiver,
-      "abc"
+      functionName
     );
 
     final List<String> currentCommands =
       new ArrayList<String>(Arrays.asList(EXECUTE_AND_STEP_COMMAND, TheRTraceAndDebugUtilsTest.LS_FUNCTIONS_COMMAND));
 
     assertTrue(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(new TheRLocation(functionName, 0), debugger.getLocation());
     MockitoUtils.verifyExecutor(executor, currentCommands);
     verifyZeroInteractions(handler);
     assertEquals(Collections.emptyList(), receiver.getOutputs());
@@ -829,10 +835,10 @@ public class TheRBraceFunctionDebuggerTest {
     debugger.advance();
 
     assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    assertEquals(new TheRLocation(functionName, -1), debugger.getLocation());
     assertEquals("[1] 1 2 3", debugger.getResult());
     MockitoUtils.verifyExecutor(executor, currentCommands);
-    verify(handler, times(1)).setDropFrames(3);
+    if (recursive) verify(handler, times(1)).setDropFrames(3);
     if (returnLineNumber != -1) verify(handler, times(1)).setReturnLineNumber(returnLineNumber);
     assertEquals(output ? Collections.singletonList("[1] 1 2 3") : Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
