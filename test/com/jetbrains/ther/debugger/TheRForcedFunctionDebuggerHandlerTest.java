@@ -62,7 +62,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
 
     final String result = "[1] 1 2 3";
 
-    final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2);
+    final MockTheRFunctionDebugger secondFunctionDebugger = new MockTheRFunctionDebugger("abc", 2, null);
     final MockTheRFunctionDebugger firstFunctionDebugger = new Stack211TheRFunctionDebugger(secondFunctionDebugger);
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(firstFunctionDebugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
@@ -177,7 +177,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
   private static class Stack1TheRFunctionDebugger extends MockTheRFunctionDebugger {
 
     public Stack1TheRFunctionDebugger() {
-      super("", 1);
+      super("", 1, null);
     }
 
     @NotNull
@@ -199,7 +199,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     private final MockTheRFunctionDebugger myNextFunctionDebugger;
 
     public Stack211TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger debugger) {
-      super("def", 3);
+      super("def", 3, null);
 
       myNextFunctionDebugger = debugger;
     }
@@ -234,7 +234,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     private final MockTheRFunctionDebugger myNextFunctionDebugger;
 
     public Stack221TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger debugger) {
-      super("def", 2);
+      super("def", 2, null);
 
       myNextFunctionDebugger = debugger;
     }
@@ -261,7 +261,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
   private static class Stack222TheRFunctionDebugger extends MockTheRFunctionDebugger {
 
     public Stack222TheRFunctionDebugger() {
-      super("abc", 2);
+      super("abc", 2, null);
     }
 
     @NotNull
@@ -294,7 +294,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     private final MockTheRFunctionDebugger myNextFunctionDebugger;
 
     public Stack31TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger nextFunctionDebugger) {
-      super("def", 3);
+      super("def", 3, null);
 
       myNextFunctionDebugger = nextFunctionDebugger;
     }
@@ -324,7 +324,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
     private final MockTheRFunctionDebugger myNextFunctionDebugger;
 
     public Stack32TheRFunctionDebugger(@NotNull final MockTheRFunctionDebugger nextFunctionDebugger) {
-      super("abc", 2);
+      super("abc", 2, null);
 
       myNextFunctionDebugger = nextFunctionDebugger;
     }
@@ -345,7 +345,7 @@ public class TheRForcedFunctionDebuggerHandlerTest {
   private static class Stack33TheRFunctionDebugger extends MockTheRFunctionDebugger {
 
     public Stack33TheRFunctionDebugger() {
-      super("ghi", 2);
+      super("ghi", 2, null);
     }
 
     @Override

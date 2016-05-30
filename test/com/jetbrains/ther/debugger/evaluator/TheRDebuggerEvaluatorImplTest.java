@@ -316,7 +316,7 @@ public class TheRDebuggerEvaluatorImplTest {
   private static class MyFunctionDebugger extends MockTheRFunctionDebugger {
 
     public MyFunctionDebugger() {
-      super("def", 2);
+      super("def", 2, null);
     }
 
     @NotNull

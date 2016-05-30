@@ -201,7 +201,7 @@ public class TheRValueModifierImplTest {
       error
     );
 
-    final MockTheRFunctionDebugger debugger = new MockTheRFunctionDebugger("def", 2);
+    final MockTheRFunctionDebugger debugger = new MockTheRFunctionDebugger("def", 2, "result");
     final MockTheRFunctionDebuggerFactory factory = new MockTheRFunctionDebuggerFactory(debugger);
     final MockTheROutputReceiver receiver = new MockTheROutputReceiver();
     final AlwaysSameResponseHandler handler = new AlwaysSameResponseHandler(true);

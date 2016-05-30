@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public class IllegalTheRFunctionDebugger extends MockTheRFunctionDebugger {
 
   public IllegalTheRFunctionDebugger() {
-    super("", 0);
+    super("", 0, null);
   }
 
   @NotNull
@@ -24,11 +24,5 @@ public class IllegalTheRFunctionDebugger extends MockTheRFunctionDebugger {
   @Override
   public void advance() throws TheRDebuggerException {
     throw new IllegalStateException("Advance shouldn't be called");
-  }
-
-  @NotNull
-  @Override
-  public String getResult() {
-    throw new IllegalStateException("GetResult shouldn't be called");
   }
 }

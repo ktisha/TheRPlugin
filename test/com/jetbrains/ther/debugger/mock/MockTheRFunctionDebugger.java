@@ -11,16 +11,21 @@ public class MockTheRFunctionDebugger implements TheRFunctionDebugger {
 
   @NotNull
   private final String myFunctionName;
+
   private final int myLimit;
+
+  @Nullable
+  private final String myResult;
 
   private int myCounter = 0;
 
   @Nullable
   private TheRFunctionDebuggerHandler myHandler;
 
-  public MockTheRFunctionDebugger(@NotNull final String functionName, final int limit) {
+  public MockTheRFunctionDebugger(@NotNull final String functionName, final int limit, @Nullable final String result) {
     myFunctionName = functionName;
     myLimit = limit;
+    myResult = result;
   }
 
   @NotNull
@@ -42,7 +47,11 @@ public class MockTheRFunctionDebugger implements TheRFunctionDebugger {
   @NotNull
   @Override
   public String getResult() {
-    throw new IllegalStateException("GetResult shouldn't be called");
+    if (myResult == null) {
+      throw new IllegalStateException("GetResult shouldn't be called");
+    }
+
+    return myResult;
   }
 
   @Nullable
