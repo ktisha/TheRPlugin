@@ -223,10 +223,6 @@ abstract class TheRFunctionDebuggerBase implements TheRFunctionDebugger {
     throw new TheRRuntimeException(result.getError());
   }
 
-  protected void setCurrentLineNumber(final int currentLineNumber) {
-    myCurrentLineNumber = currentLineNumber;
-  }
-
   private int extractLineNumber(@NotNull final String output, final int debugAtIndex) {
     final int lineNumberBegin = debugAtIndex + DEBUG_AT_LINE_PREFIX.length();
     final int lineNumberEnd = output.indexOf(':', lineNumberBegin + 1);

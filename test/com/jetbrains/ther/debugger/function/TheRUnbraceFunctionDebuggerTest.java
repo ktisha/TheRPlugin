@@ -92,8 +92,10 @@ public class TheRUnbraceFunctionDebuggerTest {
     receiver.reset();
     debugger.advance();
 
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
+    // one of next debuggers will handle `RECURSIVE_EXITING_FROM`
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(2, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
@@ -355,17 +357,33 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
 
-    // debugger handles `EXITING_FROM`
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_dbg_at_1", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(5, executor.getCounter());
+    assertEquals(Collections.singletonList("[1] 1 2 3"), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_dbg_at_2", LS_FUNCTIONS_ERROR), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
 
     assertFalse(debugger.hasNext());
     assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
     assertEquals("[1] 1\n[1] 2", debugger.getResult());
-    assertEquals(2, executor.getCounter());
+    assertEquals(6, executor.getCounter());
     assertEquals(Collections.singletonList("[1] 1\n[1] 2"), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_exit"), receiver.getErrors());
   }
@@ -395,19 +413,38 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(0, factory.getCounter());
     assertEquals(0, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
 
-    // debugger handles `DEBUGGING_IN`,
-    // `d` iterations run with `CONTINUE_TRACE` between them and return `RECURSIVE_EXITING_FROM` in the end
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(3, executor.getCounter());
+    assertEquals(0, factory.getCounter());
+    assertEquals(0, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Arrays.asList("error_dbg_at", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
-    assertFalse(debugger.hasNext());
-    assertEquals(new TheRLocation("abc", -1), debugger.getLocation());
-    assertEquals(2, executor.getCounter());
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(4, executor.getCounter());
     assertEquals(1, factory.getCounter());
     assertEquals(1, handler.getCounter());
+    assertEquals(Collections.emptyList(), receiver.getOutputs());
+    assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
+
+    receiver.reset();
+    debugger.advance();
+
+    assertTrue(debugger.hasNext());
+    assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
+    assertEquals(5, executor.getCounter());
+    assertEquals(2, factory.getCounter());
+    assertEquals(2, handler.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
     assertEquals(Collections.singletonList("error_debugging"), receiver.getErrors());
   }
@@ -433,7 +470,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(1, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Collections.singletonList("error_ls"), receiver.getErrors());
+    assertEquals(Collections.singletonList(LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -442,7 +479,7 @@ public class TheRUnbraceFunctionDebuggerTest {
     assertEquals(new TheRLocation("abc", 0), debugger.getLocation());
     assertEquals(3, executor.getCounter());
     assertEquals(Collections.emptyList(), receiver.getOutputs());
-    assertEquals(Arrays.asList("error_body", "error_ls"), receiver.getErrors());
+    assertEquals(Arrays.asList("error_body", LS_FUNCTIONS_ERROR), receiver.getErrors());
 
     receiver.reset();
     debugger.advance();
@@ -684,6 +721,25 @@ public class TheRUnbraceFunctionDebuggerTest {
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
       if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
         return new TheRExecutionResult(
+          DEBUG_AT_PREFIX + "print(i)",
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_dbg_at_1"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 4) {
+        return new TheRExecutionResult(
+          "[1] 1 2 3\n" +
+          DEBUG_AT_PREFIX + "print(i)",
+          TheRExecutionResultType.DEBUG_AT,
+          new TextRange(0, 9),
+          "error_dbg_at_2"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 6) {
+        return new TheRExecutionResult(
           "[1] 1\n[1] 2\n" +
           EXITING_FROM_PREFIX + "abc()\n" +
           BROWSE_PREFIX + "1" + BROWSE_SUFFIX,
@@ -702,7 +758,16 @@ public class TheRUnbraceFunctionDebuggerTest {
     @NotNull
     @Override
     protected TheRExecutionResult doExecute(@NotNull final String command) throws TheRDebuggerException {
-      if (command.equals(EXECUTE_AND_STEP_COMMAND)) {
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && getCounter() == 2) {
+        return new TheRExecutionResult(
+          DEBUG_AT_PREFIX + "h()",
+          TheRExecutionResultType.DEBUG_AT,
+          TextRange.EMPTY_RANGE,
+          "error_dbg_at"
+        );
+      }
+
+      if (command.equals(EXECUTE_AND_STEP_COMMAND) && (getCounter() == 4 || getCounter() == 5)) {
         return new TheRExecutionResult(
           DEBUGGING_IN_PREFIX + "d(i)\n" +
           DEBUG_AT_PREFIX + "{\n" +

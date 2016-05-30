@@ -32,11 +32,4 @@ class TheRUnbraceFunctionDebugger extends TheRFunctionDebuggerBase {
   protected TheRExecutionResultType getStartTraceType() {
     return TheRExecutionResultType.START_TRACE_UNBRACE;
   }
-
-  @Override
-  protected void handleDebuggingIn(@NotNull final TheRExecutionResult result) throws TheRDebuggerException {
-    super.handleDebuggingIn(result);
-
-    setCurrentLineNumber(-1);
-  }
 }
