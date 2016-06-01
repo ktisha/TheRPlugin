@@ -151,6 +151,12 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
   @Override
   protected void doDestroyProcess() {
+    final String errorBuffer = waitAndCopyErrorBuffer();
+
+    for (final Listener listener : myListeners) {
+      listener.onDestroying(errorBuffer);
+    }
+
     // reworked version of com.intellij.execution.process.impl.OSProcessManagerImpl#killProcessTree
 
     if (SystemInfo.isUnix) {
@@ -199,6 +205,21 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   }
 
   @NotNull
+  private String waitAndCopyErrorBuffer() {
+    try {
+      waitForError();
+    }
+    catch (IOException ignored) {
+    }
+    catch (InterruptedException ignored) {
+    }
+
+    synchronized (myErrorBuffer) {
+      return myErrorBuffer.toString();
+    }
+  }
+
+  @NotNull
   private WinProcess convertToWinProcess(@NotNull final Process process) {
     // copied from com.intellij.execution.process.impl.OSProcessManagerImpl#createWinProcess
 
@@ -222,6 +243,8 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   public interface Listener {
 
     void onInitialized();
+
+    void onDestroying(@NotNull final String errorBuffer);
   }
 
   private class TheRXBaseOutputReader extends BaseOutputReader {

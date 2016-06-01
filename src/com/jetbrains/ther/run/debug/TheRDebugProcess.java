@@ -257,8 +257,6 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
 
   @Override
   public void onInitialized() {
-    myProcessHandler.removeListener(this);
-
     myExecutor.execute(
       new Runnable() {
         @Override
@@ -278,6 +276,13 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
     );
 
     resume();
+  }
+
+  @Override
+  public void onDestroying(@NotNull final String errorBuffer) {
+    if (!errorBuffer.isEmpty()) {
+      myOutputReceiver.receiveError(errorBuffer);
+    }
   }
 
   private boolean advance() throws TheRDebuggerException {

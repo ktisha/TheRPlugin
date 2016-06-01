@@ -124,6 +124,13 @@ class TheRRunProcess {
         }
       );
     }
+
+    @Override
+    public void onDestroying(@NotNull final String errorBuffer) {
+      if (!errorBuffer.isEmpty()) {
+        new TheROutputReceiverImpl(myProcessHandler).receiveError(errorBuffer);
+      }
+    }
   }
 
   private static class TerminationProcessListener extends ProcessAdapter {
