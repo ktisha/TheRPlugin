@@ -279,7 +279,7 @@ class TheRDebugProcess extends XDebugProcess implements TheRXProcessHandler.List
   }
 
   @Override
-  public void onDestroying(@NotNull final String errorBuffer) {
+  public void onTerminated(@NotNull final String errorBuffer) {
     if (!errorBuffer.isEmpty()) {
       myOutputReceiver.receiveError(errorBuffer);
     }

@@ -171,7 +171,7 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
     final String errorBuffer = waitAndCopyErrorBuffer();
 
     for (final Listener listener : myListeners) {
-      listener.onDestroying(errorBuffer);
+      listener.onTerminated(errorBuffer);
     }
 
     super.onOSProcessTerminated(exitCode);
@@ -249,7 +249,7 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
     void onInitialized();
 
-    void onDestroying(@NotNull final String errorBuffer);
+    void onTerminated(@NotNull final String errorBuffer);
   }
 
   private class TheRXBaseOutputReader extends BaseOutputReader {

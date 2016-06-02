@@ -126,7 +126,7 @@ class TheRRunProcess {
     }
 
     @Override
-    public void onDestroying(@NotNull final String errorBuffer) {
+    public void onTerminated(@NotNull final String errorBuffer) {
       if (!errorBuffer.isEmpty()) {
         new TheROutputReceiverImpl(myProcessHandler).receiveError(errorBuffer);
       }
