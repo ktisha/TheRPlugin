@@ -151,12 +151,6 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
   @Override
   protected void doDestroyProcess() {
-    final String errorBuffer = waitAndCopyErrorBuffer();
-
-    for (final Listener listener : myListeners) {
-      listener.onDestroying(errorBuffer);
-    }
-
     // reworked version of com.intellij.execution.process.impl.OSProcessManagerImpl#killProcessTree
 
     if (SystemInfo.isUnix) {
@@ -170,6 +164,17 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
       getProcess().destroy();
     }
+  }
+
+  @Override
+  protected void onOSProcessTerminated(final int exitCode) {
+    final String errorBuffer = waitAndCopyErrorBuffer();
+
+    for (final Listener listener : myListeners) {
+      listener.onDestroying(errorBuffer);
+    }
+
+    super.onOSProcessTerminated(exitCode);
   }
 
   private void waitForOutput() throws IOException, InterruptedException {
