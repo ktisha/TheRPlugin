@@ -138,7 +138,7 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   protected BaseDataReader createOutputDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
     myOutputReader = super.createProcessOutReader();
 
-    return new TheRXBaseOutputReader(myOutputReader, sleepingPolicy, myOutputBuffer);
+    return new TheRXBaseOutputReader(myOutputReader, sleepingPolicy, myOutputBuffer, "output stream of " + myCommandLine);
   }
 
   @NotNull
@@ -146,7 +146,7 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
   protected BaseDataReader createErrorDataReader(@NotNull final BaseDataReader.SleepingPolicy sleepingPolicy) {
     myErrorReader = super.createProcessErrReader();
 
-    return new TheRXBaseOutputReader(myErrorReader, sleepingPolicy, myErrorBuffer);
+    return new TheRXBaseOutputReader(myErrorReader, sleepingPolicy, myErrorBuffer, "error stream of " + myCommandLine);
   }
 
   @Override
@@ -259,12 +259,13 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
 
     public TheRXBaseOutputReader(@NotNull final Reader reader,
                                  @NotNull final SleepingPolicy sleepingPolicy,
-                                 @NotNull final StringBuilder buffer) {
+                                 @NotNull final StringBuilder buffer,
+                                 @NotNull final String presentableName) {
       super(reader, sleepingPolicy);
 
       myBuffer = buffer;
 
-      start();
+      start(presentableName);
     }
 
     @Override
@@ -275,6 +276,7 @@ public class TheRXProcessHandler extends ColoredProcessHandler implements TheREx
       }
     }
 
+    @NotNull
     @Override
     protected Future<?> executeOnPooledThread(@NotNull final Runnable runnable) {
       return TheRXProcessHandler.this.executeOnPooledThread(runnable);
