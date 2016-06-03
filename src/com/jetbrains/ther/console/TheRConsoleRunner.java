@@ -9,7 +9,10 @@ import com.intellij.execution.process.ColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.text.StringUtil;
 import com.jetbrains.ther.TheRLanguage;
+import com.jetbrains.ther.debugger.data.TheRInterpreterConstants;
 import com.jetbrains.ther.interpreter.TheRInterpreterService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,39 +23,52 @@ public class TheRConsoleRunner extends AbstractConsoleRunnerWithHistory<Language
     super(project, "The R Console", workingDir);
   }
 
+  @NotNull
   @Override
   protected LanguageConsoleView createConsoleView() {
-    return new LanguageConsoleImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
+    final LanguageConsoleImpl console = new LanguageConsoleImpl(getProject(), getConsoleTitle(), TheRLanguage.getInstance());
+    console.setPrompt(null);
+    return console;
   }
 
-  private String getInterpreterPath() throws ExecutionException {
-    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
-    if (interpreterPath == null) {
-      throw new ExecutionException("Cannot find R interpreter for this run configuration");
-    }
-    return interpreterPath;
-  }
-
-  @Nullable
+  @NotNull
   @Override
   protected Process createProcess() throws ExecutionException {
-    final GeneralCommandLine commandLine = new GeneralCommandLine();
-    commandLine.withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE);
-    commandLine.setExePath(getInterpreterPath());
-    commandLine.addParameter("--slave");
-
-    commandLine.withWorkDirectory(getWorkingDir());
-    return commandLine.createProcess();
+    return getCommandLine(getInterpreterPath()).createProcess();
   }
 
+  @NotNull
   @Override
   protected OSProcessHandler createProcessHandler(@NotNull final Process process) {
-    return new ColoredProcessHandler(process, null);
+    final String commandLine = getCommandLine(TheRInterpreterService.getInstance().getInterpreterPath()).getCommandLineString();
+    return new ColoredProcessHandler(process, commandLine);
   }
 
   @NotNull
   @Override
   protected ProcessBackedConsoleExecuteActionHandler createExecuteActionHandler() {
-    return new ProcessBackedConsoleExecuteActionHandler(getProcessHandler(), true);
+    final ProcessBackedConsoleExecuteActionHandler handler = new ProcessBackedConsoleExecuteActionHandler(getProcessHandler(), false);
+    handler.setAddCurrentToHistory(false);
+    return handler;
+  }
+
+  @NotNull
+  private GeneralCommandLine getCommandLine(@NotNull final String exePath) {
+    return new GeneralCommandLine()
+      .withExePath(exePath)
+      .withParameters(TheRInterpreterConstants.QUIET_PARAMETER, SystemInfo.isWindows ? "--ess" : "--interactive")
+      .withWorkDirectory(getWorkingDir())
+      .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE);
+  }
+
+  @NotNull
+  private String getInterpreterPath() throws ExecutionException {
+    final String interpreterPath = TheRInterpreterService.getInstance().getInterpreterPath();
+
+    if (StringUtil.isEmptyOrSpaces(interpreterPath)) {
+      throw new ExecutionException("The R interpreter is not specified");
+    }
+
+    return interpreterPath;
   }
 }
