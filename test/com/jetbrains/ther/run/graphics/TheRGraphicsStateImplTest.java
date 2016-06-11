@@ -1,5 +1,6 @@
 package com.jetbrains.ther.run.graphics;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.PlatformTestCase;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 
 import static org.mockito.Mockito.*;
@@ -123,7 +125,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.addListener(listener);
 
-    file1.setBinaryContent("abc".getBytes());
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file1.setBinaryContent("abc".getBytes());
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -143,7 +157,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.addListener(listener);
 
-    file.setBinaryContent("abc".getBytes());
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.setBinaryContent("abc".getBytes());
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -162,7 +188,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.addListener(listener);
 
-    file.setBinaryContent("abc".getBytes());
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.setBinaryContent("abc".getBytes());
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -186,7 +224,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
-    file.setBinaryContent("abc".getBytes());
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.setBinaryContent("abc".getBytes());
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -267,7 +317,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.addListener(listener);
 
-    file2.delete(this);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file2.delete(this);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -292,7 +354,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
-    file1.delete(this);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file1.delete(this);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -322,7 +396,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
-    file2.delete(this);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file2.delete(this);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -347,7 +433,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
-    file.delete(this);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.delete(this);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -372,7 +470,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     myState.addListener(listener);
     verifyZeroInteractions(listener);
 
-    file.rename(this, "snapshot_2.png");
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.rename(this, "snapshot_2.png");
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -400,7 +510,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
     final VirtualFile anotherSnapshotDir = getVirtualFile(createTempDirectory(true));
     assert anotherSnapshotDir != null;
 
-    file.move(this, anotherSnapshotDir);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.move(this, anotherSnapshotDir);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -424,7 +546,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.addListener(listener);
 
-    file.copy(this, mySnapshotDir, "snapshot_2.png");
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.copy(this, mySnapshotDir, "snapshot_2.png");
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
@@ -451,7 +585,19 @@ public class TheRGraphicsStateImplTest extends PlatformTestCase {
 
     myState.removeListener(listener);
 
-    file.delete(this);
+    ApplicationManager.getApplication().runWriteAction(
+      new Runnable() {
+        @Override
+        public void run() {
+          try {
+            file.delete(this);
+          }
+          catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+        }
+      }
+    );
 
     myState.refresh(false);
 
